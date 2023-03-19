@@ -1,0 +1,14 @@
+% Capuano (2017) - Reciever Performance & Verification Data		
+%				
+%				
+%Performance Charts				
+%				
+%P/m	eta	"T_g,out"	
+%[kJ/kg] [-]	[K]	
+100	0.96635	408.28
+200	0.9482	483.68
+300	0.92715	559.08
+400	0.905	634.48
+500	0.88235	709.88
+600	0.8586	785.28
+700	0.83195	860.68

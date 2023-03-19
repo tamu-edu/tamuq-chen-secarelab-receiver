@@ -1,0 +1,9 @@
+% Model:              Cav_Hex_Unif_flux_v5.1 - Base Case.mph
+% Version:            COMSOL 5.5.0.359
+% Date:               Oct 26 2021, 12:26
+% Table:              Evaluation Group 2 - Pressure Drop - 
+% LD_ratio               Inlet pressure (Pa)      Outlet pressure (Pa)
+10                       6.482746359770638        0.04222751795731243
+20                       11.284157082508393       0.04362626512737672
+40                       20.486351433274844       0.0391861866843963
+80                       38.526902154992776       0.04407061967493903

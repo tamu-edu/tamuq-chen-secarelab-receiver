@@ -1,0 +1,9 @@
+% Model:              Cav_Hex_Unif_flux_v5.2.1 - Lin. Distn.mph
+% Version:            COMSOL 5.5.0.359
+% Date:               Mar 22 2022, 20:09
+% Table:              Evaluation Group 2 - pressure drop - 
+% LD_ratio               Len (mm)                 p_out (Pa)               p_in (Pa)
+15                       100                      0.008529411880761444     1.8162667482987984
+20                       100                      0.008615285375292688     2.269219995872636
+40                       100                      0.009836006064059741     4.088392788824308
+80                       100                      0.009960258799151375     7.24895700697618
