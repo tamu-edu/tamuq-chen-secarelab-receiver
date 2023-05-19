@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.17.1
+# v0.19.22
 
 using Markdown
 using InteractiveUtils
@@ -15,7 +15,10 @@ macro bind(def, element)
 end
 
 # ╔═╡ 1e060c7e-886f-4208-b68e-09f2b08195fa
-using PlutoUI
+begin
+	using PlutoUI
+	TableOfContents()
+  end
 
 # ╔═╡ ad798898-61ea-4188-9c5f-d258e10cc47e
 using Plots; plotly()
@@ -30,183 +33,47 @@ md"""
 ##### _Fully_ Specular Stepped Distribution Case - Stage 1: Effect of $R$ and $L_e$
 """
 
-# ╔═╡ aa57714a-6ba3-48ec-afcd-31b44845a4e8
-readdlm("Parametric Sweep Levels.txt")
+# ╔═╡ dcf26869-bd7c-4a30-884d-6692b6e5aa01
+function interpolate_lin_1D(U, z, z_int)
+	"""Generate a 1D function u(z) at given x-locations using interpolation
+    Args:
+        U (Vector{Float64}): known 1D function values
+        z (Vector{Float64}): locations corresponding to given u-values
+        z_int (Vector{Float64}): locations at which u(z) is desired
 
-# ╔═╡ 6317f5cc-bbf9-4c22-a813-c500a538d380
-# Parameter Levels
-begin
-	R = [0.5, 1, 2, 4, 8]
-	E = [1e-5, 0.1, 0.3, 0.5, 0.7, 0.9]
-	LD = [25]
-	M = [1000]	#m^-1
-end
-
-# ╔═╡ cdfd8cb1-7602-45ad-abc4-8d9ed53eee19
-t = 0.4 	#channel wall half-thickness [mm]
-
-# ╔═╡ 1f6244a6-09a4-4e7c-9468-8aa6ff376070
-# Additional Parameters of Interest
-begin
-	# Re = readdlm("Reynolds No.txt")[6:end,1:3]
-	# Re = Re[:,3]				#Reynolds number
+    Returns:
+        U_int (Vector{Float64}): interpolatd u-values at the given u_int locations
+	"""	
+	Z = length(U)
+	U_int = zeros(length(z_int))
 	
-	ϕ = (R.^2) ./ (R .+ t).^2 	#Porosity
-	
-	const emis_low = 0.1
-	const emis_high = 0.9
-
-	A_front = 4*t * (2*R .+ t)	#[mm^2] per channel
-	A_int = 16*R.^2 * LD[1] 		#[mm^2] per channel
-
-	ε = [
-		(emis_high*(A_front[r] + (1 - E[e])*A_int[r]) + emis_low*E[e]*A_int[r]) / (A_front[r] + A_int[r])
-		for r = 1:length(R), e = 1:length(E)
-	]
-
-	ε = vec(ε[end,:])
-end
-
-# ╔═╡ 1d0c4527-1a3b-4767-b9ed-06df5054e5ae
-readdlm("Global Powers.txt")[5,:]
-
-# ╔═╡ c62cb59a-864e-4a16-996f-5423fd08569b
-Eff = readdlm("Global Powers.txt"; comments=true, comment_char='%')
-
-# ╔═╡ 1124a3c4-2b53-448a-9d63-278da7a2d834
-P_ap_lin = readdlm("Power on Apperture.txt"; comments=true, comment_char='%')[:,end]
-
-# ╔═╡ 75527708-4ca3-4277-a4fe-a8de6aa888a9
-begin
-	n_param = 2
-	
-	Q_abs_lin = Eff[:,n_param+1]	# Heat absorbed by gas [W]
-	BHS_lin = Eff[:,n_param+2]		# Boundary heat source [W]
-	T_in_lin = Eff[:,n_param+3]		# Gas inflow temp. [K]
-	T_out_lin = Eff[:,n_param+4]	# Gas outflow temp. [K]
-	Q_rad_loss_lin = Eff[:,n_param+5]		# Radiative loss [W]
-	Q_rad_loss_int_lin = Eff[:,n_param+6]	# Radiative loss from interior surfaces [W]
-	Q_rad_loss_front_lin = Eff[:,n_param+7]	# Radiative loss from front surface [W]
-
-	Q_abs_out_lin = Eff[:,n_param+8]	# Total energy flux through outlet [W]
-	Q_abs_in_lin = Eff[:,n_param+9]	# Total energy flux through inlet [W]
-	BHS_int_lin = Eff[:,n_param+10]	# Primary ray power absorbed by interior surfaces [W]
-	BHS_front_lin = Eff[:,n_param+11]	# Primary ray power absorbed by front surface  [W]
-
-end
-
-# ╔═╡ 819592b5-8152-4db4-8ced-7472c0381e38
-plot(Q_abs_lin - ((Q_abs_out_lin) .- (Q_abs_in_lin)))
-
-# ╔═╡ da408ddb-5b01-4376-ad34-c19c3177910d
-begin
-	T_out = zeros(length(R),length(E))
-	for i = 1:length(R), j = 1:length(E)
-		lin_index = (i-1)*length(E) + j
-		T_out[i,j] = T_out_lin[lin_index]
+	for i = 1:length(z_int)
+		
+		if z_int[i] == z[1]
+			U_int[i] = U[1]
+		elseif z_int[i] == z[end]
+			U_int[i] = U[end]
+		else
+			r_ind = findfirst(z_int[i] .< z) - 1
+			slope = (U[r_ind] - U[r_ind+1])/(z[r_ind] - z[r_ind+1])
+			U_int[i] = slope*(z_int[i] - z[r_ind]) + U[r_ind]
+		end
 	end
+	
+	return U_int
 end
 
-# ╔═╡ da2add34-b3f8-4cab-915a-bfe7e378246a
-
-
-# ╔═╡ 42efe36f-025c-44ad-8890-a32a86f7b571
-contourf(
-	log2.(R), E, transpose(T_out),
-	xlabel = "log<sub>2</sub>(Radius - mm)",
-	#---------------------------------------------
-	# R, E, transpose(T_out),
-	# xlabel = "Radius (mm)",
-	# xscale=:log3,
-	# xticks = R,
-	# xlim = (2e-1, 2e3),
-	#---------------------------------------------
-	# Re, E, transpose(T_out),
-	# xlabel = "Reynolds Number",
-	#---------------------------------------------
-	# ϕ, E, transpose(T_out),
-	# xlabel = "Porosity, ϕ",
-	#---------------------------------------------
-	ylabel = "Refelctive Region,  L<sub>e</sub>/L<sub>ch</sub>",
-	title = "Exit Gas Temperature (K)",
-	#--------------------------------------------
-	# Size formatting for ppt
-	# top_margin = 12*Plots.mm,
-	# left_margin = 3*Plots.mm,
-	# tickfontsize = 12,
-	# guidefont = 14,
-	# titlefont = 16,
-	# fontfamily = "ComputerModern",
-	# colorbar_font = "ComputerModern",
-	# contour_labels = true,
-	# size = (624,477), #for ppt
-	#--------------------------------------------
-	# Size formatting for word
-	top_margin = 5*Plots.mm,
-	left_margin = 3*Plots.mm,
-	tickfontsize = 12,
-    guidefont = 14,
-	titlefont = 16,
-	fontfamily = "ComputerModern",
-	colorbar_font = "ComputerModern",
-	contour_labels = true,
-	size = (624/1.5,477/1.5),	#for word doc.
-		
-	)
-
-# ╔═╡ 8c024801-84be-4fff-aaee-3a55cc84b396
-surface(
-	log2.(R), E, transpose(T_out),
-	xlabel = "log<sub>2</sub>(Radius - mm)",
-	#---------------------------------------------
-	# R, E, transpose(T_out),
-	# xlabel = "Radius (mm)",
-	#---------------------------------------------
-	# Re, E, transpose(T_out),
-	# xlabel = "Reynolds Number",
-	#---------------------------------------------
-	# ϕ, E, transpose(T_out),
-	# xlabel = "Porosity, ϕ",
-	#---------------------------------------------
-	ylabel = "Refelctive Region,  L<sub>e</sub>/L<sub>ch</sub>",
-	title = "Exit Gas Temperature (K)",
-	#--------------------------------------------
-	# Size formatting for ppt
-	# top_margin = 12*Plots.mm,
-	# left_margin = 3*Plots.mm,
-	# tickfontsize = 12,
-	# guidefont = 14,
-	# titlefont = 16,
-	# fontfamily = "ComputerModern",
-	# colorbar_font = "ComputerModern",
-	# contour_labels = true,
-	# size = (624,477), #for ppt
-	#--------------------------------------------
-	# Size formatting for word
-	top_margin = 5*Plots.mm,
-	left_margin = 3*Plots.mm,
-	tickfontsize = 11,
-    guidefont = 12,
-	titlefont = 14,
-	fontfamily = "ComputerModern",
-	colorbar_font = "ComputerModern",
-	contour_labels = true,
-	size = (624/1.5,477/1.5),	#for word doc.
-		
-	
-	)
-
-# ╔═╡ d33a36b0-1e13-4476-9e8b-bd1b99cd5061
-md"""
-Replotting based on average emissivity
-
-"""
-
-# ╔═╡ 743091d1-3f24-4899-b694-2b5e3d7e9ed8
+# ╔═╡ 36b4d191-4294-4e65-8b16-7517b619ad18
 function interpolate_lin(U, x, x_int)
-	#U = known 2D property array
-	#x = levels at which 'U' is known (y is assumed the same for both U and U_int)
-	#x_int = levels at which 'U' is desired
+	"""Generate a 2D function u(y,x) at given x-locations using interpolation, assuming y-levels for u before and after interpolation are the same
+    Args:
+        U (Matrix{Float64}): known 2D property array
+        x (Vector{Float64}): locations corresponding to given u-values
+        x_int (Vector{Float64}): locations at which u(y,x) is desired
+
+    Returns:
+        U_int (Matrix{Float64}): interpolatd u-values at the given x_int locations
+	"""	
 	Y,X = size(U)
 	U_int = zeros(Y, length(x_int))
 	
@@ -218,6 +85,278 @@ function interpolate_lin(U, x, x_int)
 	
 	return U_int
 end
+
+# ╔═╡ 319b4145-0a35-4881-9d0d-127a4ed568a8
+function line_avg(u, x)
+	"""Find the line average of a 1D function u(x)
+    Args:
+        u (Vector{Float64}): known 1D function values
+        x (Vector{Float64}): locations corresponding to given u-values
+
+    Returns:
+        u_avg (Float64): calculated line average (u_avg = ∫u dx/(x_max - x_min))
+	"""
+	u_dx = zeros(length(u))
+	for i = 1:length(u)
+		if i == 1
+			u_dx[i] = u[1]*(x[2]-x[1])/2
+		elseif i == length(u)
+			u_dx[i] = u[end]*(x[end]-x[end-1])/2
+		else
+			u_dx[i] = u[i]*(x[i+1]-x[i-1])/2
+		end
+	end
+		
+	u_avg = sum(u_dx)/(x[end] - x[1])
+	return u_avg
+end
+
+# ╔═╡ 00529d8d-f74e-4c20-b772-8c555ee1968f
+function line_grad(u, x)
+	"""Calculate local gradients in a 1D function u(x) using a central difference formula
+    Args:
+        u (Vector{Float64}): known 1D function values
+        x (Vector{Float64}): locations corresponding to given u-values
+
+    Returns:
+        u_avg (Float64): calculated line average (u_avg = ∫u dx/(x_max - x_min))
+	"""
+	n = length(u)
+	du_dx = zeros(n)
+	for i = 1:n
+		if i == 1
+			du_dx[i] = (u[2]-u[1]) / (x[2]-x[1])
+		elseif i == n
+			du_dx[i] = (u[n]-u[n-1]) / (x[n]-x[n-1])
+		else
+			du_dx[i] = (u[i+1]-u[i-1]) / (x[i+1]-x[i-1])
+		end
+	end
+		
+	return du_dx
+end
+
+# ╔═╡ 95c674af-38d3-4900-90c0-a6af1cdc967e
+md"""
+## 1. Importing And Processing Data
+
+"""
+
+# ╔═╡ aa57714a-6ba3-48ec-afcd-31b44845a4e8
+readdlm("Parametric Sweep Levels.txt")
+
+# ╔═╡ 6317f5cc-bbf9-4c22-a813-c500a538d380
+# Parameter Levels
+begin
+	LD = [25] 				# length to diameter ratio
+	ld = 1 					# index of applicable length to diameter ratio
+	M = [1000]				# slope of linear reflectivtiy distribution [m^-1]
+	R = [0.5, 1., 2., 4., 8.] 	# channel radius [mm]
+	E = [1e-5, 0.1, 0.3, 0.5, 0.7, 0.9]  	# fractional entry length for reflective region
+end
+
+# ╔═╡ 1f6244a6-09a4-4e7c-9468-8aa6ff376070
+# Additional Parameters of Interest
+begin
+	const emis_low = 0.1
+	const emis_high = 0.9
+	t = 0.4 			# channel wall half-thickness [mm]
+	ϕ = (R.^2) ./ (R .+ t).^2 	#Porosity
+	h_nat = 10 	 		# natural heat transfer coefficienct for frontal losses [W/m^2.K]
+	T_amb = 318 		# ambient gas temperature [K]
+	D_tot =  140 		# inscribed diameter of square SolAir-200 reciever module [mm]
+	A_tot = D_tot^2 	# area of square receiver module [mm^2]
+	n_channels(R_channel, t_channel) = (D_tot/(R_channel*2 .+ t_channel*2))^2 
+	P_to_m = 700 		# power on apperture to mass flowrate ratio [kJ/kg]
+	q_ap =  650 		# flux density on apperture [kW/m^2]
+	m_tot = q_ap*A_tot./P_to_m # Mass flowrate per module [kg/s]
+	A_front = 4*t * (2*R .+ t)	#[mm^2] front surface per channel
+	A_int = 16*R.^2 * LD[1] 	#[mm^2] interior surface per channel
+	ε = [
+		(emis_high*(A_front[r] + (1 - E[e])*A_int[r]) + emis_low*E[e]*A_int[r]) / (A_front[r] + A_int[r])
+		for r = 1:length(R), e = 1:length(E)
+	]
+	ε = vec(ε[end,:]) 	# average receiver emissivity
+
+	md"""
+	Defining global variables and dimensions
+	"""
+end
+
+# ╔═╡ b6110076-48aa-401d-b747-4db8452c6319
+function emissivity(refl_reg, m, z)
+	"""Generate axial emissivity profile for a linear distribution receiver
+    Args:
+        refl_reg (Float64): reflective entry region as a fraction of total length
+        m (Float64): slope of linear reflectivtiy distribution [m^-1]
+        z (Vector{Float64}): axial locations at which ε(z) is desired
+
+    Returns:
+        emis (Vector{Float64}): interpolatd u-values at the given x_int locations
+	"""	
+	emis = zeros(length(z))
+	L_channel = z[end]
+	Len = refl_reg * L_channel
+	
+	Lex_hypo = ((emis_high-emis_low)/m)+Len  	
+	Lex = (if (Lex_hypo<L_channel) Lex_hypo else L_channel end)
+		
+	i_start = findfirst(isapprox.(z, Len; atol=0.5))
+	i_end = findfirst(isapprox.(z, Lex; atol=0.5))
+		
+	emis[1:i_start] .= emis_low
+	emis[i_start+1:i_end] = m * (z[i_start+1:i_end] .- Len) .+ emis_low
+	emis[i_end+1:end] .= emis_high
+		
+	return emis
+end
+
+# ╔═╡ 75527708-4ca3-4277-a4fe-a8de6aa888a9
+begin
+	Eff = readdlm("Global Powers.txt"; comments=true, comment_char='%')
+	P_ap_lin = readdlm("Power on Apperture.txt"; comments=true, comment_char='%')[:,end]
+	
+	n_param = 2
+	
+	Q_abs_lin = Eff[:,n_param+1]	# Heat absorbed by gas [W]
+	BHS_lin = Eff[:,n_param+2]		# Boundary heat source [W]
+	T_in_lin = Eff[:,n_param+3]		# Gas inflow temp. [K]
+	T_out_lin = Eff[:,n_param+4]	# Gas outflow temp. [K]
+	Q_rad_loss_lin = Eff[:,n_param+5]		# Radiative loss [W]
+	Q_rad_loss_int_lin = Eff[:,n_param+6]	# Radiative loss from interior surfaces [W]
+	Q_rad_loss_front_lin = Eff[:,n_param+7]	# Radiative loss from front surface [W]
+	
+	Q_abs_out_lin = Eff[:,n_param+8]	# Total energy flux through outlet [W]
+	Q_abs_in_lin = Eff[:,n_param+9]	# Total energy flux through inlet [W]
+	BHS_front_lin = Eff[:,n_param+10]	# Primary ray power absorbed by front surface  [W]
+	BHS_int_lin = Eff[:,n_param+11]	# Primary ray power absorbed by interior surfaces [W]
+	
+	md"""
+	Reading global powers and extracting linearized powers
+	"""
+end
+
+# ╔═╡ 6536390f-6cee-44c2-9a88-c23df8205992
+begin
+	Eff_Ap = zeros(length(R), length(E))
+	T_out = zeros(length(R),length(E))
+	for r = 1:length(R), e = 1:length(E)
+		lin_index = (r-1)*length(E) + e
+		T_out[r,e] = T_out_lin[lin_index]
+		Eff_Ap[r,e] = Q_abs_lin[lin_index]./P_ap_lin[r]		
+	end
+
+	md"""
+	Calculating basic responses
+	"""
+end
+
+# ╔═╡ da408ddb-5b01-4376-ad34-c19c3177910d
+begin
+	plot(
+		range(0,50,length=100),
+		[emissivity(E[e],M[1],range(0,50,length=100)) for e = 1:length(E)
+			],
+		xlabel = "Channel Depth, z",
+		ylabel = "Emissivity, <i>ε(z)</i>",
+		title = "Axial Emissivity Distributions",
+		label = permutedims(["L<sub>e</sub>/L<sub>ch</sub> = $(E[e])" for e = 1:length(E)]),
+		xlims = (-5,50),
+		ylim = (0,1),
+		color = permutedims(palette(:tab10)[1:length(R)]),
+		linewidth = 2,
+		legend = :right,
+		top_margin = 2*Plots.mm,
+		left_margin = 3*Plots.mm,
+		right_margin = 5*Plots.mm,
+		tickfontsize = 12,
+		guidefont = 14,
+		titlefont = 16,
+		fontfamily = "ComputerModern",
+		size = (450,350),	
+	)
+	
+	hline!(
+		[emis_low,
+		emis_high],
+		color = :black,
+		line = :dash,
+		linealpha = 0.3,
+		linewidth = 2,
+		label = "",
+		
+		)
+end
+
+# ╔═╡ da2add34-b3f8-4cab-915a-bfe7e378246a
+md"""
+## 2. Plotting Performance Charts and Intermediate Powers
+
+"""
+
+# ╔═╡ f19af87b-385d-4af9-88dd-3d29626763aa
+md"""
+### 2.1. Plotting Basic Responses
+
+Thermal efficiency, exit gas temperature and volumetric effect ratio
+"""
+
+# ╔═╡ 31ee1595-be66-4d8a-9be1-96b2514dcc0c
+contourf(
+	log2.(R), E, transpose(Eff_Ap),
+	xlabel = "log<sub>2</sub>(Radius - mm)",
+	#---------------------------------------------
+	# R, E, transpose(Eff_Ap),
+	# xlabel = "Radius (mm)",
+	#---------------------------------------------
+	# Re, E, transpose(Eff_Ap),
+	# xlabel = "Reynolds Number",
+	#---------------------------------------------
+	# ϕ, E, transpose(Eff_Ap),
+	# xlabel = "Porosity, ϕ",
+	#---------------------------------------------
+	ylabel = "Refelctive Region,  L<sub>e</sub>/L<sub>ch</sub>",
+	title = "Thermal Efficiency, η",
+	#--------------------------------------------
+	# Size formatting for word
+	framestyle = :box,
+	top_margin = 5*Plots.mm,
+	left_margin = 3*Plots.mm,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
+	fontfamily = "ComputerModern",
+	colorbar_font = "ComputerModern",
+	contour_labels = true,
+	size = (389,300),	
+	)
+
+# ╔═╡ 42efe36f-025c-44ad-8890-a32a86f7b571
+contourf(
+	log2.(R), E, transpose(T_out),
+	xlabel = "log<sub>2</sub>(Radius - mm)",
+	#---------------------------------------------
+	# Re, E, transpose(T_out),
+	# xlabel = "Reynolds Number",
+	#---------------------------------------------
+	# ϕ, E, transpose(T_out),
+	# xlabel = "Porosity, ϕ",
+	#---------------------------------------------
+	ylabel = "Refelctive Region,  L<sub>e</sub>/L<sub>ch</sub>",
+	title = "Exit Gas Temperature (K)",
+	#--------------------------------------------
+	# Size formatting for word
+	framestyle = :box,
+	top_margin = 5*Plots.mm,
+	left_margin = 3*Plots.mm,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
+	fontfamily = "ComputerModern",
+	colorbar_font = "ComputerModern",
+	contour_labels = true,
+	size = (389,300),	
+	)
 
 # ╔═╡ b1b2f925-8f6f-4b23-bae0-c2c2550c5b53
 # # Interpolating all relevant properties
@@ -237,273 +376,17 @@ end
 # 	]
 # end
 
-# ╔═╡ 142b3096-9165-4470-bdc1-43ffb28b8eef
-contourf(
-	log2.(R), ε, transpose(T_out),
-	# log2.(R), E_base, transpose(T_out_int),
-	xlabel = "log<sub>2</sub>(Radius - mm)",
-	#---------------------------------------------
-	# R, E, transpose(T_out),
-	# xlabel = "Radius (mm)",
-	#---------------------------------------------
-	# Re, E, transpose(T_out),
-	# xlabel = "Reynolds Number",
-	#---------------------------------------------
-	# ϕ, E, transpose(T_out),
-	# xlabel = "Porosity, ϕ",
-	#---------------------------------------------
-	ylabel = "Average Emissivity",
-	title = "Exit Gas Temperature (K)",
-	#--------------------------------------------
-	# Size formatting for ppt
-	# top_margin = 12*Plots.mm,
-	# left_margin = 3*Plots.mm,
-	# tickfontsize = 12,
-	# guidefont = 14,
-	# titlefont = 16,
-	# fontfamily = "ComputerModern",
-	# colorbar_font = "ComputerModern",
-	# contour_labels = true,
-	# size = (624,477), #for ppt
-	#--------------------------------------------
-	# Size formatting for word
-	top_margin = 5*Plots.mm,
-	left_margin = 3*Plots.mm,
-	tickfontsize = 14,
-    guidefont = 16,
-	titlefont = 18,
-	fontfamily = "ComputerModern",
-	colorbar_font = "ComputerModern",
-	contour_labels = true,
-	size = (440,335),	#for word doc.
-		
-	)
+# ╔═╡ d33a36b0-1e13-4476-9e8b-bd1b99cd5061
+md"""
+Replotting based on average emissivity
 
-# ╔═╡ 44cec87f-537d-426d-8089-934210aee5b3
-function line_avg(u, x, m, n)
-	u_dx = zeros(length(u))
-	for i = m:n
-		if i == m
-			u_dx[i] = u[1]*(x[2]-x[1])/2
-		elseif i == n
-			u_dx[i] = u[n]*(x[n]-x[n-1])/2
-		else
-			u_dx[i] = u[i]*(x[i+1]-x[i-1])/2
-		end
-	end
-		
-	u_avg = sum(u_dx)/(x[n] - x[m])
-	return u_avg
-end
-
-# ╔═╡ 03f25a88-efb5-40bb-9c13-4ca2b8b97c14
-σ = 5.670374419e-8 #W.m-2.K-4 (Stefan-Boltzmann Const)
-
-# ╔═╡ ebe6df24-c623-4ffd-9857-40110fb0336d
-T_amb = 318 	#K
-
-# ╔═╡ 0c49cfb9-2787-4bc7-a25a-5869e33e6457
-h_nat = 10  #[W/m^2.K]
-
-# ╔═╡ 5ccfecd6-c794-4ca8-ab1e-d21ed06e69dd
-F_amb_min = 0.01 #Lowest view factor to be considered
-
-# ╔═╡ 20b8d53d-d6ca-4b69-b409-775e9722e746
-function emissivity(refl_reg, m, z)
-	emis = zeros(length(z))
-	L_channel = z[end]
-	Len = refl_reg * L_channel
-	
-	Lex_hypo = ((emis_high-emis_low)/m)+Len  	
-	Lex = (if (Lex_hypo<L_channel) Lex_hypo else L_channel end)
-		
-	i_start = findfirst(isapprox.(z, Len; atol=0.5))
-	i_end = findfirst(isapprox.(z, Lex; atol=0.5))
-		
-	emis[1:i_start] .= emis_low
-	emis[i_start+1:i_end] = m * (z[i_start+1:i_end] .- Len) .+ emis_low
-	emis[i_end+1:end] .= emis_high
-		
-	return emis
-end
-
-# ╔═╡ d9eab463-1477-4703-bc73-c3d8fcc9314c
-begin
-	plot(
-		range(0,50,length=100),
-		[emissivity(E[e],M[1],range(0,50,length=100)) for e = 1:length(E)
-			],
-		xlabel = "Channel Depth, z",
-		ylabel = "Emissivity, <i>ε(z)</i>",
-		label = permutedims(["L<sub>e</sub>/L<sub>ch</sub> = $(E[e])" for e = 1:length(E)]),
-		xlims = (-5,50),
-		ylim = (0,1),
-		color = permutedims(palette(:tab10)[1:length(R)]),
-		linewidth = 2,
-		legend = :right,
-		top_margin = 12*Plots.mm,
-		left_margin = 3*Plots.mm,
-		right_margin = 5*Plots.mm,
-		tickfontsize = 12,
-		guidefont = 14,
-		titlefont = 16,
-		fontfamily = "ComputerModern",
-		size = (624/1.2,477/1.2)
-	)
-	
-	plot!(
-		range(-5,50,length=100),
-		[ones(100)*emis_low,
-		ones(100)*emis_high],
-		color = :black,
-		line = :dash,
-		linealpha = 0.3,
-		linewidth = 2,
-		label = "",
-		
-		)
-end
-
-# ╔═╡ 0593c86b-fb0f-40c2-a38f-9c7330c7a484
-begin
-	D_tot =  140 #[mm] "Inscribed diameter of square SolAir-200 reciever module"
-	A_tot = D_tot^2 #"Area of square receiver module"
-	n_channels(R_channel, t_channel) = (D_tot/(R_channel*2+t_channel*2))^2 
-	q_ap =  650 #[kW/m^2] "Flux density on apperture"
-	P_to_m = 700 # [kJ/kg] "Power on apperture to mass flowrate ratio"
-	q_ap_lin = [q_ap*1e3/n_channels(R[r],t)*(A_tot*1e-6) for r = 1:length(R)] #[W]
-	
-	m_tot = q_ap*A_tot/P_to_m # "Mass flowrate on module"
-	m_channel(R_channel,t_channel) =  m_tot/n_channels(R_channel,t_channel) # "Mass flowrate per channel"
-end
-
-# ╔═╡ 6536390f-6cee-44c2-9a88-c23df8205992
-begin
-	Eff_Ap = zeros(length(R), length(E))
-	
-	Q_abs = zeros(length(R), length(E))
-	Q_abs_spec = zeros(length(R),length(E))
-	Q_abs_tot = zeros(length(R),length(E))
-
-	for r = 1:length(R), e = 1:length(E)
-		lin_index = (r-1)*length(E) + e
-		
-		Q_abs[r,e] = Q_abs_lin[lin_index]		
-		#--------------------------------------------------------------------------
-		m_gas = m_channel(R[r]*1e-3,t)
-		Q_abs_spec[r,e] = Q_abs_lin[lin_index]/m_gas #[W/kg]
-		#--------------------------------------------------------------------------
-		Q_abs_tot[r,e] = Q_abs_lin[lin_index]*n_channels(R[r],t) #[W] per mod
-		
-		#--------------------------------------------------------------------------
-
-		Eff_Ap[r,e] = Q_abs_lin[lin_index]./P_ap_lin[r]
-		
-		# Eff_Ap[r,e] = Q_abs_lin[lin_index]./q_ap_lin[r]
-		# Eff_Ap[r,e] = Q_abs_out_lin[lin_index]./P_ap_lin[r]
-		# Eff_Ap[r,e] = (Q_abs_out_lin[lin_index] - Q_abs_in_lin[lin_index])./P_ap_lin[r]
-	end
-end
-
-# ╔═╡ a9f7c5df-9852-4f06-9989-d6a9677e7b19
-Eff_Ap .== maximum(Eff_Ap)
-
-# ╔═╡ 0799d6a5-84fc-431c-83b1-249ce9805e12
-Eff_Ap
-
-# ╔═╡ 31ee1595-be66-4d8a-9be1-96b2514dcc0c
-contourf(
-	log2.(R), E, transpose(Eff_Ap),
-	xlabel = "log<sub>2</sub>(Radius - mm)",
-	#---------------------------------------------
-	# R, E, transpose(Eff_Ap),
-	# xlabel = "Radius (mm)",
-	#---------------------------------------------
-	# Re, E, transpose(Eff_Ap),
-	# xlabel = "Reynolds Number",
-	#---------------------------------------------
-	# ϕ, E, transpose(Eff_Ap),
-	# xlabel = "Porosity, ϕ",
-	#---------------------------------------------
-	ylabel = "Refelctive Region,  L<sub>e</sub>/L<sub>ch</sub>",
-	title = "Thermal Efficiency, η",# - using Power on Apperture",
-	#--------------------------------------------
-	# Size formatting for ppt
-	# top_margin = 12*Plots.mm,
-	# left_margin = 3*Plots.mm,
-	# tickfontsize = 12,
-	# guidefont = 14,
-	# titlefont = 16,
-	# fontfamily = "ComputerModern",
-	# colorbar_font = "ComputerModern",
-	# contour_labels = true,
-	# size = (624,477), #for ppt
-	#--------------------------------------------
-	# Size formatting for word
-	top_margin = 5*Plots.mm,
-	left_margin = 3*Plots.mm,
-	tickfontsize = 11,
-    guidefont = 12,
-	titlefont = 14,
-	fontfamily = "ComputerModern",
-	colorbar_font = "ComputerModern",
-	contour_labels = true,
-	size = (624/1.5,477/1.5),	#for word doc.
-		
-	)
-
-# ╔═╡ 6e2d8d5b-627e-416b-8e84-79a3af3b384a
-surface(
-	log2.(R), E, transpose(Eff_Ap),
-	xlabel = "log<sub>2</sub>(Radius - mm)",
-	#---------------------------------------------
-	# R, E, transpose(Eff_Ap),
-	# xlabel = "Radius (mm)",
-	#---------------------------------------------
-	# Re, E, transpose(Eff_Ap),
-	# xlabel = "Reynolds Number",
-	#---------------------------------------------
-	# ϕ, E, transpose(Eff_Ap),
-	# xlabel = "Porosity, ϕ",
-	#---------------------------------------------
-	ylabel = "Refelctive Region,  L<sub>e</sub>/L<sub>ch</sub>",
-	title = "Thermal Efficiency, η",# - using Boundary Heat Source",
-	#--------------------------------------------
-	# Size formatting for ppt
-	# top_margin = 12*Plots.mm,
-	# left_margin = 3*Plots.mm,
-	# tickfontsize = 12,
-	# guidefont = 14,
-	# titlefont = 16,
-	# fontfamily = "ComputerModern",
-	# colorbar_font = "ComputerModern",
-	# contour_labels = true,
-	# size = (624,477), #for ppt
-	#--------------------------------------------
-	# Size formatting for word
-	top_margin = 5*Plots.mm,
-	left_margin = 3*Plots.mm,
-	tickfontsize = 11,
-    guidefont = 12,
-	titlefont = 14,
-	fontfamily = "ComputerModern",
-	colorbar_font = "ComputerModern",
-	contour_labels = true,
-	size = (624/1.5,477/1.5),	#for word doc.
-		
-	)
+"""
 
 # ╔═╡ faec19c6-a584-4421-991b-3cb01abbbc8c
 contourf(
 	log2.(R), ε, transpose(Eff_Ap),
 	# log2.(R), E_base, transpose(Eff_Ap_int),
 	xlabel = "log<sub>2</sub>(Radius - mm)",
-	#---------------------------------------------
-	# R, E, transpose(Eff_Ap),
-	# xlabel = "Radius (mm)",
-	# xscale=:log3,
-	# xticks = R,
-	# xlim = (2e-1, 2e3),
 	#---------------------------------------------
 	# Re, E, transpose(Eff_Ap),
 	# xlabel = "Reynolds Number",
@@ -514,53 +397,195 @@ contourf(
 	ylabel = "Average Emissivity",
 	title = "Thermal Efficiency, η",
 	#--------------------------------------------
-	# Size formatting for ppt
-	# top_margin = 12*Plots.mm,
-	# left_margin = 3*Plots.mm,
-	# tickfontsize = 12,
-	# guidefont = 14,
-	# titlefont = 16,
-	# fontfamily = "ComputerModern",
-	# colorbar_font = "ComputerModern",
-	# contour_labels = true,
-	# size = (624,477), #for ppt
-	#--------------------------------------------
 	# Size formatting for word
-	top_margin = 5*Plots.mm,
+	framestyle = :box,
+	top_margin = 12*Plots.mm,
 	left_margin = 3*Plots.mm,
-	tickfontsize = 14,
-    guidefont = 16,
-	titlefont = 18,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
 	fontfamily = "ComputerModern",
 	colorbar_font = "ComputerModern",
 	contour_labels = true,
-	size = (440,335),	#for word doc.
-		
+	size = (389,300),	
 	)
 
-# ╔═╡ b9ae10ff-f59d-4be3-b7da-99fb678310cb
-ε
+# ╔═╡ 142b3096-9165-4470-bdc1-43ffb28b8eef
+contourf(
+	log2.(R), ε, transpose(T_out),
+	# log2.(R), E_base, transpose(T_out_int),
+	xlabel = "log<sub>2</sub>(Radius - mm)",
+	#---------------------------------------------
+	# Re, E, transpose(T_out),
+	# xlabel = "Reynolds Number",
+	#---------------------------------------------
+	# ϕ, E, transpose(T_out),
+	# xlabel = "Porosity, ϕ",
+	#---------------------------------------------
+	ylabel = "Average Emissivity",
+	title = "Exit Gas Temperature (K)",
+	#--------------------------------------------
+	# Size formatting for word
+	framestyle = :box,
+	top_margin = 12*Plots.mm,
+	left_margin = 3*Plots.mm,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
+	fontfamily = "ComputerModern",
+	colorbar_font = "ComputerModern",
+	contour_labels = true,
+	size = (389,300),	
+	)
+
+# ╔═╡ 0593c86b-fb0f-40c2-a38f-9c7330c7a484
+md"""
+### 2.2. Plotting Auxillary Results
+
+Intermediate fluxes for heat transfer analysis
+"""
 
 # ╔═╡ f226cd78-4380-4340-a3b9-9d7bb1940abb
 md"""
-## Additional plots
+#### 2.2.1. Plotting total power on a per unit area basis
 
-For heat transfer analysis
 """
 
-# ╔═╡ e5300a51-d793-4fe2-88b4-8a117924f91b
+# ╔═╡ b2b3ab4b-82e2-49ca-a654-271a33790179
 md"""
-#### Plots that use specific power values (per unit mass or area per area)
+#### 2.2.2. Plotting total power on a per module basis
 
 """
+
+# ╔═╡ c944cbc9-a9b6-4538-836d-eafea086189f
+md"""
+## 3. Plotting Temperature and BHS Profiles
+"""
+
+# ╔═╡ c435991e-093b-4ee6-b437-fee7e5acc890
+begin
+	Temp_profile = "Cutline Temp. Profiles (processed)"
+
+	T_gas_dict = [
+			readdlm("$(Temp_profile)//T_gas (R=$(R[r])mm, LD=$(LD[ld]), E=$(E[e])).txt"; comments=true, comment_char='%')[:,2:end]
+	
+	for r = 1:length(R), ld = 1:length(LD), e = 1:length(E)
+			]
+	
+	x_gas_dict = [
+	readdlm("$(Temp_profile)//T_gas (R=$(R[r])mm, LD=$(LD[ld]), E=$(E[e])).txt"; comments=true, comment_char='%')[:,1]
+
+	for r = 1:length(R), ld = 1:length(LD), e = 1:length(E)
+			]
+	
+	T_solid_dict = [
+	readdlm("$(Temp_profile)//T_solid (R=$(R[r])mm, LD=$(LD[ld]), E=$(E[e])).txt"; comments=true, comment_char='%')[:,2:end]
+			
+	for r = 1:length(R), ld = 1:length(LD), e = 1:length(E)
+			]
+
+	x_solid_dict = [
+	readdlm("$(Temp_profile)//T_solid (R=$(R[r])mm, LD=$(LD[ld]), E=$(E[e])).txt"; comments=true, comment_char='%')[:,1]
+
+	for r = 1:length(R), ld = 1:length(LD), e = 1:length(E)
+			]
+
+	md"""
+	Importing temperature profile data
+	
+	"""
+end
+
+# ╔═╡ 083ec386-aefd-4a16-a1b8-c82340ff967f
+begin
+	Q_abs = zeros(length(R), length(E))
+	Q_abs_spec = zeros(length(R),length(E))
+	Q_abs_tot = zeros(length(R),length(E))
+
+	BHS = zeros(length(R),length(E))
+	BHS_spec = zeros(length(R),length(E))
+	BHS_tot = zeros(length(R),length(E))
+		
+	BHS_int_tot = zeros(length(R),length(E))
+	BHS_front_tot = zeros(length(R),length(E))
+	
+	Q_rad_loss = zeros(length(R),length(E))
+	Q_rad_loss_spec = zeros(length(R),length(E))
+	
+	Q_cnat_loss_tot = zeros(length(R),length(E))
+
+	Q_rad_loss_tot = zeros(length(R),length(E))
+	Q_rad_loss_tot_front = zeros(length(R),length(E))
+	Q_rad_loss_tot_int = zeros(length(R),length(E))
+
+	A_surface_tot = zeros(length(R))
+	A_surface_tot_front = zeros(length(R))
+	A_surface_tot_int = zeros(length(R))
+
+	T_s_in = zeros(length(R),length(E))
+	T_s_avg = zeros(length(R),length(E))
+
+	for r = 1:length(R), e = 1:length(E), ld = 1:length(LD)
+		lin_index = (r-1)*length(E) + e
+
+		local T_s = T_solid_dict[r,ld,e]
+		local x = x_solid_dict[r,ld,e]
+		
+		local A_walls = 2*4*R[r]*(LD[ld]*2*R[r])	#[mm^2]
+		local A_front = 4*(R[r]+t)^2 - 4*R[r]^2 	#[mm^2]
+		
+		#--------------------------------------------------------------------------	
+		# Calculating heat absorbed by the gas
+		Q_abs[r,e] = Q_abs_lin[lin_index]		
+		Q_abs_spec[r,e] = Q_abs_lin[lin_index]*n_channels(R[r],t)/((A_walls + A_front)*1e-6) #[W/m^2] per module
+		Q_abs_tot[r,e] = Q_abs_lin[lin_index]*n_channels(R[r],t) #[W] per module
+		
+		#--------------------------------------------------------------------------	
+		# Calculating biundary heat source
+		BHS[r,e] = BHS_lin[lin_index]	# [W]
+		BHS_spec[r,e] = BHS_lin[lin_index]/((A_walls + A_front)*1e-6) * n_channels(R[r],t)	#[W/m^2]
+		
+		BHS_tot[r,e] = BHS_lin[lin_index] * n_channels(R[r],t) 	#[W]	
+		BHS_int_tot[r,e] = BHS_int_lin[lin_index] * n_channels(R[r],t) 	#[W]
+		BHS_front_tot[r,e] = BHS_front_lin[lin_index] * n_channels(R[r],t) 	#[W]
+		
+		#--------------------------------------------------------------------------	
+		# Calculating radiative heat loss
+		Q_rad_loss[r,e] = Q_rad_loss_lin[lin_index]	# [W] per channel	
+		Q_rad_loss_front = Q_rad_loss_front_lin[lin_index] 	#[W]
+		Q_rad_loss_int = Q_rad_loss_int_lin[lin_index]  	#[W]
+
+		Q_rad_loss_spec[r,e] = Q_rad_loss_lin[lin_index]/((A_walls + A_front)*1e-6) * n_channels(R[r],t)	#[W/m^2]	
+
+		Q_rad_loss_tot[r,e] = Q_rad_loss[r,e]*n_channels(R[r], t) #[W]
+		Q_rad_loss_tot_front[r,e] = Q_rad_loss_front*n_channels(R[r], t) #[W]
+		Q_rad_loss_tot_int[r,e] = Q_rad_loss_int*n_channels(R[r], t) #[W]
+		
+		#--------------------------------------------------------------------------	
+		# Calculating total surface areas
+		A_surface_tot_front[r] = A_front*n_channels(R[r], t) #[m^2]
+		A_surface_tot_int[r] = A_walls*n_channels(R[r], t) #[m^2]
+		A_surface_tot[r] =  A_surface_tot_front[r] + A_surface_tot_int[r] #[m^2]
+
+		#--------------------------------------------------------------------------	
+		# Calculating natural convection heat loss
+		Q_cnat_loss_tot[r,e] = h_nat*(T_s[1] - T_amb)*A_front*1e-6*n_channels(R[r],t) #[W]
+		
+		#--------------------------------------------------------------------------	
+		# Calculating front and average solid temperatures
+		T_s_in[r,e] = T_s[1]
+		T_s_avg[r,e] = line_avg(T_s, x)
+	end
+
+	md"""
+	Calculating/Extracting auxillary response variables including powers on a per module basis (`_tot` endings), on a per unit area basis (`_spec` variable endings), or for interior (`_int`) ar frontal (`_front`) surfaces of the receiver. 
+	"""
+end
 
 # ╔═╡ dec3866e-881e-42a0-9236-e65fd6fd8599
 contourf(
 	log2.(R), E, transpose(Q_abs_spec),
 	xlabel = "log<sub>2</sub>(Radius - mm)",
-	#---------------------------------------------
-	# R, E, transpose(Q_abs_spec),
-	# xlabel = "Radius (mm)",
 	#---------------------------------------------
 	# Re, E, transpose(Q_abs_spec),
 	# xlabel = "Reynolds Number",
@@ -569,37 +594,76 @@ contourf(
 	# xlabel = "Porosity, ϕ",
 	#---------------------------------------------
 	ylabel = "Emissivity",
-	title = "Heat Absorbed by the Gas,  <i>Q<sub>abs,g</sub>/m<sub>g</sub></i> <br> per channel (W/kg)",
+	title = "Heat Absorbed by the Gas<br>per Unit Area (W/m<sup>2</sup>)",
 	#--------------------------------------------
 	# Size formatting for ppt
-	# top_margin = 12*Plots.mm,
-	# left_margin = 3*Plots.mm,
-	# tickfontsize = 12,
-	# guidefont = 14,
-	# titlefont = 16,
-	# fontfamily = "ComputerModern",
-	# colorbar_font = "ComputerModern",
-	# contour_labels = true,
-	# size = (624,477), #for ppt
-	#--------------------------------------------
-	# Size formatting for word
-	top_margin = 10*Plots.mm,
+	framestyle = :box,
+	top_margin = 15*Plots.mm,
 	left_margin = 3*Plots.mm,
-	tickfontsize = 10,
-    guidefont = 11,
-	titlefont = 12,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
 	fontfamily = "ComputerModern",
 	colorbar_font = "ComputerModern",
 	contour_labels = true,
-	size = (325,250),	#for word doc.
-		
+	size = (389,300),	
 	)
 
-# ╔═╡ 2a730b37-d2d3-4b32-9c47-24fd5b122d95
-md"""
-#### Plots that use absolute power values (per module)
+# ╔═╡ 8cb6d0d1-9301-419e-a242-817b0b718ae6
+contourf(
+	log2.(R), E, transpose(BHS_spec),
+	xlabel = "log<sub>2</sub>(Radius - mm)",
+	#---------------------------------------------
+	# Re, E, transpose(BHS_spec),
+	# xlabel = "Reynolds Number",
+	#---------------------------------------------
+	# ϕ, E, transpose(BHS_spec),
+	# xlabel = "Porosity, ϕ",
+	#---------------------------------------------
+	ylabel = "Emissivity",
+	title = "Total Boundary Heat Source<br>per Unit Area (W/m<sup>2</sup>)",
+	c = cgrad(:thermal),
+	#--------------------------------------------
+	# Size formatting for ppt
+	framestyle = :box,
+	top_margin = 15*Plots.mm,
+	left_margin = 3*Plots.mm,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
+	fontfamily = "ComputerModern",
+	colorbar_font = "ComputerModern",
+	contour_labels = true,
+	size = (389,300),	
+	)
 
-"""
+# ╔═╡ 2caf1b17-51cf-4d96-93d3-948104c92fa5
+contourf(
+	log2.(R), E, transpose(Q_rad_loss_spec),
+	xlabel = "log<sub>2</sub>(Radius - mm)",
+	#---------------------------------------------
+	# R, E, transpose(Q_rad_loss_spec),
+	# xlabel = "Radius (mm)",
+	#---------------------------------------------
+	# ϕ, E, transpose(Q_rad_loss_spec),
+	# xlabel = "Porosity, ϕ",
+	#---------------------------------------------
+	ylabel = "Emissivity",
+	title = "Radiative Heat Loss<br>per Unit Area (W/m<sup>2</sup>)",
+	c = cgrad(:thermal, rev=true),
+	#---------------------------------------------
+	# Size formatting for ppt
+	framestyle = :box,
+	top_margin = 15*Plots.mm,
+	left_margin = 3*Plots.mm,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
+	fontfamily = "ComputerModern",
+	colorbar_font = "ComputerModern",
+	contour_labels = true,
+	size = (389,300),	
+	)
 
 # ╔═╡ 76f0b4fd-dc94-499d-8d41-c58cc2d3ff2d
 contourf(
@@ -616,364 +680,220 @@ contourf(
 	# xlabel = "Porosity, ϕ",
 	#---------------------------------------------
 	ylabel = "Averag Emissivity",
-	title = "Heat Absorbed by the Gas,  <i>Q<sub>abs,g</sub> </i> <br> per Module (W)",
-	#--------------------------------------------
+	title = "Heat Absorbed by the Gas (W)",
+	#---------------------------------------------
 	# Size formatting for ppt
-	# top_margin = 12*Plots.mm,
-	# left_margin = 3*Plots.mm,
-	# tickfontsize = 12,
-	# guidefont = 14,
-	# titlefont = 16,
-	# fontfamily = "ComputerModern",
-	# colorbar_font = "ComputerModern",
-	# contour_labels = true,
-	# size = (624,477), #for ppt
-	#--------------------------------------------
-	# Size formatting for word
-	top_margin = 10*Plots.mm,
+	framestyle = :box,
+	top_margin = 5*Plots.mm,
 	left_margin = 3*Plots.mm,
-	tickfontsize = 10,
-    guidefont = 11,
-	titlefont = 12,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
 	fontfamily = "ComputerModern",
 	colorbar_font = "ComputerModern",
 	contour_labels = true,
-	size = (325,250),	#for word doc.
-		
+	size = (389,300),	
 	)
 
-# ╔═╡ bd03bcfb-bd4a-43ce-bb38-8cbbb402fe55
-
-
-# ╔═╡ 32d9ee65-53bd-4af8-83fa-6c25bd8c53dd
-[T_out[i,j] .== maximum(T_out) for i = 1:length(R), j=1:length(E)]
-
-# ╔═╡ b7e0de2a-d7d3-42d5-b020-6dbc7d365868
-[Eff_Ap[i,j] .== maximum(Eff_Ap) for i = 1:length(R), j=1:length(E)]
-
-# ╔═╡ 29909be9-8863-4e09-8219-528adbcdb0d3
-E
-
-# ╔═╡ c944cbc9-a9b6-4538-836d-eafea086189f
-md"""
-##### Plotting Temperature Profiles and Volumetric Effect
-"""
-
-# ╔═╡ d9902d65-9c44-4d64-8f55-71a6bb4e555a
-Temp_profile = "Cutline Temp. Profiles"
-
-# ╔═╡ 693c84e3-f6c2-48b4-98d3-cc1e9e8ddc60
-T_gas_dict = [
-			readdlm("$(Temp_profile)//T_gas (R=$(if (R[r] < 1) R[r] else Int(R[r]) end)mm, LD=$(LD[ld])).txt"; comments=true, comment_char='%')[:,2:end]
-	
-	for r = 1:length(R), ld = 1:length(LD)
-			]
-
-# ╔═╡ 54f952ce-8f4b-4a0f-bf1e-117fc48d3996
-x_gas_dict = [
-	readdlm("$(Temp_profile)//T_gas (R=$(if (R[r] < 1) R[r] else Int(R[r]) end)mm, LD=$(LD[ld])).txt"; comments=true, comment_char='%')[:,1]
-
-	for r = 1:length(R), ld = 1:length(LD)
-			]
-
-# ╔═╡ ff09ca2a-54b9-4112-abcf-92b744a86f9b
-T_solid_dict = [
-	readdlm("$(Temp_profile)//T_solid (R=$(if (R[r] < 1) R[r] else Int(R[r]) end)mm, LD=$(LD[ld])).txt"; comments=true, comment_char='%')[:,2:end]
-			
-	for r = 1:length(R), ld = 1:length(LD)
-			]
-
-# ╔═╡ aaa5252e-0714-476d-8267-f13d8a1f9e0d
-begin
-	Q_rad_loss = zeros(length(R),length(E))
-	Q_rad_loss_spec = zeros(length(R),length(E))
-	
-	Q_cnat_loss_tot = zeros(length(R),length(E))
-
-	Q_rad_loss_tot = zeros(length(R),length(E))
-	Q_rad_loss_tot_front = zeros(length(R),length(E))
-	Q_rad_loss_tot_int = zeros(length(R),length(E))
-
-	A_surface_tot = zeros(length(R))
-	A_surface_tot_front = zeros(length(R))
-	A_surface_tot_int = zeros(length(R))
-	
-	for r = 1:length(R), e = 1:length(E), ld = 1:length(LD)
-		lin_index = (r-1)*length(E) + e
-
-		A_walls = 2*4*R[r]*(LD[ld]*2*R[r])	#[mm^2]
-		A_front = 4*(R[r]+t)^2 - 4*R[r]^2 	#[mm^2]
-			
-		T_s = T_solid_dict[r,ld][1,e]
-		
-		#--------------------------------------------------------------------------	
-		Q_rad_loss[r,e] = Q_rad_loss_lin[lin_index]	# [W] per channel	
-		Q_rad_loss_front = Q_rad_loss_front_lin[lin_index] 	#[W]
-		Q_rad_loss_int = Q_rad_loss_int_lin[lin_index]  	#[W]
-		#--------------------------------------------------------------------------
-		Q_rad_loss_spec[r,e] = Q_rad_loss_lin[lin_index]/((A_walls + A_front)*1e-6) 	#[W/m^2]	
-		#--------------------------------------------------------------------------	
-		Q_rad_loss_tot[r,e] = Q_rad_loss[r,e]*n_channels(R[r], t) #[W]
-		Q_rad_loss_tot_front[r,e] = Q_rad_loss_front*n_channels(R[r], t) #[W]
-		Q_rad_loss_tot_int[r,e] = Q_rad_loss_int*n_channels(R[r], t) #[W]
-				
-		A_surface_tot_front[r] = A_front*n_channels(R[r], t) #[m^2]
-		A_surface_tot_int[r] = A_walls*n_channels(R[r], t) #[m^2]
-		A_surface_tot[r] =  A_surface_tot_front[r] + A_surface_tot_int[r] #[m^2]
-
-		Q_cnat_loss_tot[r,e] = h_nat*(T_s[1] - T_amb)*A_front*1e-6*n_channels(R[r],t) #[W]
-		
-	end
-end
-
-# ╔═╡ 95d1da60-d807-4ebc-8633-105fa948ddf4
-Q_rad_loss_tot
-
-# ╔═╡ 2caf1b17-51cf-4d96-93d3-948104c92fa5
+# ╔═╡ ee777a68-05da-4696-aa3e-d4fcddd3367a
 contourf(
-	log2.(R), E, transpose(Q_rad_loss_spec),
+	log2.(R), ε, transpose(BHS_tot),
 	xlabel = "log<sub>2</sub>(Radius - mm)",
 	#---------------------------------------------
-	# R, E, transpose(Q_rad_loss_spec),
+	# R, ε, transpose(BHS_tot),
 	# xlabel = "Radius (mm)",
 	#---------------------------------------------
-	# Re, E, transpose(Q_rad_loss_spec),
+	# Re, ε, transpose(BHS_tot),
 	# xlabel = "Reynolds Number",
 	#---------------------------------------------
-	# ϕ, E, transpose(Q_rad_loss_spec),
+	# ϕ, ε, transpose(BHS_tot),
 	# xlabel = "Porosity, ϕ",
 	#---------------------------------------------
-	ylabel = "Emissivity",
-	title = "Radiative Heat Loss per Channel using<br> Elements with <i>F<sub>amb</sub> > $(round(F_amb_min; digits=2)) </i> (W/m<sup>2</sup>)",
-	# c = cgrad(:thermal, rev = true),
+	ylabel = "Average Emissivity",
+	title = "Total Boundary Heat Source<br>per Module (W)",
 	c = cgrad(:thermal),
 	#--------------------------------------------
 	# Size formatting for ppt
-	# top_margin = 12*Plots.mm,
-	# left_margin = 3*Plots.mm,
-	# tickfontsize = 12,
-	# guidefont = 14,
-	# titlefont = 16,
-	# fontfamily = "ComputerModern",
-	# colorbar_font = "ComputerModern",
-	# contour_labels = true,
-	# size = (624,477), #for ppt
-	#--------------------------------------------
-	# Size formatting for word
-	top_margin = 10*Plots.mm,
+	framestyle = :box,
+	top_margin = 12*Plots.mm,
 	left_margin = 3*Plots.mm,
-	tickfontsize = 10,
-    guidefont = 11,
-	titlefont = 12,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
 	fontfamily = "ComputerModern",
 	colorbar_font = "ComputerModern",
 	contour_labels = true,
-	size = (325,250),	#for word doc.
-		
+	size = (389,300),	
+	)
+
+# ╔═╡ bd03bcfb-bd4a-43ce-bb38-8cbbb402fe55
+contourf(
+	log2.(R), ε, transpose(BHS_int_tot),
+	xlabel = "log<sub>2</sub>(Radius - mm)",
+	yaxis = range(0.2, 0.8, step=0.2),
+	#---------------------------------------------
+	# R, ε, transpose(BHS_tot),
+	# xlabel = "Radius (mm)",
+	#---------------------------------------------
+	# ϕ, ε, transpose(BHS_tot),
+	# xlabel = "Porosity, ϕ",
+	#---------------------------------------------
+	ylabel = "Average Emissivity",
+	title = "Interior Boundary Heat Source<br>per Module (W)",
+	#--------------------------------------------
+	# Size formatting for ppt
+	framestyle = :box,
+	top_margin = 12*Plots.mm,
+	left_margin = 3*Plots.mm,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
+	fontfamily = "ComputerModern",
+	colorbar_font = "ComputerModern",
+	contour_labels = true,
+	size = (389,300),	
+	)
+
+# ╔═╡ d996de9d-406f-4cb2-930b-b33909befc74
+contourf(
+	log2.(R), ε, transpose(BHS_front_tot),
+	xlabel = "log<sub>2</sub>(Radius - mm)",
+	yaxis = range(0.2, 0.8, step=0.2),
+	#---------------------------------------------
+	# R, ε, transpose(BHS_tot),
+	# xlabel = "Radius (mm)",
+	#---------------------------------------------
+	# ϕ, ε, transpose(BHS_tot),
+	# xlabel = "Porosity, ϕ",
+	#---------------------------------------------
+	ylabel = "Average Emissivity",
+	title = "Front Boundary Heat Source<br>per Module (W)",
+	#--------------------------------------------
+	# Size formatting for ppt
+	framestyle = :box,
+	top_margin = 12*Plots.mm,
+	left_margin = 3*Plots.mm,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
+	fontfamily = "ComputerModern",
+	colorbar_font = "ComputerModern",
+	contour_labels = true,
+	size = (389,300),	
+	)
+
+# ╔═╡ 46f66376-05a1-4047-b572-adee3b37d519
+contour(
+	log2.(R), ε, transpose(BHS_int_tot./BHS_front_tot),
+	xlabel = "log<sub>2</sub>(Radius - mm)",
+	#---------------------------------------------
+	# R, ε, transpose(BHS_tot),
+	# xlabel = "Radius (mm)",
+	#---------------------------------------------
+	# ϕ, ε, transpose(BHS_tot),
+	# xlabel = "Porosity, ϕ",
+	#---------------------------------------------
+	ylabel = "Average Emissivity",
+	title = "BHS<sub>int</sub> / BHS<sub>front</sub>",
+	yaxis = range(0.2, 0.8, step=0.2),
+	#--------------------------------------------
+	# Size formatting for ppt
+	framestyle = :box,
+	top_margin = 5*Plots.mm,
+	left_margin = 3*Plots.mm,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
+	fontfamily = "ComputerModern",
+	colorbar_font = "ComputerModern",
+	contour_labels = true,
+	size = (389,300),	
 	)
 
 # ╔═╡ c917cb94-36a6-49f1-bf2c-7681f6172310
-contourf(
+contour(
 	log2.(R), ε, transpose(Q_rad_loss_tot),
 	xlabel = "log<sub>2</sub>(Radius - mm)",
 	#---------------------------------------------
 	# R, ε, transpose(Q_rad_loss_tot),
 	# xlabel = "Radius (mm)",
 	#---------------------------------------------
-	# Re, ε, transpose(Q_rad_loss_tot),
-	# xlabel = "Reynolds Number",
-	#---------------------------------------------
 	# ϕ, ε, transpose(Q_rad_loss_tot),
 	# xlabel = "Porosity, ϕ",
 	#---------------------------------------------
 	ylabel = "Average Emissivity",
-	# title = "Radiative Heat Loss per Module<br>w/ Elements with <i>F<sub>amb</sub> > $(round(F_amb_min; digits=2)) </i> (W)",
+	yaxis = [0.2, 0.4, 0.6, 0.8],
 	title = "Radiative Heat Loss per <br> Module (W)",
-	# c = cgrad(:thermal, rev = true),
-	c = cgrad(:thermal),
+	levels = range(0, 2500, step = 100),
 	#--------------------------------------------
 	# Size formatting for ppt
-	# top_margin = 12*Plots.mm,
-	# left_margin = 3*Plots.mm,
-	# tickfontsize = 12,
-	# guidefont = 14,
-	# titlefont = 16,
-	# fontfamily = "ComputerModern",
-	# colorbar_font = "ComputerModern",
-	# contour_labels = true,
-	# size = (624,477), #for ppt
-	#--------------------------------------------
-	# Size formatting for word
-	top_margin = 10*Plots.mm,
+	framestyle = :box,
+	top_margin = 12*Plots.mm,
 	left_margin = 3*Plots.mm,
-	tickfontsize = 10,
-    guidefont = 11,
-	titlefont = 12,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
 	fontfamily = "ComputerModern",
 	colorbar_font = "ComputerModern",
 	contour_labels = true,
-	size = (325,250),	#for word doc.
-		
+	size = (389,300),	
 	)
 
 # ╔═╡ 1672b8ce-a4a5-44c5-aa7a-54af60a29451
-contourf(
+contour(
 	log2.(R), ε, transpose(Q_rad_loss_tot_front),
 	xlabel = "log<sub>2</sub>(Radius - mm)",
 	#---------------------------------------------
 	# R, E, transpose(Q_rad_loss_tot_front),
 	# xlabel = "Radius (mm)",
 	#---------------------------------------------
-	# Re, E, transpose(Q_rad_loss_tot_front),
-	# xlabel = "Reynolds Number",
-	#---------------------------------------------
 	# ϕ, E, transpose(Q_rad_loss_tot_front),
 	# xlabel = "Porosity, ϕ",
 	#---------------------------------------------
 	ylabel = "Average Emissivity",
-	title = "Radiative Heat Loss per Module<br> from Front Surface (W)",
-	# c = cgrad(:thermal, rev = true),
-	c = cgrad(:thermal),
+	title = "Radiative Heat Loss per Module<br>from Front Surface (W)",
 	#--------------------------------------------
 	# Size formatting for ppt
-	# top_margin = 12*Plots.mm,
-	# left_margin = 3*Plots.mm,
-	# tickfontsize = 12,
-	# guidefont = 14,
-	# titlefont = 16,
-	# fontfamily = "ComputerModern",
-	# colorbar_font = "ComputerModern",
-	# contour_labels = true,
-	# size = (624,477), #for ppt
-	#--------------------------------------------
-	# Size formatting for word
-	top_margin = 10*Plots.mm,
+	framestyle = :box,
+	yaxis = [0.2, 0.4, 0.6, 0.8],
+	top_margin = 12*Plots.mm,
 	left_margin = 3*Plots.mm,
-	tickfontsize = 10,
-    guidefont = 11,
-	titlefont = 12,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
 	fontfamily = "ComputerModern",
 	colorbar_font = "ComputerModern",
 	contour_labels = true,
-	size = (325,250),	#for word doc.
-		
+	size = (389,300),	
 	)
 
 # ╔═╡ 549fbc4f-b840-4a49-b0dc-2174d9d8468d
-contourf(
+contour(
 	log2.(R), ε, transpose(Q_rad_loss_tot_int),
 	xlabel = "log<sub>2</sub>(Radius - mm)",
 	#---------------------------------------------
 	# R, ε, transpose(Q_rad_loss_tot_int),
 	# xlabel = "Radius (mm)",
 	#---------------------------------------------
-	# Re, ε, transpose(Q_rad_loss_tot_int),
-	# xlabel = "Reynolds Number",
-	#---------------------------------------------
 	# ϕ, ε, transpose(Q_rad_loss_tot_int),
 	# xlabel = "Porosity, ϕ",
 	#---------------------------------------------
 	ylabel = "Average Emissivity",
-	title = "Radiative Heat Loss per Module<br> from Interior Surfaces (W)",
-	# c = cgrad(:thermal, rev = true),
-	c = cgrad(:thermal),
-	#--------------------------------------------
+	title = "Radiative Heat Loss per Module<br>from Interior Surfaces (W)",
+	#---------------------------------------------
 	# Size formatting for ppt
-	# top_margin = 12*Plots.mm,
-	# left_margin = 3*Plots.mm,
-	# tickfontsize = 12,
-	# guidefont = 14,
-	# titlefont = 16,
-	# fontfamily = "ComputerModern",
-	# colorbar_font = "ComputerModern",
-	# contour_labels = true,
-	# size = (624,477), #for ppt
-	#--------------------------------------------
-	# Size formatting for word
-	top_margin = 10*Plots.mm,
+	framestyle = :box,
+	yaxis = [0.2, 0.4, 0.6, 0.8],
+	top_margin = 12*Plots.mm,
 	left_margin = 3*Plots.mm,
-	tickfontsize = 10,
-    guidefont = 11,
-	titlefont = 12,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
 	fontfamily = "ComputerModern",
 	colorbar_font = "ComputerModern",
 	contour_labels = true,
-	size = (325,250),	#for word doc.
-		
+	size = (389,300),	
 	)
-
-# ╔═╡ 2c8cc361-2eb0-445f-95d7-7d65295a3087
-begin
-	T_s_in = zeros(length(R),length(E))
-	for r = 1:length(R), ld = 1:length(LD), e = 1:length(E)
-		T_s = T_solid_dict[r,ld][:,e]
-		T_s_in[r,e] = T_s[1]
-	end
-end
-
-# ╔═╡ 475c4317-427d-4558-923b-982662107ea2
-contourf(
-	log2.(R), ε, transpose(T_s_in),
-	xlabel = "log<sub>2</sub>(Radius - mm)",
-	#---------------------------------------------
-	# R, E, transpose(T_s_in),
-	# xlabel = "Radius (mm)",
-	#---------------------------------------------
-	# Re, E, transpose(T_s_in),
-	# xlabel = "Reynolds Number",
-	#---------------------------------------------
-	# ϕ, E, transpose(T_s_in),
-	# xlabel = "Porosity, ϕ",
-	#---------------------------------------------
-	ylabel = "Average Emissivity",
-	title = "Front Solid Surface Temp. (K)",
-	# c = cgrad(:thermal, rev = true),
-	c = cgrad(:thermal),
-	#--------------------------------------------
-	# Size formatting for ppt
-	# top_margin = 12*Plots.mm,
-	# left_margin = 3*Plots.mm,
-	# tickfontsize = 12,
-	# guidefont = 14,
-	# titlefont = 16,
-	# fontfamily = "ComputerModern",
-	# colorbar_font = "ComputerModern",
-	# contour_labels = true,
-	# size = (624,477), #for ppt
-	#--------------------------------------------
-	# Size formatting for word
-	top_margin = 10*Plots.mm,
-	left_margin = 3*Plots.mm,
-	tickfontsize = 10,
-    guidefont = 11,
-	titlefont = 12,
-	fontfamily = "ComputerModern",
-	colorbar_font = "ComputerModern",
-	contour_labels = true,
-	size = (325,250),	#for word doc.
-		
-	)
-
-# ╔═╡ b3c91cbe-baa8-421a-8ff1-b2b0bca215fa
-x_solid_dict = [
-	readdlm("$(Temp_profile)//T_solid (R=$(if (R[r] < 1) R[r] else Int(R[r]) end)mm, LD=$(LD[ld])).txt"; comments=true, comment_char='%')[:,1]
-
-	for r = 1:length(R), ld = 1:length(LD)
-			]
-
-# ╔═╡ a71d51c0-efdb-45bb-bb1b-821b1ee4bb81
-begin
-	T_s_avg = zeros(length(R),length(E))
-	for r = 1:length(R), ld = 1:length(LD), e = 1:length(E)
-		x = x_solid_dict[r,ld]
-		A_int = (x*1e-3)*(4*R[r]*2*1e-3) 	#Interior surface area per channel
-		T_s = T_solid_dict[r,ld][:,e]
-		m = 1	# Start length considered for integration
-		n = length(x)
-	
-		T_s_avg[r,e] = line_avg(T_s, x, m, n)
-	end
-end
 
 # ╔═╡ 1dab20f7-dd45-42c1-9565-156b9d4f5009
 contourf(
@@ -983,40 +903,74 @@ contourf(
 	# R, E, transpose(T_s_avg),
 	# xlabel = "Radius (mm)",
 	#---------------------------------------------
-	# Re, E, transpose(T_s_avg),
-	# xlabel = "Reynolds Number",
-	#---------------------------------------------
 	# ϕ, E, transpose(T_s_avg),
 	# xlabel = "Porosity, ϕ",
 	#---------------------------------------------
 	ylabel = "Average Emissivity",
 	title = "Average Solid Surface Temp. (K)",
-	# c = cgrad(:thermal, rev = true),
 	c = cgrad(:thermal),
 	#--------------------------------------------
 	# Size formatting for ppt
-	# top_margin = 12*Plots.mm,
-	# left_margin = 3*Plots.mm,
-	# tickfontsize = 12,
-	# guidefont = 14,
-	# titlefont = 16,
-	# fontfamily = "ComputerModern",
-	# colorbar_font = "ComputerModern",
-	# contour_labels = true,
-	# size = (624,477), #for ppt
-	#--------------------------------------------
-	# Size formatting for word
-	top_margin = 10*Plots.mm,
+	framestyle = :box,
+	top_margin = 5*Plots.mm,
 	left_margin = 3*Plots.mm,
-	tickfontsize = 10,
-    guidefont = 11,
-	titlefont = 12,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
 	fontfamily = "ComputerModern",
 	colorbar_font = "ComputerModern",
 	contour_labels = true,
-	size = (325,250),	#for word doc.
-		
+	size = (389,300),	
 	)
+
+
+# ╔═╡ 475c4317-427d-4558-923b-982662107ea2
+contourf(
+	log2.(R), ε, transpose(T_s_in),
+	xlabel = "log<sub>2</sub>(Radius - mm)",
+	#---------------------------------------------
+	# R, E, transpose(T_s_in),
+	# xlabel = "Radius (mm)",
+	#---------------------------------------------
+	# ϕ, E, transpose(T_s_in),
+	# xlabel = "Porosity, ϕ",
+	#---------------------------------------------
+	ylabel = "Average Emissivity",
+	title = "Front Solid Surface Temp. (K)",
+	c = cgrad(:thermal),
+	#---------------------------------------------
+	# Size formatting for ppt
+	framestyle = :box,
+	top_margin = 5*Plots.mm,
+	left_margin = 3*Plots.mm,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
+	fontfamily = "ComputerModern",
+	colorbar_font = "ComputerModern",
+	contour_labels = true,
+	size = (389,300),	
+	)
+
+
+# ╔═╡ 2c85185c-00d7-4409-943f-aceac14b7c80
+begin
+	BHS_profiles = "Integrated BHS Profiles (Vol-el)Centroid"
+	
+	x_bhs_dict = [
+		readdlm("$(BHS_profiles)//BHS Profile (R = $(R[r])mm, E = $(E[e])).txt"; comments=true, comment_char='%')[:,1]
+		for r = 1:length(R), e = 1:length(E)
+				]
+	
+	bhs_z_dict = [
+		readdlm("$(BHS_profiles)//BHS Profile (R = $(R[r])mm, E = $(E[e])).txt"; comments=true, comment_char='%')[:,2:end]
+		for r = 1:length(R), e = 1:length(E)
+				]
+	
+	md"""
+	Importing BHS profile data
+	"""
+end
 
 # ╔═╡ be8c4bdf-501a-4f2c-8a0d-d7e034040b24
 colors = permutedims(palette(:tab10)[1:length(E)])
@@ -1024,14 +978,19 @@ colors = permutedims(palette(:tab10)[1:length(E)])
 # ╔═╡ da253a52-1954-4890-842b-b9444917deeb
 @bind r1 PlutoUI.Slider(1:length(R), show_value=true)
 
+# ╔═╡ 66b5ad99-ee4d-418e-b00c-d84b86941ba6
+md"""
+Use the slider above to change the radius of the set of displayed temperature and houndary heat source profiles 
+"""
+
 # ╔═╡ 92bd2aae-62c7-4f84-9427-16e09a7bac14
 begin
 	# r1 = 2
 	ld1 = 1
 	plot(
-			x_gas_dict[r1,ld1],
+			[x_gas_dict[r1,ld1,e1] for e1 = 1:length(E)],
 
-			[T_gas_dict[r1,ld1][:,e1] for e1 = 1:length(E)],
+			[T_gas_dict[r1,ld1,e1] for e1 = 1:length(E)],
 		color = colors,
 		# color = permutedims(palette(:tab10)[1:length(E)]),
 		line = :dash,
@@ -1040,9 +999,9 @@ begin
 		)
 
 	plot!(
-			x_solid_dict[r1,ld1],
+			[x_solid_dict[r1,ld1,1] for e1 = 1:length(E)],
 
-			[T_solid_dict[r1,ld1][:,e1] for e1 = 1:length(E)],
+			[T_solid_dict[r1,ld1,e1] for e1 = 1:length(E)],
 		color = colors,
 		# color = permutedims(palette(:tab10)[1:length(E)]),
 		line = :solid,
@@ -1051,36 +1010,84 @@ begin
 		
 		xlabel = "Channel Length (L<sub>ch</sub> - mm)",
 		ylabel = "Temperature (K)",
-		title = "Axial Temperature Profiles (R<sub>ch</sub> = $(R[r1])mm)",
-		legend = :bottomright,
+		title = "Axial Temp. Profiles (R<sub>ch</sub> = $(R[r1])mm)",
+		legend = :outerbottomright,
+		#--------------------------------------------
+		# Size formatting for ppt
 		top_margin = 5*Plots.mm,
-		left_margin = 3*Plots.mm,
-		tickfontsize = 12,
+		left_margin = 6*Plots.mm,
 		legendfont = 10,
-		guidefont = 14,
-		titlefont = 16,
-		size = (624,477)
+		tickfontsize = 14,
+	    guidefont = 16,
+		titlefont = 18,
+		fontfamily = "ComputerModern",
+		colorbar_font = "ComputerModern",
+		contour_labels = true,
+		size = (620,335),
+		)
 
+end
+
+# ╔═╡ 499cb60d-d669-4cfc-8251-1a0011d8efbc
+begin
+	plot(
+		[x_bhs_dict[r1,e1] for e1 = 1:length(E)],
+		[bhs_z_dict[r1,e1] for e1 = 1:length(E)]./1e3,
+		color = colors,
+		line = :solid,
+		linewidth = 2,
+		label = permutedims(["L<sub>e</sub>/L<sub>ch</sub> = $(E[e])" for e = 1:length(E)]),
+		
+		xlabel = "Channel Length (L<sub>ch</sub> - mm)",
+		ylabel = "BHS Density (kW/m<sup>2</sup>)",
+		title = "Axial BHS Profiles (R<sub>ch</sub> = $(R[r1])mm)",
+		legend = :outerbottomright,
+		#--------------------------------------------
+		# Size formatting for ppt
+		top_margin = 5*Plots.mm,
+		left_margin = 6*Plots.mm,
+		legendfont = 10,
+		tickfontsize = 14,
+	    guidefont = 16,
+		titlefont = 18,
+		fontfamily = "ComputerModern",
+		colorbar_font = "ComputerModern",
+		contour_labels = true,
+		size = (620,335),
 		)
 
 end
 
 # ╔═╡ fc079169-d9ba-4f8d-a57d-613e8f2c5d49
 md"""
-#### Extracting and Plotting The Volumetric Effect/Efficiency
+## 4. Extracting and Plotting The Volumetric Effect Definitions
+
+"""
+
+# ╔═╡ 2419686f-8149-421d-9f60-e1ff48de75f5
+md"""
+### 4.1. Evaluating Definitions
+
+"""
+
+# ╔═╡ 676020f2-ac50-417c-a7ec-56d4d6295294
+md"""
+#### 4.1.1. Based on inlet and outlet temperatures
 """
 
 # ╔═╡ bd7dd4ab-ee29-4780-92a6-af77c440f6ba
-vol_eff = 	[
-	T_solid_dict[r,ld][1,e1]\T_gas_dict[r,ld][end,e1]	
-	for r = 1:length(R), ld = 1:length(LD),  e1 = 1:length(E)
-			]
-
-# ╔═╡ 083ec386-aefd-4a16-a1b8-c82340ff967f
-vol_eff[:,1,:] .== maximum(vol_eff[:,1,:])
-
-# ╔═╡ e9065f52-64bf-45d2-b5da-e75a4b408607
-@bind ld PlutoUI.Slider(1:length(LD), show_value=true)
+begin
+	vol_eff = 	[
+		T_solid_dict[r,ld,e1][1]\T_gas_dict[r,ld,e1][end]	
+		for r = 1:length(R), ld = 1:length(LD),  e1 = 1:length(E)
+				]
+		md"""
+	
+		For volumetric effect ratio 
+		
+		$$E_{vol} = \frac{T_{g, out}}{T_{s, in}}$$
+		"""
+end
 
 # ╔═╡ fa856550-9cd1-496b-a2b5-2cf79c22dd33
 contourf(
@@ -1099,28 +1106,17 @@ contourf(
 	ylabel = "Refelctive Region,  L<sub>e</sub>/L<sub>ch</sub>",
 	title = "Volumetric Effect, T<sub>g,out</sub> / T<sub>s,in</sub> <br>(L/D = $(LD[ld]))",
 	#--------------------------------------------
-	# Size formatting for ppt
-	# top_margin = 12*Plots.mm,
-	# left_margin = 3*Plots.mm,
-	# tickfontsize = 12,
-	# guidefont = 14,
-	# titlefont = 16,
-	# fontfamily = "ComputerModern",
-	# colorbar_font = "ComputerModern",
-	# contour_labels = true,
-	# size = (624,477), #for ppt
-	#--------------------------------------------
 	# Size formatting for word
+	framestyle = :box,
 	top_margin = 12*Plots.mm,
 	left_margin = 3*Plots.mm,
 	tickfontsize = 12,
-    guidefont = 14,
+	guidefont = 14,
 	titlefont = 16,
 	fontfamily = "ComputerModern",
 	colorbar_font = "ComputerModern",
 	contour_labels = true,
-	size = (624/1.5,477/1.5),	#for word doc.
-		
+	size = (389,300),	
 	)
 
 # ╔═╡ 92f3e394-6119-4f2c-96d9-ee5057bea2f1
@@ -1140,289 +1136,974 @@ contourf(
 	ylabel = "Average Emissivity",
 	title = "Volumetric Effect, T<sub>g,out</sub> / T<sub>s,in</sub>",# <br>(L/D = $(LD[ld]))",
 	#--------------------------------------------
-	# Size formatting for ppt
-	# top_margin = 12*Plots.mm,
-	# left_margin = 3*Plots.mm,
-	# tickfontsize = 12,
-	# guidefont = 14,
-	# titlefont = 16,
-	# fontfamily = "ComputerModern",
-	# colorbar_font = "ComputerModern",
-	# contour_labels = true,
-	# size = (624,477), #for ppt
-	#--------------------------------------------
 	# Size formatting for word
-	top_margin = 5*Plots.mm,
+	framestyle = :box,
+	top_margin = 12*Plots.mm,
 	left_margin = 3*Plots.mm,
-	tickfontsize = 14,
-    guidefont = 16,
-	titlefont = 18,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
 	fontfamily = "ComputerModern",
 	colorbar_font = "ComputerModern",
 	contour_labels = true,
-	size = (440,335),	#for word doc.
-		
+	size = (389,300),	
 	)
 
-# ╔═╡ 3c5eaa90-ec96-4757-9356-956a98840aef
+# ╔═╡ 31e32905-e6ee-40e8-8950-fc126ad2b14e
 begin
-	BHS = zeros(length(R),length(E))
-	BHS_spec = zeros(length(R),length(E))
-	BHS_tot = zeros(length(R),length(E))
 	
-	BHS_int_tot = zeros(length(R),length(E))
-	BHS_front_tot = zeros(length(R),length(E))
+	∆T1 = [T_solid_dict[r,ld,e1][1] - T_gas_dict[r,ld,e1][1] for r = 1:length(R), ld = 1:length(LD),  e1 = 1:length(E)]
 	
-	for r = 1:length(R), e = 1:length(E)
-		lin_index = (r-1)*length(E) + e
-		BHS[r,e] = BHS_lin[lin_index]	# [W]
-		A_walls = 2*4*R[r]*(LD[ld]*2*R[r])	#[mm^2]
-		A_front = 4*(R[r]+t)^2 - 4*R[r]^2 	#[mm^2]
-		BHS_spec[r,e] = BHS_lin[lin_index]/((A_walls + A_front)*1e-6) 	#[W/m^2]
-		BHS_tot[r,e] = BHS_lin[lin_index] * n_channels(R[r],t) 	#[W]
+	∆T2 = [T_solid_dict[r,ld,e1][end] - T_gas_dict[r,ld,e1][end] for r = 1:length(R), ld = 1:length(LD),  e1 = 1:length(E)]
+	
+	LMTD = 	[
+		(∆T1[r,ld,e1] - ∆T2[r,ld,e1]) / log(∆T1[r,ld,e1] / ∆T2[r,ld,e1])
 		
-		BHS_int_tot[r,e] = BHS_int_lin[lin_index] * n_channels(R[r],t) 	#[W]
-		BHS_front_tot[r,e] = BHS_front_lin[lin_index] * n_channels(R[r],t) 	#[W]
-	end
+	for r = 1:length(R), ld = 1:length(LD),  e1 = 1:length(E)
+			]
+	
+	md"""
+
+	For LMTD 
+	
+	$$LMTD = \frac{ΔT_1 - ΔT_2}{\log{(ΔT_1/ΔT_2)}}$$
+	"""
 end
 
-# ╔═╡ 8cb6d0d1-9301-419e-a242-817b0b718ae6
-contourf(
-	log2.(R), E, transpose(BHS_spec),
-	xlabel = "log<sub>2</sub>(Radius - mm)",
-	#---------------------------------------------
-	# R, E, transpose(BHS_spec),
-	# xlabel = "Radius (mm)",
-	#---------------------------------------------
-	# Re, E, transpose(BHS_spec),
-	# xlabel = "Reynolds Number",
-	#---------------------------------------------
-	# ϕ, E, transpose(BHS_spec),
-	# xlabel = "Porosity, ϕ",
-	#---------------------------------------------
-	ylabel = "Emissivity",
-	title = "Total Boundary Heat Source (W/m<sup>2</sup>)",
-	# title = "Total Boundary Heat Source (W)",
-	# c = cgrad(:thermal, rev = true),
-	c = cgrad(:thermal),
-	#--------------------------------------------
-	# Size formatting for ppt
-	# top_margin = 12*Plots.mm,
-	# left_margin = 3*Plots.mm,
-	# tickfontsize = 12,
-	# guidefont = 14,
-	# titlefont = 16,
-	# fontfamily = "ComputerModern",
-	# colorbar_font = "ComputerModern",
-	# contour_labels = true,
-	# size = (624,477), #for ppt
-	#--------------------------------------------
-	# Size formatting for word
-	top_margin = 10*Plots.mm,
-	left_margin = 3*Plots.mm,
-	tickfontsize = 10,
-    guidefont = 11,
-	titlefont = 12,
-	fontfamily = "ComputerModern",
-	colorbar_font = "ComputerModern",
-	contour_labels = true,
-	size = (325,250),	#for word doc.
+# ╔═╡ 35f62589-916e-4b5c-a262-67962f75aa2a
+md"""
+#### 4.1.2. Based on power ratios
+"""
+
+# ╔═╡ 1f2ece4a-5f92-487c-8034-250a0152c903
+begin
+	vol_eff_p1 = Q_abs_tot./Q_rad_loss_tot
+	vol_eff_p2 = Q_rad_loss_tot./BHS_tot
+	vol_eff_p3 = Q_abs_tot./BHS_tot
+	vol_eff_p4 = [BHS_tot[r,e]/(P_ap_lin[r] * n_channels(R[r],t)) for r = 1:length(R), e = 1:length(E)]
+	
+	md"""
+	For: 
+	
+	1. $$\frac{Q_{abs,g}}{Q_{rad,loss}}$$
+	1. $$\frac{Q_{rad,loss}}{Q_{BHS}}$$
+	1. $$\frac{Q_{abs,g}}{Q_{BHS}}$$
+	1. $$\frac{Q_{BHS}}{P_{ap}}$$
+	"""
+end
+
+# ╔═╡ 0c1c9430-4e51-4734-b7ba-4539509c34ed
+md"""
+#### 4.1.3. Based on statistical evaluations of ∆T
+"""
+
+# ╔═╡ 4bb5c2c4-c37b-42b6-9d0f-caef7fbb1c77
+begin
+	T_s_int = Array{Any, 2}(undef, (length(R),length(E)))
+	T_g_int = Array{Any, 2}(undef, (length(R),length(E)))
+	Z_int = Array{Any, 2}(undef, (length(R),length(LD)))
+	
+	for r = 1:length(R), ld = 1:length(LD),  e = 1:length(E)
+		L_channel = 2*R[r]*LD[ld] #mm
+		z_int = range(0, L_channel, step = 1)
+		Z_int[r,ld] = z_int
 		
-	)
+		T_s_int[r,e] = interpolate_lin_1D(T_solid_dict[r,ld,e], x_solid_dict[r,ld,e], z_int)
 
-# ╔═╡ ee777a68-05da-4696-aa3e-d4fcddd3367a
-contourf(
-	log2.(R), ε, transpose(BHS_tot),
-	xlabel = "log<sub>2</sub>(Radius - mm)",
-	#---------------------------------------------
-	# R, ε, transpose(BHS_tot),
-	# xlabel = "Radius (mm)",
-	#---------------------------------------------
-	# Re, ε, transpose(BHS_tot),
-	# xlabel = "Reynolds Number",
-	#---------------------------------------------
-	# ϕ, ε, transpose(BHS_tot),
-	# xlabel = "Porosity, ϕ",
-	#---------------------------------------------
-	ylabel = "Average Emissivity",
-	title = "Total Boundary Heat Source <br> per Module (W)",
-	# title = "Total Boundary Heat Source (W)",
-	# c = cgrad(:thermal, rev = true),
-	c = cgrad(:thermal),
-	#--------------------------------------------
-	# Size formatting for ppt
-	# top_margin = 12*Plots.mm,
-	# left_margin = 3*Plots.mm,
-	# tickfontsize = 12,
-	# guidefont = 14,
-	# titlefont = 16,
-	# fontfamily = "ComputerModern",
-	# colorbar_font = "ComputerModern",
-	# contour_labels = true,
-	# size = (624,477), #for ppt
-	#--------------------------------------------
-	# Size formatting for word
-	top_margin = 10*Plots.mm,
-	left_margin = 3*Plots.mm,
-	tickfontsize = 10,
-    guidefont = 11,
-	titlefont = 12,
-	fontfamily = "ComputerModern",
-	colorbar_font = "ComputerModern",
-	contour_labels = true,
-	size = (325,250),	#for word doc.
+		T_g_int[r,e] = interpolate_lin_1D(T_gas_dict[r,ld,e], x_gas_dict[r,ld,e], z_int) 
+	
+	end
+	
+	md"""
+	Extracting temperature profiles at the same lengths ('z' points) to obtain driving force at 1 mm intervals.
+
+	"""
+end	
+
+# ╔═╡ 0e573a73-ec46-424a-81f1-5fdec2732909
+begin
+	RMSE = Array{Any, 2}(undef, (length(R),length(E)))
+	R_corr = Array{Any, 2}(undef, (length(R),length(E)))
+	NMB = Array{Any, 2}(undef, (length(R),length(E)))
+	NMSD = Array{Any, 2}(undef, (length(R),length(E)))
+
+	SIG_S = Array{Any, 2}(undef, (length(R),length(E)))
+	SIG_G = Array{Any, 2}(undef, (length(R),length(E)))
+	T_S_BAR = Array{Any, 2}(undef, (length(R),length(E)))
+	T_G_BAR = Array{Any, 2}(undef, (length(R),length(E)))
+
+	
+	for r = 1:length(R), ld = 1:length(LD), e = 1:length(E)
+		T_s = T_s_int[r,ld][e]
+		T_g = T_g_int[r,ld][e]
+		Z = Z_int[r,ld]
 		
-	)
-
-# ╔═╡ 187743c5-0882-40c3-8e10-bbced743e50a
-[BHS_tot[i,j] .== maximum(BHS_tot) for i = 1:length(R), j=1:length(E)]
-
-# ╔═╡ 22ead363-fe5a-4b5a-8718-9a0c000d0c4d
-contourf(
-	log2.(R), ε, transpose(BHS_int_tot),
-	# log2.(R), ε, transpose(BHS_int_tot./BHS_tot),
-	xlabel = "log<sub>2</sub>(Radius - mm)",
-	#---------------------------------------------
-	# R, ε, transpose(BHS_tot),
-	# xlabel = "Radius (mm)",
-	#---------------------------------------------
-	# Re, ε, transpose(BHS_tot),
-	# xlabel = "Reynolds Number",
-	#---------------------------------------------
-	# ϕ, ε, transpose(BHS_tot),
-	# xlabel = "Porosity, ϕ",
-	#---------------------------------------------
-	ylabel = "Average Emissivity",
-	title = "Interior Boundary Heat Source <br> per Module (W)",
-	# title = "Total Boundary Heat Source (W)",
-	# c = cgrad(:thermal, rev = true),
-	c = cgrad(:thermal),
-	#--------------------------------------------
-	# Size formatting for ppt
-	# top_margin = 12*Plots.mm,
-	# left_margin = 3*Plots.mm,
-	# tickfontsize = 12,
-	# guidefont = 14,
-	# titlefont = 16,
-	# fontfamily = "ComputerModern",
-	# colorbar_font = "ComputerModern",
-	# contour_labels = true,
-	# size = (624,477), #for ppt
-	#--------------------------------------------
-	# Size formatting for word
-	top_margin = 10*Plots.mm,
-	left_margin = 3*Plots.mm,
-	tickfontsize = 10,
-    guidefont = 11,
-	titlefont = 12,
-	fontfamily = "ComputerModern",
-	colorbar_font = "ComputerModern",
-	contour_labels = true,
-	size = (325,250),	#for word doc.
+		N = length(Z)
 		
-	)
-
-# ╔═╡ d996de9d-406f-4cb2-930b-b33909befc74
-contourf(
-	log2.(R), ε, transpose(BHS_front_tot),
-	# log2.(R), ε, transpose(BHS_front_tot./BHS_tot),
-	xlabel = "log<sub>2</sub>(Radius - mm)",
-	#---------------------------------------------
-	# R, ε, transpose(BHS_tot),
-	# xlabel = "Radius (mm)",
-	#---------------------------------------------
-	# Re, ε, transpose(BHS_tot),
-	# xlabel = "Reynolds Number",
-	#---------------------------------------------
-	# ϕ, ε, transpose(BHS_tot),
-	# xlabel = "Porosity, ϕ",
-	#---------------------------------------------
-	ylabel = "Average Emissivity",
-	title = "Front Boundary Heat Source <br> per Module (W)",
-	# title = "Total Boundary Heat Source (W)",
-	# c = cgrad(:thermal, rev = true),
-	c = cgrad(:thermal),
-	#--------------------------------------------
-	# Size formatting for ppt
-	# top_margin = 12*Plots.mm,
-	# left_margin = 3*Plots.mm,
-	# tickfontsize = 12,
-	# guidefont = 14,
-	# titlefont = 16,
-	# fontfamily = "ComputerModern",
-	# colorbar_font = "ComputerModern",
-	# contour_labels = true,
-	# size = (624,477), #for ppt
-	#--------------------------------------------
-	# Size formatting for word
-	top_margin = 10*Plots.mm,
-	left_margin = 3*Plots.mm,
-	tickfontsize = 10,
-    guidefont = 11,
-	titlefont = 12,
-	fontfamily = "ComputerModern",
-	colorbar_font = "ComputerModern",
-	contour_labels = true,
-	size = (325,250),	#for word doc.
+		T_s_bar = line_avg(T_s, Z)
+		T_g_bar = line_avg(T_g, Z)
 		
-	)
-
-# ╔═╡ 46f66376-05a1-4047-b572-adee3b37d519
-contour(
-	log2.(R), ε, transpose(BHS_int_tot./BHS_front_tot),
-	# log2.(R), ε, transpose(BHS_int_tot./BHS_tot),
-	xlabel = "log<sub>2</sub>(Radius - mm)",
-	#---------------------------------------------
-	# R, ε, transpose(BHS_tot),
-	# xlabel = "Radius (mm)",
-	#---------------------------------------------
-	# Re, ε, transpose(BHS_tot),
-	# xlabel = "Reynolds Number",
-	#---------------------------------------------
-	# ϕ, ε, transpose(BHS_tot),
-	# xlabel = "Porosity, ϕ",
-	#---------------------------------------------
-	ylabel = "Average Emissivity",
-	title = "BHS<sub>int</sub> / BHS<sub>front</sub> per Module",
-	# title = "Total Boundary Heat Source (W)",
-	# c = cgrad(:thermal, rev = true),
-	c = cgrad(:thermal),
-	#--------------------------------------------
-	# Size formatting for ppt
-	# top_margin = 12*Plots.mm,
-	# left_margin = 3*Plots.mm,
-	# tickfontsize = 12,
-	# guidefont = 14,
-	# titlefont = 16,
-	# fontfamily = "ComputerModern",
-	# colorbar_font = "ComputerModern",
-	# contour_labels = true,
-	# size = (624,477), #for ppt
-	#--------------------------------------------
-	# Size formatting for word
-	top_margin = 5*Plots.mm,
-	left_margin = 3*Plots.mm,
-	tickfontsize = 10,
-    guidefont = 11,
-	titlefont = 12,
-	fontfamily = "ComputerModern",
-	colorbar_font = "ComputerModern",
-	contour_labels = true,
-	size = (325,250),	#for word doc.
+		sig_s = sqrt(1/N * sum((T_s .- T_s_bar).^2))
+		sig_g = sqrt(1/N * sum((T_g .- T_g_bar).^2))
 		
-	)
+		T_S_BAR[r,e] = T_s_bar
+		T_G_BAR[r,e] = T_g_bar
+		SIG_S[r,e] = sig_s
+		SIG_G[r,e] = sig_g
 
-# ╔═╡ e52e6862-0adc-494f-a088-a288104b5554
-plot(
-	# E.*R[1]*LD[1],
-	E,
-	[BHS_tot[i,:] for i =1:length(R)])
+		
+		RMSE[r,e] = sqrt(1/N * sum((T_s .- T_g).^2))
+		R_corr[r,e] = (sum((T_s .- T_s_bar).*(T_g .- T_g_bar))			
+						)/(
+				sqrt(sum((T_s .- T_s_bar).^2)) * sqrt(sum((T_g .- T_g_bar).^2))
+						)
+		NMB[r,e] = (T_s_bar - T_g_bar)/(T_g_bar)
+		NMSD[r,e] = (sig_s - sig_g)/(sig_g)
+					
+	end
 
-# ╔═╡ 0c4c7b1b-f5bd-46c1-acd0-173ca3c8ab02
-[BHS_tot[i,3] - BHS_tot[i,end] for i =1:length(R)]
+	md"""
+	Calculating:
+
+	1. $$RMSE = \sqrt{\frac{1}{N} \sum_{i=1}^N{ ( T_{s,i} - T_{g,i}} )^2}$$
+	2. $$NMB = \frac{\bar{T_s} - \bar{T_g}}{\bar{T_g}}$$
+	2. $$NMSD = \frac{\bar{σ_s} - \bar{σ_g}}{\bar{σ_g}}$$
+	"""
+end	
+
+# ╔═╡ 181a8d6a-f722-4fef-9e30-21d61904551c
+md"""
+#### 4.1.4. Based on uniformity of ∆T
+"""
 
 # ╔═╡ 7466e9ae-0a09-4c7f-8067-baed695e80ec
+begin
+	# driving force non-uniformity
+	σ_DF = std.(
+	[T_s_int[r,e] .- T_g_int[r,e]  for r = 1:length(R), e = 1:length(E)]
+				)
+	
+	# maximum temperature variation
+	IOTS = Array{Any, 2}(undef, (length(R),length(E)))
+	IOTG = Array{Any, 2}(undef, (length(R),length(E)))
 
+	# average local temperature gradient
+	DT_S_DZ = Array{Any, 2}(undef, (length(R),length(E)))
+	DT_G_DZ = Array{Any, 2}(undef, (length(R),length(E)))
+
+	
+	for r = 1:length(R), e = 1:length(E)
+		T_s = T_s_int[r,e]
+		T_g = T_g_int[r,e]
+		Z = Z_int[r,ld]
+		
+		N = length(Z)
+		
+		dT_s_dz = line_grad(T_s, Z)
+		dT_g_dz = line_grad(T_g, Z)
+				
+		DT_S_DZ[r,e] = line_avg(dT_s_dz, Z)
+		DT_G_DZ[r,e] = line_avg(dT_g_dz, Z)
+		
+		IOTS[r,e] = maximum(T_s) - minimum(T_s)
+		IOTG[r,e] = maximum(T_g) - minimum(T_g)
+					
+	end
+	md"""
+	Calculating local temperature gradients and standard deviation in temperature driving force
+	
+	$$σ_{ΔT} = \sqrt{\frac{1}{N} \sum_{i=1}^{N}{(ΔT_i - \bar{ΔT})^2}}$$
+	"""
+end
+
+# ╔═╡ faf61cff-f186-4e78-a370-515ee041a758
+md"""
+### 4.2. Plotting Definitions
+
+"""
+
+# ╔═╡ 53884e2a-f4a4-4147-b7ef-654e7a2b64df
+md"""
+#### 4.2.1. Based on inlet and outlet temperatures
+"""
+
+# ╔═╡ 9d5a104f-1e92-4e83-9651-5ef0cd3e0351
+contourf(
+	log2.(R), ε, transpose(vol_eff[:,ld,:]),
+	xlabel = "log<sub>2</sub>(Radius - mm)",
+	#---------------------------------------------
+	# R, E, transpose(T_s_avg),
+	# xlabel = "Radius (mm)",
+	#---------------------------------------------
+	# ϕ, E, transpose(T_s_avg),
+	# xlabel = "Porosity, ϕ",
+	#---------------------------------------------
+	ylabel = "Average Emissivity",
+	title = "Volumetric Effect, T<sub>g,out</sub>/T<sub>s,in</sub>",
+	#--------------------------------------------
+	# Size formatting for ppt
+	framestyle = :box,
+	top_margin = 5*Plots.mm,
+	left_margin = 3*Plots.mm,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
+	fontfamily = "ComputerModern",
+	colorbar_font = "ComputerModern",
+	contour_labels = true,
+	size = (389,300),	
+	)
+
+# ╔═╡ 08987764-7df9-4b67-83dc-4a362d30fbce
+contourf(
+	log2.(R), ε, transpose(LMTD[:,ld,:]),
+	xlabel = "log<sub>2</sub>(Radius - mm)",
+	#---------------------------------------------
+	# R, E, transpose(T_s_avg),
+	# xlabel = "Radius (mm)",
+	#---------------------------------------------
+	# ϕ, E, transpose(T_s_avg),
+	# xlabel = "Porosity, ϕ",
+	#---------------------------------------------
+	ylabel = "Average Emissivity",
+	title = "Volumetric Effect, LMTD (K)",# <br>(L/D = $(LD[ld]))",
+	#--------------------------------------------
+	# Size formatting for ppt
+	framestyle = :box,
+	top_margin = 5*Plots.mm,
+	left_margin = 3*Plots.mm,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
+	fontfamily = "ComputerModern",
+	colorbar_font = "ComputerModern",
+	contour_labels = true,
+	size = (389,300),	
+	)
+
+# ╔═╡ 7026ce17-23ca-4c85-9615-9dae6b561438
+md"""
+#### 4.2.2. Based on power ratios
+"""
+
+# ╔═╡ 57711ce7-0a46-421e-a006-4e5e74103f9a
+contourf(
+	log2.(R), ε, transpose(vol_eff_p1),
+	xlabel = "log<sub>2</sub>(Radius - mm)",
+	#---------------------------------------------
+	# R, E, transpose(T_s_avg),
+	# xlabel = "Radius (mm)",
+	#---------------------------------------------
+	# ϕ, E, transpose(T_s_avg),
+	# xlabel = "Porosity, ϕ",
+	#---------------------------------------------
+	ylabel = "Average Emissivity",
+	title = "Volumetric Effect, Q<sub>abs,g</sub>/Q<sub>rad,loss</sub>",
+	#--------------------------------------------
+	# Size formatting for ppt
+	framestyle = :box,
+	top_margin = 5*Plots.mm,
+	left_margin = 3*Plots.mm,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
+	fontfamily = "ComputerModern",
+	colorbar_font = "ComputerModern",
+	contour_labels = true,
+	size = (389,300),	
+	)
+
+# ╔═╡ 5e6729fa-5617-4382-93e5-9adbc32ed72a
+contourf(
+	log2.(R), ε, transpose(vol_eff_p2),
+	xlabel = "log<sub>2</sub>(Radius - mm)",
+	#---------------------------------------------
+	# R, E, transpose(T_s_avg),
+	# xlabel = "Radius (mm)",
+	#---------------------------------------------
+	# ϕ, E, transpose(T_s_avg),
+	# xlabel = "Porosity, ϕ",
+	#---------------------------------------------
+	ylabel = "Average Emissivity",
+	title = "Volumetric Effect, Q<sub>rad,loss</sub>/Q<sub>BHS</sub>",
+	#--------------------------------------------
+	# Size formatting for ppt
+	framestyle = :box,
+	top_margin = 5*Plots.mm,
+	left_margin = 3*Plots.mm,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
+	fontfamily = "ComputerModern",
+	colorbar_font = "ComputerModern",
+	contour_labels = true,
+	size = (389,300),	
+	)
+
+# ╔═╡ fb1a042d-3f22-45bb-b6c9-bd570bddf500
+contourf(
+	log2.(R), ε, transpose(vol_eff_p3),
+	xlabel = "log<sub>2</sub>(Radius - mm)",
+	#---------------------------------------------
+	# R, E, transpose(T_s_avg),
+	# xlabel = "Radius (mm)",
+	#---------------------------------------------
+	# ϕ, E, transpose(T_s_avg),
+	# xlabel = "Porosity, ϕ",
+	#---------------------------------------------
+	ylabel = "Average Emissivity",
+	title = "Volumetric Effect, Q<sub>abs,g</sub>/Q<sub>BHS</sub>",
+	#--------------------------------------------
+	# Size formatting for ppt
+	framestyle = :box,
+	top_margin = 5*Plots.mm,
+	left_margin = 3*Plots.mm,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
+	fontfamily = "ComputerModern",
+	colorbar_font = "ComputerModern",
+	contour_labels = true,
+	size = (389,300),	
+	)
+
+# ╔═╡ 6b2020e4-ecc2-4e09-8d82-0cce10dcd9d8
+md"""
+#### 4.2.3. Based on statistical evaluations of ∆T driving force
+"""
+
+# ╔═╡ c61f808e-5f87-447e-a452-cbaba36beb1d
+contourf(
+	log2.(R), ε, transpose(RMSE),
+	xlabel = "log<sub>2</sub>(Radius - mm)",
+	#---------------------------------------------
+	# R, E, transpose(T_s_avg),
+	# xlabel = "Radius (mm)",
+	#---------------------------------------------
+	# ϕ, E, transpose(T_s_avg),
+	# xlabel = "Porosity, ϕ",
+	#---------------------------------------------
+	ylabel = "Average Emissivity",
+	title = "Volumetric Effect, RMSE (K)",
+	#--------------------------------------------
+	# Size formatting for ppt
+	framestyle = :box,
+	top_margin = 5*Plots.mm,
+	left_margin = 3*Plots.mm,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
+	fontfamily = "ComputerModern",
+	colorbar_font = "ComputerModern",
+	contour_labels = true,
+	size = (389,300),	
+	)
+
+# ╔═╡ 7742a129-0377-46f2-bd37-e972edfc8c8e
+contourf(
+	log2.(R), ε, transpose(R_corr),
+	xlabel = "log<sub>2</sub>(Radius - mm)",
+	#---------------------------------------------
+	# R, E, transpose(T_s_avg),
+	# xlabel = "Radius (mm)",
+	#---------------------------------------------
+	# ϕ, E, transpose(T_s_avg),
+	# xlabel = "Porosity, ϕ",
+	#---------------------------------------------
+	ylabel = "Average Emissivity",
+	title = "Volumetric Effect, R",
+	#--------------------------------------------
+	# Size formatting for ppt
+	framestyle = :box,
+	top_margin = 5*Plots.mm,
+	left_margin = 3*Plots.mm,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
+	fontfamily = "ComputerModern",
+	colorbar_font = "ComputerModern",
+	contour_labels = true,
+	size = (389,300),	
+	)
+
+# ╔═╡ 46b142d5-c523-48c2-bd6c-46fd02494dde
+contourf(
+	log2.(R), ε, transpose(NMB),
+	xlabel = "log<sub>2</sub>(Radius - mm)",
+	#---------------------------------------------
+	# R, E, transpose(T_s_avg),
+	# xlabel = "Radius (mm)",
+	#---------------------------------------------
+	# ϕ, E, transpose(T_s_avg),
+	# xlabel = "Porosity, ϕ",
+	#---------------------------------------------
+	ylabel = "Average Emissivity",
+	title = "Volumetric Effect, NMB",
+	#--------------------------------------------
+	# Size formatting for ppt
+	framestyle = :box,
+	top_margin = 5*Plots.mm,
+	left_margin = 3*Plots.mm,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
+	fontfamily = "ComputerModern",
+	colorbar_font = "ComputerModern",
+	contour_labels = true,
+	size = (389,300),	
+	)
+
+# ╔═╡ 51dfd777-e93f-482a-bc55-cff23186399e
+contourf(
+	log2.(R), ε, transpose(NMSD),
+	xlabel = "log<sub>2</sub>(Radius - mm)",
+	#---------------------------------------------
+	# R, E, transpose(T_s_avg),
+	# xlabel = "Radius (mm)",
+	#---------------------------------------------
+	# ϕ, E, transpose(T_s_avg),
+	# xlabel = "Porosity, ϕ",
+	#---------------------------------------------
+	ylabel = "Average Emissivity",
+	title = "Volumetric Effect, NMSD",
+	#--------------------------------------------
+	# Size formatting for ppt
+	framestyle = :box,
+	top_margin = 5*Plots.mm,
+	left_margin = 3*Plots.mm,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
+	fontfamily = "ComputerModern",
+	colorbar_font = "ComputerModern",
+	contour_labels = true,
+	size = (389,300),	
+	)
+
+# ╔═╡ 8f357890-d730-42d7-90ba-bfe11d9a5999
+md"""
+#### 4.2.4. Based on uniformity of ∆T
+"""
+
+# ╔═╡ acef4071-c913-4f9d-968d-033dc891a351
+contourf(
+	log2.(R), ε, transpose(SIG_S),
+	xlabel = "log<sub>2</sub>(Radius - mm)",
+	#---------------------------------------------
+	# R, E, transpose(T_s_avg),
+	# xlabel = "Radius (mm)",
+	#---------------------------------------------
+	# ϕ, E, transpose(T_s_avg),
+	# xlabel = "Porosity, ϕ",
+	#---------------------------------------------
+	ylabel = "Average Emissivity",
+	title = "Volumetric Effect, σ<sub>s</sub>",
+	#--------------------------------------------
+	# Size formatting for ppt
+	framestyle = :box,
+	top_margin = 5*Plots.mm,
+	left_margin = 3*Plots.mm,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
+	fontfamily = "ComputerModern",
+	colorbar_font = "ComputerModern",
+	contour_labels = true,
+	size = (389,300),	
+	)
+
+# ╔═╡ b3c34bf5-fa63-40f4-a334-b2197a64e01b
+contourf(
+	log2.(R), ε, transpose(DT_S_DZ),
+	xlabel = "log<sub>2</sub>(Radius - mm)",
+	#---------------------------------------------
+	# R, E, transpose(T_s_avg),
+	# xlabel = "Radius (mm)",
+	#---------------------------------------------
+	# ϕ, E, transpose(T_s_avg),
+	# xlabel = "Porosity, ϕ",
+	#---------------------------------------------
+	ylabel = "Average Emissivity",
+	title = "Vol. Effect, <i><dT<sub>s</sub> / dz></i> (K/mm)",# <br>(L/D = $(LD[ld]))",
+	#--------------------------------------------
+	# Size formatting for ppt
+	framestyle = :box,
+	top_margin = 5*Plots.mm,
+	left_margin = 3*Plots.mm,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
+	fontfamily = "ComputerModern",
+	colorbar_font = "ComputerModern",
+	contour_labels = true,
+	size = (389,300),	
+	)
+
+# ╔═╡ 923c74b5-efe4-4891-ab78-25053df3dd22
+contourf(
+	log2.(R), ε, transpose(σ_DF),
+	xlabel = "log<sub>2</sub>(Radius - mm)",
+	#---------------------------------------------
+	# R, E, transpose(T_s_avg),
+	# xlabel = "Radius (mm)",
+	#---------------------------------------------
+	# ϕ, E, transpose(T_s_avg),
+	# xlabel = "Porosity, ϕ",
+	#---------------------------------------------
+	ylabel = "Average Emissivity",
+	title = "Volumetric Effect, σ<sub>∆T</sub>",
+	#--------------------------------------------
+	# Size formatting for ppt
+	framestyle = :box,
+	top_margin = 5*Plots.mm,
+	left_margin = 3*Plots.mm,
+	tickfontsize = 12,
+	guidefont = 14,
+	titlefont = 16,
+	fontfamily = "ComputerModern",
+	colorbar_font = "ComputerModern",
+	contour_labels = true,
+	size = (389,300),	
+	)
+
+# ╔═╡ 9215fef1-52fe-4bb0-b710-0b4f2cfa00cf
+md"""
+## 5. Analysing Trends in $\eta$ and $E_{vol}$ 
+"""
+
+# ╔═╡ bb2366d6-75cc-4124-89aa-4f1c6928d1b5
+md"""
+### 5.1. Analysing Designs Targeted by Different $E_{vol}$ Definitions
+"""
+
+# ╔═╡ 519fc224-01ac-4836-af8c-bccf66840e13
+begin
+	# Setting designs targeted by each E_vol definition
+	target = Array{CartesianIndex{2}, 1}(undef, 10)
+	
+	target[1] = findall(vol_eff[:,ld,:] .== maximum(vol_eff[:,ld,:]))[1]
+	target[2] = findall(LMTD[:,1,:] .== maximum(LMTD[:,1,:]))[1]
+	target[3] = findall(RMSE .== minimum(RMSE))[1] #closest value to 0
+	target[4] = findall(NMB .== minimum(NMB))[1] #closest value to 0
+	target[5] = findall(abs.(NMSD) .== minimum(abs.(NMSD)))[1] #closest value to 0
+	target[6] = findall(vol_eff_p1 .== maximum(vol_eff_p1))[1]
+	target[7] = findall(vol_eff_p2 .== minimum(vol_eff_p2))[1]
+	target[8] = findall(vol_eff_p3 .== maximum(vol_eff_p3))[1]
+	target[9] = findall(vol_eff_p4 .== maximum(vol_eff_p4))[1]
+	target[10] = findall(σ_DF .== minimum(σ_DF))[1]
+
+	# Reorganizing labels
+	labels = ["dTₛ/dz", "σₛ" , "T<sub>g,out</sub>/T<sub>s,in</sub>" , "LMTD" ,"R_corr", "RMSE", "NMB"  ,"NMSD", "Q<sub>abs,g</sub>/Q<sub>rad,loss</sub>", "Q<sub>rad,loss</sub>/Q<sub>BHS</sub>", "Q<sub>abs,g</sub>/Q<sub>BHS</sub>", "σ_∆T" ] 
+	
+	labels3 = cat(labels[3:4], labels[6:11], ["Q<sub>BHS,g</sub>/P<sub>ap</sub>"], "σ<sub>∆T</sub>"; dims = 1)
+	labels3[8] = "η<sub>conv</sub>"; labels3[9] = "η<sub>opt</sub>"
+	
+	labels2 = cat(copy(labels[1:11]), ["Q<sub>BHS</sub>/P<sub>ap</sub>"], [labels[12]]; dims = 1)
+	labels2[13] = "σ<sub>∆T</sub>";  labels2[5] = "R<sub>corr</sub>";
+
+	marker_shapes = [:circle  :circle  :square  :square  :square  :diamond  :diamond  :diamond  :diamond  :utriangle]
+
+	md"""
+	Finding designs targeted by each volumetric effect definition.
+	"""
+end
+
+# ╔═╡ 18dcd972-57ba-4ace-9369-a58bb9fef611
+colors2 = permutedims(palette(:solar, 10)[:])
+
+# ╔═╡ 2ff13589-c0af-42f7-8a11-2bfe15e2500c
+begin
+	contourf(
+		log2.(R), E, transpose(Eff_Ap),
+		#---------------------------------------------
+		xlabel = "log<sub>2</sub>(Radius - mm)",
+		ylabel = "Emissivity",
+		
+		colorbar_title = " η<sub> thermal<sub>",
+		colorbar_titlefontsize = 16,
+	    colorbar_title_location = :right,           
+	    colorbar_titlefontfamily = :match,
+		color = :grays,
+		#--------------------------------------------
+		# Size formatting for word
+		framestyle = :box,
+		top_margin = 15*Plots.mm,
+		left_margin = 7*Plots.mm,
+		tickfontsize = 14,
+	    guidefont = 16,
+		titlefont = 18,
+		fontfamily = "ComputerModern",
+		colorbar_font = "ComputerModern",
+		contour_labels = true,			
+		)
+
+	# Adding targets
+	scatter!(
+		[[log2(R[target[i][1]])] for i = 1:length(target)],
+		[[E[target[i][2]]] for i = 1:length(target)],
+
+		label = permutedims(labels3),		
+		
+		color = colors2,
+		markershape = marker_shapes,
+		markerstrokewidth = 1,
+		markerstrokecolor  = :white,
+		markersize = 8,
+
+		legendfontsize = 13,
+		legend = (1.3,0.9)
+		)
+
+	scatter!(
+		[log2(mean(R[1:2]))],
+		[E[5]],
+
+		marker = :xcross,
+		color = :black,
+		markersize = 5,
+		label = "η<sub>max</sub>",
+		)
+end
+
+# ╔═╡ 8d1abc15-cacd-4d00-a920-e8b691afd223
+begin
+	bar(
+		# [[labels2[i]] for i = 1:length(target)],
+		# [[labels2[i]] for i = cat(1:11, [13]; dims=1)],
+		[[labels3[i]] for i = 1:length(labels3)],
+		[[Eff_Ap[target[i]]] for i = 1:length(target)],
+
+		ylabel = "Thermal Efficiency, η",
+		ylim = [0.2, 1.0],
+		xgrid = :none,
+		
+		xrotation = 90,
+		bottom_margin = -120*Plots.mm,
+	
+		color = colors2,
+		legend = false,
+
+		# title = "(B)", titlelocation = :left, 
+		topmargin = 15*Plots.mm,
+		#--------------------------------------------
+		# Size formatting for word
+		tickfontsize = 14,
+		guidefont = 16,
+		titlefont = 18,
+		fontfamily = "ComputerModern",
+		colorbar_font = "ComputerModern",
+		contour_labels = true,
+		size = (440, 400),	#for word doc.
+				
+	)
+	
+	hline!(
+		[maximum(Eff_Ap)],
+	
+		label = "η<sub>max</sub>",
+		
+		color = :black,
+		line = :dash,
+		lineswidth = 2,
+		
+		# annotations = (14.5, maximum(Eff_Ap)*1.05, Plots.text("<i> η<sub>max</sub> </i>", :left, "ComputerModern")),	
+		annotations = (11.5, maximum(Eff_Ap)*1.06, Plots.text("<i> η<sub>max</sub> </i>", :left, "ComputerModern")),	
+	)
+end
+
+# ╔═╡ 75fe45b8-4eef-46b4-9fa5-76c0fbc77f9e
+begin
+	plot(
+		[Z_int[target[i][1]] for i = 1:length(target)],
+
+		[T_g_int[target[i]] for i = 1:length(target)],
+		
+		color = colors2,
+		line = :dash,
+		linewidth = 2,
+		label = permutedims(labels3),
+
+		)
+	
+
+	plot!(
+		[Z_int[target[i][1]] for i = 1:length(target)],
+
+		[T_s_int[target[i]]  for i = 1:length(target)],
+		
+		color = colors2,
+		line = :solid,
+		linewidth = 2,
+		label = permutedims(labels3),
+
+		xlabel = "Channel Length (L<sub>ch</sub> - mm)",
+		ylabel = "Temperature (K)",
+		title = "Axial Temperature Profiles for <i>max(E<sub>vol</sub>)</i> <br> (Base Case)",
+		legend = :outerbottomright,
+		framestyle = :box,
+		top_margin = 12*Plots.mm,
+		left_margin = 3*Plots.mm,
+		legendfont = 10,
+		tickfontsize = 12,
+		guidefont = 14,
+		titlefont = 16,
+		fontfamily = "ComputerModern",
+		colorbar_font = "ComputerModern",
+		contour_labels = true,
+		size = (600,450),	
+		)
+
+	plot!(
+		Z_int[1],
+
+		[T_s_int[1,5], T_g_int[1,5]],
+
+		color = :black,
+		line = [:solid :dash],
+		linewidth = 2,
+		label = ["<i>max(η)</i>"  "<i>max(η)</i>"],
+		
+		)
+
+end
+
+# ╔═╡ b3084472-3443-4e7c-aff3-648a92a223ff
+
+
+# ╔═╡ 2b01927c-7236-4f47-ab35-e1090a951149
+md"""
+Separating grouped definitions
+"""
+
+# ╔═╡ 525c06f7-078c-452c-92cc-c21b1e274901
+colors3 = permutedims(palette(:Dark2_4)[:])
+
+# ╔═╡ 618f81b5-dafa-43b7-bfba-a1fbaf2b69f2
+begin
+	plot(
+		[Z_int[target[i][1],1] for i = 1:2],
+
+		[T_g_int[target[i]] for i = 1:2],
+		
+		color = colors3,
+		line = :dash,
+		linewidth = 2,
+		# label = permutedims(labels2),
+		label = permutedims(["" for i = 1:2]),		
+		)
+
+	plot!(
+		[Z_int[target[i][1],1] for i = 1:2],
+
+		[T_s_int[target[i]]  for i = 1:2],
+		
+		color = colors3,
+		line = :solid,
+		linewidth = 2,
+		# label = permutedims(labels2),
+		label = permutedims(labels3[1:2]),
+		
+		xlabel = "Channel Length (L<sub>ch</sub> - mm)",
+		ylabel = "Temperature (K)",
+		# title = "Based on Power ratios",
+		title = "(A)", titlelocation = :left, topmargin = 8*Plots.mm,
+
+		legend = (1.0, 0.7),
+		framestyle = :box,
+		top_margin = 5*Plots.mm,
+		left_margin = 3*Plots.mm,
+		tickfontsize = 12,
+		legendfont = 12,
+		guidefont = 14,
+		titlefont = 16,
+		fontfamily = "ComputerModern",
+		size = (320,250).*1.5,
+		)
+
+	plot!(
+		Z_int[1],
+
+		[T_s_int[1,5], T_g_int[1,5]],
+
+		color = :black,
+		line = [:solid :dash],
+		linewidth = 2,
+		# label = ["<i>max(η)</i>"  "<i>max(η)</i>"],
+		label = ["<i>max(η)</i>"  ""],
+		
+		)
+	
+
+end
+
+# ╔═╡ af2ed81f-cfef-487f-a225-726a60cb5b55
+begin
+	plot(
+		[Z_int[target[i][1]] for i = 6:9],
+
+		[T_g_int[target[i]] for i = 6:9],
+		
+		color = colors3,
+		line = :dash,
+		linewidth = 2,
+		# label = permutedims(labels2),
+		label = permutedims(["" for i = 6:9]),		
+		)
+
+	plot!(
+		[Z_int[target[i][1],1] for i = 6:9],
+
+		[T_s_int[target[i]]  for i = 6:9],
+		
+		color = colors3,
+		line = :solid,
+		linewidth = 2,
+		# label = permutedims(labels2),
+		label = permutedims(labels3[6:9]),
+		
+		xlabel = "Channel Length (L<sub>ch</sub> - mm)",
+		ylabel = "Temperature (K)",
+		# title = "Based on Power ratios",
+		title = "(B)", titlelocation = :left, topmargin = 8*Plots.mm,
+
+		legend = (1.0, 0.7),
+		framestyle = :box,
+		top_margin = 5*Plots.mm,
+		left_margin = 3*Plots.mm,
+		tickfontsize = 12,
+		legendfont = 12,
+		guidefont = 14,
+		titlefont = 16,
+		fontfamily = "ComputerModern",
+		size = (320,250).*1.5,
+		)
+
+	plot!(
+		Z_int[1],
+
+		[T_s_int[1,5], T_g_int[1,5]],
+
+		color = :black,
+		line = [:solid :dash],
+		linewidth = 2,
+		# label = ["<i>max(η)</i>"  "<i>max(η)</i>"],
+		label = ["<i>max(η)</i>"  ""],
+		
+		)
+	
+
+end
+
+# ╔═╡ c979d3ed-14b0-42b4-b09d-6b89ff933d40
+begin
+	plot(
+		[Z_int[target[i][1]] for i = 3:5],
+
+		[T_g_int[target[i]] for i = 3:5],
+		
+		color = colors3,
+		line = :dash,
+		linewidth = 2,
+		label = permutedims(["" for i = 3:5]),		
+		)
+
+	plot!(
+		[Z_int[target[i][1],1] for i = 3:5],
+
+		[T_s_int[target[i]]  for i = 3:5],
+		
+		color = colors3,
+		line = :solid,
+		linewidth = 2,
+		label = permutedims(labels3[3:5]),
+		
+		xlabel = "Channel Length (L<sub>ch</sub> - mm)",
+		ylabel = "Temperature (K)",
+		title = "(C)", titlelocation = :left, topmargin = 8*Plots.mm,
+
+		legend = (1.0, 0.7),
+		framestyle = :box,
+		top_margin = 5*Plots.mm,
+		left_margin = 3*Plots.mm,
+		tickfontsize = 12,
+		legendfont = 12,
+		guidefont = 14,
+		titlefont = 16,
+		fontfamily = "ComputerModern",
+		size = (320,250).*1.5,
+		)
+
+	plot!(
+		Z_int[1],
+
+		[T_s_int[1,5], T_g_int[1,5]],
+
+		color = :black,
+		line = [:solid :dash],
+		linewidth = 2,
+		label = ["<i>max(η)</i>"  ""],
+		
+		)
+	
+
+end
+
+# ╔═╡ ad2477af-c685-43b4-97eb-a6e8495017ec
+begin
+	plot(
+		[Z_int[target[i][1],1] for i in [10]],
+
+		[T_g_int[target[i]] for i in [10]],
+		
+		color = colors3,
+		line = :dash,
+		linewidth = 2,
+		label = permutedims(["" for i in [10]]),		
+		)
+
+	plot!(
+		[Z_int[target[i][1],1] for i in [10]],
+
+		[T_s_int[target[i]]  for i in [10]],
+		
+		color = colors3,
+		line = :solid,
+		linewidth = 2,
+		# label = permutedims(labels2),
+		label = labels3[10],
+		
+		xlabel = "Channel Length (L<sub>ch</sub> - mm)",
+		ylabel = "Temperature (K)",
+		# title = "Based on Power ratios",
+		title = "(D)", titlelocation = :left, topmargin = 8*Plots.mm,
+
+		legend = (1.0, 0.7),
+		framestyle = :box,
+		top_margin = 5*Plots.mm,
+		left_margin = 3*Plots.mm,
+		tickfontsize = 12,
+		legendfont = 12,
+		guidefont = 14,
+		titlefont = 16,
+		fontfamily = "ComputerModern",
+		size = (320,250).*1.5,
+		)
+
+	plot!(
+		Z_int[1],
+
+		[T_s_int[1,5], T_g_int[1,5]],
+
+		color = :black,
+		line = [:solid :dash],
+		linewidth = 2,
+		# label = ["<i>max(η)</i>"  "<i>max(η)</i>"],
+		label = ["<i>max(η)</i>"  ""],
+		
+		)
+	
+
+end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1450,6 +2131,7 @@ version = "3.3.1"
 
 [[ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
+version = "1.1.1"
 
 [[Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
@@ -1464,10 +2146,10 @@ uuid = "6e34b625-4abd-537c-b88f-471c36dfa7a0"
 version = "1.0.8+0"
 
 [[Cairo_jll]]
-deps = ["Artifacts", "Bzip2_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "JLLWrappers", "LZO_jll", "Libdl", "Pixman_jll", "Pkg", "Xorg_libXext_jll", "Xorg_libXrender_jll", "Zlib_jll", "libpng_jll"]
-git-tree-sha1 = "f2202b55d816427cd385a9a4f3ffb226bee80f99"
+deps = ["Artifacts", "Bzip2_jll", "CompilerSupportLibraries_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "JLLWrappers", "LZO_jll", "Libdl", "Pixman_jll", "Pkg", "Xorg_libXext_jll", "Xorg_libXrender_jll", "Zlib_jll", "libpng_jll"]
+git-tree-sha1 = "4b859a208b2397a7a623a03449e4636bdb17bcf2"
 uuid = "83423d85-b0ee-5818-9007-b63ccbeb887a"
-version = "1.16.1+0"
+version = "1.16.1+1"
 
 [[ColorSchemes]]
 deps = ["ColorTypes", "Colors", "FixedPointNumbers", "Random"]
@@ -1496,6 +2178,7 @@ version = "3.39.0"
 [[CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
+version = "1.0.1+0"
 
 [[Contour]]
 deps = ["StaticArrays"]
@@ -1532,8 +2215,9 @@ deps = ["Random", "Serialization", "Sockets"]
 uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[Downloads]]
-deps = ["ArgTools", "LibCURL", "NetworkOptions"]
+deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
+version = "1.6.0"
 
 [[EarCut_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1558,6 +2242,9 @@ deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers",
 git-tree-sha1 = "d8a578692e3077ac998b50c0217dfd67f21d1e5f"
 uuid = "b22a6f82-2f65-5046-a5b2-351ab43fb4e5"
 version = "4.4.0+0"
+
+[[FileWatching]]
+uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
 
 [[FixedPointNumbers]]
 deps = ["Statistics"]
@@ -1621,9 +2308,9 @@ version = "0.21.0+0"
 
 [[Glib_jll]]
 deps = ["Artifacts", "Gettext_jll", "JLLWrappers", "Libdl", "Libffi_jll", "Libiconv_jll", "Libmount_jll", "PCRE_jll", "Pkg", "Zlib_jll"]
-git-tree-sha1 = "7bf67e9a481712b3dbe9cb3dac852dc4b1162e02"
+git-tree-sha1 = "a32d672ac2c967f3deb8a81d828afc739c838a06"
 uuid = "7746bdde-850d-59dc-9ae8-88ece973131d"
-version = "2.68.3+0"
+version = "2.68.3+2"
 
 [[Graphite2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1644,9 +2331,9 @@ version = "0.9.16"
 
 [[HarfBuzz_jll]]
 deps = ["Artifacts", "Cairo_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "Graphite2_jll", "JLLWrappers", "Libdl", "Libffi_jll", "Pkg"]
-git-tree-sha1 = "8a954fed8ac097d5be04921d595f741115c1b2ad"
+git-tree-sha1 = "129acf094d168394e80ee1dc4bc06ec835e510a3"
 uuid = "2e76f6c2-a576-52d4-95c1-20adfe4de566"
-version = "2.8.1+0"
+version = "2.8.1+1"
 
 [[HypertextLiteral]]
 git-tree-sha1 = "72053798e1be56026b81d4e2682dbe58922e5ec9"
@@ -1703,6 +2390,12 @@ git-tree-sha1 = "f6250b16881adf048549549fba48b1161acdac8c"
 uuid = "c1c5ebd0-6772-5130-a774-d5fcae4a789d"
 version = "3.100.1+0"
 
+[[LERC_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "bf36f528eec6634efc60d7ec062008f171071434"
+uuid = "88015f11-f218-50d7-93a8-a6af411a945d"
+version = "3.0.0+1"
+
 [[LZO_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "e5b909bcf985c5e2605737d2ce278ed791b89be6"
@@ -1723,10 +2416,12 @@ version = "0.15.6"
 [[LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
 uuid = "b27032c2-a3e7-50c8-80cd-2d36dbcbfd21"
+version = "0.6.3"
 
 [[LibCURL_jll]]
 deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll", "Zlib_jll", "nghttp2_jll"]
 uuid = "deac9b47-8bc7-5906-a0fe-35ac56dc84c0"
+version = "7.84.0+0"
 
 [[LibGit2]]
 deps = ["Base64", "NetworkOptions", "Printf", "SHA"]
@@ -1735,6 +2430,7 @@ uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
 [[LibSSH2_jll]]
 deps = ["Artifacts", "Libdl", "MbedTLS_jll"]
 uuid = "29816b5a-b9ab-546f-933c-edad1886dfa8"
+version = "1.10.2+0"
 
 [[Libdl]]
 uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
@@ -1765,9 +2461,9 @@ version = "1.42.0+0"
 
 [[Libiconv_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "42b62845d70a619f063a7da093d995ec8e15e778"
+git-tree-sha1 = "c7cb1f5d892775ba13767a87c7ada0b980ea0a71"
 uuid = "94ce4f54-9a6c-5748-9c1c-f9c7231a4531"
-version = "1.16.1+1"
+version = "1.16.1+2"
 
 [[Libmount_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1776,10 +2472,10 @@ uuid = "4b2f31a3-9ecc-558c-b454-b3730dcb73e9"
 version = "2.35.0+0"
 
 [[Libtiff_jll]]
-deps = ["Artifacts", "JLLWrappers", "JpegTurbo_jll", "Libdl", "Pkg", "Zlib_jll", "Zstd_jll"]
-git-tree-sha1 = "340e257aada13f95f98ee352d316c3bed37c8ab9"
+deps = ["Artifacts", "JLLWrappers", "JpegTurbo_jll", "LERC_jll", "Libdl", "Pkg", "Zlib_jll", "Zstd_jll"]
+git-tree-sha1 = "c9551dd26e31ab17b86cbd00c2ede019c08758eb"
 uuid = "89763e89-9b03-5906-acba-b20f662cd828"
-version = "4.3.0+0"
+version = "4.3.0+1"
 
 [[Libuuid_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1788,7 +2484,7 @@ uuid = "38a345b3-de98-5d2b-a5d3-14cd9215e700"
 version = "2.36.0+0"
 
 [[LinearAlgebra]]
-deps = ["Libdl"]
+deps = ["Libdl", "libblastrampoline_jll"]
 uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [[Logging]]
@@ -1813,6 +2509,7 @@ version = "1.0.3"
 [[MbedTLS_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "c8ffd9c3-330d-5841-b78e-0817d7145fa1"
+version = "2.28.0+0"
 
 [[Measures]]
 git-tree-sha1 = "e498ddeee6f9fdb4551ce855a46f54dbd900245f"
@@ -1830,6 +2527,7 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 
 [[MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
+version = "2022.2.1"
 
 [[NaNMath]]
 git-tree-sha1 = "bfe47e760d60b82b66b61d2d44128b62e3a369fb"
@@ -1838,12 +2536,18 @@ version = "0.3.5"
 
 [[NetworkOptions]]
 uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
+version = "1.2.0"
 
 [[Ogg_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "7937eda4681660b4d6aeeecc2f7e1c81c8ee4e2f"
+git-tree-sha1 = "887579a3eb005446d514ab7aeac5d1d027658b8f"
 uuid = "e7412a2a-1a6e-54c0-be00-318e2571c051"
-version = "1.3.5+0"
+version = "1.3.5+1"
+
+[[OpenBLAS_jll]]
+deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
+uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
+version = "0.3.20+0"
 
 [[OpenSSL_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1883,6 +2587,7 @@ version = "0.40.1+0"
 [[Pkg]]
 deps = ["Artifacts", "Dates", "Downloads", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs", "p7zip_jll"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+version = "1.8.0"
 
 [[PlotThemes]]
 deps = ["PlotUtils", "Requires", "Statistics"]
@@ -1920,16 +2625,16 @@ uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 
 [[Qt5Base_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Fontconfig_jll", "Glib_jll", "JLLWrappers", "Libdl", "Libglvnd_jll", "OpenSSL_jll", "Pkg", "Xorg_libXext_jll", "Xorg_libxcb_jll", "Xorg_xcb_util_image_jll", "Xorg_xcb_util_keysyms_jll", "Xorg_xcb_util_renderutil_jll", "Xorg_xcb_util_wm_jll", "Zlib_jll", "xkbcommon_jll"]
-git-tree-sha1 = "ad368663a5e20dbb8d6dc2fddeefe4dae0781ae8"
+git-tree-sha1 = "0c03844e2231e12fda4d0086fd7cbe4098ee8dc5"
 uuid = "ea2cea3b-5b76-57ae-a6ef-0a8af62496e1"
-version = "5.15.3+0"
+version = "5.15.3+2"
 
 [[REPL]]
 deps = ["InteractiveUtils", "Markdown", "Sockets", "Unicode"]
 uuid = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
 
 [[Random]]
-deps = ["Serialization"]
+deps = ["SHA", "Serialization"]
 uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [[RecipesBase]]
@@ -1956,6 +2661,7 @@ version = "1.1.3"
 
 [[SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
+version = "0.7.0"
 
 [[Scratch]]
 deps = ["Dates"]
@@ -2019,6 +2725,7 @@ version = "0.6.3"
 [[TOML]]
 deps = ["Dates"]
 uuid = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
+version = "1.0.0"
 
 [[TableTraits]]
 deps = ["IteratorInterfaceExtensions"]
@@ -2035,6 +2742,7 @@ version = "1.6.0"
 [[Tar]]
 deps = ["ArgTools", "SHA"]
 uuid = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
+version = "1.10.1"
 
 [[Test]]
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
@@ -2205,6 +2913,7 @@ version = "1.4.0+3"
 [[Zlib_jll]]
 deps = ["Libdl"]
 uuid = "83775a58-1f1d-513f-b197-d71354ab007a"
+version = "1.2.12+3"
 
 [[Zstd_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -2217,6 +2926,11 @@ deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "HarfBuzz_jll"
 git-tree-sha1 = "5982a94fcba20f02f42ace44b9894ee2b140fe47"
 uuid = "0ac62f75-1d6f-5e53-bd7c-93b484bb37c0"
 version = "0.15.1+0"
+
+[[libblastrampoline_jll]]
+deps = ["Artifacts", "Libdl", "OpenBLAS_jll"]
+uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
+version = "5.1.1+0"
 
 [[libfdk_aac_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -2232,17 +2946,19 @@ version = "1.6.38+0"
 
 [[libvorbis_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Ogg_jll", "Pkg"]
-git-tree-sha1 = "c45f4e40e7aafe9d086379e5578947ec8b95a8fb"
+git-tree-sha1 = "b910cb81ef3fe6e78bf6acee440bda86fd6ae00c"
 uuid = "f27f6e37-5d2b-51aa-960f-b287f2bc3b7a"
-version = "1.3.7+0"
+version = "1.3.7+1"
 
 [[nghttp2_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850ede-7688-5339-a07c-302acd2aaf8d"
+version = "1.48.0+0"
 
 [[p7zip_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
+version = "17.4.0+0"
 
 [[x264_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -2268,81 +2984,95 @@ version = "0.9.1+5"
 # ╠═1e060c7e-886f-4208-b68e-09f2b08195fa
 # ╠═ad798898-61ea-4188-9c5f-d258e10cc47e
 # ╠═a226d405-d910-4112-8b6f-a153420a38ca
+# ╟─dcf26869-bd7c-4a30-884d-6692b6e5aa01
+# ╟─36b4d191-4294-4e65-8b16-7517b619ad18
+# ╟─b6110076-48aa-401d-b747-4db8452c6319
+# ╟─319b4145-0a35-4881-9d0d-127a4ed568a8
+# ╟─00529d8d-f74e-4c20-b772-8c555ee1968f
+# ╟─95c674af-38d3-4900-90c0-a6af1cdc967e
 # ╠═aa57714a-6ba3-48ec-afcd-31b44845a4e8
 # ╠═6317f5cc-bbf9-4c22-a813-c500a538d380
-# ╠═cdfd8cb1-7602-45ad-abc4-8d9ed53eee19
-# ╠═1f6244a6-09a4-4e7c-9468-8aa6ff376070
-# ╠═1d0c4527-1a3b-4767-b9ed-06df5054e5ae
-# ╠═c62cb59a-864e-4a16-996f-5423fd08569b
-# ╠═1124a3c4-2b53-448a-9d63-278da7a2d834
-# ╠═75527708-4ca3-4277-a4fe-a8de6aa888a9
-# ╠═819592b5-8152-4db4-8ced-7472c0381e38
-# ╠═6536390f-6cee-44c2-9a88-c23df8205992
-# ╠═a9f7c5df-9852-4f06-9989-d6a9677e7b19
-# ╠═0799d6a5-84fc-431c-83b1-249ce9805e12
-# ╠═083ec386-aefd-4a16-a1b8-c82340ff967f
-# ╠═da408ddb-5b01-4376-ad34-c19c3177910d
-# ╠═da2add34-b3f8-4cab-915a-bfe7e378246a
+# ╟─1f6244a6-09a4-4e7c-9468-8aa6ff376070
+# ╟─75527708-4ca3-4277-a4fe-a8de6aa888a9
+# ╟─6536390f-6cee-44c2-9a88-c23df8205992
+# ╟─083ec386-aefd-4a16-a1b8-c82340ff967f
+# ╟─da408ddb-5b01-4376-ad34-c19c3177910d
+# ╟─da2add34-b3f8-4cab-915a-bfe7e378246a
+# ╟─f19af87b-385d-4af9-88dd-3d29626763aa
 # ╟─31ee1595-be66-4d8a-9be1-96b2514dcc0c
-# ╟─6e2d8d5b-627e-416b-8e84-79a3af3b384a
 # ╟─42efe36f-025c-44ad-8890-a32a86f7b571
-# ╟─8c024801-84be-4fff-aaee-3a55cc84b396
 # ╟─fa856550-9cd1-496b-a2b5-2cf79c22dd33
-# ╟─d33a36b0-1e13-4476-9e8b-bd1b99cd5061
-# ╟─743091d1-3f24-4899-b694-2b5e3d7e9ed8
 # ╟─b1b2f925-8f6f-4b23-bae0-c2c2550c5b53
+# ╟─d33a36b0-1e13-4476-9e8b-bd1b99cd5061
 # ╟─faec19c6-a584-4421-991b-3cb01abbbc8c
 # ╟─142b3096-9165-4470-bdc1-43ffb28b8eef
 # ╟─92f3e394-6119-4f2c-96d9-ee5057bea2f1
-# ╠═3c5eaa90-ec96-4757-9356-956a98840aef
-# ╟─44cec87f-537d-426d-8089-934210aee5b3
-# ╟─03f25a88-efb5-40bb-9c13-4ca2b8b97c14
-# ╟─ebe6df24-c623-4ffd-9857-40110fb0336d
-# ╟─0c49cfb9-2787-4bc7-a25a-5869e33e6457
-# ╠═5ccfecd6-c794-4ca8-ab1e-d21ed06e69dd
-# ╟─20b8d53d-d6ca-4b69-b409-775e9722e746
-# ╟─d9eab463-1477-4703-bc73-c3d8fcc9314c
-# ╠═aaa5252e-0714-476d-8267-f13d8a1f9e0d
-# ╠═0593c86b-fb0f-40c2-a38f-9c7330c7a484
-# ╠═95d1da60-d807-4ebc-8633-105fa948ddf4
-# ╠═b9ae10ff-f59d-4be3-b7da-99fb678310cb
+# ╟─0593c86b-fb0f-40c2-a38f-9c7330c7a484
 # ╟─f226cd78-4380-4340-a3b9-9d7bb1940abb
-# ╟─e5300a51-d793-4fe2-88b4-8a117924f91b
 # ╟─dec3866e-881e-42a0-9236-e65fd6fd8599
 # ╟─8cb6d0d1-9301-419e-a242-817b0b718ae6
 # ╟─2caf1b17-51cf-4d96-93d3-948104c92fa5
-# ╟─2a730b37-d2d3-4b32-9c47-24fd5b122d95
+# ╟─b2b3ab4b-82e2-49ca-a654-271a33790179
 # ╟─76f0b4fd-dc94-499d-8d41-c58cc2d3ff2d
 # ╟─ee777a68-05da-4696-aa3e-d4fcddd3367a
-# ╠═bd03bcfb-bd4a-43ce-bb38-8cbbb402fe55
-# ╠═187743c5-0882-40c3-8e10-bbced743e50a
-# ╠═32d9ee65-53bd-4af8-83fa-6c25bd8c53dd
-# ╠═b7e0de2a-d7d3-42d5-b020-6dbc7d365868
-# ╟─22ead363-fe5a-4b5a-8718-9a0c000d0c4d
+# ╟─bd03bcfb-bd4a-43ce-bb38-8cbbb402fe55
 # ╟─d996de9d-406f-4cb2-930b-b33909befc74
 # ╟─46f66376-05a1-4047-b572-adee3b37d519
-# ╠═e52e6862-0adc-494f-a088-a288104b5554
-# ╠═0c4c7b1b-f5bd-46c1-acd0-173ca3c8ab02
-# ╠═29909be9-8863-4e09-8219-528adbcdb0d3
 # ╟─c917cb94-36a6-49f1-bf2c-7681f6172310
 # ╟─1672b8ce-a4a5-44c5-aa7a-54af60a29451
 # ╟─549fbc4f-b840-4a49-b0dc-2174d9d8468d
-# ╟─a71d51c0-efdb-45bb-bb1b-821b1ee4bb81
-# ╟─2c8cc361-2eb0-445f-95d7-7d65295a3087
 # ╟─1dab20f7-dd45-42c1-9565-156b9d4f5009
 # ╟─475c4317-427d-4558-923b-982662107ea2
 # ╟─c944cbc9-a9b6-4538-836d-eafea086189f
-# ╠═d9902d65-9c44-4d64-8f55-71a6bb4e555a
-# ╠═693c84e3-f6c2-48b4-98d3-cc1e9e8ddc60
-# ╠═54f952ce-8f4b-4a0f-bf1e-117fc48d3996
-# ╠═ff09ca2a-54b9-4112-abcf-92b744a86f9b
-# ╠═b3c91cbe-baa8-421a-8ff1-b2b0bca215fa
+# ╟─c435991e-093b-4ee6-b437-fee7e5acc890
+# ╟─2c85185c-00d7-4409-943f-aceac14b7c80
 # ╠═be8c4bdf-501a-4f2c-8a0d-d7e034040b24
-# ╠═da253a52-1954-4890-842b-b9444917deeb
-# ╠═92bd2aae-62c7-4f84-9427-16e09a7bac14
+# ╟─da253a52-1954-4890-842b-b9444917deeb
+# ╟─66b5ad99-ee4d-418e-b00c-d84b86941ba6
+# ╟─92bd2aae-62c7-4f84-9427-16e09a7bac14
+# ╟─499cb60d-d669-4cfc-8251-1a0011d8efbc
 # ╟─fc079169-d9ba-4f8d-a57d-613e8f2c5d49
-# ╠═bd7dd4ab-ee29-4780-92a6-af77c440f6ba
-# ╠═e9065f52-64bf-45d2-b5da-e75a4b408607
-# ╠═7466e9ae-0a09-4c7f-8067-baed695e80ec
+# ╟─2419686f-8149-421d-9f60-e1ff48de75f5
+# ╟─676020f2-ac50-417c-a7ec-56d4d6295294
+# ╟─bd7dd4ab-ee29-4780-92a6-af77c440f6ba
+# ╟─31e32905-e6ee-40e8-8950-fc126ad2b14e
+# ╟─35f62589-916e-4b5c-a262-67962f75aa2a
+# ╟─1f2ece4a-5f92-487c-8034-250a0152c903
+# ╟─0c1c9430-4e51-4734-b7ba-4539509c34ed
+# ╟─4bb5c2c4-c37b-42b6-9d0f-caef7fbb1c77
+# ╟─0e573a73-ec46-424a-81f1-5fdec2732909
+# ╟─181a8d6a-f722-4fef-9e30-21d61904551c
+# ╟─7466e9ae-0a09-4c7f-8067-baed695e80ec
+# ╟─faf61cff-f186-4e78-a370-515ee041a758
+# ╟─53884e2a-f4a4-4147-b7ef-654e7a2b64df
+# ╟─9d5a104f-1e92-4e83-9651-5ef0cd3e0351
+# ╟─08987764-7df9-4b67-83dc-4a362d30fbce
+# ╟─7026ce17-23ca-4c85-9615-9dae6b561438
+# ╟─57711ce7-0a46-421e-a006-4e5e74103f9a
+# ╟─5e6729fa-5617-4382-93e5-9adbc32ed72a
+# ╟─fb1a042d-3f22-45bb-b6c9-bd570bddf500
+# ╟─6b2020e4-ecc2-4e09-8d82-0cce10dcd9d8
+# ╟─c61f808e-5f87-447e-a452-cbaba36beb1d
+# ╟─7742a129-0377-46f2-bd37-e972edfc8c8e
+# ╟─46b142d5-c523-48c2-bd6c-46fd02494dde
+# ╟─51dfd777-e93f-482a-bc55-cff23186399e
+# ╟─8f357890-d730-42d7-90ba-bfe11d9a5999
+# ╟─acef4071-c913-4f9d-968d-033dc891a351
+# ╟─b3c34bf5-fa63-40f4-a334-b2197a64e01b
+# ╟─923c74b5-efe4-4891-ab78-25053df3dd22
+# ╟─9215fef1-52fe-4bb0-b710-0b4f2cfa00cf
+# ╟─bb2366d6-75cc-4124-89aa-4f1c6928d1b5
+# ╟─519fc224-01ac-4836-af8c-bccf66840e13
+# ╠═18dcd972-57ba-4ace-9369-a58bb9fef611
+# ╟─2ff13589-c0af-42f7-8a11-2bfe15e2500c
+# ╟─8d1abc15-cacd-4d00-a920-e8b691afd223
+# ╟─75fe45b8-4eef-46b4-9fa5-76c0fbc77f9e
+# ╟─b3084472-3443-4e7c-aff3-648a92a223ff
+# ╟─2b01927c-7236-4f47-ab35-e1090a951149
+# ╟─525c06f7-078c-452c-92cc-c21b1e274901
+# ╟─618f81b5-dafa-43b7-bfba-a1fbaf2b69f2
+# ╟─af2ed81f-cfef-487f-a225-726a60cb5b55
+# ╟─c979d3ed-14b0-42b4-b09d-6b89ff933d40
+# ╟─ad2477af-c685-43b4-97eb-a6e8495017ec
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
