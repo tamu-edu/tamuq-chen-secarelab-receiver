@@ -3,8 +3,10 @@ using ModelingToolkit
 using DomainSets, OrdinaryDiffEq
 using NonlinearSolve, DifferentialEquations
 using Plots, XLSX, Statistics, Symbolics, Interpolations
-using Optim, DifferentialEvolutionMCMC, LsqFit
+using Optim, LsqFit
 using Optimization, OptimizationNLopt, Symbolics, OptimizationOptimJL, ForwardDiff, OptimizationMOI
+
+begin #define pameters
     #solid
     ks= 120/1000 #C SiC- #kW/m.K from the web (imetra.com))
     #ks=(52000*exp(-1.24e-5*T)/(T+437))/1000 #kW/m.K (Ali et al.)
@@ -55,46 +57,46 @@ using Optimization, OptimizationNLopt, Symbolics, OptimizationOptimJL, ForwardDi
     #hf= 10/1000 #kW/m2.K - check value (free convection)
     #hs= 0.2/1000 #kW/m2.K 
     #I0 * exp(-2300 * T(t, x)) #attenuation term negligible
+end;
     #begin
         # Parameters, variables, and derivatives for system 1
-        @parameters t x hlocal
+        @variables t x
+        #@parameters hlocal
         @variables Ts(..) Tf(..)
         Dt = Differential(t) 
         Dx = Differential(x)
         Dxx = Differential(x)^2
         
-         p = [hlocal => (0.98/1000)]
+         p = [0.98/1000]
        # p = [ks => (52000*exp(-1.24e-5*Ts(t,x))/(Ts(t,x)+437))/1000, hs=> 0.2/1000, hf => 10.0/1000, kf => (1.52e-11*(Tf(t,x)^3)-4.86e-8*(Tf(t,x)^2)+1.02e-4*Tf(t,x)-3.93e-3)/1000]
         
-        Cps(Ts)= 1110+0.15*Ts-425*exp(-0.003*Ts)
-        Cpf(Tf)=1.93e-10*(Tf^3)+1.14e-3*(Tf^2)-4.49e-1*Tf+1.06e3
+        Cps(T)= 1110+0.15*T-425*exp(-0.003*T)
+        Cpf(T)=1.93e-10*(T^3)+1.14e-3*(T^2)-4.49e-1*T+1.06e3
         #Cps = 1.
         #Cpf = 1.
         # MOL Discretization parameters for system 1
         x_max1 = L
-        x_min1 = 0
-        t_min = 0
-        t_max = 6737
-        nc1 = 100
+        x_min1 = 0.
+        t_min = 0.
+        t_max = 6737.
+        nc1 = 100.
         x_num1 = range(x_min1, x_max1, length=nc1)
         dx = (x_max1 - x_min1) / (nc1 - 1)
         
         
         # PDE equation for system 1
         
-            eq1 = [
-               Vs * ρs * Cps(Ts(t,x)) * Dt(Ts(t,x)) ~ Vs * ks * Dxx(Ts(t,x)) + hlocal * Av * Vi * ((Ts(t,x)) - Tf(t,x)) - (kins * (r/r0) * (Ts(t,x)-Tins)) * A_t/ (r-r0) ,
-               Vf* ρf * Cpf(Tf(t,x)) * Dt(Tf(t, x)) ~ - Vf* Cpf(Tf(t,x)) * ρf * V * Dx(Tf(t,x)) + hlocal * Av * Vi * ((Ts(t,x) - Tf(t,x)))
-                ]
-        
-        
+        eq1 = [
+            Vs * ρs * Cps(Ts(t,x)) * Dt(Ts(t,x)) ~ Vs * ks * Dxx(Ts(t,x)) + p[1] * Av * Vi * ((Ts(t,x)) - Tf(t,x)) - (kins * (r/r0) * (Ts(t,x)-Tins)) * A_t/ (r-r0) ,
+            Vf* ρf * Cpf(Tf(t,x)) * Dt(Tf(t, x)) ~ - Vf* Cpf(Tf(t,x)) * ρf * V * Dx(Tf(t,x)) + p[1] * Av * Vi * ((Ts(t,x) - Tf(t,x)))
+            ]     
             
-            bcs1 = [
-            Ts(t_min, x) ~ Tamb, # initial
+        bcs1 = [
+            Ts(0., x) ~ Tamb, # initial
+            Tf(0., x) ~ Tamb, # initial
             -A_st * ks * Dx(Ts(t, x_max1)) ~ 0, # far right
             -A_st * ks * Dx(Ts(t, x_min1)) ~ I0 * A_st - ϵ * σ * A_st * (Ts(t,x_min1)^4 - Tamb^4) - hext * A_st * (Ts(t, x_min1) - Tamb),  # far left
-            Tf(t_min, x) ~ Tamb, # initial
-            -A_ft * kf * Dx(Tf(t, x_max1)) ~ -ρf * Cpf(Tf(t,x)) * V * A_ft * (Tf(t, x_max1) - Tamb) # fluid exiting
+            -A_ft * kf * Dx(Tf(t, x_max1)) ~ -ρf * Cpf(Tf(t, x_max1)) * V * A_ft * (Tf(t, x_max1) - Tamb) # fluid exiting
             ] 
         # Space and time domain for system 1
         domains1 = [t ∈ Interval(t_min, t_max),
@@ -104,7 +106,7 @@ using Optimization, OptimizationNLopt, Symbolics, OptimizationOptimJL, ForwardDi
         @named pdesys = PDESystem(eq1, bcs1, domains1, [t, x], [Ts(t, x), Tf(t, x)], p)
         
     #end
-    begin
+    #begin
 
             # MOL parameters for system 1
             order = 2
@@ -114,11 +116,11 @@ using Optimization, OptimizationNLopt, Symbolics, OptimizationOptimJL, ForwardDi
             
             
             
-    end
-    begin
+    #end
+    #begin
             sol1 = solve(prob, Rodas4(), saveat=2)
         
-        end
+     #   end
         begin
             Ts_front_t = sol1.u[(Ts(t,x))][:,1]
             Tf_front_t = sol1.u[(Tf(t,x))][:,1]
