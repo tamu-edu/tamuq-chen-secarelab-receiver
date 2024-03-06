@@ -1,11 +1,12 @@
-using MethodOfLines
-using ModelingToolkit
-using DomainSets, OrdinaryDiffEq
-using NonlinearSolve, DifferentialEquations
-using Plots, XLSX, Statistics, Symbolics, Interpolations
-using Optim, LsqFit
-using Optimization, OptimizationNLopt, Symbolics, OptimizationOptimJL, ForwardDiff, OptimizationMOI
-
+begin #libraries
+    using MethodOfLines
+    using ModelingToolkit
+    using DomainSets, OrdinaryDiffEq
+    using NonlinearSolve, DifferentialEquations
+    using Plots, XLSX, Statistics, Symbolics, Interpolations
+    using Optim, LsqFit
+    using Optimization, OptimizationNLopt, Symbolics, OptimizationOptimJL, ForwardDiff, OptimizationMOI
+end
 begin #define pameters
     #solid
     ks= 120/1000 #C SiC- #kW/m.K from the web (imetra.com))
@@ -61,13 +62,13 @@ end;
     #begin
         # Parameters, variables, and derivatives for system 1
         @variables t x
-        #@parameters hlocal
+        @parameters hlocal
         @variables Ts(..) Tf(..)
         Dt = Differential(t) 
         Dx = Differential(x)
         Dxx = Differential(x)^2
         
-         p = [0.98/1000]
+         p = [hlocal => 0.98/1000]
        # p = [ks => (52000*exp(-1.24e-5*Ts(t,x))/(Ts(t,x)+437))/1000, hs=> 0.2/1000, hf => 10.0/1000, kf => (1.52e-11*(Tf(t,x)^3)-4.86e-8*(Tf(t,x)^2)+1.02e-4*Tf(t,x)-3.93e-3)/1000]
         
         Cps(T)= 1110+0.15*T-425*exp(-0.003*T)
@@ -79,16 +80,16 @@ end;
         x_min1 = 0.
         t_min = 0.
         t_max = 6737.
-        nc1 = 100.
-        x_num1 = range(x_min1, x_max1, length=nc1)
+        nc1 = 100
+        x_num1 = range(x_min1, x_max1, length = nc1)
         dx = (x_max1 - x_min1) / (nc1 - 1)
         
         
         # PDE equation for system 1
         
         eq1 = [
-            Vs * ρs * Cps(Ts(t,x)) * Dt(Ts(t,x)) ~ Vs * ks * Dxx(Ts(t,x)) + p[1] * Av * Vi * ((Ts(t,x)) - Tf(t,x)) - (kins * (r/r0) * (Ts(t,x)-Tins)) * A_t/ (r-r0) ,
-            Vf* ρf * Cpf(Tf(t,x)) * Dt(Tf(t, x)) ~ - Vf* Cpf(Tf(t,x)) * ρf * V * Dx(Tf(t,x)) + p[1] * Av * Vi * ((Ts(t,x) - Tf(t,x)))
+            Vs * ρs * Dt(Ts(t,x)) ~ 1/Cps(Ts(t,x)) * (Vs * ks * Dxx(Ts(t,x)) + hlocal * Av * Vi * ((Ts(t,x)) - Tf(t,x)) - (kins * (r/r0) * (Ts(t,x)-Tins)) * A_t/ (r-r0)) ,
+            Vf* ρf * Dt(Tf(t, x)) ~ 1/Cpf(Tf(t,x)) * (- Vf* Cpf(Tf(t,x)) * ρf * V * Dx(Tf(t,x)) + hlocal * Av * Vi * ((Ts(t,x) - Tf(t,x))))
             ]     
             
         bcs1 = [

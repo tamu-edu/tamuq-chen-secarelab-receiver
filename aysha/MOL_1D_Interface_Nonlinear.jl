@@ -1,4 +1,4 @@
-using ModelingToolkit, MethodOfLines, LinearAlgebra, Test, OrdinaryDiffEq, DomainSets
+using ModelingToolkit, MethodOfLines, LinearAlgebra, OrdinaryDiffEq, DomainSets, DifferentialEquations
 
 # Parameters, variables, and derivatives
 @parameters t x1 x2
@@ -38,7 +38,7 @@ discretization = MOLFiniteDifference([x1 => l, x2 => l], t)
 
 prob = discretize(pdesys, discretization)
 
-sol = solve(prob, Tsit5(), saveat = 0.1)
+sol = solve(prob, saveat = 0.1)
 
 x1_sol = sol[x1]
 x2_sol = sol[x2]
