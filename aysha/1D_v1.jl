@@ -7,7 +7,7 @@ begin #libraries
     using Optim, LsqFit
     using Optimization, OptimizationNLopt, Symbolics, OptimizationOptimJL, ForwardDiff, OptimizationMOI
 end
-begin #define pameters
+begin #define parameters
     #solid
     ks= 120/1000 #C SiC- #kW/m.K from the web (imetra.com))
     #ks=(52000*exp(-1.24e-5*T)/(T+437))/1000 #kW/m.K (Ali et al.)
@@ -68,11 +68,11 @@ end;
         Dx = Differential(x)
         Dxx = Differential(x)^2
         
-         p = [hlocal => 0.98/1000]
+         p = [hlocal => 10000/1000]
        # p = [ks => (52000*exp(-1.24e-5*Ts(t,x))/(Ts(t,x)+437))/1000, hs=> 0.2/1000, hf => 10.0/1000, kf => (1.52e-11*(Tf(t,x)^3)-4.86e-8*(Tf(t,x)^2)+1.02e-4*Tf(t,x)-3.93e-3)/1000]
         
-        Cps(T)= 1110+0.15*T-425*exp(-0.003*T)
-        Cpf(T)=1.93e-10*(T^3)+1.14e-3*(T^2)-4.49e-1*T+1.06e3
+        Cps(T)= (1110+0.15*(T-273)-425*exp(-0.003*(T-273)))/1000 #kJ/kg*K
+        Cpf(T)= (1.93e-10*(T^3)+1.14e-3*(T^2)-4.49e-1*T+1.06e3)/1000 #kJ/kg*K
         #Cps = 1.
         #Cpf = 1.
         # MOL Discretization parameters for system 1
@@ -81,7 +81,10 @@ end;
         t_min = 0.
         t_max = 6737.
         nc1 = 100
+        
         x_num1 = range(x_min1, x_max1, length = nc1)
+        
+        
         dx = (x_max1 - x_min1) / (nc1 - 1)
         
         
@@ -142,6 +145,7 @@ end;
             y1d1_data = D1[:,2] .+ 273.
             y2d1_data = D1[:,3] .+ 273.
         end
+        
         begin
             plot(
                 sol1.t, 
@@ -187,7 +191,7 @@ end;
         p0 = [x[2] for x in p]
         expdata = append!(copy(y2d1_data), y1d1_data)
         length(expdata)
-        pguess = [hlocal => (0.98 /1000)]
+        pguess = [hlocal => (10000 /1000)]
             # Set up initial guesses for parameters
             
             # Perform the optimization using Lsqfit
@@ -226,7 +230,8 @@ end;
         modelfit = remake(prob, p = pnew)
         modelfit_sol = solve(modelfit, Rodas4(), saveat = xd1_data, reltol=1e-12, abstol = 1e-12)
         
-    psol = modelfit_sol
+    
+        psol = modelfit_sol
     plot1 =  plot(
         psol.t, 
         psol.u[Tf(t,x)][:,end-1], # around 135 mm in T3
