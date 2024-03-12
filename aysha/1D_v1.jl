@@ -9,24 +9,23 @@ begin #libraries
 end
 begin #define parameters
     #solid
-    ks= 120/1000 #C SiC- #kW/m.K from the web (imetra.com))
+    ks= 37/1000 #C SiC- #kW/m.K from the web (imetra.com))
     #ks=(52000*exp(-1.24e-5*T)/(T+437))/1000 #kW/m.K (Ali et al.)
-    #k=ks*(1-0.88) # effective axial heat conductivity for monolithic structures pg.285 (structured cayalysts and reactors book), using apparent emissivity pg.240 (thermal radiation heat transfer book)
-    kf = 0.06763/1000 #thermal conductivity of the fluid phase kW/m.K
+    #k=ks*(1-0.88) # effective axial heat conductivty for monolithic structures pg.285 (structured cayalysts and reactors book), using apparent emissivity pg.240 (thermal radiation heat transfer book)
+    kf = 0.056/1000 #thermal conductivity of the fluid phase kW/m.K
     #kf=(1.52e-11*(T^3)-4.86e-8*(T^2)+1.02e-4*T-3.93e-3)/1000 #kW/m.K (Ali et al.)
     #keff=0.82*kf+(1-0.82)*ks #using "Thermal analysis and design of a volumetric solar absorber depending on the porosity" paper - note that I still need to measure the porosity of SiC 
     #ρf= 3.018*exp(-0.00574*T)+0.8063*exp(-0.0008381*T) #kg/m3 (Roldan et al.)
-    #Cps= 750/1000 #KJ/kg.K SiC- from the web (imetra.com)
     #Cps=1110+0.15*T-425*exp(-0.003*T)
     #Cpf=1.93e-10*(T^3)+1.14e-3*(T^2)-4.49e-1*T+1.06e3
-    #Cpf=1180/1000 #kJ/kg.K - check
-    #Cps=1380/1000 #kJ/kg.K - check
-    ρs=3100 #kg/m3
-    ρf=1.225 #kg/m3
+    #Cpf=1090/1000 #kJ/kg.K 
+    #Cps=1225/1000 #kJ/kg.K 
+    ρs= 3100 #kg/m3
+    ρf= 0.0155 #kg/m3
     L= 137e-3 #m
     #α = keff/ρ*Cp #kW/m2.K 
     Tamb= (22.448 + 273.15) #K (same for all exp) 
-    deltax = 0.00223 #discretization (m)
+    deltax = 0.002795918367346939 #discretization (m)
     A_t= 324e-6 #m2 - for the whole receiver (18x18mm2)
     
     A_st= 176e-6 #total area - solid m2
@@ -45,7 +44,7 @@ begin #define parameters
     #Qv= I0*exp(-1000*x)  #kW/m2 - (K extinction coefficient taken from Howell and Hendrick paper pg.86, measure pore diameter and fix)
     Q= I0 #kW/m2
     ϵ= 0.8
-    σ= (5.17e-8)/1000 #kW/m2.K^4 
+    σ= (5.17e-8)/1000 #kW/m2.K^4 Stefan-Boltzmann constant
     Nu = 3.657 
     w = 1.5e-3 #width of channel (m)
     Vi = w * w * deltax * n_channel #m3
@@ -62,25 +61,24 @@ end;
     #begin
         # Parameters, variables, and derivatives for system 1
         @variables t x
-        @parameters hlocal
+        @parameters hlocal Cps Cpf 
         @variables Ts(..) Tf(..)
         Dt = Differential(t) 
         Dx = Differential(x)
         Dxx = Differential(x)^2
         
-         p = [hlocal => 10000/1000]
-       # p = [ks => (52000*exp(-1.24e-5*Ts(t,x))/(Ts(t,x)+437))/1000, hs=> 0.2/1000, hf => 10.0/1000, kf => (1.52e-11*(Tf(t,x)^3)-4.86e-8*(Tf(t,x)^2)+1.02e-4*Tf(t,x)-3.93e-3)/1000]
+        p = [hlocal => (500.), Cps => (1225.), Cpf => (1090.)]
+        #p = [hlocal => (200000.)]
+        #Cps(T)= (1110+0.15*(T-273)-425*exp(-0.003*(T-273)))/1000 #kJ/kg*K
+        #Cpf(T)= (1.93e-10*(T^3)+1.14e-3*(T^2)-4.49e-1*T+1.06e3)/1000 #kJ/kg*K
+
         
-        Cps(T)= (1110+0.15*(T-273)-425*exp(-0.003*(T-273)))/1000 #kJ/kg*K
-        Cpf(T)= (1.93e-10*(T^3)+1.14e-3*(T^2)-4.49e-1*T+1.06e3)/1000 #kJ/kg*K
-        #Cps = 1.
-        #Cpf = 1.
         # MOL Discretization parameters for system 1
         x_max1 = L
         x_min1 = 0.
         t_min = 0.
-        t_max = 6737.
-        nc1 = 100
+        t_max = 7084.
+        nc1 = 50
         
         x_num1 = range(x_min1, x_max1, length = nc1)
         
@@ -91,8 +89,8 @@ end;
         # PDE equation for system 1
         
         eq1 = [
-            Vs * ρs * Dt(Ts(t,x)) ~ 1/Cps(Ts(t,x)) * (Vs * ks * Dxx(Ts(t,x)) + hlocal * Av * Vi * ((Ts(t,x)) - Tf(t,x)) - (kins * (r/r0) * (Ts(t,x)-Tins)) * A_t/ (r-r0)) ,
-            Vf* ρf * Dt(Tf(t, x)) ~ 1/Cpf(Tf(t,x)) * (- Vf* Cpf(Tf(t,x)) * ρf * V * Dx(Tf(t,x)) + hlocal * Av * Vi * ((Ts(t,x) - Tf(t,x))))
+            Vs * ρs * Dt(Ts(t,x)) ~ (Vs * ks * Dxx(Ts(t,x))/(Cps/1000)) + (((hlocal/(1000)) * Av * Vi * ((Ts(t,x)) - Tf(t,x)))/(Cps/1000)) - (((kins * (r/r0) * (Ts(t,x)-Tins)) * A_t/ (r-r0))/(Cps/1000)),
+            Vf* ρf * Dt(Tf(t, x)) ~ (- Vf * ρf * V * Dx(Tf(t,x))) + ((hlocal/(1000)) * Av * Vi * ((Ts(t,x) - Tf(t,x)))/(Cpf/1000))
             ]     
             
         bcs1 = [
@@ -100,7 +98,7 @@ end;
             Tf(0., x) ~ Tamb, # initial
             -A_st * ks * Dx(Ts(t, x_max1)) ~ 0, # far right
             -A_st * ks * Dx(Ts(t, x_min1)) ~ I0 * A_st - ϵ * σ * A_st * (Ts(t,x_min1)^4 - Tamb^4) - hext * A_st * (Ts(t, x_min1) - Tamb),  # far left
-            -A_ft * kf * Dx(Tf(t, x_max1)) ~ -ρf * Cpf(Tf(t, x_max1)) * V * A_ft * (Tf(t, x_max1) - Tamb) # fluid exiting
+            -A_ft * kf * Dx(Tf(t, x_max1)) ~ -ρf * (Cpf/1000) * V * A_ft * (Tf(t, x_max1) - Tamb) # fluid exiting
             ] 
         # Space and time domain for system 1
         domains1 = [t ∈ Interval(t_min, t_max),
@@ -113,6 +111,7 @@ end;
     #begin
 
             # MOL parameters for system 1
+            
             order = 2
             discretization = MOLFiniteDifference([x => dx], t, approx_order=order)
             
@@ -122,7 +121,8 @@ end;
             
     #end
     #begin
-            sol1 = solve(prob, Rodas4(), saveat=2)
+            
+    sol1 = solve(prob, FBDF(), saveat=2, maxiters = 100)
         
      #   end
         begin
@@ -138,6 +138,7 @@ end;
             plot!(sol1.t, Tf_back_t, label="T_bck_f")
         end
         x__domain = collect(sol1.ivdomain[2])
+        
         begin
             #Exp 71
             D1 = XLSX.readxlsx("/Users/aishamelhim/Documents/GitHub/Aysha/SolarSimulator/EXCEL/Data_FPT0071_231128_102707.xlsx")["Sheet 1 - Data_FPT0071_231128_1"]["A3:C7087"]
@@ -165,7 +166,7 @@ end;
         begin
             plot(
                 sol1.t, 
-                sol1.u[Tf(t,x)][:,59], # around 135 mm in T3
+                sol1.u[Tf(t,x)][:,49], # around 135 mm in T3
                 title = "Gas Temperature Profile T3", 
                 label = "Numerical", 
                 xlabel = "Time (s)", 
@@ -177,22 +178,14 @@ end;
                     xlabel = "Time (s)", 
                     ylabel = "Temperature (K)")
         end
-            # Define the objective function for fitting
-        
-            function objective_function(xvalues, p_vary)
-                p = [hlocal=> p_vary[1]]
-                modelfit = remake(prob, p = p_vary, tspan=(xvalues[1], xvalues[end]))
-                modelfit_sol = solve(modelfit, Rodas4(), saveat = xvalues, reltol=1e-12, abstol = 1e-12)
-                time = modelfit_sol.t
-                tempTs = modelfit_sol.u[Ts(t,x)][:, 3]
-                tempTf = modelfit_sol.u[Tf(t,x)][:, end-1]
-                return  append!(tempTs, tempTf)
-        end
+       
         p0 = [x[2] for x in p]
         expdata = append!(copy(y2d1_data), y1d1_data)
+        #expdata =  y1d1_data
         length(expdata)
-        pguess = [hlocal => (10000 /1000)]
-            # Set up initial guesses for parameters
+        pguess = p
+           
+        # Set up initial guesses for parameters
             
             # Perform the optimization using Lsqfit
         
@@ -200,33 +193,44 @@ end;
             # Get the optimized parameters
             # optimized_parameters = result.param
             # result.converged, result.resid
+
+            #Optimization using NLOpt
             function NLmodeloptim(xvalues, p_vary)
-                p = [hlocal => p_vary[1]]
+                #p = [hlocal => p_vary[1]]
                 modeloptim = remake(prob, p = p_vary, tspan=(xvalues[1], xvalues[end]))
-                modeloptim_sol = solve(modeloptim, Rodas4(), saveat = xvalues, reltol=1e-12, abstol = 1e-12)
+                modeloptim_sol = solve(modeloptim, FBDF(), saveat = xvalues, reltol=1e-12, abstol = 1e-12)
                 #time = modelfit_sol.t
                 tempTs_op = modeloptim_sol.u[Ts(t,x)][:, 3]
                 tempTf_op = modeloptim_sol.u[Tf(t,x)][:, end-1]
                 return  append!(tempTs_op, tempTf_op)
+                #return tempTf_op
             end
-        function loss(pguess, _)
-            sol1, _, Temp = NLmodeloptim(xd1_data, pguess)
-            lossr = (Temp .- expdata).^2
-            return sqrt(sum(lossr) / length(expdata))
-        end
-    loss([1.], [])
+        
+            function loss(pguess, _)
+                Temp = NLmodeloptim(xd1_data, pguess)
+                lossr = (Temp .- expdata).^2
+                return sqrt(sum(lossr) / length(expdata)) #MSE
+            end
+    #loss([1.], [])
+    
     display(loss(p0, []))
 
         optf = OptimizationFunction(loss, Optimization.AutoForwardDiff())
-        lb = [0.00000000001]
-        ub = [10.0]
+        lb = [100., 700., 700.]
+        ub = [1000., 2000., 2000.]
+        #lb = [90.]
+        #ub = [7000.]
         optprob = Optimization.OptimizationProblem(optf, p0, [], lb=lb, ub=ub)
-        optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method = NLopt.LN_NELDERMEAD(), maxtime = 160, local_maxiters = 10000)
+        optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method = NLopt.LN_NELDERMEAD(), maxtime = 180, local_maxiters = 10000)
         println(optsol.retcode)
+        
+        
+         
+        
         pnew = optsol.u
         
         res_error = loss(pnew, [])
-        display(loss(pnew, []))
+        display(res_error)
         modelfit = remake(prob, p = pnew)
         modelfit_sol = solve(modelfit, Rodas4(), saveat = xd1_data, reltol=1e-12, abstol = 1e-12)
         
