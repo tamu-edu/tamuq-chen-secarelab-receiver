@@ -9,22 +9,22 @@ begin #libraries
 end
 begin #define parameters
     #solid
-    ks= 37/1000 #C SiC- #kW/m.K from the web (imetra.com))
+    #ks= (45/1000)*(1-0.62) #C SiC- #kW/m.K from the web (imetra.com))
     #ks=(52000*exp(-1.24e-5*T)/(T+437))/1000 #kW/m.K (Ali et al.)
     #k=ks*(1-0.88) # effective axial heat conductivty for monolithic structures pg.285 (structured cayalysts and reactors book), using apparent emissivity pg.240 (thermal radiation heat transfer book)
-    kf = 0.056/1000 #thermal conductivity of the fluid phase kW/m.K
+    #kf = (0.055/1000)*(0.62) #thermal conductivity of the fluid phase kW/m.K
     #kf=(1.52e-11*(T^3)-4.86e-8*(T^2)+1.02e-4*T-3.93e-3)/1000 #kW/m.K (Ali et al.)
     #keff=0.82*kf+(1-0.82)*ks #using "Thermal analysis and design of a volumetric solar absorber depending on the porosity" paper - note that I still need to measure the porosity of SiC 
     #ρf= 3.018*exp(-0.00574*T)+0.8063*exp(-0.0008381*T) #kg/m3 (Roldan et al.)
     #Cps=1110+0.15*T-425*exp(-0.003*T)
     #Cpf=1.93e-10*(T^3)+1.14e-3*(T^2)-4.49e-1*T+1.06e3
-    #Cpf=1090/1000 #kJ/kg.K 
+    #Cpf= (1090/1000)*0.62 #kJ/kg.K 
     #Cps=1225/1000 #kJ/kg.K 
-    ρs= 3100 #kg/m3
-    ρf= 0.0155 #kg/m3
+    ρs= 3100*(1-0.62) #kg/m3
+    ρf= 0.0155*0.62 #kg/m3
     L= 137e-3 #m
     #α = keff/ρ*Cp #kW/m2.K 
-    Tamb= (22.448 + 273.15) #K (same for all exp) 
+    Tamb= (23.409 + 273.15) #K (same for all exp) 
     deltax = 0.002795918367346939 #discretization (m)
     A_t= 324e-6 #m2 - for the whole receiver (18x18mm2)
     
@@ -35,7 +35,7 @@ begin #define parameters
     A_exchange = 162.5e-6 #m2 - contact area between fluid and solid
     Vs =  A_st * deltax
     Vf =  A_ft * deltax
-    qlpm = 7.12 #lpm
+    qlpm = 15.27 #lpm
     q= qlpm/(1000*60) #m3/s
     V= q/(A_channel*n_channel) #m/s - using the area of the whole receiver (18x18mm2)
     th_s = 0.4e-3 #m
@@ -53,7 +53,7 @@ begin #define parameters
     kins = 0.078/1000 #kW/m*K
     r0 = 23/1000 #m
     r = 42/1000 #m
-    Tins = 356 #K exp. 71
+    Tins = 326.437 #K exp. 71
     #hf= 10/1000 #kW/m2.K - check value (free convection)
     #hs= 0.2/1000 #kW/m2.K 
     #I0 * exp(-2300 * T(t, x)) #attenuation term negligible
@@ -61,14 +61,20 @@ end;
     #begin
         # Parameters, variables, and derivatives for system 1
         @variables t x
-        @parameters hlocal Cps Cpf 
+        @parameters hlocal Cps 
         @variables Ts(..) Tf(..)
         Dt = Differential(t) 
         Dx = Differential(x)
         Dxx = Differential(x)^2
         
-        p = [hlocal => (500.), Cps => (1225.), Cpf => (1090.)]
-        #p = [hlocal => (200000.)]
+        p = [hlocal => (10000.), Cps => (1225.)]
+        e = 0.3
+        ks= (45/1000)*(1-e) #kW/m.K
+        kf = (0.055/1000)*(e) #kW/m.K
+        Cpf= (1090/1000)*e 
+        Cpf= (1090/1000)*e
+        ρs= 3100*(1-e) #kg/m3
+        #p = [hlocal => (800.)]
         #Cps(T)= (1110+0.15*(T-273)-425*exp(-0.003*(T-273)))/1000 #kJ/kg*K
         #Cpf(T)= (1.93e-10*(T^3)+1.14e-3*(T^2)-4.49e-1*T+1.06e3)/1000 #kJ/kg*K
 
@@ -77,7 +83,7 @@ end;
         x_max1 = L
         x_min1 = 0.
         t_min = 0.
-        t_max = 7084.
+        t_max = 4000.
         nc1 = 50
         
         x_num1 = range(x_min1, x_max1, length = nc1)
@@ -91,7 +97,7 @@ end;
         eq1 = [
             Vs * ρs * Dt(Ts(t,x)) ~ (Vs * ks * Dxx(Ts(t,x))/(Cps/1000)) + (((hlocal/(1000)) * Av * Vi * ((Ts(t,x)) - Tf(t,x)))/(Cps/1000)) - (((kins * (r/r0) * (Ts(t,x)-Tins)) * A_t/ (r-r0))/(Cps/1000)),
             Vf* ρf * Dt(Tf(t, x)) ~ (- Vf * ρf * V * Dx(Tf(t,x))) + ((hlocal/(1000)) * Av * Vi * ((Ts(t,x) - Tf(t,x)))/(Cpf/1000))
-            ]     
+            ]    
             
         bcs1 = [
             Ts(0., x) ~ Tamb, # initial
@@ -140,11 +146,11 @@ end;
         x__domain = collect(sol1.ivdomain[2])
         
         begin
-            #Exp 71
-            D1 = XLSX.readxlsx("/Users/aishamelhim/Documents/GitHub/Aysha/SolarSimulator/EXCEL/Data_FPT0071_231128_102707.xlsx")["Sheet 1 - Data_FPT0071_231128_1"]["A3:C7087"]
-            xd1_data = D1[:,1]
-            y1d1_data = D1[:,2] .+ 273.
-            y2d1_data = D1[:,3] .+ 273.
+           #Exp 67
+            Z = XLSX.readxlsx("/Users/aishamelhim/Documents/ResearchData/SolarSimulator/EXCEL/Data_FPT0067_231125_161757.xlsx")["Sheet 1 - Data_FPT0067_231125_1"]["A3:C3932"]
+            xz_data = Z[:,1]
+            y1z_data = Z[:,2] .+ 273.
+            y2z_data = Z[:,3] .+ 273.
         end
         
         begin
@@ -156,8 +162,8 @@ end;
                 xlabel = "Time (s)", 
                 ylabel = "Temperature (K)")
                 scatter!(
-                    xd1_data, 
-                    y2d1_data,  
+                    xz_data, 
+                    y2z_data,  
                     label = "Experimental",
                     xlabel = "Time (s)", 
                     ylabel = "Temperature (K)")
@@ -172,16 +178,16 @@ end;
                 xlabel = "Time (s)", 
                 ylabel = "Temperature (K)")
                 scatter!(
-                    xd1_data, 
-                    y1d1_data,  
+                    xz_data, 
+                    y1z_data,  
                     label = "Experimental",
                     xlabel = "Time (s)", 
                     ylabel = "Temperature (K)")
         end
        
         p0 = [x[2] for x in p]
-        expdata = append!(copy(y2d1_data), y1d1_data)
-        #expdata =  y1d1_data
+        #expdata = append!(copy(y2z_data), y1z_data)
+        expdata =  y1z_data
         length(expdata)
         pguess = p
            
@@ -200,14 +206,14 @@ end;
                 modeloptim = remake(prob, p = p_vary, tspan=(xvalues[1], xvalues[end]))
                 modeloptim_sol = solve(modeloptim, FBDF(), saveat = xvalues, reltol=1e-12, abstol = 1e-12)
                 #time = modelfit_sol.t
-                tempTs_op = modeloptim_sol.u[Ts(t,x)][:, 3]
+                #tempTs_op = modeloptim_sol.u[Ts(t,x)][:, 3]
                 tempTf_op = modeloptim_sol.u[Tf(t,x)][:, end-1]
-                return  append!(tempTs_op, tempTf_op)
-                #return tempTf_op
+                #return  append!(tempTs_op, tempTf_op)
+                return tempTf_op
             end
         
             function loss(pguess, _)
-                Temp = NLmodeloptim(xd1_data, pguess)
+                Temp = NLmodeloptim(xz_data, pguess)
                 lossr = (Temp .- expdata).^2
                 return sqrt(sum(lossr) / length(expdata)) #MSE
             end
@@ -216,8 +222,8 @@ end;
     display(loss(p0, []))
 
         optf = OptimizationFunction(loss, Optimization.AutoForwardDiff())
-        lb = [100., 700., 700.]
-        ub = [1000., 2000., 2000.]
+        lb = [5000., 700.]
+        ub = [20000., 2000.]
         #lb = [90.]
         #ub = [7000.]
         optprob = Optimization.OptimizationProblem(optf, p0, [], lb=lb, ub=ub)
@@ -232,35 +238,34 @@ end;
         res_error = loss(pnew, [])
         display(res_error)
         modelfit = remake(prob, p = pnew)
-        modelfit_sol = solve(modelfit, Rodas4(), saveat = xd1_data, reltol=1e-12, abstol = 1e-12)
+        modelfit_sol = solve(modelfit, Rodas4(), saveat = xz_data, reltol=1e-12, abstol = 1e-12)
         
     
         psol = modelfit_sol
     plot1 =  plot(
         psol.t, 
         psol.u[Tf(t,x)][:,end-1], # around 135 mm in T3
-        title = "Gas Temperature Profile T3", 
+        title = "Gas Temperature Profile T3 - exp. 67", 
         label = "optimized", 
         xlabel = "Time (s)", 
         ylabel = "Temperature (K)")
         scatter!(
-            xd1_data, 
-            y1d1_data,  
+            xz_data, 
+            y1z_data,  
             label = "Experimental",
             xlabel = "Time (s)", 
             ylabel = "Temperature (K)")
                 
-            
 plot2 = plot(
    psol.t, 
    psol.u[Ts(t,x)][:,3], # around 5 mm in T8
-   title = "Solid Temperature Profile T8", 
+   title = "Solid Temperature Profile T8 - exp. 67", 
    label = "Numerical", 
    xlabel = "Time (s)", 
    ylabel = "Temperature (K)")
    scatter!(
-   xd1_data, 
-   y2d1_data,  
+   xz_data, 
+   y2z_data,  
    label = "Experimental",
    xlabel = "Time (s)", 
    ylabel = "Temperature (K)")
