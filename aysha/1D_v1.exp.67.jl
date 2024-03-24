@@ -24,7 +24,8 @@ begin #define parameters
     ρf= 0.0155*0.62 #kg/m3
     L= 137e-3 #m
     #α = keff/ρ*Cp #kW/m2.K 
-    Tamb= (23.409 + 273.15) #K (same for all exp) 
+    Tamb = (23.409 + 273.15) #K (same for all exp) 
+    T3_dan = (30.753 + 273.15) #K for Danckwert BC
     deltax = 0.002795918367346939 #discretization (m)
     A_t= 324e-6 #m2 - for the whole receiver (18x18mm2)
     
@@ -67,12 +68,12 @@ end;
         Dx = Differential(x)
         Dxx = Differential(x)^2
         
-        p = [hlocal => (10000.), Cps => (1225.)]
+        p = [hlocal => (900.), Cps => (1225.)]
         e = 0.3
         ks= (45/1000)*(1-e) #kW/m.K
-        kf = (0.055/1000)*(e) #kW/m.K
-        Cpf= (1090/1000)*e 
-        Cpf= (1090/1000)*e
+        kf = (0.055/1000)#kW/m.K
+        Cpf= (1090/1000)
+        Cpf= (1090/1000)
         ρs= 3100*(1-e) #kg/m3
         #p = [hlocal => (800.)]
         #Cps(T)= (1110+0.15*(T-273)-425*exp(-0.003*(T-273)))/1000 #kJ/kg*K
@@ -84,7 +85,7 @@ end;
         x_min1 = 0.
         t_min = 0.
         t_max = 4000.
-        nc1 = 50
+        nc1 = 100
         
         x_num1 = range(x_min1, x_max1, length = nc1)
         
@@ -94,17 +95,18 @@ end;
         
         # PDE equation for system 1
         
-        eq1 = [
-            Vs * ρs * Dt(Ts(t,x)) ~ (Vs * ks * Dxx(Ts(t,x))/(Cps/1000)) + (((hlocal/(1000)) * Av * Vi * ((Ts(t,x)) - Tf(t,x)))/(Cps/1000)) - (((kins * (r/r0) * (Ts(t,x)-Tins)) * A_t/ (r-r0))/(Cps/1000)),
-            Vf* ρf * Dt(Tf(t, x)) ~ (- Vf * ρf * V * Dx(Tf(t,x))) + ((hlocal/(1000)) * Av * Vi * ((Ts(t,x) - Tf(t,x)))/(Cpf/1000))
-            ]    
+        eq1 = [ 
+               Vs * ρs * Dt(Ts(t,x)) ~ 1/(Cps/1000) * (Vs * ks * Dxx(Ts(t,x)) - (hlocal/1000) * Av * Vi * ((Ts(t,x)) - Tf(t,x)) - (kins * (r/r0) * (Ts(t,x)-Tins)) * A_t / (r-r0)) ,
+               Vf* ρf * Dt(Tf(t, x)) ~ 1/Cpf * (Vf * kf * Dxx(Tf(t,x)) + (- Vf* Cpf * ρf * V * Dx(Tf(t,x))) + (hlocal/1000) * Av * Vi * ((Ts(t,x) - Tf(t,x))))    
+              ]  
             
         bcs1 = [
             Ts(0., x) ~ Tamb, # initial
             Tf(0., x) ~ Tamb, # initial
             -A_st * ks * Dx(Ts(t, x_max1)) ~ 0, # far right
             -A_st * ks * Dx(Ts(t, x_min1)) ~ I0 * A_st - ϵ * σ * A_st * (Ts(t,x_min1)^4 - Tamb^4) - hext * A_st * (Ts(t, x_min1) - Tamb),  # far left
-            -A_ft * kf * Dx(Tf(t, x_max1)) ~ -ρf * (Cpf/1000) * V * A_ft * (Tf(t, x_max1) - Tamb) # fluid exiting
+            -A_ft * kf * Dx(Tf(t, x_max1)) ~ - ρf * (Cpf) * V * A_ft * (Tf(t, x_max1) - Tamb), # fluid exiting
+            -A_ft * kf * Dx(Tf(t, x_min1)) ~ ρf * Cpf * V * A_ft * (Tf(t,x_min1) - Tamb) # entering fluid
             ] 
         # Space and time domain for system 1
         domains1 = [t ∈ Interval(t_min, t_max),
@@ -122,9 +124,6 @@ end;
             discretization = MOLFiniteDifference([x => dx], t, approx_order=order)
             
             prob = discretize(pdesys, discretization)
-            
-            
-            
     #end
     #begin
             
@@ -156,7 +155,7 @@ end;
         begin
             plot(
                 sol1.t, 
-                sol1.u[Ts(t,x)][:,3], # around 5 mm in T8
+                sol1.u[Ts(t,x)][:,2], # around 5 mm in T8
                 title = "Solid Temperature Profile T8", 
                 label = "Numerical", 
                 xlabel = "Time (s)", 
@@ -222,8 +221,8 @@ end;
     display(loss(p0, []))
 
         optf = OptimizationFunction(loss, Optimization.AutoForwardDiff())
-        lb = [5000., 700.]
-        ub = [20000., 2000.]
+        lb = [200., 700.]
+        ub = [2000., 2000.]
         #lb = [90.]
         #ub = [7000.]
         optprob = Optimization.OptimizationProblem(optf, p0, [], lb=lb, ub=ub)
@@ -232,7 +231,7 @@ end;
         
         
          
-        
+    begin
         pnew = optsol.u
         
         res_error = loss(pnew, [])
@@ -242,31 +241,41 @@ end;
         
     
         psol = modelfit_sol
-    plot1 =  plot(
+    
+        plot1 =  plot(
         psol.t, 
-        psol.u[Tf(t,x)][:,end-1], # around 135 mm in T3
+        psol.u[Tf(t,x)][:,end-1], # around 136 mm in T3
         title = "Gas Temperature Profile T3 - exp. 67", 
         label = "optimized", 
         xlabel = "Time (s)", 
         ylabel = "Temperature (K)")
         scatter!(
-            xz_data, 
-            y1z_data,  
-            label = "Experimental",
-            xlabel = "Time (s)", 
-            ylabel = "Temperature (K)")
+        xz_data, 
+        y1z_data,  
+        label = "Experimental",
+        xlabel = "Time (s)", 
+        ylabel = "Temperature (K)")
+        plot!(
+        psol.t,
+        psol.u[Ts(t,x)][:,end-1],
+        label = "solid 136 mm")
                 
-plot2 = plot(
-   psol.t, 
-   psol.u[Ts(t,x)][:,3], # around 5 mm in T8
-   title = "Solid Temperature Profile T8 - exp. 67", 
-   label = "Numerical", 
-   xlabel = "Time (s)", 
-   ylabel = "Temperature (K)")
-   scatter!(
-   xz_data, 
-   y2z_data,  
-   label = "Experimental",
-   xlabel = "Time (s)", 
-   ylabel = "Temperature (K)")
-   plot(plot1, plot2, layout=(2,1), size=(700, 700))
+    plot2 = plot(
+        psol.t, 
+        psol.u[Ts(t,x)][:,2], # around 5 mm in T8
+        title = "Solid Temperature Profile T8 - exp. 67", 
+        label = "Numerical", 
+        xlabel = "Time (s)", 
+        ylabel = "Temperature (K)")
+        scatter!(
+        xz_data, 
+        y2z_data,  
+        label = "Experimental",
+        xlabel = "Time (s)", 
+        ylabel = "Temperature (K)")
+        plot!(
+        psol.t,
+        psol.u[Tf(t,x)][:,2],
+        label = "gas 5 mm")
+        plot(plot1, plot2, layout=(2,1), size=(700, 700))
+    end
