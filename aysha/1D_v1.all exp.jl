@@ -1,5 +1,5 @@
 begin #libraries
-    using MethodOfLines
+    using MethodOfLines, PEtab, DataFrames
     using ModelingToolkit
     using DomainSets, OrdinaryDiffEq
     using NonlinearSolve, DifferentialEquations
@@ -8,16 +8,6 @@ begin #libraries
     using Optimization, OptimizationNLopt, Symbolics, OptimizationOptimJL, ForwardDiff, OptimizationMOI
 end
 begin #define parameters
-
-    #ks= (37/1000)*(1-e) #C SiC- #kW/m.K using equation plotted from (Ali et al.)
-    #ks=(52000*exp(-1.24e-5*T)/(T+437))/1000 #kW/m.K (Ali et al.)
-    #kf = (0.056/1000)*e #thermal conductivity of the fluid phase kW/m.K
-    #kf=(1.52e-11*(T^3)-4.86e-8*(T^2)+1.02e-4*T-3.93e-3)/1000 #kW/m.K (Ali et al.)
-    #keff=0.82*kf+(1-0.82)*ks #using "Thermal analysis and design of a volumetric solar absorber depending on the porosity" paper - note that I still need to measure the porosity of SiC 
-    #ρf= 3.018*exp(-0.00574*T)+0.8063*exp(-0.0008381*T) #kg/m3 (Roldan et al.)
-    #Cpf=(1090/1000)*e #kJ/kg.K 
-    #Cps=1225/1000 #kJ/kg.K 
-    #ρs= (3100)*(1-e) #kg/m3
     L= 137e-3 #m
     #α = keff/ρ*Cp #kW/m2.K 
     Tamb = (22.448 + 273.15) #K (same for all exp) 
@@ -35,12 +25,12 @@ begin #define parameters
     qlpm = 7.12 #lpm
     q= qlpm/(1000*60) #m3/s
     #V= q/(A_channel*n_channel) #m/s - using the area of the whole receiver (18x18mm2)
-    V = 0.57 #m/s (calculated from excel sheet and COMSOL)
+    #V = 0.57 #m/s (calculated from excel sheet and COMSOL)
     th_s = 0.4e-3 #m
     th_f = 0.7e-3 #m
     I0 = 456 #kW/m2
     #Qv= I0*exp(-1000*x)  #kW/m2 - (K extinction coefficient taken from Howell and Hendrick paper pg.86, measure pore diameter and fix)
-    Q= I0 #kW/m2
+    #Q= I0 #kW/m2
     ϵ= 0.8
     σ= (5.17e-8)/1000 #kW/m2.K^4 Stefan-Boltzmann constant
     Lc = 4*(w_t*w_t)/(4*w_t)
@@ -90,7 +80,7 @@ end;
     begin
         # Parameters, variables, and derivatives for system 1
         @variables t x 
-        @parameters ρsCps A B n C #psCps ks h_average
+        @parameters V I0 ρsCps A B n C #psCps ks h_average
         @variables Ts(..) Tf(..)
         Dt = Differential(t) 
         Dx = Differential(x)
@@ -101,18 +91,20 @@ end;
         #Cps = (1225/1000)*(1-e) #kJ/kg
 
         #p = [psCps => 90000., ks=> 37, h_average => (Nu*kf)/w_t]
-        p = [ρsCps => 80000., A => 20., B =>0.7, C => 40., n => 0.1]
+        p = [ρsCps => 80000., A => 20., B =>0.7, C => 40., n => 0.1, V => 0.57, I0=>456]
         Nu = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
         nu = 4.364*(1+(0.7*((Gz_f(0.134))^10)*exp(-40/Gz_f(0.134))))
         h_average = (Nu*kf)/Lc
-        #Cps(T)= (1110+0.15*(T-273)-425*exp(-0.003*(T-273)))/1000 #kJ/kg*K
-        #Cpf(T)= (1.93e-10*(T^3)+1.14e-3*(T^2)-4.49e-1*T+1.06e3)/1000 #kJ/kg*K
 
-        #psCps = ρs * Cps * (1-e)
 
         # MOL Discretization parameters for system 1
-        x_max1 = L
+        x_max1 = L #T3
         x_min1 = 0.
+        x1 = 5/1000 #m #T8
+        x2 = 55/1000 #m #T9
+        x3 = 106/1000 #m #T10
+        x4 = 82/1000 #m #T11
+        x5 = 27/1000 #m #T12
         t_min = 0.
         t_max = 7084.
         
@@ -158,8 +150,10 @@ end;
             
     end
    
-            
+        
     sol1 = solve(prob, FBDF(), saveat=2, maxiters = 100)
+
+
         begin
             Ts_front_t = sol1.u[(Ts(t,x))][:,1]
             Tf_front_t = sol1.u[(Tf(t,x))][:,2]
@@ -222,195 +216,114 @@ end;
                     xlabel = "Time (s)", 
                     ylabel = "Temperature (K)")
         end
-    begin
-        # model results for different thermocouples
-       sol1.u[Ts(t,x)][:,40] #T9 model 55mm (external)
-       sol1.u[Ts(t,x)][:,77] #T10 model 106mm (external)
-       sol1.u[Tf(t,x)][:,59] #T11 model 82mm (internal-gas)
-       sol1.u[Ts(t,x)][:,59] #T11 model 82mm (internal-solid)
-       sol1.u[Tf(t,x)][:,20] #T12 model 27mm (internal-gas)
-       sol1.u[Ts(t,x)][:,20] #T12 model 27mm (internal-solid)
-        # taking averages of internal thermocouples
-       # T12_model = sol1.u[Tf(t,x)][:,20], sol1.u[Ts(t,x)][:,20]
-       # T12_modelmean = mean(T12_model)
-       # T11_model = sol1.u[Tf(t,x)][:,59], sol1.u[Ts(t,x)][:,59]
-        #T11_modelmean = mean(T11_model)
-    end
-        p0 = [x[2] for x in p]
-        #expdata = append!(copy(y2d1_data), y1d2_data, y2d2_data, y1d1_data, y3d2_data, y4d2_data)
-        expdata =  append!(copy(y2d1_data), y1d2_data, y2d2_data, y1d1_data, y3d2_data, y4d2_data)
-        length(expdata)
-        
-        
-        pguess = p
-
-            #Optimization using NLOpt
-            function NLmodeloptim(xvalues, p_vary)
-                #p = [hlocal => p_vary[1]]
-                modeloptim = remake(prob, p = p_vary, tspan=(xvalues[1], xvalues[end]))
-                modeloptim_sol = solve(modeloptim, FBDF(), saveat = xvalues, reltol=1e-12, abstol = 1e-12)
-                #time = modelfit_sol.t
-                tempT8_op = modeloptim_sol.u[Ts(t,x)][:, 4]
-                tempT9_op = modeloptim_sol.u[Ts(t,x)][:,40]
-                tempT10_op = modeloptim_sol.u[Ts(t,x)][:,77]
-                tempT3_op = modeloptim_sol.u[Tf(t,x)][:, end-1]
-                T12_modelmean = (modeloptim_sol.u[Tf(t,x)][:,20] .+  modeloptim_sol.u[Ts(t,x)][:,20]) ./2
-                T11_modelmean = (modeloptim_sol.u[Tf(t,x)][:,59] .+ modeloptim_sol.u[Ts(t,x)][:,59]) ./2
-                
-                return append!(tempT8_op, tempT9_op, tempT10_op, tempT3_op, T12_modelmean, T11_modelmean)
-            end
-        
-            function loss(pguess, _)
-                Temp = NLmodeloptim(xd1_data, pguess)
-                lossr = (Temp .- expdata).^2
-                return sqrt(sum(lossr) / length(expdata)) #MSE
-            end
-        
-            #loss([1.], [])
+        #using PEtab
+        obs_T8 = PEtabObservable(Ts(t, x1))
+        obs_T9 = PEtabObservable(Ts(t, x2))
+        obs_T10 = PEtabObservable(Ts(t, x3))
+        obs_T11 = PEtabObservable((Tf(t, x4) + Ts(t, x4)) /2)
+        obs_T12 = PEtabObservable((Tf(t, x5) + Ts(t, x5)) /2)
+        obs_T3 = PEtabObservable(Tf(t, x_max1))
     
-        initialerror=(loss(p0, []))
+        observables = Dict("obs_T8" => obs_T8, "obs_T9" => obs_T9, "obs_T10" => obs_T10, 
+        "obs_T11" => obs_T11, "obs_T12" => obs_T12, "obs_T3" => obs_T3)
 
-        optf = OptimizationFunction(loss, Optimization.AutoForwardDiff())
-        
-        lb = [0.0, 0.0, 0.0, 30., 0.0]
-        ub = [10e6, 100., 1., 60., 1.]
-        #lb = [100.]
-        #ub = [1000.]
-        optprob = Optimization.OptimizationProblem(optf, p0, [], lb=lb, ub=ub)
-        
-        optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method = NLopt.LN_NELDERMEAD(), maxtime = 180, local_maxiters = 10000)
-        
-        
-        println(optsol.retcode)
-        
-        
-        pnew = optsol.u
-begin
-        
-        #pnew = [0.3]
-        res_error = loss(pnew, [])
-        display(res_error)
-        modelfit = remake(prob, p = pnew)
-        modelfit_sol = solve(modelfit, FBDF(), saveat = xd1_data, reltol=1e-12, abstol = 1e-12)
-        
-    
-        psol = modelfit_sol
-
-    plot1 =  plot(
-        psol.t, 
-        psol.u[Tf(t,x)][:,end-1], # around 136 mm in T3
-        title = "Gas Temperature Profile T3 - exp. 71", 
-        label = "optimized", 
-        xlabel = "Time (s)", 
-        ylabel = "Temperature (K)")
-        scatter!(
-        xd1_data, 
-        y1d1_data,  
-        label = "Experimental",
-        xlabel = "Time (s)", 
-        ylabel = "Temperature (K)")
-        plot!(
-        psol.t, 
-        psol.u[Ts(t,x)][:,end-1], 
-        label = "solid 136 mm")
+            _ρsCps = PEtabParameter(ρsCps, lb=1e-3, ub=1e3, scale=:log10)
+            _A = PEtabParameter(A, lb=1e-3, ub=1e3, scale=:log10)
+            _B = PEtabParameter(B, lb=1e-3, ub=1e3, scale=:log10)
+            _n = PEtabParameter(n, lb=1e-3, ub=1e3, scale=:log10)
+            _C = PEtabParameter(C, lb=1e-3, ub=1e3, scale=:log10)
             
-    plot2 = plot(
-        psol.t, 
-        psol.u[Ts(t,x)][:,4], # around 5 mm in T8
-        title = "Solid Temperature Profile T8 - exp. 71", 
-        label = "Numerical", 
-        xlabel = "Time (s)", 
-        ylabel = "Temperature (K)")
-        scatter!(
-        xd1_data, 
-        y2d1_data,  
-        label = "Experimental",
-        xlabel = "Time (s)", 
-        ylabel = "Temperature (K)")
-        plot!(
-        psol.t, 
-        psol.u[Tf(t,x)][:,4], # around 5 mm in T8
-        label = "gas 5mm")
-    plot3 = plot(
-        psol.t, 
-        psol.u[Ts(t,x)][:,40], # around 55 mm in T9
-        title = "Solid Temperature Profile T9 - exp. 71", 
-        label = "Numerical", 
-        xlabel = "Time (s)", 
-        ylabel = "Temperature (K)")
-        scatter!(
-        xd1_data, 
-        y1d2_data,  
-        label = "Experimental",
-        xlabel = "Time (s)", 
-        ylabel = "Temperature (K)")
-        plot!(
-        psol.t, 
-        psol.u[Tf(t,x)][:,40], 
-        label = "gas 55mm")
-    plot4 = plot(
-        psol.t, 
-        psol.u[Ts(t,x)][:,77], # around 106 mm in T10
-        title = "Solid Temperature Profile T10 - exp. 71", 
-        label = "Numerical", 
-        xlabel = "Time (s)", 
-        ylabel = "Temperature (K)")
-        scatter!(
-        xd1_data, 
-        y2d2_data,  
-        label = "Experimental",
-        xlabel = "Time (s)", 
-        ylabel = "Temperature (K)")
-        plot!(
-        psol.t, 
-        psol.u[Tf(t,x)][:,77], 
-        label = "gas 106mm")
-    plot5 = plot(
-        psol.t, 
-        psol.u[Ts(t,x)][:,20], # around 27 mm in T12
-        title = "Solid Temperature Profile T12 - exp. 71", 
-        label = "Numerical", 
-        xlabel = "Time (s)", 
-        ylabel = "Temperature (K)")
-        scatter!(
-        xd1_data, 
-        y4d2_data,  
-        label = "Experimental",
-        xlabel = "Time (s)", 
-        ylabel = "Temperature (K)")
-        plot!(
-        psol.t, 
-        psol.u[Tf(t,x)][:,20], 
-        label = "gas 27mm")
-    plot6 = plot(
-        psol.t, 
-        psol.u[Ts(t,x)][:,59], # around 82 mm in T11
-        title = "Solid Temperature Profile T11 - exp. 71", 
-        label = "Numerical", 
-        xlabel = "Time (s)", 
-        ylabel = "Temperature (K)")
-        scatter!(
-        xd1_data, 
-        y3d2_data,  
-        label = "Experimental",
-        xlabel = "Time (s)", 
-        ylabel = "Temperature (K)")
-        plot!(
-        psol.t, 
-        psol.u[Tf(t,x)][:,59], 
-        label = "gas 82mm")
-    plot7 = plot(
-        collect(x_num1),
-        psol.u[Tf(t,x)][end,:],
-        label = "gas",
-        xlabel = "Length (m)",
-        ylabel = "Temperature (K)")
-        plot!(
-        collect(x_num1),
-        psol.u[Ts(t,x)][end,:],
-        label = "solid",
-        xlabel = "Length (m)",
-        ylabel = "Temperature (K)")
-        
-    plot(plot1, plot2, plot3, plot4, plot5, plot6, plot7, layout=(10,2), size=(1500, 1500))
-end
+            parameters = [_ρsCps, _A, _B, _n, _C]
+            
+            #Defining simulation conditions
+            begin
+                condition_E67 = Dict(:I0 => 456, :v => 1.22)
+                condition_E68 = Dict(:I0 => 456, :v => 1.00)
+                condition_E69 = Dict(:I0 => 456, :v => 0.84)
+                condition_E70 = Dict(:I0 => 456, :v => 0.73)
+                condition_E71 = Dict(:I0 => 456, :v => 0.57)
+                condition_E72 = Dict(:I0 => 304, :v => 1.46)
+                condition_E73 = Dict(:I0 => 304, :v => 1.05)
+                condition_E74 = Dict(:I0 => 304, :v => 0.72)
+                condition_E75 = Dict(:I0 => 304, :v => 0.55)
+                condition_E76 = Dict(:I0 => 304, :v => 0.36)
+                condition_E77 = Dict(:I0 => 256, :v => 1.10)
+                condition_E78 = Dict(:I0 => 256, :v => 0.80)
+                condition_E79 = Dict(:I0 => 256, :v => 0.64)
+                condition_E80 = Dict(:I0 => 256, :v => 0.53)
+                condition_E81 = Dict(:I0 => 256, :v => 0.36)
+            end
+            
+            begin
+            simulation_conditions = Dict("E67" => condition_E67, "E68" => condition_E68, 
+            "E69" => condition_E69, "E70" => condition_E70,
+            "E71" => condition_E71,"E72" => condition_E72, 
+            "E73" => condition_E73, "E74" => condition_E74, 
+            "E75" => condition_E75, "E76" => condition_E76,
+            "E77" => condition_E77,"E78" => condition_E78, 
+            "E79" => condition_E79, "E80" => condition_E80,
+            "E81" => condition_E81)
+            end
+
+            #Defining measurement data
+            measurements = DataFrame(
+            simulation_id = ["Ts1_T8", "Ts1_T9", "Ts1_T10", "Ts1_T11", "Ts1_T12", "Tf1_T3",
+            "Ts2_T8", "Ts2_T9", "Ts2_T10", "Ts2_T11", "Ts2_T12", "Tf2_T3",
+            "Ts3_T8", "Ts3_T9", "Ts3_T10", "Ts3_T11", "Ts3_T12", "Tf3_T3",
+            "Ts4_T8", "Ts4_T9", "Ts4_T10", "Ts4_T11", "Ts4_T12", "Tf4_T3",
+            "Ts5_T8", "Ts5_T9", "Ts5_T10", "Ts5_T11", "Ts5_T12", "Tf5_T3",
+            "Ts6_T8", "Ts6_T9", "Ts6_T10", "Ts6_T11", "Ts6_T12", "Tf6_T3",
+            "Ts7_T8", "Ts7_T9", "Ts7_T10", "Ts7_T11", "Ts7_T12", "Tf7_T3",
+            "Ts8_T8", "Ts8_T9", "Ts8_T10", "Ts8_T11", "Ts8_T12", "Tf8_T3",
+            "Ts9_T8", "Ts9_T9", "Ts9_T10", "Ts9_T11", "Ts9_T12", "Tf9_T3",
+            "Ts10_T8", "Ts10_T9", "Ts10_T10", "Ts10_T11", "Ts10_T12", "Tf10_T3",
+            "Ts11_T8", "Ts11_T9", "Ts11_T10", "Ts11_T11", "Ts11_T12", "Tf11_T3",
+            "Ts12_T8", "Ts12_T9", "Ts12_T10", "Ts12_T11", "Ts12_T12", "Tf12_T3",
+            "Ts13_T8", "Ts13_T9", "Ts13_T10", "Ts13_T11", "Ts13_T12", "Tf13_T3",
+            "Ts14_T8", "Ts14_T9", "Ts14_T10", "Ts14_T11", "Ts14_T12", "Tf14_T3",
+            "Ts15_T8", "Ts15_T9", "Ts15_T10", "Ts15_T11", "Ts15_T12", "Tf15_T3"],
+            time = [3929, 3929, 3929, 3929, 3929, 3929,
+            5362, 5362, 5362, 5362, 5362, 5362,
+            5363, 5363, 5363, 5363, 5363, 5363,
+            6702, 6702, 6702, 6702, 6702, 6702,
+            7084, 7084, 7084, 7084, 7084, 7084,
+            3214, 3214, 3214, 3214, 3214, 3214,
+            4572, 4572, 4572, 4572, 4572, 4572,
+            6015, 6015, 6015, 6015, 6015, 6015, 
+            6351, 6351, 6351, 6351, 6351, 6351,
+            7144, 7144, 7144, 7144, 7144, 7144, 
+            3041, 3041, 3041, 3041, 3041, 3041,
+            5381, 5381, 5381, 5381, 5381, 5381,
+            5230, 5230, 5230, 5230, 5230, 5230,
+            5811, 5811, 5811, 5811, 5811, 5811, 
+            5986, 5986, 5986, 5986, 5986, 5986],
+            temperatures = [965.407, 975.144, 825.592, 880.867, 1004.165, 763.859,
+            1031.574, 1023.115, 850.099, 898.754, 1050.691, 773.207,
+            1070.803, 1045.898, 852.837, 896.788, 1072.727, 769.76,
+            1167.978, 1093.849, 871.496, 912.173, 1120.42, 779.53,
+            1210.945, 1095.322, 847.476, 882.823, 1120.417, 753.56,
+            742.125, 778.592, 684.246, 736.626, 807.125, 652.955,
+            844.257, 870.26, 747.444, 791.958, 898.081, 694.626,
+            962.113, 938.106, 767.803, 804.082, 965.702, 697.672,
+            1015.081, 954.214, 757.393, 788.678, 979.795, 681.066,
+            1069.567, 947.372, 726.308, 751.159, 970.498, 647.019,
+            569.248, 604.984, 543.727, 574.299, 627.16, 525.356,
+            634.731, 664.296, 583.704, 612.092, 686.936, 554.455,
+            677.817, 694.156, 595.766, 622.325, 716.314, 560.033,
+            711.537, 713.686, 601.77, 626.485, 735.984, 561.254,
+            763.299, 729.461, 597.766, 618.975, 751.15, 550.499])
+
+
+            petab_model = PEtabModel(pdesys, simulation_conditions, observables, measurements,
+                         parameters, parameter_map = p, verbose=false)
+            petab_problem = PEtabODEProblem(petab_model, verbose=false)
+
+        #Optimization
+        petab_problem_opt= PEtab.OptimizationProblem(petab_problem;
+        interior_point_alg=true,
+        box_constraints=true)
+
+        sol = solve(petab_problem_opt, Optim.ParticleSwarm(); reltol=1e-8)
+
+
+ 
