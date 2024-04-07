@@ -59,22 +59,27 @@ mx = px[idx]
 mT = pT[:, idx]
 
 #Create PEtab problem
+
 odesys = symbolic_discretize(pdesys, discretization)
-@unpack T, k, a, To = odesys[1]
+simpsys = structural_simplify(odesys[1])
+@unpack T, k, a, To = simpsys
 obs_T3 = PEtabObservable(T[3], 0.5)
 observables = Dict("obs_T3" => obs_T3)
 _k = PEtabParameter(:k, lb=0.1, ub=100., scale=:lin)
 _a = PEtabParameter(:a, lb=0.1, ub=100., scale=:lin)
 params = [_k , _a]  
-E0 = Dict[To => 1000.]
-E1 = Dict[To => 900.]
+E0 = Dict(:To => 1000.)
+E1 = Dict(:To => 900.)
 sim_cond = Dict("c0" => E0, "c1" => E1)
 measurements = DataFrame(
-    sim_id = ["c0"],
-    obs_id=["obs_T3"],
-    time = [pt[end]],
-    measurement=[400.])
+    simulation_id = ["c0", "c1"],
+    obs_id=["obs_T3", "obs_T3"],
+    time = [300., 300.],
+    measurement=[400., 420.])
 
-petab_model = PEtabModel(odesys, simulation_conditions, observables, measurements,
-    parameters, state_map=state_map, parameter_map=parameter_map,
-    verbose=false)
+petab_model = PEtabModel(simpsys, sim_cond, observables, measurements, params, verbose=false)
+petab_problem = PEtabODEProblem(petab_model, verbose=false)
+p0 = generate_startguesses(petab_problem, 1)
+res = calibrate_model(petab_problem, p0, IpoptOptimiser(false),
+                      options=IpoptOptions(max_iter = 1000))
+println(res)
