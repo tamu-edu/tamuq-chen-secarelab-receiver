@@ -1,0 +1,9 @@
+prefix=//tamuqfiles/project/Chemical Engineering/Air_Quality_Eng_R_Team/!GITHUB/tamuq-chen-secarelab-receiver/aysha/.CondaPkg/env/Library 
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: OpenSSL
+Description: Secure Sockets Layer and cryptography libraries and tools
+Requires: libssl libcrypto
+Version: 3.2.1 

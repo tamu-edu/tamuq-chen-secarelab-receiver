@@ -1,0 +1,40 @@
+{
+    "arch": "x86_64",
+    "build": "py312h2e8e312_0",
+    "build_number": 0,
+    "build_string": "py312h2e8e312_0",
+    "channel": "https://conda.anaconda.org/conda-forge/win-64",
+    "constrains": [],
+    "depends": [
+        "matplotlib-base >=3.8.3,<3.8.4.0a0",
+        "pyqt >=5.10",
+        "python >=3.12,<3.13.0a0",
+        "python_abi 3.12.* *_cp312",
+        "tornado >=5"
+    ],
+    "extracted_package_dir": "C:\\Users\\kkakosim\\.julia\\scratchspaces\\0b3b1443-0f03-428d-bdfb-f27f9c1191ea\\root\\pkgs\\matplotlib-3.8.3-py312h2e8e312_0",
+    "files": [],
+    "fn": "matplotlib-3.8.3-py312h2e8e312_0.conda",
+    "license": "PSF-2.0",
+    "license_family": "PSF",
+    "link": {
+        "source": "C:\\Users\\kkakosim\\.julia\\scratchspaces\\0b3b1443-0f03-428d-bdfb-f27f9c1191ea\\root\\pkgs\\matplotlib-3.8.3-py312h2e8e312_0",
+        "type": 1
+    },
+    "md5": "ab33ab32d357937a0c165fbe5dec854c",
+    "name": "matplotlib",
+    "package_tarball_full_path": "C:\\Users\\kkakosim\\.julia\\scratchspaces\\0b3b1443-0f03-428d-bdfb-f27f9c1191ea\\root\\pkgs\\matplotlib-3.8.3-py312h2e8e312_0.tar.bz2",
+    "paths_data": {
+        "paths": [],
+        "paths_version": 1
+    },
+    "platform": "win",
+    "requested_spec": "matplotlib[version='>=1']",
+    "sha256": "a8f9f94ed6be01eb6c4bc2327b3206dc2e87d0901d6330fe1aa069df82b92d5e",
+    "size": 8859,
+    "subdir": "win-64",
+    "timestamp": 1708027288324,
+    "track_features": "",
+    "url": "https://conda.anaconda.org/conda-forge/win-64/matplotlib-3.8.3-py312h2e8e312_0.conda",
+    "version": "3.8.3"
+}

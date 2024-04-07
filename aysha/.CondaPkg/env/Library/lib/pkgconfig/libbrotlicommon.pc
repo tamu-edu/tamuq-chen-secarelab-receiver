@@ -1,0 +1,11 @@
+prefix=//tamuqfiles/project/Chemical Engineering/Air_Quality_Eng_R_Team/!GITHUB/tamuq-chen-secarelab-receiver/aysha/.CondaPkg/env/Library
+exec_prefix=//tamuqfiles/project/Chemical Engineering/Air_Quality_Eng_R_Team/!GITHUB/tamuq-chen-secarelab-receiver/aysha/.CondaPkg/env/Library
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: libbrotlicommon
+URL: https://github.com/google/brotli
+Description: Brotli common dictionary library
+Version: 1.1.0
+Libs: -L${libdir} -lbrotlicommon
+Cflags: -I${includedir}

@@ -1,0 +1,64 @@
+{
+    "arch": "x86_64",
+    "build": "hcfcfb64_1",
+    "build_number": 1,
+    "build_string": "hcfcfb64_1",
+    "channel": "https://conda.anaconda.org/conda-forge/win-64",
+    "constrains": [],
+    "depends": [
+        "libbrotlicommon 1.1.0 hcfcfb64_1",
+        "ucrt >=10.0.20348.0",
+        "vc >=14.2,<15",
+        "vc14_runtime >=14.29.30139"
+    ],
+    "extracted_package_dir": "C:\\Users\\kkakosim\\.julia\\scratchspaces\\0b3b1443-0f03-428d-bdfb-f27f9c1191ea\\root\\pkgs\\libbrotlienc-1.1.0-hcfcfb64_1",
+    "files": [
+        "Library\\bin\\brotlienc.dll",
+        "Library\\lib\\brotlienc.lib",
+        "Library\\lib\\pkgconfig\\libbrotlienc.pc"
+    ],
+    "fn": "libbrotlienc-1.1.0-hcfcfb64_1.conda",
+    "license": "MIT",
+    "link": {
+        "source": "C:\\Users\\kkakosim\\.julia\\scratchspaces\\0b3b1443-0f03-428d-bdfb-f27f9c1191ea\\root\\pkgs\\libbrotlienc-1.1.0-hcfcfb64_1",
+        "type": 1
+    },
+    "md5": "71e890a0b361fd58743a13f77e1506b7",
+    "name": "libbrotlienc",
+    "package_tarball_full_path": "C:\\Users\\kkakosim\\.julia\\scratchspaces\\0b3b1443-0f03-428d-bdfb-f27f9c1191ea\\root\\pkgs\\libbrotlienc-1.1.0-hcfcfb64_1.tar.bz2",
+    "paths_data": {
+        "paths": [
+            {
+                "_path": "Library\\bin\\brotlienc.dll",
+                "path_type": "hardlink",
+                "sha256": "29389044989383251a49466f2c9e4a4e51ccc287127897c870895cb798ab952e",
+                "sha256_in_prefix": "29389044989383251a49466f2c9e4a4e51ccc287127897c870895cb798ab952e",
+                "size_in_bytes": 3343872
+            },
+            {
+                "_path": "Library\\lib\\brotlienc.lib",
+                "path_type": "hardlink",
+                "sha256": "8a83ab2977b6d1def849c3077bb6127d3a698a81db8fb4aa9c13bf032e6f9c8c",
+                "sha256_in_prefix": "8a83ab2977b6d1def849c3077bb6127d3a698a81db8fb4aa9c13bf032e6f9c8c",
+                "size_in_bytes": 4990
+            },
+            {
+                "_path": "Library\\lib\\pkgconfig\\libbrotlienc.pc",
+                "path_type": "hardlink",
+                "sha256": "ae13ed51e3eeb360fb2fe9b0ad78aa98ec9c4e9eef3654d13ef76d47590d11c3",
+                "sha256_in_prefix": "842b9447daddfc07f103c2d0866b1213c135ccbdf697b4d3930db5dfc800f03b",
+                "size_in_bytes": 385
+            }
+        ],
+        "paths_version": 1
+    },
+    "platform": "win",
+    "requested_spec": "",
+    "sha256": "eae6b76154e594c6d211160c6d1aeed848672618152a562e0eabdfa641d34aca",
+    "size": 246515,
+    "subdir": "win-64",
+    "timestamp": 1695990479484,
+    "track_features": "",
+    "url": "https://conda.anaconda.org/conda-forge/win-64/libbrotlienc-1.1.0-hcfcfb64_1.conda",
+    "version": "1.1.0"
+}

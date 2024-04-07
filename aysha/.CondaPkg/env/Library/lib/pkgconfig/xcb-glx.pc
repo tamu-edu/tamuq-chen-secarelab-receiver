@@ -1,0 +1,11 @@
+prefix=//tamuqfiles/project/Chemical Engineering/Air_Quality_Eng_R_Team/!GITHUB/tamuq-chen-secarelab-receiver/aysha/.CondaPkg/env/Library
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: XCB GLX
+Description: XCB GLX Extension
+Version: 1.15
+Requires.private: xcb
+Libs: -L${libdir} -lxcb-glx
+Cflags: -I${includedir}
