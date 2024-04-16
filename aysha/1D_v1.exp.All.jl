@@ -65,7 +65,8 @@ begin
     y1d3_data = D3[:, 2] .+ 273.0 #T2 (insulation)
     x1 = D3[:, 1]
     #2.create interpolation function
-    Tins = linear_interpolation(x1, y1d3_data)
+    #Tins = linear_interpolation(x1, y1d3_data)
+    Tins = LinearInterpolation(x1, y1d3_data)
     Tins_f(t) = Tins(t)
     @register_symbolic Tins_f(t)
 end
@@ -73,7 +74,8 @@ begin
     x11 = 0.0001:0.001383838383838384:0.137 #T2 (insulation)
     Gz = (1 ./ x11) * Re * Pr * w_t
     #2.create interpolation function
-    Gz_ = linear_interpolation(x11, Gz)
+    #Gz_ = linear_interpolation(x11, Gz)
+    Gz_ = LinearInterpolation(x11, Gz)
     Gz_f(x) = Gz_(x)
     @register_symbolic Gz_f(x)
 end
@@ -268,7 +270,8 @@ begin
         T12_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 20] .+ modeloptim_sol.u[Ts(t, x)][end, 20]) ./ 2
         T11_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 59] .+ modeloptim_sol.u[Ts(t, x)][end, 59]) ./ 2
 
-        return append!(tempT8_op, tempT9_op, tempT10_op, tempT3_op, T12_modelmean, T11_modelmean)
+        #return append!(tempT8_op, tempT9_op, tempT10_op, tempT3_op, T12_modelmean, T11_modelmean)
+        return [tempT8_op, tempT9_op, tempT10_op, tempT3_op, T12_modelmean, T11_modelmean]
     end
 
     #the first entry in the simulation_conditions
@@ -292,8 +295,9 @@ begin
         # Retrieve from measurements the experimental data for the current simulation condition
         expdata = (measurements[measurements.simulation_id .== string(sm), :temperatures])
         time_opt = (measurements[measurements.simulation_id .== string(sm), :time])
-        p_math_vec = (vcat(collect(pguess), values(cond)))  # pguess is the initial guess for the optimization
-        Temp = NLmodeloptim(p_math_vec, time_opt)
+        p_math_vec = copy(cond)
+        for (k,v) in pguess merge!(p_math_vec, Dict(Symbol(k) => v)) end  # pguess is the initial guess for the optimization
+        Temp = NLmodeloptim(time_opt, p_math_vec)
     end
 
 initialerror = (loss(p0, []))
