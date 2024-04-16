@@ -80,7 +80,7 @@ end;
     begin
         # Parameters, variables, and derivatives for system 1
         @variables t x 
-        @parameters V I0 ρsCps A B n C #psCps ks h_average
+        @parameters v I0 ρsCps A B n C #psCps ks h_average
         @variables Ts(..) Tf(..)
         Dt = Differential(t) 
         Dx = Differential(x)

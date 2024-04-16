@@ -2,22 +2,12 @@ begin #libraries
     using MethodOfLines
     using ModelingToolkit
     using DomainSets, OrdinaryDiffEq
-    using NonlinearSolve, DifferentialEquations
+    using NonlinearSolve, DifferentialEquations, DataFrames
     using Plots, XLSX, Statistics, Symbolics, Interpolations
     using Optim, LsqFit
     using Optimization, OptimizationNLopt, Symbolics, OptimizationOptimJL, ForwardDiff, OptimizationMOI
 end
 begin #define parameters
-
-    #ks= (37/1000)*(1-e) #C SiC- #kW/m.K using equation plotted from (Ali et al.)
-    #ks=(52000*exp(-1.24e-5*T)/(T+437))/1000 #kW/m.K (Ali et al.)
-    #kf = (0.056/1000)*e #thermal conductivity of the fluid phase kW/m.K
-    #kf=(1.52e-11*(T^3)-4.86e-8*(T^2)+1.02e-4*T-3.93e-3)/1000 #kW/m.K (Ali et al.)
-    #keff=0.82*kf+(1-0.82)*ks #using "Thermal analysis and design of a volumetric solar absorber depending on the porosity" paper - note that I still need to measure the porosity of SiC 
-    #ρf= 3.018*exp(-0.00574*T)+0.8063*exp(-0.0008381*T) #kg/m3 (Roldan et al.)
-    #Cpf=(1090/1000)*e #kJ/kg.K 
-    #Cps=1225/1000 #kJ/kg.K 
-    #ρs= (3100)*(1-e) #kg/m3
     L = 137e-3 #m
     #α = keff/ρ*Cp #kW/m2.K 
     Tamb = (22.448 + 273.15) #K (same for all exp) 
@@ -105,6 +95,7 @@ begin
     p_opt = [ρsCps => 80000.0, A => 20.0, B => 0.7, C => 40.0, n => 0.1]
     p_cond = [I0 => 456.0, v => 1.22]
     p_math = vcat(p_opt, p_cond)
+    #p_math_vec = collect(p_math)
     Nu = A * (1 + (B * ((Gz_f(x))^n) * exp(-C / Gz_f(x))))
     nu = 4.364 * (1 + (0.7 * ((Gz_f(0.134))^10) * exp(-40 / Gz_f(0.134))))
     h_average = (Nu * kf) / Lc
@@ -177,23 +168,7 @@ begin
 end
 
 x__domain = collect(sol1.ivdomain[2])
-#Data extraction
-begin
-    #Exp 71
-    D1 = XLSX.readxlsx("/Users/aishamelhim/Documents/GitHub/tamuq-chen-secarelab-receiver/aysha/SolarSimulator/EXCEL/Data_FPT0071_231128_102707.xlsx")["Sheet 1 - Data_FPT0071_231128_1"]["A3:C7087"]
-    xd1_data = D1[:, 1] #time
-    y1d1_data = D1[:, 2] .+ 273.0 #T3
-    y2d1_data = D1[:, 3] .+ 273.0 #T8
-end
-begin
-    #Exp 71 
-    D2 = XLSX.readxlsx("/Users/aishamelhim/Documents/GitHub/tamuq-chen-secarelab-receiver/aysha/SolarSimulator/EXCEL/Data_FPT0071_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0071_231128_1"]["A3:D7087"]
-    y1d2_data = D2[:, 1] .+ 273.0 #T9 (external)
-    y2d2_data = D2[:, 2] .+ 273.0 #T10 (external)
-    y3d2_data = D2[:, 3] .+ 273.0 #T11 (internal)
-    y4d2_data = D2[:, 4] .+ 273.0 #T12 (internal)
-end
-# Model solution plotted with experimental data
+
 begin
     plot(title="Solid Temperature Profile T8")
     plot!(sol1.t,
@@ -202,15 +177,6 @@ begin
         label="Numerical",
         xlabel="Time (s)",
         ylabel="Temperature (K)")
-    scatter!(
-        xd1_data,
-        y2d1_data,
-        label="Experimental",
-        xlabel="Time (s)",
-        ylabel="Temperature (K)")
-
-end
-begin
     plot()
     plot!(sol1.t,
         sol1.u[Tf(t, x)][:, end-1], # around 136 mm in T3
@@ -218,12 +184,12 @@ begin
         label="Numerical",
         xlabel="Time (s)",
         ylabel="Temperature (K)")
-    scatter!(
-        xd1_data,
-        y1d1_data,
-        label="Experimental",
-        xlabel="Time (s)",
-        ylabel="Temperature (K)")
+    # scatter!(
+    #     xd1_data,
+    #     y1d1_data,
+    #     label="Experimental",
+    #     xlabel="Time (s)",
+    #     ylabel="Temperature (K)")
 end
 begin
     # model results for different thermocouples
@@ -242,21 +208,21 @@ end
 
 #measurements and conditions#Defining simulation conditions
 begin
-    condition_E67 = Dict(:I0 => 456, :v => 1.22)
-    condition_E68 = Dict(:I0 => 456, :v => 1.00)
-    condition_E69 = Dict(:I0 => 456, :v => 0.84)
-    condition_E70 = Dict(:I0 => 456, :v => 0.73)
-    condition_E71 = Dict(:I0 => 456, :v => 0.57)
-    condition_E72 = Dict(:I0 => 304, :v => 1.46)
-    condition_E73 = Dict(:I0 => 304, :v => 1.05)
-    condition_E74 = Dict(:I0 => 304, :v => 0.72)
-    condition_E75 = Dict(:I0 => 304, :v => 0.55)
-    condition_E76 = Dict(:I0 => 304, :v => 0.36)
-    condition_E77 = Dict(:I0 => 256, :v => 1.10)
-    condition_E78 = Dict(:I0 => 256, :v => 0.80)
-    condition_E79 = Dict(:I0 => 256, :v => 0.64)
-    condition_E80 = Dict(:I0 => 256, :v => 0.53)
-    condition_E81 = Dict(:I0 => 256, :v => 0.36)
+    condition_E67 = Dict(:I0 => 456.0, :v => 1.22)
+    condition_E68 = Dict(:I0 => 456.0, :v => 1.00)
+    condition_E69 = Dict(:I0 => 456.0, :v => 0.84)
+    condition_E70 = Dict(:I0 => 456.0, :v => 0.73)
+    condition_E71 = Dict(:I0 => 456.0, :v => 0.57)
+    condition_E72 = Dict(:I0 => 304.0, :v => 1.46)
+    condition_E73 = Dict(:I0 => 304.0, :v => 1.05)
+    condition_E74 = Dict(:I0 => 304.0, :v => 0.72)
+    condition_E75 = Dict(:I0 => 304.0, :v => 0.55)
+    condition_E76 = Dict(:I0 => 304.0, :v => 0.36)
+    condition_E77 = Dict(:I0 => 256.0, :v => 1.10)
+    condition_E78 = Dict(:I0 => 256.0, :v => 0.80)
+    condition_E79 = Dict(:I0 => 256.0, :v => 0.64)
+    condition_E80 = Dict(:I0 => 256.0, :v => 0.53)
+    condition_E81 = Dict(:I0 => 256.0, :v => 0.36)
 
     simulation_conditions = Dict("E67" => condition_E67, "E68" => condition_E68,
         "E69" => condition_E69, "E70" => condition_E70,
@@ -266,73 +232,69 @@ begin
         "E77" => condition_E77, "E78" => condition_E78,
         "E79" => condition_E79, "E80" => condition_E80,
         "E81" => condition_E81)
+        #Defining measurement data
+        measurements = DataFrame(
+            simulation_id=repeat(["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"], inner=6, outer=1),
+            obs_id=repeat(["_T8", "_T9", "_T10", "_T11", "_T12", "_T3"], inner=1, outer=15),
+            time=repeat([3929, 5362, 5363, 6702, 7084, 3214, 4572, 6015, 6351, 7144, 3041, 5381, 5230, 5811, 5986], inner=6, outer=1),
+            temperatures=[965.407, 975.144, 825.592, 880.867, 1004.165, 763.859,
+                1031.574, 1023.115, 850.099, 898.754, 1050.691, 773.207,
+                1070.803, 1045.898, 852.837, 896.788, 1072.727, 769.76,
+                1167.978, 1093.849, 871.496, 912.173, 1120.42, 779.53,
+                1210.945, 1095.322, 847.476, 882.823, 1120.417, 753.56,
+                742.125, 778.592, 684.246, 736.626, 807.125, 652.955,
+                844.257, 870.26, 747.444, 791.958, 898.081, 694.626,
+                962.113, 938.106, 767.803, 804.082, 965.702, 697.672,
+                1015.081, 954.214, 757.393, 788.678, 979.795, 681.066,
+                1069.567, 947.372, 726.308, 751.159, 970.498, 647.019,
+                569.248, 604.984, 543.727, 574.299, 627.16, 525.356,
+                634.731, 664.296, 583.704, 612.092, 686.936, 554.455,
+                677.817, 694.156, 595.766, 622.325, 716.314, 560.033,
+                711.537, 713.686, 601.77, 626.485, 735.984, 561.254,
+                763.299, 729.461, 597.766, 618.975, 751.15, 550.499])
+    end
 
-    #Defining measurement data
-    measurements = DataFrame(
-        simulation_id=repeat(["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"], inner=6, outer=1),
-        obs_id=repeat(["_T8", "_T9", "_T10", "_T11", "_T12", "_T3"], inner=1, outer=15),
-        time=repeat([3929, 5362, 5363, 6702, 7084, 3214, 4572, 6015, 6351, 7144, 3041, 5381, 5230, 5811, 5986], inner=6, outer=1),
-        temperatures=[965.407, 975.144, 825.592, 880.867, 1004.165, 763.859,
-            1031.574, 1023.115, 850.099, 898.754, 1050.691, 773.207,
-            1070.803, 1045.898, 852.837, 896.788, 1072.727, 769.76,
-            1167.978, 1093.849, 871.496, 912.173, 1120.42, 779.53,
-            1210.945, 1095.322, 847.476, 882.823, 1120.417, 753.56,
-            742.125, 778.592, 684.246, 736.626, 807.125, 652.955,
-            844.257, 870.26, 747.444, 791.958, 898.081, 694.626,
-            962.113, 938.106, 767.803, 804.082, 965.702, 697.672,
-            1015.081, 954.214, 757.393, 788.678, 979.795, 681.066,
-            1069.567, 947.372, 726.308, 751.159, 970.498, 647.019,
-            569.248, 604.984, 543.727, 574.299, 627.16, 525.356,
-            634.731, 664.296, 583.704, 612.092, 686.936, 554.455,
-            677.817, 694.156, 595.766, 622.325, 716.314, 560.033,
-            711.537, 713.686, 601.77, 626.485, 735.984, 561.254,
-            763.299, 729.461, 597.766, 618.975, 751.15, 550.499])
-end
+    #Optimization using NLOpt
+    function NLmodeloptim(tvalues, p_math_vec)
+        
+        #p = [hlocal => p_vary[1]]
+        modeloptim = remake(prob, p=p_math_vec, tspan=(tvalues[1], tvalues[end]))
+        modeloptim_sol = solve(modeloptim, FBDF(), saveat=tvalues, reltol=1e-12, abstol=1e-12)
+        #time = modelfit_sol.t
+        tempT8_op = modeloptim_sol.u[Ts(t, x)][end, 4]
+        tempT9_op = modeloptim_sol.u[Ts(t, x)][end, 40]
+        tempT10_op = modeloptim_sol.u[Ts(t, x)][end, 77]
+        tempT3_op = modeloptim_sol.u[Tf(t, x)][end, end-1]
+        T12_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 20] .+ modeloptim_sol.u[Ts(t, x)][end, 20]) ./ 2
+        T11_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 59] .+ modeloptim_sol.u[Ts(t, x)][end, 59]) ./ 2
 
-pguess = p
+        return append!(tempT8_op, tempT9_op, tempT10_op, tempT3_op, T12_modelmean, T11_modelmean)
+    end
 
-#Optimization using NLOpt
-function NLmodeloptim(p_math, tvalues)
-    
-    #p = [hlocal => p_vary[1]]
-    modeloptim = remake(prob, p=p_math, tspan=(1, tvalues))
-    modeloptim_sol = solve(modeloptim, FBDF(), saveat=xvalues, reltol=1e-12, abstol=1e-12)
-    #time = modelfit_sol.t
-    tempT8_op = modeloptim_sol.u[Ts(t, x)][end, 4]
-    tempT9_op = modeloptim_sol.u[Ts(t, x)][end, 40]
-    tempT10_op = modeloptim_sol.u[Ts(t, x)][end, 77]
-    tempT3_op = modeloptim_sol.u[Tf(t, x)][end, end-1]
-    T12_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 20] .+ modeloptim_sol.u[Ts(t, x)][end, 20]) ./ 2
-    T11_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 59] .+ modeloptim_sol.u[Ts(t, x)][end, 59]) ./ 2
+    #the first entry in the simulation_conditions
 
-    return append!(tempT8_op, tempT9_op, tempT10_op, tempT3_op, T12_modelmean, T11_modelmean)
-end
+    pguess = p_opt
 
-#the first entry in the simulation_conditions
+    function lossAll(pguess, _)
 
-pguess = p_opt
+        #to place the conditions loop
 
-function lossAll(pguess, _)
+        p_math_vec = (vcat(collect(pguess), values(p_cond)))
+        Temp = NLmodeloptim(xd1_data, p_math_vec)
+        lossr = (Temp .- expdata) .^ 2
 
-    #to place the conditions loop
+        return sqrt(sum(lossr) / length(expdata)) #MSE
+    end
 
-    p_math = vcat(pguess, p_cond)
-    Temp = NLmodeloptim(p_math, xd1_data)
-    lossr = (Temp .- expdata) .^ 2
+    test_cond = Dict("E67" => condition_E67)
 
-    return sqrt(sum(lossr) / length(expdata)) #MSE
-end
-
-test_cond = Dict("E67" => condition_E67)
-
-for (sm, cond) in test_cond
-    #retrieve from measurements the experimental data for the current simulation condition
-    expdata = measurements[measurements.simulation_id .== sm, :temperatures]
-    time = measurements[measurements.simulation_id .== sm, :time]
-    p_math = vcat(pguess, cond)
-    Temp = NLmodeloptim(p_math, time[1])
-end
-#loss([1.], [])
+    for (sm, cond) in test_cond
+        # Retrieve from measurements the experimental data for the current simulation condition
+        expdata = (measurements[measurements.simulation_id .== string(sm), :temperatures])
+        time_opt = (measurements[measurements.simulation_id .== string(sm), :time])
+        p_math_vec = (vcat(collect(pguess), values(cond)))  # pguess is the initial guess for the optimization
+        Temp = NLmodeloptim(p_math_vec, time_opt)
+    end
 
 initialerror = (loss(p0, []))
 
@@ -353,7 +315,6 @@ println(optsol.retcode)
 pnew = optsol.u
 begin
 
-    #pnew = [0.3]
     res_error = loss(pnew, [])
     display(res_error)
     modelfit = remake(prob, p=pnew)
