@@ -4,7 +4,7 @@ begin #libraries
     using DomainSets, OrdinaryDiffEq
     using NonlinearSolve, DifferentialEquations, DataFrames
     using Plots, XLSX, Statistics, Symbolics, Interpolations
-    using Optim, LsqFit
+    using Optim, LsqFit, LossFunctions
     using Optimization, OptimizationNLopt, Symbolics, OptimizationOptimJL, ForwardDiff, OptimizationMOI
 end
 begin #define parameters
@@ -38,9 +38,7 @@ begin #define parameters
     ρf = 0.5 #kg/m3
     Cpf = (1090 / 1000) #kJ/kg.K
     mu = 2.0921e-5 #Pa.s
-    Re = (ρf * V * w_t) / mu
-    Pr = (Cpf * mu) / kf
-    Gz = (w_t / L) * Re * Pr
+    #Gz = (w_t / L) * Re * Pr
     # A = 3.657
     # B = 0.5272
     # C = 55.1239
@@ -55,7 +53,6 @@ begin #define parameters
     kins = 0.078 / 1000 #kW/m*K
     r0 = 23 / 1000 #m
     r = 42 / 1000 #m
-    #Tins = 356 #K exp. 71
 end;
 #for interpolations 
 #1. extract T2 data
@@ -65,36 +62,42 @@ begin
     y1d3_data = D3[:, 2] .+ 273.0 #T2 (insulation)
     x1 = D3[:, 1]
     #2.create interpolation function
-    #Tins = linear_interpolation(x1, y1d3_data)
-    Tins = LinearInterpolation(x1, y1d3_data)
+    Tins = linear_interpolation(x1, y1d3_data, extrapolation_bc=y1d3_data[end])
     Tins_f(t) = Tins(t)
     @register_symbolic Tins_f(t)
 end
-begin
-    x11 = 0.0001:0.001383838383838384:0.137 #T2 (insulation)
-    Gz = (1 ./ x11) * Re * Pr * w_t
-    #2.create interpolation function
-    #Gz_ = linear_interpolation(x11, Gz)
-    Gz_ = LinearInterpolation(x11, Gz)
-    Gz_f(x) = Gz_(x)
-    @register_symbolic Gz_f(x)
-end
+# begin
+#     x11 = 0.0001:0.001383838383838384:0.137 #T2 (insulation)
+#     Gz = (1 ./ x11) * Re * Pr * w_t
+#     #2.create interpolation function
+#     Gz_ = linear_interpolation(x11, Gz)
+#     Gz_f(x) = Gz_(x)
+#     @register_symbolic Gz_f(x)
+# end
 begin
     # Parameters, variables, and derivatives for system 1
     @variables t x
-    @parameters ρsCps A B n C #psCps ks h_average
+    @parameters A B n C #psCps ks h_average
     @parameters I0 v
     @variables Ts(..) Tf(..)
     Dt = Differential(t)
     Dx = Differential(x)
     Dxx = Differential(x)^2
     e = 0.62
-    ks = (37 / 1000) * (1 - e) #kW/m.K
-    #ρs = 3100*(1-e) #kg/m3
-    #Cps = (1225/1000)*(1-e) #kJ/kg
-
-    #p = [psCps => 90000., ks=> 37, h_average => (Nu*kf)/w_t]
-    p_opt = [ρsCps => 80000.0, A => 20.0, B => 0.7, C => 40.0, n => 0.1]
+    ks = (48.78 / 1000) * 1.97 * ((1 - e)^1.5) #kW/m.K
+    ρs = 3200 #kg/m3
+    Cps = 1290 / 1000 #kJ/kg*K
+    Re = (ρf * v * w_t) / mu
+    Pr = (Cpf * mu) / kf
+    #Interpolation for Gz number
+    x11 = 0.0001:0.001383838383838384:0.137 #T2 (insulation)
+    Gz = (1 ./ x11) * Re * Pr * w_t
+    #2.create interpolation function
+    Gz_ = linear_interpolation(x11, Gz)
+    Gz_f(x) = Gz_(x)
+    @register_symbolic Gz_f(x)
+    #Cps(Ts) = (0.27+0.135e-4*(Ts)-9720*((Ts)^-2)+0.204e-7*((Ts)^2))/1000 #kJ/kg*K from manufacturer data
+    p_opt = [A => 8.0, B => 0.5, C => 55.0, n => 0.2]
     p_cond = [I0 => 456.0, v => 1.22]
     p_math = vcat(p_opt, p_cond)
     #p_math_vec = collect(p_math)
@@ -103,8 +106,6 @@ begin
     h_average = (Nu * kf) / Lc
     #Cps(T)= (1110+0.15*(T-273)-425*exp(-0.003*(T-273)))/1000 #kJ/kg*K
     #Cpf(T)= (1.93e-10*(T^3)+1.14e-3*(T^2)-4.49e-1*T+1.06e3)/1000 #kJ/kg*K
-
-    #psCps = ρs * Cps * (1-e)
 
     # MOL Discretization parameters for system 1
     x_max1 = L
@@ -123,7 +124,7 @@ begin
     # PDE equation for system 1
 
     eq1 = [
-        Vs * (ρsCps / 1000) * Dt(Ts(t, x)) ~ Vs * (ks) * Dxx(Ts(t, x)) - ((h_average / 1000) * Av * Vi * ((Ts(t, x)) - Tf(t, x))) .- (kins * (r / r0) .* (Ts(t, x) .- Tins_f(t)) * A_t / (r - r0)),
+        Vs * (ρs * Cps) * Dt(Ts(t, x)) ~ Vs * (ks) * Dxx(Ts(t, x)) - ((h_average / 1000) * Av * Vi * ((Ts(t, x)) - Tf(t, x))) .- (kins * (r / r0) .* (Ts(t, x) .- Tins_f(t)) * A_t / (r - r0)),
         Vf * ρf * Cpf * Dt(Tf(t, x)) ~ Vf * kf * Dxx(Tf(t, x)) - Vf * ρf * Cpf * V * Dx(Tf(t, x)) + (h_average / 1000) * Av * Vi * ((Ts(t, x) - Tf(t, x)))
     ]
 
@@ -234,82 +235,202 @@ begin
         "E77" => condition_E77, "E78" => condition_E78,
         "E79" => condition_E79, "E80" => condition_E80,
         "E81" => condition_E81)
-        #Defining measurement data
-        measurements = DataFrame(
-            simulation_id=repeat(["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"], inner=6, outer=1),
-            obs_id=repeat(["_T8", "_T9", "_T10", "_T11", "_T12", "_T3"], inner=1, outer=15),
-            time=repeat([3929, 5362, 5363, 6702, 7084, 3214, 4572, 6015, 6351, 7144, 3041, 5381, 5230, 5811, 5986], inner=6, outer=1),
-            temperatures=[965.407, 975.144, 825.592, 880.867, 1004.165, 763.859,
-                1031.574, 1023.115, 850.099, 898.754, 1050.691, 773.207,
-                1070.803, 1045.898, 852.837, 896.788, 1072.727, 769.76,
-                1167.978, 1093.849, 871.496, 912.173, 1120.42, 779.53,
-                1210.945, 1095.322, 847.476, 882.823, 1120.417, 753.56,
-                742.125, 778.592, 684.246, 736.626, 807.125, 652.955,
-                844.257, 870.26, 747.444, 791.958, 898.081, 694.626,
-                962.113, 938.106, 767.803, 804.082, 965.702, 697.672,
-                1015.081, 954.214, 757.393, 788.678, 979.795, 681.066,
-                1069.567, 947.372, 726.308, 751.159, 970.498, 647.019,
-                569.248, 604.984, 543.727, 574.299, 627.16, 525.356,
-                634.731, 664.296, 583.704, 612.092, 686.936, 554.455,
-                677.817, 694.156, 595.766, 622.325, 716.314, 560.033,
-                711.537, 713.686, 601.77, 626.485, 735.984, 561.254,
-                763.299, 729.461, 597.766, 618.975, 751.15, 550.499])
-    end
+    #Defining measurement data
+    measurements = DataFrame(
+        simulation_id=repeat(["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"], inner=6, outer=1),
+        obs_id=repeat(["_T8", "_T9", "_T10", "_T11", "_T12", "_T3"], inner=1, outer=15),
+        time=repeat([3929, 5362, 5363, 6702, 7084, 3214, 4572, 6015, 6351, 7144, 3041, 5381, 5230, 5811, 5986], inner=6, outer=1),
+        temperatures=[965.407, 975.144, 825.592, 880.867, 1004.165, 763.859,
+            1031.574, 1023.115, 850.099, 898.754, 1050.691, 773.207,
+            1070.803, 1045.898, 852.837, 896.788, 1072.727, 769.76,
+            1167.978, 1093.849, 871.496, 912.173, 1120.42, 779.53,
+            1210.945, 1095.322, 847.476, 882.823, 1120.417, 753.56,
+            742.125, 778.592, 684.246, 736.626, 807.125, 652.955,
+            844.257, 870.26, 747.444, 791.958, 898.081, 694.626,
+            962.113, 938.106, 767.803, 804.082, 965.702, 697.672,
+            1015.081, 954.214, 757.393, 788.678, 979.795, 681.066,
+            1069.567, 947.372, 726.308, 751.159, 970.498, 647.019,
+            569.248, 604.984, 543.727, 574.299, 627.16, 525.356,
+            634.731, 664.296, 583.704, 612.092, 686.936, 554.455,
+            677.817, 694.156, 595.766, 622.325, 716.314, 560.033,
+            711.537, 713.686, 601.77, 626.485, 735.984, 561.254,
+            763.299, 729.461, 597.766, 618.975, 751.15, 550.499])
+end
 
-    #Optimization using NLOpt
-    function NLmodeloptim(tvalues, p_math_vec)
-        
-        #p = [hlocal => p_vary[1]]
-        modeloptim = remake(prob, p=p_math_vec, tspan=(tvalues[1], tvalues[end]))
-        modeloptim_sol = solve(modeloptim, FBDF(), saveat=tvalues, reltol=1e-12, abstol=1e-12)
-        #time = modelfit_sol.t
-        tempT8_op = modeloptim_sol.u[Ts(t, x)][end, 4]
-        tempT9_op = modeloptim_sol.u[Ts(t, x)][end, 40]
-        tempT10_op = modeloptim_sol.u[Ts(t, x)][end, 77]
-        tempT3_op = modeloptim_sol.u[Tf(t, x)][end, end-1]
-        T12_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 20] .+ modeloptim_sol.u[Ts(t, x)][end, 20]) ./ 2
-        T11_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 59] .+ modeloptim_sol.u[Ts(t, x)][end, 59]) ./ 2
+#Exp. data to extract temp.
+begin
+    #Exp 67 - T3, T8
+    Z = XLSX.readxlsx("/Users/aishamelhim/Documents/ResearchData/SolarSimulator/EXCEL/Data_FPT0067_231125_161757.xlsx")["Sheet 1 - Data_FPT0067_231125_1"]["A3:C3932"]
+    xz_data = Z[:, 1]
+    y1z_data = Z[:, 2] .+ 273.15
+    y2z_data = Z[:, 3] .+ 273.15
 
-        #return append!(tempT8_op, tempT9_op, tempT10_op, tempT3_op, T12_modelmean, T11_modelmean)
-        return [tempT8_op, tempT9_op, tempT10_op, tempT3_op, T12_modelmean, T11_modelmean]
-    end
+#Exp 67 - T9, T10, T11, T12
+    Z1 = XLSX.readxlsx("/Users/aishamelhim/Documents/Github/Aysha/SolarSimulator/EXCEL/Data_FPT0067_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0067_T9"]["A3:E3932"]
+    y3z_data = Z1[:, 2] .+ 273.15
+    y4z_data = Z1[:, 3] .+ 273.15
+    y5z_data = Z1[:, 4] .+ 273.15
+    y6z_data = Z1[:, 5] .+ 273.15
 
-    #the first entry in the simulation_conditions
+    #Exp 68 - T3, T8
+    A1 = XLSX.readxlsx("/Users/aishamelhim/Documents/ResearchData/SolarSimulator/EXCEL/Data_FPT0068_231126_115725.xlsx")["Sheet 1 - Data_FPT0068_231126_1"]["A3:C5365"]
+    xa1_data = A1[:, 1]
+    y1a1_data = A1[:, 2] .+ 273.15
+    y2a1_data = A1[:, 3] .+ 273.15
 
-    pguess = p_opt
+#Exp 68 - T9, T10, T11, T12
+    A11 = XLSX.readxlsx("/Users/aishamelhim/Documents/Github/Aysha/SolarSimulator/EXCEL/Data_FPT0068_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0068_231126_1"]["A3:E5365"]
+    y3a_data = A11[:, 2] .+ 273.15
+    y4a_data = A11[:, 3] .+ 273.15
+    y5a_data = A11[:, 4] .+ 273.15
+    y6a_data = A11[:, 5] .+ 273.15
 
-    function lossAll(pguess, _)
+    #Exp 69 - T3, T8
+    B1 = XLSX.readxlsx("/Users/aishamelhim/Documents/ResearchData/SolarSimulator/EXCEL/Data_FPT0069_231126_140153.xlsx")["Sheet 1 - Data_FPT0069_231126_1"]["A3:C5366"]
+    xb1_data = B1[:, 1]
+    y1b1_data = B1[:, 2] .+ 273.15
+    y2b1_data = B1[:, 3] .+ 273.15
 
-        #to place the conditions loop
+#Exp 69 - T9, T10, T11, T12
+    B11 = XLSX.readxlsx("/Users/aishamelhim/Documents/Github/Aysha/SolarSimulator/EXCEL/Data_FPT0069_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0069_231126_1"]["A3:E5366"]
+    y3b_data = B11[:, 2] .+ 273.15
+    y4b_data = B11[:, 3] .+ 273.15
+    y5b_data = B11[:, 4] .+ 273.15
+    y6b_data = B11[:, 5] .+ 273.15
 
-        p_math_vec = (vcat(collect(pguess), values(p_cond)))
-        Temp = NLmodeloptim(xd1_data, p_math_vec)
-        lossr = (Temp .- expdata) .^ 2
+    #Exp 70 - T3, T8
+    C1 = XLSX.readxlsx("/Users/aishamelhim/Documents/ResearchData/SolarSimulator/EXCEL/Data_FPT0070_231127_090339.xlsx")["Sheet 1 - Data_FPT0070_231127_0"]["A3:C6705"]
+    xc1_data = C1[:, 1]
+    y1c1_data = C1[:, 2] .+ 273.15
+    y2c1_data = C1[:, 3] .+ 273.15
 
-        return sqrt(sum(lossr) / length(expdata)) #MSE
-    end
+#Exp 70 - T9, T10, T11, T12
 
-    test_cond = Dict("E67" => condition_E67)
+    C11 = XLSX.readxlsx("/Users/aishamelhim/Documents/Github/Aysha/SolarSimulator/EXCEL/Data_FPT0070_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0070_231127_0"]["A3:E6705"]
+    y3c_data = C11[:, 2] .+ 273.15
+    y4c_data = C11[:, 3] .+ 273.15
+    y5c_data = C11[:, 4] .+ 273.15
+    y6c_data = C11[:, 5] .+ 273.15
 
-    for (sm, cond) in test_cond
+    #Exp 71 - T3, T8
+    D1 = XLSX.readxlsx("/Users/aishamelhim/Documents/ResearchData/SolarSimulator/EXCEL/Data_FPT0071_231128_102707.xlsx")["Sheet 1 - Data_FPT0071_231128_1"]["A3:C7087"]
+    xd1_data = D1[:, 1]
+    y1d1_data = D1[:, 2] .+ 273.15
+    y2d1_data = D1[:, 3] .+ 273.15
+
+#Exp 71 - T9, T10, T11, T12
+
+    D11 = XLSX.readxlsx("/Users/aishamelhim/Documents/Github/Aysha/SolarSimulator/EXCEL/Data_FPT0071_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0071_231128_1"]["A3:E7087"]
+    y3d_data = D11[:, 2] .+ 273.15
+    y4d_data = D11[:, 3] .+ 273.15
+    y5d_data = D11[:, 4] .+ 273.15
+    y6d_data = D11[:, 5] .+ 273.15
+
+    #Exp 72 - T3, T8
+    E1 = XLSX.readxlsx("/Users/aishamelhim/Documents/ResearchData/SolarSimulator/EXCEL/Data_FPT0072_231129_104140.xlsx")["Sheet 1 - Data_FPT0072_231129_1"]["A3:C3217"]
+    xe1_data = E1[:, 1]
+    y1e1_data = E1[:, 2] .+ 273.15
+    y2e1_data = E1[:, 3] .+ 273.15
+
+#Exp 72 - T9, T10, T11, T12
+
+    E11 = XLSX.readxlsx("/Users/aishamelhim/Documents/Github/Aysha/SolarSimulator/EXCEL/Data_FPT0072_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0072_231129_1"]["A3:E3217"]
+    y3e_data = E11[:, 2] .+ 273.15
+    y4e_data = E11[:, 3] .+ 273.15
+    y5e_data = E11[:, 4] .+ 273.15
+    y6e_data = E11[:, 5] .+ 273.15
+
+    #Exp 73 - T3, T8
+    F1 = XLSX.readxlsx("/Users/aishamelhim/Documents/ResearchData/SolarSimulator/EXCEL/Data_FPT0073_231129_132744.xlsx")["Sheet 1 - Data_FPT0073_231129_1"]["A3:C4575"]
+    xf1_data = F1[:, 1]
+    y1f1_data = F1[:, 2] .+ 273.15
+    y2f1_data = F1[:, 3] .+ 273.15
+
+#Exp 73 - T9, T10, T11, T12
+
+    F11 = XLSX.readxlsx("/Users/aishamelhim/Documents/Github/Aysha/SolarSimulator/EXCEL/Data_FPT0073_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0073_231129_1"]["A3:E4575"]
+    y3f_data = F11[:, 2] .+ 273.15
+    y4f_data = F11[:, 3] .+ 273.15
+    y5f_data = F11[:, 4] .+ 273.15
+    y6f_data = F11[:, 5] .+ 273.15
+end
+#Optimization using NLOpt
+function NLmodeloptim(tvalues, p_math_vec)
+
+    #p = [hlocal => p_vary[1]]
+    modeloptim = remake(prob, p=p_math_vec, tspan=(tvalues[1], tvalues[end]))
+    modeloptim_sol = solve(modeloptim, FBDF(), saveat=tvalues, reltol=1e-12, abstol=1e-12)
+    #time = modelfit_sol.t
+    tempT8_op = modeloptim_sol.u[Ts(t, x)][end, 4]
+    tempT9_op = modeloptim_sol.u[Ts(t, x)][end, 40]
+    tempT10_op = modeloptim_sol.u[Ts(t, x)][end, 77]
+    tempT3_op = modeloptim_sol.u[Tf(t, x)][end, end-1]
+    T12_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 20] .+ modeloptim_sol.u[Ts(t, x)][end, 20]) ./ 2
+    T11_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 59] .+ modeloptim_sol.u[Ts(t, x)][end, 59]) ./ 2
+
+    #return append!(tempT8_op, tempT9_op, tempT10_op, tempT3_op, T12_modelmean, T11_modelmean)
+    return [tempT8_op, tempT9_op, tempT10_op, tempT3_op, T12_modelmean, T11_modelmean]
+end
+
+#the first entry in the simulation_conditions
+pguess = p_opt
+# expdata = [965.407, 975.144, 825.592, 880.867, 1004.165, 763.859,
+#             1031.574, 1023.115, 850.099, 898.754, 1050.691, 773.207,
+#             1070.803, 1045.898, 852.837, 896.788, 1072.727, 769.76,
+#             1167.978, 1093.849, 871.496, 912.173, 1120.42, 779.53,
+#             1210.945, 1095.322, 847.476, 882.823, 1120.417, 753.56,
+#             742.125, 778.592, 684.246, 736.626, 807.125, 652.955,
+#             844.257, 870.26, 747.444, 791.958, 898.081, 694.626,
+#             962.113, 938.106, 767.803, 804.082, 965.702, 697.672,
+#             1015.081, 954.214, 757.393, 788.678, 979.795, 681.066,
+#             1069.567, 947.372, 726.308, 751.159, 970.498, 647.019,
+#             569.248, 604.984, 543.727, 574.299, 627.16, 525.356,
+#             634.731, 664.296, 583.704, 612.092, 686.936, 554.455,
+#             677.817, 694.156, 595.766, 622.325, 716.314, 560.033,
+#             711.537, 713.686, 601.77, 626.485, 735.984, 561.254,
+#             763.299, 729.461, 597.766, 618.975, 751.15, 550.499]
+function lossAll(pguess, _)
+
+    #to place the conditions loop
+
+    #p_math_vec = (vcat(collect(pguess), values(p_cond)))
+    #Temp = NLmodeloptim(xz_data, p_math_vec)
+  
+    lossr = 0.0
+    for (sm, cond) in simulation_conditions
         # Retrieve from measurements the experimental data for the current simulation condition
-        expdata = (measurements[measurements.simulation_id .== string(sm), :temperatures])
-        time_opt = (measurements[measurements.simulation_id .== string(sm), :time])
+        #println(sm)
+        expdata = (measurements[measurements.simulation_id.==string(sm), :temperatures])
+        time_opt = (measurements[measurements.simulation_id.==string(sm), :time])
         p_math_vec = copy(cond)
-        for (k,v) in pguess merge!(p_math_vec, Dict(Symbol(k) => v)) end  # pguess is the initial guess for the optimization
-        Temp = NLmodeloptim(time_opt, p_math_vec)
+        j=1
+        for (k, v) in p_opt #FIX DICTIONARY PARAMETERS OR VECTORS
+            merge!(p_math_vec, Dict(Symbol(k) => pguess[j]))
+            j+=1
+        end  # pguess is the initial guess for the optimization
+        temp_T = NLmodeloptim(time_opt, p_math_vec)
+        temp_error = (temp_T .- expdata) .^ 2
+        lossr = lossr + sqrt(sum(temp_error))
     end
 
-initialerror = (loss(p0, []))
+    return lossr #MSE
+end
 
-optf = OptimizationFunction(loss, Optimization.AutoForwardDiff())
+#test_cond = Dict("E76" => condition_E76)
 
-lb = [0.0, 0.0, 0.0, 30.0, 0.0]
-ub = [10e6, 100.0, 1.0, 60.0, 1.0]
+
+#initialerror = (lossAll(pguess, []))
+
+optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
+
+lb = [3.0, 0.0, 0.0, 0.0]
+ub = [10.0, 0.5, 60.0, 0.99]
 #lb = [100.]
 #ub = [1000.]
-optprob = Optimization.OptimizationProblem(optf, p0, [], lb=lb, ub=ub)
+pguess_opt = [x[2] for x in p_opt]
+initialerror = (lossAll(pguess_opt, []))
 
+optprob = Optimization.OptimizationProblem(optf, pguess_opt, [], lb=lb, ub=ub)
 optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method=NLopt.LN_NELDERMEAD(), maxtime=180, local_maxiters=10000)
 
 
@@ -319,7 +440,7 @@ println(optsol.retcode)
 pnew = optsol.u
 begin
 
-    res_error = loss(pnew, [])
+    res_error = lossAll(pnew, [])
     display(res_error)
     modelfit = remake(prob, p=pnew)
     modelfit_sol = solve(modelfit, FBDF(), saveat=xd1_data, reltol=1e-12, abstol=1e-12)
@@ -371,7 +492,7 @@ begin
         ylabel="Temperature (K)")
     scatter!(
         xd1_data,
-        y1d2_data,
+        y3d_data,
         label="Experimental",
         xlabel="Time (s)",
         ylabel="Temperature (K)")
@@ -388,7 +509,7 @@ begin
         ylabel="Temperature (K)")
     scatter!(
         xd1_data,
-        y2d2_data,
+        y3d_data,
         label="Experimental",
         xlabel="Time (s)",
         ylabel="Temperature (K)")
@@ -405,7 +526,7 @@ begin
         ylabel="Temperature (K)")
     scatter!(
         xd1_data,
-        y4d2_data,
+        y6d_data,
         label="Experimental",
         xlabel="Time (s)",
         ylabel="Temperature (K)")
@@ -422,7 +543,7 @@ begin
         ylabel="Temperature (K)")
     scatter!(
         xd1_data,
-        y3d2_data,
+        y5d_data,
         label="Experimental",
         xlabel="Time (s)",
         ylabel="Temperature (K)")

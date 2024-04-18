@@ -4,7 +4,7 @@ begin #libraries
     using DomainSets, OrdinaryDiffEq
     using NonlinearSolve, DifferentialEquations
     using Plots, XLSX, Statistics, Symbolics, Interpolations
-    using Optim, LsqFit
+    using Optim, LsqFit, LossFunctions
     using Optimization, OptimizationNLopt, Symbolics, OptimizationOptimJL, ForwardDiff, OptimizationMOI
 end
 begin #define parameters
