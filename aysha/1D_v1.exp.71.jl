@@ -65,8 +65,10 @@ begin #define parameters
     kins = 0.078/1000 #kW/m*K
     r0 = 23/1000 #m
     r = 42/1000 #m
-    #Tins = 356 #K exp. 71
-end;
+    ρs = 3200 #kg/m3
+    Cps = 1290 / 1000 #kJ/kg*K
+    #Tins 356 #K exp. 71
+end
     #for interpolations 
     #1. extract T2 data
     #Exp 71 
@@ -90,18 +92,18 @@ end;
     begin
         # Parameters, variables, and derivatives for system 1
         @variables t x 
-        @parameters ρsCps A B n C #psCps ks h_average
+        @parameters A B n C #psCps ks h_average
         @variables Ts(..) Tf(..)
         Dt = Differential(t) 
         Dx = Differential(x)
         Dxx = Differential(x)^2
         e = 0.62
-        ks = (37/1000)*(1-e) #kW/m.K
+        ks = (48.78 / 1000) * 1.97 * ((1 - e)^1.5) #kW/m.K
         #ρs = 3100*(1-e) #kg/m3
         #Cps = (1225/1000)*(1-e) #kJ/kg
 
         #p = [psCps => 90000., ks=> 37, h_average => (Nu*kf)/w_t]
-        p = [ρsCps => 80000., A => 20., B =>0.7, C => 40., n => 0.1]
+        p = [A => 15., B =>0.041, C => 40., n => 0.1]
         Nu = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
         nu = 4.364*(1+(0.7*((Gz_f(0.134))^10)*exp(-40/Gz_f(0.134))))
         h_average = (Nu*kf)/Lc
@@ -127,8 +129,8 @@ end;
         # PDE equation for system 1
         
         eq1 = [
-               Vs * (ρsCps/1000) * Dt(Ts(t,x)) ~ Vs * (ks) * Dxx(Ts(t,x)) - ((h_average/1000) * Av * Vi * ((Ts(t,x)) - Tf(t,x))) .- (kins * (r/r0) .* (Ts(t,x) .- Tins_f(t)) * A_t / (r-r0)),
-               Vf* ρf * Cpf * Dt(Tf(t,x)) ~ Vf * kf * Dxx(Tf(t,x)) - Vf * ρf * Cpf * V * Dx(Tf(t,x)) + (h_average/1000) * Av * Vi * ((Ts(t,x) - Tf(t,x)))
+               Vs * (ρs*Cps) * Dt(Ts(t,x)) ~ Vs * (ks) * Dxx(Ts(t,x)) - ((h_average) * Av * Vi * ((Ts(t,x)) - Tf(t,x))) .- (kins * (r/r0) .* (Ts(t,x) .- Tins_f(t)) * A_t / (r-r0)),
+               Vf* ρf * Cpf * Dt(Tf(t,x)) ~ Vf * kf * Dxx(Tf(t,x)) - Vf * ρf * Cpf * V * Dx(Tf(t,x)) + (h_average) * Av * Vi * ((Ts(t,x) - Tf(t,x)))
                ]
               
         bcs1 = [
@@ -272,8 +274,8 @@ end;
 
         optf = OptimizationFunction(loss, Optimization.AutoForwardDiff())
         
-        lb = [0.0, 0.0, 0.0, 30., 0.0]
-        ub = [10e6, 100., 1., 60., 1.]
+        lb = [0.0, 0.0, 0.0, 0.0]
+        ub = [20., 0.52, 60., 0.7]
         #lb = [100.]
         #ub = [1000.]
         optprob = Optimization.OptimizationProblem(optf, p0, [], lb=lb, ub=ub)

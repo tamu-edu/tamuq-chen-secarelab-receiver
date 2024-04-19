@@ -424,7 +424,7 @@ end
 optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
 
 lb = [3.0, 0.0, 0.0, 0.0]
-ub = [10.0, 0.5, 60.0, 0.99]
+ub = [10.0, 0.5, 60.0, 0.66]
 #lb = [100.]
 #ub = [1000.]
 pguess_opt = [x[2] for x in p_opt]
