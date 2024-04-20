@@ -85,8 +85,8 @@ begin
     Dxx = Differential(x)^2
     e = 0.62
     ks = (48.78 / 1000) * 1.97 * ((1 - e)^1.5) #kW/m.K
-    ρs = 3200 #kg/m3
-    Cps = 1290 / 1000 #kJ/kg*K
+    ρs = 3200 * e #kg/m3
+    Cps = 1290 / 1000 * e #kJ/kg*K
     Re = (ρf * v * w_t) / mu
     Pr = (Cpf * mu) / kf
     #Interpolation for Gz number
@@ -156,7 +156,7 @@ begin
 end
 
 
-sol1 = solve(prob, FBDF(), saveat=2, maxiters=100)
+sol1 = solve(prob, FBDF(), saveat=2)
 begin
     Ts_front_t = sol1.u[(Ts(t, x))][:, 1]
     Tf_front_t = sol1.u[(Tf(t, x))][:, 2]
@@ -260,95 +260,95 @@ end
 #Exp. data to extract temp.
 begin
     #Exp 67 - T3, T8
-    Z = XLSX.readxlsx("/Users/aishamelhim/Documents/ResearchData/SolarSimulator/EXCEL/Data_FPT0067_231125_161757.xlsx")["Sheet 1 - Data_FPT0067_231125_1"]["A3:C3932"]
+    Z = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0067_231125_161757.xlsx")["Sheet 1 - Data_FPT0067_231125_1"]["A3:C3932"]
     xz_data = Z[:, 1]
     y1z_data = Z[:, 2] .+ 273.15
     y2z_data = Z[:, 3] .+ 273.15
 
-#Exp 67 - T9, T10, T11, T12
-    Z1 = XLSX.readxlsx("/Users/aishamelhim/Documents/Github/Aysha/SolarSimulator/EXCEL/Data_FPT0067_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0067_T9"]["A3:E3932"]
+    #Exp 67 - T9, T10, T11, T12
+    Z1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0067_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0067_T9"]["A3:E3932"]
     y3z_data = Z1[:, 2] .+ 273.15
     y4z_data = Z1[:, 3] .+ 273.15
     y5z_data = Z1[:, 4] .+ 273.15
     y6z_data = Z1[:, 5] .+ 273.15
 
     #Exp 68 - T3, T8
-    A1 = XLSX.readxlsx("/Users/aishamelhim/Documents/ResearchData/SolarSimulator/EXCEL/Data_FPT0068_231126_115725.xlsx")["Sheet 1 - Data_FPT0068_231126_1"]["A3:C5365"]
+    A1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0068_231126_115725.xlsx")["Sheet 1 - Data_FPT0068_231126_1"]["A3:C5365"]
     xa1_data = A1[:, 1]
     y1a1_data = A1[:, 2] .+ 273.15
     y2a1_data = A1[:, 3] .+ 273.15
 
-#Exp 68 - T9, T10, T11, T12
-    A11 = XLSX.readxlsx("/Users/aishamelhim/Documents/Github/Aysha/SolarSimulator/EXCEL/Data_FPT0068_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0068_231126_1"]["A3:E5365"]
+    #Exp 68 - T9, T10, T11, T12
+    A11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0068_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0068_231126_1"]["A3:E5365"]
     y3a_data = A11[:, 2] .+ 273.15
     y4a_data = A11[:, 3] .+ 273.15
     y5a_data = A11[:, 4] .+ 273.15
     y6a_data = A11[:, 5] .+ 273.15
 
     #Exp 69 - T3, T8
-    B1 = XLSX.readxlsx("/Users/aishamelhim/Documents/ResearchData/SolarSimulator/EXCEL/Data_FPT0069_231126_140153.xlsx")["Sheet 1 - Data_FPT0069_231126_1"]["A3:C5366"]
+    B1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0069_231126_140153.xlsx")["Sheet 1 - Data_FPT0069_231126_1"]["A3:C5366"]
     xb1_data = B1[:, 1]
     y1b1_data = B1[:, 2] .+ 273.15
     y2b1_data = B1[:, 3] .+ 273.15
 
-#Exp 69 - T9, T10, T11, T12
-    B11 = XLSX.readxlsx("/Users/aishamelhim/Documents/Github/Aysha/SolarSimulator/EXCEL/Data_FPT0069_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0069_231126_1"]["A3:E5366"]
+    #Exp 69 - T9, T10, T11, T12
+    B11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0069_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0069_231126_1"]["A3:E5366"]
     y3b_data = B11[:, 2] .+ 273.15
     y4b_data = B11[:, 3] .+ 273.15
     y5b_data = B11[:, 4] .+ 273.15
     y6b_data = B11[:, 5] .+ 273.15
 
     #Exp 70 - T3, T8
-    C1 = XLSX.readxlsx("/Users/aishamelhim/Documents/ResearchData/SolarSimulator/EXCEL/Data_FPT0070_231127_090339.xlsx")["Sheet 1 - Data_FPT0070_231127_0"]["A3:C6705"]
+    C1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0070_231127_090339.xlsx")["Sheet 1 - Data_FPT0070_231127_0"]["A3:C6705"]
     xc1_data = C1[:, 1]
     y1c1_data = C1[:, 2] .+ 273.15
     y2c1_data = C1[:, 3] .+ 273.15
 
-#Exp 70 - T9, T10, T11, T12
+    #Exp 70 - T9, T10, T11, T12
 
-    C11 = XLSX.readxlsx("/Users/aishamelhim/Documents/Github/Aysha/SolarSimulator/EXCEL/Data_FPT0070_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0070_231127_0"]["A3:E6705"]
+    C11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0070_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0070_231127_0"]["A3:E6705"]
     y3c_data = C11[:, 2] .+ 273.15
     y4c_data = C11[:, 3] .+ 273.15
     y5c_data = C11[:, 4] .+ 273.15
     y6c_data = C11[:, 5] .+ 273.15
 
     #Exp 71 - T3, T8
-    D1 = XLSX.readxlsx("/Users/aishamelhim/Documents/ResearchData/SolarSimulator/EXCEL/Data_FPT0071_231128_102707.xlsx")["Sheet 1 - Data_FPT0071_231128_1"]["A3:C7087"]
+    D1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0071_231128_102707.xlsx")["Sheet 1 - Data_FPT0071_231128_1"]["A3:C7087"]
     xd1_data = D1[:, 1]
     y1d1_data = D1[:, 2] .+ 273.15
     y2d1_data = D1[:, 3] .+ 273.15
 
-#Exp 71 - T9, T10, T11, T12
+    #Exp 71 - T9, T10, T11, T12
 
-    D11 = XLSX.readxlsx("/Users/aishamelhim/Documents/Github/Aysha/SolarSimulator/EXCEL/Data_FPT0071_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0071_231128_1"]["A3:E7087"]
+    D11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0071_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0071_231128_1"]["A3:E7087"]
     y3d_data = D11[:, 2] .+ 273.15
     y4d_data = D11[:, 3] .+ 273.15
     y5d_data = D11[:, 4] .+ 273.15
     y6d_data = D11[:, 5] .+ 273.15
 
     #Exp 72 - T3, T8
-    E1 = XLSX.readxlsx("/Users/aishamelhim/Documents/ResearchData/SolarSimulator/EXCEL/Data_FPT0072_231129_104140.xlsx")["Sheet 1 - Data_FPT0072_231129_1"]["A3:C3217"]
+    E1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0072_231129_104140.xlsx")["Sheet 1 - Data_FPT0072_231129_1"]["A3:C3217"]
     xe1_data = E1[:, 1]
     y1e1_data = E1[:, 2] .+ 273.15
     y2e1_data = E1[:, 3] .+ 273.15
 
-#Exp 72 - T9, T10, T11, T12
+    #Exp 72 - T9, T10, T11, T12
 
-    E11 = XLSX.readxlsx("/Users/aishamelhim/Documents/Github/Aysha/SolarSimulator/EXCEL/Data_FPT0072_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0072_231129_1"]["A3:E3217"]
+    E11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0072_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0072_231129_1"]["A3:E3217"]
     y3e_data = E11[:, 2] .+ 273.15
     y4e_data = E11[:, 3] .+ 273.15
     y5e_data = E11[:, 4] .+ 273.15
     y6e_data = E11[:, 5] .+ 273.15
 
     #Exp 73 - T3, T8
-    F1 = XLSX.readxlsx("/Users/aishamelhim/Documents/ResearchData/SolarSimulator/EXCEL/Data_FPT0073_231129_132744.xlsx")["Sheet 1 - Data_FPT0073_231129_1"]["A3:C4575"]
+    F1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0073_231129_132744.xlsx")["Sheet 1 - Data_FPT0073_231129_1"]["A3:C4575"]
     xf1_data = F1[:, 1]
     y1f1_data = F1[:, 2] .+ 273.15
     y2f1_data = F1[:, 3] .+ 273.15
 
-#Exp 73 - T9, T10, T11, T12
+    #Exp 73 - T9, T10, T11, T12
 
-    F11 = XLSX.readxlsx("/Users/aishamelhim/Documents/Github/Aysha/SolarSimulator/EXCEL/Data_FPT0073_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0073_231129_1"]["A3:E4575"]
+    F11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0073_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0073_231129_1"]["A3:E4575"]
     y3f_data = F11[:, 2] .+ 273.15
     y4f_data = F11[:, 3] .+ 273.15
     y5f_data = F11[:, 4] .+ 273.15
@@ -358,8 +358,8 @@ end
 function NLmodeloptim(tvalues, p_math_vec)
 
     #p = [hlocal => p_vary[1]]
-    modeloptim = remake(prob, p=p_math_vec, tspan=(tvalues[1], tvalues[end]))
-    modeloptim_sol = solve(modeloptim, FBDF(), saveat=tvalues, reltol=1e-12, abstol=1e-12)
+    modeloptim = remake(prob, p=p_math_vec, tspan=(1.0, tvalues[end]))
+    modeloptim_sol = solve(modeloptim, FBDF(), saveat=tvalues[end])#, reltol=1e-12, abstol=1e-12)
     #time = modelfit_sol.t
     tempT8_op = modeloptim_sol.u[Ts(t, x)][end, 4]
     tempT9_op = modeloptim_sol.u[Ts(t, x)][end, 40]
@@ -389,31 +389,34 @@ pguess = p_opt
 #             677.817, 694.156, 595.766, 622.325, 716.314, 560.033,
 #             711.537, 713.686, 601.77, 626.485, 735.984, 561.254,
 #             763.299, 729.461, 597.766, 618.975, 751.15, 550.499]
-function lossAll(pguess, _)
+function lossAll(pguess_l, _)
 
     #to place the conditions loop
 
     #p_math_vec = (vcat(collect(pguess), values(p_cond)))
     #Temp = NLmodeloptim(xz_data, p_math_vec)
-  
-    lossr = 0.0
-    for (sm, cond) in simulation_conditions
+
+    sim_key = collect(keys(simulation_conditions))
+    lossr = zeros(length(sim_key))
+   Threads.@threads for it in 1:length(sim_key)
         # Retrieve from measurements the experimental data for the current simulation condition
+        sm = sim_key[it]
         #println(sm)
-        expdata = (measurements[measurements.simulation_id.==string(sm), :temperatures])
-        time_opt = (measurements[measurements.simulation_id.==string(sm), :time])
+        cond = simulation_conditions[sm]
+        expdata = (measurements[measurements.simulation_id.==sm, :temperatures])
+        time_opt = (measurements[measurements.simulation_id.==sm, :time])
         p_math_vec = copy(cond)
-        j=1
+        j = 1
         for (k, v) in p_opt #FIX DICTIONARY PARAMETERS OR VECTORS
-            merge!(p_math_vec, Dict(Symbol(k) => pguess[j]))
-            j+=1
+            merge!(p_math_vec, Dict(Symbol(k) => pguess_l[j]))
+            j += 1
         end  # pguess is the initial guess for the optimization
         temp_T = NLmodeloptim(time_opt, p_math_vec)
         temp_error = (temp_T .- expdata) .^ 2
-        lossr = lossr + sqrt(sum(temp_error))
+        lossr[it] = sqrt(sum(temp_error))
     end
 
-    return lossr #MSE
+    return sum(lossr) #MSE
 end
 
 #test_cond = Dict("E76" => condition_E76)
@@ -424,26 +427,36 @@ end
 optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
 
 lb = [3.0, 0.0, 0.0, 0.0]
-ub = [10.0, 0.5, 60.0, 0.66]
+#ub = [10.0, 0.5, 60.0, 0.66]
+ub = [100.0, 5., 60.0, 10.]
 #lb = [100.]
 #ub = [1000.]
 pguess_opt = [x[2] for x in p_opt]
 initialerror = (lossAll(pguess_opt, []))
+println(initialerror)
 
 optprob = Optimization.OptimizationProblem(optf, pguess_opt, [], lb=lb, ub=ub)
-optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method=NLopt.LN_NELDERMEAD(), maxtime=180, local_maxiters=10000)
+optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method=NLopt.LN_NELDERMEAD(), maxtime=1200, local_maxiters=10000)
 
 
 println(optsol.retcode)
-
-
 pnew = optsol.u
+println(pnew)
+res_error = lossAll(pnew, [])
+display(res_error)
+
 begin
 
-    res_error = lossAll(pnew, [])
-    display(res_error)
-    modelfit = remake(prob, p=pnew)
-    modelfit_sol = solve(modelfit, FBDF(), saveat=xd1_data, reltol=1e-12, abstol=1e-12)
+    #p_opt = [A => 8.0, B => 0.5, C => 55.0, n => 0.2]
+    case = "E71"
+    p_cond = simulation_conditions[case]
+    j=1
+    for (k, v) in p_opt #FIX DICTIONARY PARAMETERS OR VECTORS
+        merge!(p_cond, Dict(Symbol(k) => pnew[j]))
+        j += 1
+    end
+    modelfit = remake(prob, p=p_cond)
+    modelfit_sol = solve(modelfit, FBDF(), saveat=xd1_data)
 
 
     psol = modelfit_sol

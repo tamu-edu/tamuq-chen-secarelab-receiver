@@ -66,7 +66,7 @@ simpsys = structural_simplify(odesys[1])
 obs_T3 = PEtabObservable(T[3], 0.5)
 observables = Dict("obs_T3" => obs_T3)
 _k = PEtabParameter(:k, lb=0.1, ub=100., scale=:lin)
-_a = PEtabParameter(:a, lb=1E-7, ub=1E-4, scale=:log10)
+_a = PEtabParameter(:a, lb=1E-7, ub=1E-4., scale=:log10)
 params = [_k , _a]  
 E0 = Dict(:To => 1000.)
 E1 = Dict(:To => 900.)
