@@ -24,19 +24,18 @@ begin #define parameters
     Vf = A_ft * L #* deltax
     qlpm = 7.12 #lpm
     q = qlpm / (1000 * 60) #m3/s
+    m = 3.2923e-4 #kg/s
     #V= q/(A_channel*n_channel) #m/s - using the area of the whole receiver (18x18mm2)
     V = 0.57 #m/s (calculated from excel sheet and COMSOL)
     th_s = 0.4e-3 #m
     th_f = 0.7e-3 #m
-    I0 = 456 #kW/m2
     #Qv= I0*exp(-1000*x)  #kW/m2 - (K extinction coefficient taken from Howell and Hendrick paper pg.86, measure pore diameter and fix)
-    Q = I0 #kW/m2
     ϵ = 0.8
-    σ = (5.17e-8) / 1000 #kW/m2.K^4 Stefan-Boltzmann constant
+    σ = 5.17e-8 #W/m2.K^4 Stefan-Boltzmann constant
     Lc = 4 * (w_t * w_t) / (4 * w_t)
-    kf = (0.056 / 1000) #kW/m.K
+    kf = 0.056 #W/m.K
     ρf = 0.5 #kg/m3
-    Cpf = (1090 / 1000) #kJ/kg.K
+    Cpf = 1090 #kJ/kg.K
     mu = 2.0921e-5 #Pa.s
     #Gz = (w_t / L) * Re * Pr
     # A = 3.657
@@ -49,8 +48,8 @@ begin #define parameters
     w = 1.5e-3 #width of channel (m)
     Vi = w * w * n_channel * L #m3
     Av = 4 * (w * L) / (w^2 * L) #specific area (m-1)
-    hext = 10 / 1000 #kW/m2.K
-    kins = 0.078 / 1000 #kW/m*K
+    hext = 10 #W/m2.K
+    kins = 0.078 #W/m*K
     r0 = 23 / 1000 #m
     r = 42 / 1000 #m
 end;
@@ -66,46 +65,41 @@ begin
     Tins_f(t) = Tins(t)
     @register_symbolic Tins_f(t)
 end
-# begin
-#     x11 = 0.0001:0.001383838383838384:0.137 #T2 (insulation)
-#     Gz = (1 ./ x11) * Re * Pr * w_t
-#     #2.create interpolation function
-#     Gz_ = linear_interpolation(x11, Gz)
-#     Gz_f(x) = Gz_(x)
-#     @register_symbolic Gz_f(x)
-# end
+
 begin
     # Parameters, variables, and derivatives for system 1
     @variables t x
-    @parameters A B n C #psCps ks h_average
+    @parameters ρsCps ks h_average #ks h_average A n
     @parameters I0 v
     @variables Ts(..) Tf(..)
     Dt = Differential(t)
     Dx = Differential(x)
     Dxx = Differential(x)^2
     e = 0.62
-    ks = (48.78 / 1000) * 1.97 * ((1 - e)^1.5) #kW/m.K
+    #ks = (48.78 / 1000) * 1.97 * ((1 - e)^1.5) #kW/m.K
     ρs = 3200 * e #kg/m3
-    Cps = 1290 / 1000 * e #kJ/kg*K
+    Cps = 1290 / 1000  #kJ/kg*K
     Re = (ρf * v * w_t) / mu
     Pr = (Cpf * mu) / kf
+    Gz = (1/L) * Re * Pr * w_t
     #Interpolation for Gz number
-    x11 = 0.0001:0.001383838383838384:0.137 #T2 (insulation)
-    Gz = (1 ./ x11) * Re * Pr * w_t
-    #2.create interpolation function
-    Gz_ = linear_interpolation(x11, Gz)
-    Gz_f(x) = Gz_(x)
-    @register_symbolic Gz_f(x)
+    # x11 = 0.0001:0.001383838383838384:0.137 #T2 (insulation)
+    # Gz = (1 ./ x11) * Re * Pr * w_t
+    # #2.create interpolation function
+    # Gz_ = linear_interpolation(x11, Gz)
+    # Gz_f(x) = Gz_(x)
+    # @register_symbolic Gz_f(x)
     #Cps(Ts) = (0.27+0.135e-4*(Ts)-9720*((Ts)^-2)+0.204e-7*((Ts)^2))/1000 #kJ/kg*K from manufacturer data
-    p_opt = [A => 8.0, B => 0.5, C => 55.0, n => 0.2]
-    p_cond = [I0 => 456.0, v => 1.22]
+    p_opt = [ρsCps => 706048., ks => 22.5, h_average => 50000.]#[A => 20., n => 0.005]
+    p_cond = [I0 => 456000.0, v => 1.22]
     p_math = vcat(p_opt, p_cond)
+    #Nu = A * (Gz_f(x)^n)
+    #Nu = A * (Gz)^n
+
     #p_math_vec = collect(p_math)
-    Nu = A * (1 + (B * ((Gz_f(x))^n) * exp(-C / Gz_f(x))))
-    nu = 4.364 * (1 + (0.7 * ((Gz_f(0.134))^10) * exp(-40 / Gz_f(0.134))))
-    h_average = (Nu * kf) / Lc
-    #Cps(T)= (1110+0.15*(T-273)-425*exp(-0.003*(T-273)))/1000 #kJ/kg*K
-    #Cpf(T)= (1.93e-10*(T^3)+1.14e-3*(T^2)-4.49e-1*T+1.06e3)/1000 #kJ/kg*K
+    #Nu = A * (1 + (B * ((Gz_f(x))^n) * exp(-C / Gz_f(x))))
+    #nu = 4.364 * (1 + (0.7 * ((Gz_f(0.134))^10) * exp(-40 / Gz_f(0.134))))
+    #h_average = (Nu * kf) / Lc
 
     # MOL Discretization parameters for system 1
     x_max1 = L
@@ -117,24 +111,26 @@ begin
 
     x_num1 = range(x_min1, x_max1, length=nc1)
 
-
     dx = (x_max1 - x_min1) / (nc1 - 1)
 
 
     # PDE equation for system 1
 
+    # eq1 = [
+    #     Vs * (ρs*Cps) * Dt(Ts(t, x)) ~ Vs * (ks) * Dxx(Ts(t, x)) - ((h_average) * Av * Vi * ((Ts(t, x)) - Tf(t, x))) .- (kins * (r / r0) .* (Ts(t, x) .- Tins_f(t)) * A_t / (r - r0)),
+    #     Vf * ρf * Cpf * Dt(Tf(t, x)) ~ Vf * kf * Dxx(Tf(t, x)) - Vf * ρf * Cpf * V * Dx(Tf(t, x)) + (h_average) * Av * Vi * ((Ts(t, x) - Tf(t, x)))
+    # ]
     eq1 = [
-        Vs * (ρs * Cps) * Dt(Ts(t, x)) ~ Vs * (ks) * Dxx(Ts(t, x)) - ((h_average) * Av * Vi * ((Ts(t, x)) - Tf(t, x))) .- (kins * (r / r0) .* (Ts(t, x) .- Tins_f(t)) * A_t / (r - r0)),
-        Vf * ρf * Cpf * Dt(Tf(t, x)) ~ Vf * kf * Dxx(Tf(t, x)) - Vf * ρf * Cpf * V * Dx(Tf(t, x)) + (h_average) * Av * Vi * ((Ts(t, x) - Tf(t, x)))
+        A_st * (ρsCps) * Dt(Ts(t, x)) ~ A_st * (ks) * Dxx(Ts(t, x)) - (((h_average)/ Av) * ((Ts(t, x)) - Tf(t, x))) .- (kins * (r / r0) .* (Ts(t, x) .- Tins_f(t)) * L / (r - r0)),
+        A_ft * ρf * Cpf * Dt(Tf(t, x)) ~ A_ft * kf * Dxx(Tf(t, x)) -  m * Cpf * Dx(Tf(t, x)) + (((h_average)/ Av) * ((Ts(t, x)) - Tf(t, x)))
     ]
-
     bcs1 = [
         Ts(0.0, x) ~ Tamb, # initial
         Tf(0.0, x) ~ Tamb, # initial
         -A_st * (ks) * Dx(Ts(t, x_max1)) ~ 0.0, # far right
         -A_st * (ks) * Dx(Ts(t, x_min1)) ~ I0 * A_st - ϵ * σ * A_st * (Ts(t, x_min1)^4 - Tamb^4) - hext * A_st * (Ts(t, x_min1) - Tamb),  # far left
         -A_ft * kf * Dx(Tf(t, x_max1)) ~ 0.0, #-ρf * Cpf * V * A_ft * (Tf(t, x_max1) - Tamb), # exiting fluid
-        -A_ft * kf * Dx(Tf(t, x_min1)) ~ ρf * Cpf * V * A_ft * (Tf(t, x_min1) - Tamb) # entering fluid (upstream temperature)
+        -A_ft * kf * Dx(Tf(t, x_min1)) ~ m * Cpf * (Tf(t, x_min1) - Tamb) # entering fluid (upstream temperature)
     ]
     # Space and time domain for system 1
     domains1 = [t ∈ Interval(t_min, t_max),
@@ -202,30 +198,25 @@ begin
     sol1.u[Ts(t, x)][:, 59] #T11 model 82mm (internal-solid)
     sol1.u[Tf(t, x)][:, 20] #T12 model 27mm (internal-gas)
     sol1.u[Ts(t, x)][:, 20] #T12 model 27mm (internal-solid)
-    # taking averages of internal thermocouples
-    # T12_model = sol1.u[Tf(t,x)][:,20], sol1.u[Ts(t,x)][:,20]
-    # T12_modelmean = mean(T12_model)
-    # T11_model = sol1.u[Tf(t,x)][:,59], sol1.u[Ts(t,x)][:,59]
-    #T11_modelmean = mean(T11_model)
 end
 
 #measurements and conditions#Defining simulation conditions
 begin
-    condition_E67 = Dict(:I0 => 456.0, :v => 1.22)
-    condition_E68 = Dict(:I0 => 456.0, :v => 1.00)
-    condition_E69 = Dict(:I0 => 456.0, :v => 0.84)
-    condition_E70 = Dict(:I0 => 456.0, :v => 0.73)
-    condition_E71 = Dict(:I0 => 456.0, :v => 0.57)
-    condition_E72 = Dict(:I0 => 304.0, :v => 1.46)
-    condition_E73 = Dict(:I0 => 304.0, :v => 1.05)
-    condition_E74 = Dict(:I0 => 304.0, :v => 0.72)
-    condition_E75 = Dict(:I0 => 304.0, :v => 0.55)
-    condition_E76 = Dict(:I0 => 304.0, :v => 0.36)
-    condition_E77 = Dict(:I0 => 256.0, :v => 1.10)
-    condition_E78 = Dict(:I0 => 256.0, :v => 0.80)
-    condition_E79 = Dict(:I0 => 256.0, :v => 0.64)
-    condition_E80 = Dict(:I0 => 256.0, :v => 0.53)
-    condition_E81 = Dict(:I0 => 256.0, :v => 0.36)
+    condition_E67 = Dict(:I0 => 456000.0, :v => 1.22)
+    condition_E68 = Dict(:I0 => 456000.0, :v => 1.00)
+    condition_E69 = Dict(:I0 => 456000.0, :v => 0.84)
+    condition_E70 = Dict(:I0 => 456000.0, :v => 0.73)
+    condition_E71 = Dict(:I0 => 456000.0, :v => 0.57)
+    condition_E72 = Dict(:I0 => 304000.0, :v => 1.46)
+    condition_E73 = Dict(:I0 => 304000.0, :v => 1.05)
+    condition_E74 = Dict(:I0 => 304000.0, :v => 0.72)
+    condition_E75 = Dict(:I0 => 304000.0, :v => 0.55)
+    condition_E76 = Dict(:I0 => 304000.0, :v => 0.36)
+    condition_E77 = Dict(:I0 => 256000.0, :v => 1.10)
+    condition_E78 = Dict(:I0 => 256000.0, :v => 0.80)
+    condition_E79 = Dict(:I0 => 256000.0, :v => 0.64)
+    condition_E80 = Dict(:I0 => 256000.0, :v => 0.53)
+    condition_E81 = Dict(:I0 => 256000.0, :v => 0.36)
 
     simulation_conditions = Dict("E67" => condition_E67, "E68" => condition_E68,
         "E69" => condition_E69, "E70" => condition_E70,
@@ -374,27 +365,10 @@ end
 
 #the first entry in the simulation_conditions
 pguess = p_opt
-# expdata = [965.407, 975.144, 825.592, 880.867, 1004.165, 763.859,
-#             1031.574, 1023.115, 850.099, 898.754, 1050.691, 773.207,
-#             1070.803, 1045.898, 852.837, 896.788, 1072.727, 769.76,
-#             1167.978, 1093.849, 871.496, 912.173, 1120.42, 779.53,
-#             1210.945, 1095.322, 847.476, 882.823, 1120.417, 753.56,
-#             742.125, 778.592, 684.246, 736.626, 807.125, 652.955,
-#             844.257, 870.26, 747.444, 791.958, 898.081, 694.626,
-#             962.113, 938.106, 767.803, 804.082, 965.702, 697.672,
-#             1015.081, 954.214, 757.393, 788.678, 979.795, 681.066,
-#             1069.567, 947.372, 726.308, 751.159, 970.498, 647.019,
-#             569.248, 604.984, 543.727, 574.299, 627.16, 525.356,
-#             634.731, 664.296, 583.704, 612.092, 686.936, 554.455,
-#             677.817, 694.156, 595.766, 622.325, 716.314, 560.033,
-#             711.537, 713.686, 601.77, 626.485, 735.984, 561.254,
-#             763.299, 729.461, 597.766, 618.975, 751.15, 550.499]
+
 function lossAll(pguess_l, _)
 
     #to place the conditions loop
-
-    #p_math_vec = (vcat(collect(pguess), values(p_cond)))
-    #Temp = NLmodeloptim(xz_data, p_math_vec)
 
     sim_key = collect(keys(simulation_conditions))
     lossr = zeros(length(sim_key))
@@ -419,25 +393,17 @@ function lossAll(pguess_l, _)
     return sum(lossr) #MSE
 end
 
-#test_cond = Dict("E76" => condition_E76)
-
-
-#initialerror = (lossAll(pguess, []))
-
 optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
 
-lb = [3.0, 0.0, 0.0, 0.0]
-#ub = [10.0, 0.5, 60.0, 0.66]
-ub = [100.0, 5., 60.0, 10.]
-#lb = [100.]
-#ub = [1000.]
+lb = [0.0, 0.0, 0.0]
+ub = [1000000., 50., 100000.]
 pguess_opt = [x[2] for x in p_opt]
 initialerror = (lossAll(pguess_opt, []))
 println(initialerror)
 
 optprob = Optimization.OptimizationProblem(optf, pguess_opt, [], lb=lb, ub=ub)
-optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method=NLopt.LN_NELDERMEAD(), maxtime=1200, local_maxiters=10000)
-
+#optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method=NLopt.LN_NELDERMEAD(), maxtime=10, local_maxiters=10)
+optsol = solve(optprob, NLopt.LN_NELDERMEAD(), maxtime=100, local_maxiters=10)
 
 println(optsol.retcode)
 pnew = optsol.u
@@ -445,137 +411,197 @@ println(pnew)
 res_error = lossAll(pnew, [])
 display(res_error)
 
+# begin
+
+#     #p_opt = [A => 8.0, B => 0.5, C => 55.0, n => 0.2]
+#     case = "E71" #"E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E78", "E79", "E80", "E81")
+#     p_cond = simulation_conditions[case]
+#     j=1
+#     for (k, v) in p_opt #FIX DICTIONARY PARAMETERS OR VECTORS
+#         merge!(p_cond, Dict(Symbol(k) => pnew[j]))
+#         j += 1
+#     end
+#     modelfit = remake(prob, p=p_cond)
+#     modelfit_sol = solve(modelfit, FBDF(), saveat=xd1_data)
+
+
+#     psol = modelfit_sol
+# end
+
+# plot1 = plot(
+#         psol.t,
+#         psol.u[Tf(t, x)][:, end-1], # around 136 mm in T3
+#         title="Gas Temperature Profile T3",
+#         label="model",
+#         xlabel="Time (s)",
+#         ylabel="Temperature (K)")
 begin
+plot1 =  bar([psol.u[Tf(t, x)][end, end-1]],[measurements[6, :temperatures]], label="E67", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[12, :temperatures]], label="E68", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[18, :temperatures]], label="E69", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[24, :temperatures]], label="E70", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[30, :temperatures]], label="E71", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[36, :temperatures]], label="E72", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[42, :temperatures]], label="E73", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[48, :temperatures]], label="E74", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[54, :temperatures]], label="E75", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[60, :temperatures]], label="E76", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[66, :temperatures]], label="E77", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[72, :temperatures]], label="E78", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[78, :temperatures]], label="E79", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[84, :temperatures]], label="E80", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[90, :temperatures]], label="E81", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
 
-    #p_opt = [A => 8.0, B => 0.5, C => 55.0, n => 0.2]
-    case = "E71"
-    p_cond = simulation_conditions[case]
-    j=1
-    for (k, v) in p_opt #FIX DICTIONARY PARAMETERS OR VECTORS
-        merge!(p_cond, Dict(Symbol(k) => pnew[j]))
-        j += 1
-    end
-    modelfit = remake(prob, p=p_cond)
-    modelfit_sol = solve(modelfit, FBDF(), saveat=xd1_data)
+# plot2 = plot(
+#         psol.t,
+#         psol.u[Ts(t, x)][:, 4], # around 5 mm in T8
+#         title="Solid Temperature Profile T8",
+#         label="model",
+#         xlabel="Time (s)",
+#         ylabel="Temperature (K)")
 
+plot2 = bar([psol.u[Ts(t, x)][end, 4]],[measurements[1, :temperatures]], label="E67", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[7, :temperatures]], label="E68", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[13, :temperatures]], label="E69", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[19, :temperatures]], label="E70", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[25, :temperatures]], label="E71", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[31, :temperatures]], label="E72", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[37, :temperatures]], label="E73", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[43, :temperatures]], label="E74", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)") 
+    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[49, :temperatures]], label="E75", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[55, :temperatures]], label="E76", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[61, :temperatures]], label="E77", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[67, :temperatures]], label="E78", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[73, :temperatures]], label="E79", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[79, :temperatures]], label="E80", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[85, :temperatures]], label="E81", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
 
-    psol = modelfit_sol
+    # plot!(
+    #     psol.t,
+    #     psol.u[Tf(t, x)][:, 4], # around 5 mm in T8
+    #     label="gas 5mm")
 
-    plot1 = plot(
-        psol.t,
-        psol.u[Tf(t, x)][:, end-1], # around 136 mm in T3
-        title="Gas Temperature Profile T3 - exp. 71",
-        label="optimized",
-        xlabel="Time (s)",
-        ylabel="Temperature (K)")
-    scatter!(
-        xd1_data,
-        y1d1_data,
-        label="Experimental",
-        xlabel="Time (s)",
-        ylabel="Temperature (K)")
-    plot!(
-        psol.t,
-        psol.u[Ts(t, x)][:, end-1],
-        label="solid 136 mm")
+    # plot3 = plot(
+    #     psol.t,
+    #     psol.u[Ts(t, x)][:, 40], # around 55 mm in T9
+    #     title="Solid Temperature Profile T9",
+    #     label="model",
+    #     xlabel="Time (s)",
+    #     ylabel="Temperature (K)")
+plot3 = bar([psol.u[Ts(t, x)][end, 40]],[measurements[2, :temperatures]], label="E67", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[8, :temperatures]], label="E68", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[14, :temperatures]], label="E69", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[20, :temperatures]], label="E70", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[26, :temperatures]], label="E71", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[32, :temperatures]], label="E72", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[38, :temperatures]], label="E73", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[44, :temperatures]], label="E74", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[50, :temperatures]], label="E75", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[56, :temperatures]], label="E76", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[62, :temperatures]], label="E77", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[68, :temperatures]], label="E78", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[74, :temperatures]], label="E79", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[80, :temperatures]], label="E80", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[86, :temperatures]], label="E81", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
 
-    plot2 = plot(
-        psol.t,
-        psol.u[Ts(t, x)][:, 4], # around 5 mm in T8
-        title="Solid Temperature Profile T8 - exp. 71",
-        label="Numerical",
-        xlabel="Time (s)",
-        ylabel="Temperature (K)")
-    scatter!(
-        xd1_data,
-        y2d1_data,
-        label="Experimental",
-        xlabel="Time (s)",
-        ylabel="Temperature (K)")
-    plot!(
-        psol.t,
-        psol.u[Tf(t, x)][:, 4], # around 5 mm in T8
-        label="gas 5mm")
-    plot3 = plot(
-        psol.t,
-        psol.u[Ts(t, x)][:, 40], # around 55 mm in T9
-        title="Solid Temperature Profile T9 - exp. 71",
-        label="Numerical",
-        xlabel="Time (s)",
-        ylabel="Temperature (K)")
-    scatter!(
-        xd1_data,
-        y3d_data,
-        label="Experimental",
-        xlabel="Time (s)",
-        ylabel="Temperature (K)")
-    plot!(
-        psol.t,
-        psol.u[Tf(t, x)][:, 40],
-        label="gas 55mm")
-    plot4 = plot(
-        psol.t,
-        psol.u[Ts(t, x)][:, 77], # around 106 mm in T10
-        title="Solid Temperature Profile T10 - exp. 71",
-        label="Numerical",
-        xlabel="Time (s)",
-        ylabel="Temperature (K)")
-    scatter!(
-        xd1_data,
-        y3d_data,
-        label="Experimental",
-        xlabel="Time (s)",
-        ylabel="Temperature (K)")
-    plot!(
-        psol.t,
-        psol.u[Tf(t, x)][:, 77],
-        label="gas 106mm")
-    plot5 = plot(
-        psol.t,
-        psol.u[Ts(t, x)][:, 20], # around 27 mm in T12
-        title="Solid Temperature Profile T12 - exp. 71",
-        label="Numerical",
-        xlabel="Time (s)",
-        ylabel="Temperature (K)")
-    scatter!(
-        xd1_data,
-        y6d_data,
-        label="Experimental",
-        xlabel="Time (s)",
-        ylabel="Temperature (K)")
-    plot!(
-        psol.t,
-        psol.u[Tf(t, x)][:, 20],
-        label="gas 27mm")
-    plot6 = plot(
-        psol.t,
-        psol.u[Ts(t, x)][:, 59], # around 82 mm in T11
-        title="Solid Temperature Profile T11 - exp. 71",
-        label="Numerical",
-        xlabel="Time (s)",
-        ylabel="Temperature (K)")
-    scatter!(
-        xd1_data,
-        y5d_data,
-        label="Experimental",
-        xlabel="Time (s)",
-        ylabel="Temperature (K)")
-    plot!(
-        psol.t,
-        psol.u[Tf(t, x)][:, 59],
-        label="gas 82mm")
-    plot7 = plot(
+    # plot!(
+    #     psol.t,
+    #     psol.u[Tf(t, x)][:, 40],
+    #     label="gas 55mm")
+   
+# plot4 = plot(
+#         psol.t,
+#         psol.u[Ts(t, x)][:, 77], # around 106 mm in T10
+#         title="Solid Temperature Profile T10",
+#         label="model",
+#         xlabel="Time (s)",
+#         ylabel="Temperature (K)")
+plot4 = bar([psol.u[Ts(t, x)][end, 77]],[measurements[3, :temperatures]], label="E67", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[9, :temperatures]], label="E68", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[15, :temperatures]], label="E69", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[21, :temperatures]], label="E70")
+        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[27, :temperatures]], label="E71")
+        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[33, :temperatures]], label="E72")
+        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[39, :temperatures]], label="E73")
+        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[45, :temperatures]], label="E74")
+        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[51, :temperatures]], label="E75")
+        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[57, :temperatures]], label="E76")
+        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[63, :temperatures]], label="E77")
+        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[69, :temperatures]], label="E78")
+        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[75, :temperatures]], label="E79")
+        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[81, :temperatures]], label="E80")
+        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[87, :temperatures]], label="E81")
+    
+    # plot!(
+    #     psol.t,
+    #     psol.u[Tf(t, x)][:, 77],
+    #     label="gas 106mm")
+    # plot5 = plot(
+    #     psol.t,
+    #     psol.u[Ts(t, x)][:, 59], # around 82 mm in T11
+    #     title="Solid Temperature Profile T11",
+    #     label="model",
+    #     xlabel="Time (s)",
+    #     ylabel="Temperature (K)")
+plot5 = bar([psol.u[Ts(t, x)][end, 59]],[measurements[4, :temperatures]], label="E67", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[10, :temperatures]], label="E68")
+        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[16, :temperatures]], label="E69")
+        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[22, :temperatures]], label="E70")
+        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[28, :temperatures]], label="E71")
+        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[34, :temperatures]], label="E72")
+        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[40, :temperatures]], label="E73")
+        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[46, :temperatures]], label="E74")
+        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[52, :temperatures]], label="E75")
+        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[58, :temperatures]], label="E76")
+        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[64, :temperatures]], label="E77")
+        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[70, :temperatures]], label="E78")
+        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[76, :temperatures]], label="E79")
+        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[82, :temperatures]], label="E80")
+        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[88, :temperatures]], label="E81")
+   
+    # plot!(
+    #     psol.t,
+    #     psol.u[Tf(t, x)][:, 59],
+    #     label="gas 82mm")
+    # plot6 = plot(
+    #     psol.t,
+    #     psol.u[Ts(t, x)][:, 20], # around 27 mm in T12
+    #     title="Solid Temperature Profile T12",
+    #     label="model",
+    #     xlabel="Time (s)",
+    #     ylabel="Temperature (K)")
+plot6 = bar([psol.u[Ts(t, x)][end, 20]],[measurements[5, :temperatures]], label="E67", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[11, :temperatures]], label="E68")
+        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[17, :temperatures]], label="E69")
+        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[23, :temperatures]], label="E70")
+        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[29, :temperatures]], label="E71")
+        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[35, :temperatures]], label="E72")
+        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[41, :temperatures]], label="E73")
+        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[47, :temperatures]], label="E74")
+        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[53, :temperatures]], label="E75")
+        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[59, :temperatures]], label="E76")
+        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[65, :temperatures]], label="E77")
+        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[71, :temperatures]], label="E78")
+        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[77, :temperatures]], label="E79")
+        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[83, :temperatures]], label="E80")
+        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[89, :temperatures]], label="E81")
+ 
+    # plot!(
+    #     psol.t,
+    #     psol.u[Tf(t, x)][:, 20],
+    #     label="gas 27mm")
+plot7 = plot(
         collect(x_num1),
         psol.u[Tf(t, x)][end, :],
         label="gas",
         xlabel="Length (m)",
         ylabel="Temperature (K)")
-    plot!(
+plot!(
         collect(x_num1),
         psol.u[Ts(t, x)][end, :],
         label="solid",
         xlabel="Length (m)",
         ylabel="Temperature (K)")
 
-    plot(plot1, plot2, plot3, plot4, plot5, plot6, plot7, layout=(10, 2), size=(1500, 1500))
+plot(plot1, plot2, plot3, plot4, plot5, plot6, plot7, layout=(10, 2), size=(1500, 1500))
 end

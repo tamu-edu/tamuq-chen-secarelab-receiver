@@ -34,19 +34,20 @@ begin #define parameters
     Vf =  A_ft * L #* deltax
     qlpm = 7.12 #lpm
     q= qlpm/(1000*60) #m3/s
+    ρf = 0.46 #kg/m3
+    m = q * ρf 
     #V= q/(A_channel*n_channel) #m/s - using the area of the whole receiver (18x18mm2)
     V = 0.57 #m/s (calculated from excel sheet and COMSOL)
     th_s = 0.4e-3 #m
     th_f = 0.7e-3 #m
-    I0 = 456 #kW/m2
+    I0 = 456*1000 #W/m2
     #Qv= I0*exp(-1000*x)  #kW/m2 - (K extinction coefficient taken from Howell and Hendrick paper pg.86, measure pore diameter and fix)
-    Q= I0 #kW/m2
+    Q= I0*1000 #W/m2
     ϵ= 0.8
-    σ= (5.17e-8)/1000 #kW/m2.K^4 Stefan-Boltzmann constant
+    σ= 5.17e-8 #W/m2.K^4 Stefan-Boltzmann constant
     Lc = 4*(w_t*w_t)/(4*w_t)
-    kf = (0.056/1000) #kW/m.K
-    ρf = 0.5 #kg/m3
-    Cpf = (1090/1000) #kJ/kg.K
+    kf = 0.056 #W/m.K
+    Cpf = 1090 #J/kg.K
     mu = 2.0921e-5 #Pa.s
     Re = (ρf*V*w_t)/mu
     Pr = (Cpf*mu)/kf
@@ -61,13 +62,12 @@ begin #define parameters
     w = 1.5e-3 #width of channel (m)
     Vi = w * w * n_channel * L #m3
     Av = 4*(w*L) / (w^2*L) #specific area (m-1)
-    hext = 10/1000 #kW/m2.K
-    kins = 0.078/1000 #kW/m*K
+    hext = 10 #W/m2.K
+    kins = 0.078 #W/m*K
     r0 = 23/1000 #m
     r = 42/1000 #m
     ρs = 3200 #kg/m3
-    Cps = 1290 / 1000 #kJ/kg*K
-    #Tins 356 #K exp. 71
+    Cps = 1290 #J/kg*K
 end
     #for interpolations 
     #1. extract T2 data
@@ -92,21 +92,22 @@ end
     begin
         # Parameters, variables, and derivatives for system 1
         @variables t x 
-        @parameters A B n C #psCps ks h_average
+        @parameters ρsCps ks h_average #A B n C 
         @variables Ts(..) Tf(..)
         Dt = Differential(t) 
         Dx = Differential(x)
         Dxx = Differential(x)^2
         e = 0.62
-        ks = (48.78 / 1000) * 1.97 * ((1 - e)^1.5) #kW/m.K
+        #ks = (48.78 / 1000) * 1.97 * ((1 - e)^1.5) #kW/m.K
         #ρs = 3100*(1-e) #kg/m3
         #Cps = (1225/1000)*(1-e) #kJ/kg
-
+        p = [ρsCps => 706048., ks => 22.5, h_average => 50000.]
         #p = [psCps => 90000., ks=> 37, h_average => (Nu*kf)/w_t]
-        p = [A => 15., B =>0.041, C => 40., n => 0.1]
-        Nu = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
-        nu = 4.364*(1+(0.7*((Gz_f(0.134))^10)*exp(-40/Gz_f(0.134))))
-        h_average = (Nu*kf)/Lc
+        # p = [A => 3., B =>0.041, C => 60., n => 0.01]
+        # Nu = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
+        #Nu = A * (Gz_f(x))^n
+        # nu = 4.364*(1+(0.7*((Gz_f(0.134))^10)*exp(-40/Gz_f(0.134))))
+        #h_average = (Nu*kf)/Lc
         #Cps(T)= (1110+0.15*(T-273)-425*exp(-0.003*(T-273)))/1000 #kJ/kg*K
         #Cpf(T)= (1.93e-10*(T^3)+1.14e-3*(T^2)-4.49e-1*T+1.06e3)/1000 #kJ/kg*K
 
@@ -128,9 +129,13 @@ end
         
         # PDE equation for system 1
         
+        # eq1 = [
+        #        Vs * (ρs*Cps) * Dt(Ts(t,x)) ~ Vs * (ks) * Dxx(Ts(t,x)) - ((h_average) * Av * Vi * ((Ts(t,x)) - Tf(t,x))) .- (kins * (r/r0) .* (Ts(t,x) .- Tins_f(t)) * A_t / (r-r0)),
+        #        Vf* ρf * Cpf * Dt(Tf(t,x)) ~ Vf * kf * Dxx(Tf(t,x)) - Vf * ρf * Cpf * V * Dx(Tf(t,x)) + (h_average) * Av * Vi * ((Ts(t,x) - Tf(t,x)))
+        #        ]
         eq1 = [
-               Vs * (ρs*Cps) * Dt(Ts(t,x)) ~ Vs * (ks) * Dxx(Ts(t,x)) - ((h_average) * Av * Vi * ((Ts(t,x)) - Tf(t,x))) .- (kins * (r/r0) .* (Ts(t,x) .- Tins_f(t)) * A_t / (r-r0)),
-               Vf* ρf * Cpf * Dt(Tf(t,x)) ~ Vf * kf * Dxx(Tf(t,x)) - Vf * ρf * Cpf * V * Dx(Tf(t,x)) + (h_average) * Av * Vi * ((Ts(t,x) - Tf(t,x)))
+                A_st * (ρsCps) * Dt(Ts(t, x)) ~ A_st * (ks) * Dxx(Ts(t, x)) - (((h_average)/ Av) * ((Ts(t, x)) - Tf(t, x))) .- (kins * (r / r0) .* (Ts(t, x) .- Tins_f(t)) * L / (r - r0)),
+                A_ft * ρf * Cpf * Dt(Tf(t, x)) ~ A_ft * kf * Dxx(Tf(t, x)) -  m * Cpf * Dx(Tf(t, x)) + (((h_average)/ Av) * ((Ts(t, x)) - Tf(t, x)))
                ]
               
         bcs1 = [
@@ -139,7 +144,7 @@ end
             -A_st * (ks) * Dx(Ts(t, x_max1)) ~ 0.0, # far right
             -A_st * (ks) * Dx(Ts(t, x_min1)) ~ I0 * A_st - ϵ * σ * A_st * (Ts(t,x_min1)^4 - Tamb^4) - hext * A_st * (Ts(t, x_min1) - Tamb),  # far left
             -A_ft * kf * Dx(Tf(t, x_max1)) ~ 0.0, #-ρf * Cpf * V * A_ft * (Tf(t, x_max1) - Tamb), # exiting fluid
-            -A_ft * kf * Dx(Tf(t, x_min1)) ~ ρf * Cpf * V * A_ft * (Tf(t,x_min1)- Tamb) # entering fluid (upstream temperature)
+            -A_ft * kf * Dx(Tf(t, x_min1)) ~ m * Cpf * (Tf(t, x_min1) - Tamb) # entering fluid (upstream temperature)# entering fluid (upstream temperature)
               ] 
         # Space and time domain for system 1
         domains1 = [t ∈ Interval(t_min, t_max),
@@ -240,7 +245,7 @@ end
     end
         p0 = [x[2] for x in p]
         #expdata = append!(copy(y2d1_data), y1d2_data, y2d2_data, y1d1_data, y3d2_data, y4d2_data)
-        expdata =  append!(copy(y2d1_data), y1d2_data, y2d2_data, y1d1_data, y3d2_data, y4d2_data)
+        expdata =  append!(copy(y1d2_data), y2d2_data, y1d1_data, y3d2_data, y4d2_data)
         length(expdata)
         
         
@@ -250,16 +255,16 @@ end
             function NLmodeloptim(xvalues, p_vary)
                 #p = [hlocal => p_vary[1]]
                 modeloptim = remake(prob, p = p_vary, tspan=(xvalues[1], xvalues[end]))
-                modeloptim_sol = solve(modeloptim, FBDF(), saveat = xvalues, reltol=1e-12, abstol = 1e-12)
+                modeloptim_sol = solve(modeloptim, FBDF(), saveat = xvalues)#, reltol=1e-12, abstol = 1e-12)
                 #time = modelfit_sol.t
-                tempT8_op = modeloptim_sol.u[Ts(t,x)][:, 4]
+                #tempT8_op = modeloptim_sol.u[Ts(t,x)][:, 4]
                 tempT9_op = modeloptim_sol.u[Ts(t,x)][:,40]
                 tempT10_op = modeloptim_sol.u[Ts(t,x)][:,77]
                 tempT3_op = modeloptim_sol.u[Tf(t,x)][:, end-1]
                 T12_modelmean = (modeloptim_sol.u[Tf(t,x)][:,20] .+  modeloptim_sol.u[Ts(t,x)][:,20]) ./2
                 T11_modelmean = (modeloptim_sol.u[Tf(t,x)][:,59] .+ modeloptim_sol.u[Ts(t,x)][:,59]) ./2
                 
-                return append!(tempT8_op, tempT9_op, tempT10_op, tempT3_op, T12_modelmean, T11_modelmean)
+                return append!(tempT9_op, tempT10_op, tempT3_op, T12_modelmean, T11_modelmean) #append!(tempT8_op, tempT9_op, tempT10_op, tempT3_op, T12_modelmean, T11_modelmean)
             end
         
             function loss(pguess, _)
@@ -274,13 +279,13 @@ end
 
         optf = OptimizationFunction(loss, Optimization.AutoForwardDiff())
         
-        lb = [0.0, 0.0, 0.0, 0.0]
-        ub = [20., 0.52, 60., 0.7]
+        lb = [0.0, 0.0, 0.0]
+        ub = [1000000., 50., 100000.]
         #lb = [100.]
         #ub = [1000.]
         optprob = Optimization.OptimizationProblem(optf, p0, [], lb=lb, ub=ub)
         
-        optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method = NLopt.LN_NELDERMEAD(), maxtime = 180, local_maxiters = 10000)
+        optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method = NLopt.LN_NELDERMEAD(), maxtime = 500, local_maxiters = 10000)
         
         
         println(optsol.retcode)
@@ -297,7 +302,8 @@ begin
         
     
         psol = modelfit_sol
-
+end
+begin
     plot1 =  plot(
         psol.t, 
         psol.u[Tf(t,x)][:,end-1], # around 136 mm in T3
