@@ -488,7 +488,7 @@ begin
 
 	u0 = [Ts => Tamb, Tf => Tamb]
 
-	state_param = [qlpm => 10.54, Io =>456000. *1e3, Tins=>(40. + 273.15)]
+	state_param = [qlpm => 10.54, Io =>456. *1e3, Tins=>(40. + 273.15)]
 	fit_param = [aIo => 1., hfa => 1., hfn =>1.]
 	p = vcat(state_param, fit_param)
 	tspan = (0, 3600.)
