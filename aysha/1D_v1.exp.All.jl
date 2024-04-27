@@ -5,7 +5,7 @@ begin #libraries
     using NonlinearSolve, DifferentialEquations, DataFrames
     using Plots, XLSX, Statistics, Symbolics, Interpolations
     using Optim, LsqFit, LossFunctions
-    using Optimization, OptimizationNLopt, Symbolics, OptimizationOptimJL, ForwardDiff, OptimizationMOI
+    using Optimization, OptimizationNLopt, Symbolics, OptimizationOptimJL, ForwardDiff
 end
 begin #define parameters
     L = 137e-3 #m
