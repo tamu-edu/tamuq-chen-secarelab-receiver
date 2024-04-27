@@ -92,7 +92,7 @@ end
     begin
         # Parameters, variables, and derivatives for system 1
         @variables t x 
-        @parameters ρsCps ks h_average #A B n C 
+        @parameters ρsCps ks A n #h_average A B n C 
         @variables Ts(..) Tf(..)
         Dt = Differential(t) 
         Dx = Differential(x)
@@ -101,13 +101,13 @@ end
         #ks = (48.78 / 1000) * 1.97 * ((1 - e)^1.5) #kW/m.K
         #ρs = 3100*(1-e) #kg/m3
         #Cps = (1225/1000)*(1-e) #kJ/kg
-        p = [ρsCps => 706048., ks => 22.5, h_average => 50000.]
+        p = [ρsCps => 2e6, ks => 20., A => 10., n => 0.66]
         #p = [psCps => 90000., ks=> 37, h_average => (Nu*kf)/w_t]
         # p = [A => 3., B =>0.041, C => 60., n => 0.01]
         # Nu = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
-        #Nu = A * (Gz_f(x))^n
+        Nu = A * (Gz_f(x))^n
         # nu = 4.364*(1+(0.7*((Gz_f(0.134))^10)*exp(-40/Gz_f(0.134))))
-        #h_average = (Nu*kf)/Lc
+        h_average = (Nu*kf)/Lc
         #Cps(T)= (1110+0.15*(T-273)-425*exp(-0.003*(T-273)))/1000 #kJ/kg*K
         #Cpf(T)= (1.93e-10*(T^3)+1.14e-3*(T^2)-4.49e-1*T+1.06e3)/1000 #kJ/kg*K
 
@@ -191,11 +191,11 @@ end
         end
         begin
             #Exp 71 
-            D2 = XLSX.readxlsx("/Users/aishamelhim/Documents/GitHub/tamuq-chen-secarelab-receiver/aysha/SolarSimulator/EXCEL/Data_FPT0071_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0071_231128_1"]["A3:D7087"]
-            y1d2_data  = D2[:,1].+ 273. #T9 (external)
-            y2d2_data  = D2[:,2].+ 273. #T10 (external)
-            y3d2_data  = D2[:,3].+ 273. #T11 (internal)
-            y4d2_data = D2[:,4].+ 273. #T12 (internal)
+            D2 = XLSX.readxlsx("/Users/aishamelhim/Documents/GitHub/tamuq-chen-secarelab-receiver/aysha/SolarSimulator/EXCEL/Data_FPT0071_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0071_231128_1"]["A3:E7087"]
+            y1d2_data  = D2[:,2].+ 273. #T9 (external)
+            y2d2_data  = D2[:,3].+ 273. #T10 (external)
+            y3d2_data  = D2[:,4].+ 273. #T11 (internal)
+            y4d2_data = D2[:,5].+ 273. #T12 (internal)
         end
         # Model solution plotted with experimental data
         begin
@@ -245,7 +245,7 @@ end
     end
         p0 = [x[2] for x in p]
         #expdata = append!(copy(y2d1_data), y1d2_data, y2d2_data, y1d1_data, y3d2_data, y4d2_data)
-        expdata =  append!(copy(y1d2_data), y2d2_data, y1d1_data, y3d2_data, y4d2_data)
+        expdata =  append!(copy(y2d1_data), y1d2_data, y2d2_data, y1d1_data, y3d2_data, y4d2_data)
         length(expdata)
         
         
@@ -257,14 +257,14 @@ end
                 modeloptim = remake(prob, p = p_vary, tspan=(xvalues[1], xvalues[end]))
                 modeloptim_sol = solve(modeloptim, FBDF(), saveat = xvalues)#, reltol=1e-12, abstol = 1e-12)
                 #time = modelfit_sol.t
-                #tempT8_op = modeloptim_sol.u[Ts(t,x)][:, 4]
+                tempT8_op = modeloptim_sol.u[Ts(t,x)][:, 4]
                 tempT9_op = modeloptim_sol.u[Ts(t,x)][:,40]
                 tempT10_op = modeloptim_sol.u[Ts(t,x)][:,77]
                 tempT3_op = modeloptim_sol.u[Tf(t,x)][:, end-1]
                 T12_modelmean = (modeloptim_sol.u[Tf(t,x)][:,20] .+  modeloptim_sol.u[Ts(t,x)][:,20]) ./2
                 T11_modelmean = (modeloptim_sol.u[Tf(t,x)][:,59] .+ modeloptim_sol.u[Ts(t,x)][:,59]) ./2
                 
-                return append!(tempT9_op, tempT10_op, tempT3_op, T12_modelmean, T11_modelmean) #append!(tempT8_op, tempT9_op, tempT10_op, tempT3_op, T12_modelmean, T11_modelmean)
+                return append!(tempT8_op, tempT9_op, tempT10_op, tempT3_op, T12_modelmean, T11_modelmean) 
             end
         
             function loss(pguess, _)
@@ -279,13 +279,13 @@ end
 
         optf = OptimizationFunction(loss, Optimization.AutoForwardDiff())
         
-        lb = [0.0, 0.0, 0.0]
-        ub = [1000000., 50., 100000.]
+        lb = [1e3, 0.0, 0.0, 0.0]
+        ub = [1e8, 40., 25., 1.]
         #lb = [100.]
         #ub = [1000.]
         optprob = Optimization.OptimizationProblem(optf, p0, [], lb=lb, ub=ub)
         
-        optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method = NLopt.LN_NELDERMEAD(), maxtime = 500, local_maxiters = 10000)
+        optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method = NLopt.LN_NELDERMEAD(), maxtime = 1200, local_maxiters = 10000)
         
         
         println(optsol.retcode)

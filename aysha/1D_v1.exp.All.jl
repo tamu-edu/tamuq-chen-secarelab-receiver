@@ -4,8 +4,8 @@ begin #libraries
     using DomainSets, OrdinaryDiffEq
     using NonlinearSolve, DifferentialEquations, DataFrames
     using Plots, XLSX, Statistics, Symbolics, Interpolations
-    using Optim, LsqFit, LossFunctions
-    using Optimization, OptimizationNLopt, Symbolics, OptimizationOptimJL, ForwardDiff
+    using LsqFit, LossFunctions
+    using Optimization, OptimizationNLopt, Symbolics, ForwardDiff
 end
 begin #define parameters
     L = 137e-3 #m
@@ -51,7 +51,8 @@ begin #define parameters
     hext = 10 #W/m2.K
     kins = 0.078 #W/m*K
     r0 = 23 / 1000 #m
-    r = 42 / 1000 #m
+    r_ins = 42 / 1000 #m
+    r_H = 4 * (w_t * w_t) / (4 * w_t) #hydraulic receiver diameter
 end;
 #for interpolations 
 #1. extract T2 data
@@ -121,7 +122,7 @@ begin
     #     Vf * ρf * Cpf * Dt(Tf(t, x)) ~ Vf * kf * Dxx(Tf(t, x)) - Vf * ρf * Cpf * V * Dx(Tf(t, x)) + (h_average) * Av * Vi * ((Ts(t, x) - Tf(t, x)))
     # ]
     eq1 = [
-        A_st * (ρsCps) * Dt(Ts(t, x)) ~ A_st * (ks) * Dxx(Ts(t, x)) - (((h_average)/ Av) * ((Ts(t, x)) - Tf(t, x))) .- (kins * (r / r0) .* (Ts(t, x) .- Tins_f(t)) * L / (r - r0)),
+        A_st * (ρsCps) * Dt(Ts(t, x)) ~ A_st * (ks) * Dxx(Ts(t, x)) - (((h_average)/ Av) * ((Ts(t, x)) - Tf(t, x))) .- (kins * (r_ins/r0).* (Ts(t, x) .- Tins_f(t)) * L / (r_ins - r0)),
         A_ft * ρf * Cpf * Dt(Tf(t, x)) ~ A_ft * kf * Dxx(Tf(t, x)) -  m * Cpf * Dx(Tf(t, x)) + (((h_average)/ Av) * ((Ts(t, x)) - Tf(t, x)))
     ]
     bcs1 = [
@@ -344,6 +345,120 @@ begin
     y4f_data = F11[:, 3] .+ 273.15
     y5f_data = F11[:, 4] .+ 273.15
     y6f_data = F11[:, 5] .+ 273.15
+    
+    #Exp 74 - T3, T8
+    G = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0074_231130_123228.xlsx")["Sheet 1 - Data_FPT0074_231130_1"]["A3:C6018"]
+    xg_data = G[:, 1]
+    y1g_data = G[:, 2] .+ 273.15
+    y2g_data = G[:, 3] .+ 273.15
+
+    #Exp 74 - T9, T10, T11, T12
+
+    G1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0074_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0074_231130_1"]["A3:E6018"]
+    y3g1_data = G1[:, 2] .+ 273.15
+    y4g1_data = G1[:, 3] .+ 273.15
+    y5g1_data = G1[:, 4] .+ 273.15
+    y6g1_data = G1[:, 5] .+ 273.15
+
+    #Exp 75 - T3, T8
+    H = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0075_231201_162138.xlsx")["Sheet 1 - Data_FPT0075_231201_1"]["A3:C6354"]
+    xh_data = H[:, 1]
+    y1h_data = H[:, 2] .+ 273.15
+    y2h_data = H[:, 3] .+ 273.15
+
+    #Exp 75 - T9, T10, T11, T12
+
+    H1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0075_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0075_231201_1"]["A3:E6354"]
+    y3h1_data = H1[:, 2] .+ 273.15
+    y4h1_data = H1[:, 3] .+ 273.15
+    y5h1_data = H1[:, 4] .+ 273.15
+    y6h1_data = H1[:, 5] .+ 273.15
+
+    #Exp 76 - T3, T8
+    I = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0076_231203_120521.xlsx")["Sheet 1 - Data_FPT0076_231203_1"]["A3:C7147"]
+    xi_data = I[:, 1]
+    y1i_data = I[:, 2] .+ 273.15
+    y2i_data = I[:, 3] .+ 273.15
+
+    #Exp 76 - T9, T10, T11, T12
+
+    I1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0076_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0076_231203_1"]["A3:E7147"]
+    y3i1_data = I1[:, 2] .+ 273.15
+    y4i1_data = I1[:, 3] .+ 273.15
+    y5i1_data = I1[:, 4] .+ 273.15
+    y6i1_data = I1[:, 5] .+ 273.15
+
+    #Exp 77 - T3, T8
+    J = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0077_231203_161315.xlsx")["Sheet 1 - Data_FPT0077_231203_1"]["A3:C3044"]
+    xj_data = J[:, 1]
+    y1j_data = J[:, 2] .+ 273.15
+    y2j_data = J[:, 3] .+ 273.15
+
+    #Exp 77 - T9, T10, T11, T12
+
+    J1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0077_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0077_231203_1"]["A3:E3044"]
+    y3j1_data = J1[:, 2] .+ 273.15
+    y4j1_data = J1[:, 3] .+ 273.15
+    y5j1_data = J1[:, 4] .+ 273.15
+    y6j1_data = J1[:, 5] .+ 273.15
+
+    #Exp 78 - T3, T8
+    K = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0078_231204_132252.xlsx")["Sheet 1 - Data_FPT0078_231204_1"]["A3:C5384"]
+    xk_data = K[:, 1]
+    y1k_data = K[:, 2] .+ 273.15
+    y2k_data = K[:, 3] .+ 273.15
+
+    #Exp 78 - T9, T10, T11, T12
+
+    K1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0078_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0078_231204_1"]["A3:E5384"]
+    y3k1_data = K1[:, 2] .+ 273.15
+    y4k1_data = K1[:, 3] .+ 273.15
+    y5k1_data = K1[:, 4] .+ 273.15
+    y6k1_data = K1[:, 5] .+ 273.15
+    
+    #Exp 79 - T3, T8
+    L = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0079_231204_172244.xlsx")["Sheet 1 - Data_FPT0079_231204_1"]["A3:C5233"]
+    xl_data = L[:, 1]
+    y1l_data = L[:, 2] .+ 273.15
+    y2l_data = L[:, 3] .+ 273.15  
+    
+    #Exp 79 - T9, T10, T11, T12
+
+    L1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0079_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0079_231204_1"]["A3:E5233"]
+    y3l1_data = L1[:, 2] .+ 273.15
+    y4l1_data = L1[:, 3] .+ 273.15
+    y5l1_data = L1[:, 4] .+ 273.15
+    y6l1_data = L1[:, 5] .+ 273.15
+     
+      
+    #Exp 80 - T3, T8
+    M = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0080_231205_095122.xlsx")["Sheet 1 - Data_FPT0080_231205_0"]["A3:C5814"]
+    xm_data = M[:, 1]
+    y1m_data = M[:, 2] .+ 273.15
+    y2m_data = M[:, 3] .+ 273.15   
+
+    #Exp 80 - T9, T10, T11, T12
+
+    M1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0080_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0080_231205_0"]["A3:E5814"]
+    y3m1_data = M1[:, 2] .+ 273.15
+    y4m1_data = M1[:, 3] .+ 273.15
+    y5m1_data = M1[:, 4] .+ 273.15
+    y6m1_data = M1[:, 5] .+ 273.15
+     
+
+    #Exp 81 - T3, T8
+    N = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0081_231205_135354.xlsx")["Sheet 1 - Data_FPT0081_231205_1"]["A3:C5989"]
+    xn_data = N[:, 1]
+    y1n_data = N[:, 2] .+ 273.15
+    y2n_data = N[:, 3] .+ 273.15   
+
+    #Exp 81 - T9, T10, T11, T12
+
+    N1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0081_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0081_231205_1"]["A3:E5989"]
+    y3n1_data = N1[:, 2] .+ 273.15
+    y4n1_data = N1[:, 3] .+ 273.15
+    y5n1_data = N1[:, 4] .+ 273.15
+    y6n1_data = N1[:, 5] .+ 273.15
 end
 #Optimization using NLOpt
 function NLmodeloptim(tvalues, p_math_vec)

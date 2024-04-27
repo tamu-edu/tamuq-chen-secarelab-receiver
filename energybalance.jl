@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.41
+# v0.19.38
 
 using Markdown
 using InteractiveUtils
@@ -22,6 +22,7 @@ end
 
 # ╔═╡ 86c7df59-4f03-4730-9cbf-72d8fc7c34bd
 begin
+	Pkg.instantiate()
 	using ModelingToolkit, DifferentialEquations, Plots
 	#using ModelingToolkit: t_nounits as t, D_nounits as D
 	using PEtab, XLSX, Statistics, DataFrames
@@ -173,6 +174,142 @@ begin
 	E73Tf = y1f1_data
 	E73Ts = mean([y2f1_data, y3f_data, y4f_data, y5f_data, y6f_data])
 
+	#Exp 74 - T3, T8
+    G = XLSX.readxlsx(path*"Data_FPT0074_231130_123228.xlsx")["Sheet 1 - Data_FPT0074_231130_1"]["A3:C6018"]
+    E74t = Float64.(G[starttime:end, 1])
+    y1g_data = G[starttime:end, 2] .+ 273.15
+    y2g_data = G[starttime:end, 3] .+ 273.15
+
+	#Exp 74 - T9, T10, T11, T12
+
+    G1 = XLSX.readxlsx(path*"Data_FPT0074_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0074_231130_1"]["A3:E6018"]
+    y3g1_data = G1[starttime:end, 2] .+ 273.15
+    y4g1_data = G1[starttime:end, 3] .+ 273.15
+    y5g1_data = G1[starttime:end, 4] .+ 273.15
+    y6g1_data = G1[starttime:end, 5] .+ 273.15
+
+	E74Tf = y1g_data
+	E74Ts = mean([y2g_data, y3g1_data, y4g1_data, y5g1_data, y6g1_data])
+	
+	#Exp 75 - T3, T8
+    H = XLSX.readxlsx(path*"Data_FPT0075_231201_162138.xlsx")["Sheet 1 - Data_FPT0075_231201_1"]["A3:C6354"]
+    E75t = Float64.(H[starttime:end, 1])
+    y1h_data = H[starttime:end, 2] .+ 273.15
+    y2h_data = H[starttime:end, 3] .+ 273.15
+	
+	#Exp 75 - T9, T10, T11, T12
+
+    H1 = XLSX.readxlsx(path*"Data_FPT0075_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0075_231201_1"]["A3:E6354"]
+    y3h1_data = H1[starttime:end, 2] .+ 273.15
+    y4h1_data = H1[starttime:end, 3] .+ 273.15
+    y5h1_data = H1[starttime:end, 4] .+ 273.15
+    y6h1_data = H1[starttime:end, 5] .+ 273.15
+	
+    E75Tf = y1h_data
+	E75Ts = mean([y2h_data, y3h1_data, y4h1_data, y5h1_data, y6h1_data])
+
+	#Exp 76 - T3, T8
+    I = XLSX.readxlsx(path*"Data_FPT0076_231203_120521.xlsx")["Sheet 1 - Data_FPT0076_231203_1"]["A3:C7147"]
+    E76t = Float64.(I[starttime:end, 1])
+    y1i_data = I[starttime:end, 2] .+ 273.15
+    y2i_data = I[starttime:end, 3] .+ 273.15
+
+	#Exp 76 - T9, T10, T11, T12
+
+    I1 = XLSX.readxlsx(path*"Data_FPT0076_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0076_231203_1"]["A3:E7147"]
+    y3i1_data = I1[starttime:end, 2] .+ 273.15
+    y4i1_data = I1[starttime:end, 3] .+ 273.15
+    y5i1_data = I1[starttime:end, 4] .+ 273.15
+    y6i1_data = I1[starttime:end, 5] .+ 273.15
+	
+	E76Tf = y1i_data
+	E76Ts = mean([y2i_data, y3i1_data, y4i1_data, y5i1_data, y6i1_data])
+
+	 #Exp 77 - T3, T8
+    J = XLSX.readxlsx(path*"Data_FPT0077_231203_161315.xlsx")["Sheet 1 - Data_FPT0077_231203_1"]["A3:C3044"]
+    E77t = Float64.(J[starttime:end, 1])
+    y1j_data = J[starttime:end, 2] .+ 273.15
+    y2j_data = J[starttime:end, 3] .+ 273.15
+
+    #Exp 77 - T9, T10, T11, T12
+
+    J1 = XLSX.readxlsx(path*"Data_FPT0077_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0077_231203_1"]["A3:E3044"]
+    y3j1_data = J1[starttime:end, 2] .+ 273.15
+    y4j1_data = J1[starttime:end, 3] .+ 273.15
+    y5j1_data = J1[starttime:end, 4] .+ 273.15
+    y6j1_data = J1[starttime:end, 5] .+ 273.15
+
+	E77Tf = y1j_data
+	E77Ts = mean([y2j_data, y3j1_data, y4j1_data, y5j1_data, y6j1_data])
+
+    #Exp 78 - T3, T8
+    K = XLSX.readxlsx(path*"Data_FPT0078_231204_132252.xlsx")["Sheet 1 - Data_FPT0078_231204_1"]["A3:C5384"]
+    E78t = Float64.(K[starttime:end, 1])
+    y1k_data = K[starttime:end, 2] .+ 273.15
+    y2k_data = K[starttime:end, 3] .+ 273.15
+
+	 #Exp 78 - T9, T10, T11, T12
+
+    K1 = XLSX.readxlsx(path*"Data_FPT0078_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0078_231204_1"]["A3:E5384"]
+    y3k1_data = K1[starttime:end, 2] .+ 273.15
+    y4k1_data = K1[starttime:end, 3] .+ 273.15
+    y5k1_data = K1[starttime:end, 4] .+ 273.15
+    y6k1_data = K1[starttime:end, 5] .+ 273.15
+
+	E78Tf = y1k_data 
+	E78Ts = mean([y2k_data, y3k1_data, y4k1_data, y5k1_data, y6k1_data])
+
+	#Exp 79 - T3, T8
+    L1 = XLSX.readxlsx(path*"Data_FPT0079_231204_172244.xlsx")["Sheet 1 - Data_FPT0079_231204_1"]["A3:C5233"]
+    E79t = Float64.(L1[starttime:end, 1])
+    y1l_data = L1[starttime:end, 2] .+ 273.15
+    y2l_data = L1[starttime:end, 3] .+ 273.15  
+
+	 #Exp 79 - T9, T10, T11, T12
+
+    L11 = XLSX.readxlsx(path*"Data_FPT0079_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0079_231204_1"]["A3:E5233"]
+    y3l1_data = L11[starttime:end, 2] .+ 273.15
+    y4l1_data = L11[starttime:end, 3] .+ 273.15
+    y5l1_data = L11[starttime:end, 4] .+ 273.15
+    y6l1_data = L11[starttime:end, 5] .+ 273.15
+	
+    E79Tf = y1l_data
+	E79Ts = mean([y2l_data, y3l1_data, y4l1_data, y5l1_data, y6l1_data])
+
+	#Exp 80 - T3, T8
+    M = XLSX.readxlsx(path*"Data_FPT0080_231205_095122.xlsx")["Sheet 1 - Data_FPT0080_231205_0"]["A3:C5814"]
+    E80t = Float64.(M[starttime:end, 1])
+    y1m_data = M[starttime:end, 2] .+ 273.15
+    y2m_data = M[starttime:end, 3] .+ 273.15   
+	
+    #Exp 80 - T9, T10, T11, T12
+
+    M1 = XLSX.readxlsx(path*"Data_FPT0080_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0080_231205_0"]["A3:E5814"]
+    y3m1_data = M1[starttime:end, 2] .+ 273.15
+    y4m1_data = M1[starttime:end, 3] .+ 273.15
+    y5m1_data = M1[starttime:end, 4] .+ 273.15
+    y6m1_data = M1[starttime:end, 5] .+ 273.15
+
+	E80Tf = y1m_data
+	E80Ts = mean([y2m_data, y3m1_data, y4m1_data, y5m1_data, y6m1_data])
+
+	 #Exp 81 - T3, T8
+    N = XLSX.readxlsx(path*"Data_FPT0081_231205_135354.xlsx")["Sheet 1 - Data_FPT0081_231205_1"]["A3:C5989"]
+    E81t = Float64.(N[starttime:end, 1])
+    y1n_data = N[starttime:end, 2] .+ 273.15
+    y2n_data = N[starttime:end, 3] .+ 273.15   
+
+	#Exp 81 - T9, T10, T11, T12
+
+    N1 = XLSX.readxlsx(path*"Data_FPT0081_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0081_231205_1"]["A3:E5989"]
+    y3n1_data = N1[starttime:end, 2] .+ 273.15
+    y4n1_data = N1[starttime:end, 3] .+ 273.15
+    y5n1_data = N1[starttime:end, 4] .+ 273.15
+    y6n1_data = N1[starttime:end, 5] .+ 273.15
+
+	E81Tf = y1n_data
+	E81Ts = mean([y2n_data, y3n1_data, y4n1_data, y5n1_data, y6n1_data])
+	
 	md"Exp. data to extract temperature"
 
 end
@@ -190,24 +327,29 @@ end
 begin
 	L = 137e-3 #m
     Tamb = 296. #K (same for all exp) 
+	th_s = 0.4e-3 #m
+    th_f = 0.7e-3 #m
     w_t = 19.e-3 #m
     A_frt = w_t * w_t #m2 - for the whole receiver (19x19mm2)
     A_s_p = w_t * L * 4 #total area solid periphery m2
     w_chnl = 1.5e-3 #m
     A_chnl_p = w_chnl * L * 4  #m2 channel periphery
 	A_chnl_frt = w_chnl * w_chnl #m2 channel front
-	n_chnl = 8*8
+	n_chnl = 10*10
     A_exchange = A_chnl_p * n_chnl #m2 - contact area between fluid and solid
 	A_chnl_frt_all = A_chnl_frt * n_chnl #m2 all frontal area of channels
-    Vs = A_frt * L #* deltax
-    Vf = n_chnl * A_chnl_frt * L #* deltax
+    #Vs = A_frt * L 
+	#Vf = n_chnl * A_chnl_frt * L 
+	Af =  (w_chnl - (th_s * 2))^2 * n_chnl #m2 - fluid area
+	Vf = Af * L #m3
+	As = A_chnl_frt_all - Af #m2 - solid area
+	Vs = As * L #m3
+    #Vf = n_chnl * A_chnl_frt * L #* deltax
 	ε = Vf / Vs #porosity
     q = qlpm / 1000 / 60 #m3/s
     ρf = 1. #kg/m3
 	mf = q * ρf #kg/s
     
-	th_s = 0.4e-3 #m
-    th_f = 0.7e-3 #m
     em = 0.8
 	ab = 0.8
     σ = 5.17e-8 #W/m2.K^4 Stefan-Boltzmann constant
@@ -225,6 +367,12 @@ begin
     r_H = 4 * (w_t * w_t) / (4 * w_t) #hydraulic receiver diameter
     r_ins = 42e-3 #m location of insulation thermocouple
 end;
+
+# ╔═╡ 3b6fa5a1-f5ba-4e48-ba8d-0e11315fae5d
+ε
+
+# ╔═╡ 77c3135c-6534-49a6-8ad3-4c22a2495f71
+r_H*1000
 
 # ╔═╡ d71c355c-891e-4195-a482-652749bbb5cc
 begin
@@ -244,7 +392,7 @@ end
 begin
     condition_E67 = Dict(Io => 456000.0, qlpm => 1.22*1000*60*A_chnl_frt_all)
     condition_E68 = Dict(Io => 456000.0, qlpm => 1.00*1000*60*A_chnl_frt_all)
-    #condition_E69 = Dict(Io => 456000.0, qlpm => 0.84*1000*60*A_chnl_frt_all)
+    condition_E69 = Dict(Io => 456000.0, qlpm => 0.84*1000*60*A_chnl_frt_all)
     condition_E70 = Dict(Io => 456000.0, qlpm => 0.73*1000*60*A_chnl_frt_all)
     condition_E71 = Dict(Io => 456000.0, qlpm => 0.57*1000*60*A_chnl_frt_all)
     condition_E72 = Dict(Io => 304000.0, qlpm => 1.46*1000*60*A_chnl_frt_all)
@@ -259,14 +407,14 @@ begin
     condition_E81 = Dict(Io => 256000.0, qlpm => 0.36*1000*60*A_chnl_frt_all)
 
     simulation_conditions = Dict("E67" => condition_E67, "E68" => condition_E68,
-        #"E69" => condition_E69, 
+        "E69" => condition_E69, 
 		"E70" => condition_E70,
         "E71" => condition_E71, "E72" => condition_E72,
-        "E73" => condition_E73) #=, "E74" => condition_E74,
+        "E73" => condition_E73), "E74" => condition_E74,
         "E75" => condition_E75, "E76" => condition_E76,
         "E77" => condition_E77, "E78" => condition_E78,
         "E79" => condition_E79, "E80" => condition_E80,
-        "E81" => condition_E81) =#
+        "E81" => condition_E81
 
 	measurements = DataFrame(simulation_id = "E67", obs_id="obs_Tf", time = E67t, measurement = E67Tf)
 		#meas = DataFrame(simulation_id = "E67", obs_id="obs_Ts", time = E67t, measurement = E67Ts)
@@ -275,8 +423,8 @@ begin
 		measurements = vcat(measurements, meas)
 		#meas = DataFrame(simulation_id = "E68", obs_id="obs_Ts", time = E68t, measurement = E68Ts)
 		#measurements = vcat(measurements, meas)
-	#meas = DataFrame(simulation_id = "E69", obs_id="obs_Tf", time = E69t, measurement = E69Tf)
-	#	measurements = vcat(measurements, meas)
+	meas = DataFrame(simulation_id = "E69", obs_id="obs_Tf", time = E69t, measurement = E69Tf)
+		measurements = vcat(measurements, meas)
 		#meas = DataFrame(simulation_id = "E69", obs_id="obs_Ts", time = E69t, measurement = E69Ts)
 		#measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E70", obs_id="obs_Tf", time = E70t, measurement = E70Tf)
@@ -295,6 +443,37 @@ begin
 		measurements = vcat(measurements, meas)
 		#meas = DataFrame(simulation_id = "E73", obs_id="obs_Ts", time = E73t, measurement = E73Ts)
 		#measurements = vcat(measurements, meas)
+	meas = DataFrame(simulation_id = "E74", obs_id="obs_Tf", time = E74t, measurement = E74Tf)
+		measurements = vcat(measurements, meas)
+		#meas = DataFrame(simulation_id = "E74", obs_id="obs_Ts", time = E74t, measurement = E74Ts)
+	meas = DataFrame(simulation_id = "E75", obs_id="obs_Tf", time = E75t, measurement = E75Tf)
+		measurements = vcat(measurements, meas)
+		#meas = DataFrame(simulation_id = "E75", obs_id="obs_Ts", time = E75t, measurement = E75Ts)
+		#measurements = vcat(measurements, meas)
+	meas = DataFrame(simulation_id = "E76", obs_id="obs_Tf", time = E76t, measurement = E76Tf)
+		measurements = vcat(measurements, meas)
+		#meas = DataFrame(simulation_id = "E76", obs_id="obs_Ts", time = E76t, measurement = E76Ts)
+		#measurements = vcat(measurements, meas)
+	meas = DataFrame(simulation_id = "E77", obs_id="obs_Tf", time = E77t, measurement = E77Tf)
+		measurements = vcat(measurements, meas)
+		#meas = DataFrame(simulation_id = "E77", obs_id="obs_Ts", time = E77t, measurement = E77Ts)
+		#measurements = vcat(measurements, meas)
+	meas = DataFrame(simulation_id = "E78", obs_id="obs_Tf", time = E78t, measurement = E78Tf)
+		measurements = vcat(measurements, meas)
+		#meas = DataFrame(simulation_id = "E78", obs_id="obs_Ts", time = E78t, measurement = E78Ts)
+		#measurements = vcat(measurements, meas)
+	meas = DataFrame(simulation_id = "E79", obs_id="obs_Tf", time = E79t, measurement = E79Tf)
+		measurements = vcat(measurements, meas)
+		#meas = DataFrame(simulation_id = "E79", obs_id="obs_Ts", time = E79t, measurement = E79Ts)
+		#measurements = vcat(measurements, meas)
+	meas = DataFrame(simulation_id = "E80", obs_id="obs_Tf", time = E80t, measurement = E80Tf)
+		measurements = vcat(measurements, meas)
+		#meas = DataFrame(simulation_id = "E80", obs_id="obs_Ts", time = E80t, measurement = E80Ts)
+		#measurements = vcat(measurements, meas)
+	meas = DataFrame(simulation_id = "E81", obs_id="obs_Tf", time = E81t, measurement = E81Tf)
+		measurements = vcat(measurements, meas)
+		#meas = DataFrame(simulation_id = "E81", obs_id="obs_Ts", time = E81t, measurement = E81Ts)
+		#measurements = vcat(measurements, meas)
 end
 
 # ╔═╡ be19295e-483d-4655-8e8e-55eb349c9958
@@ -303,13 +482,13 @@ end
 # ╔═╡ bc5bf598-46e5-4beb-a9b9-e23c75137fa1
 begin
 	hf = hfa * qlpm^hfn
-	eq1 = [D(Ts) ~ 1/((1-ε) * ρCp_s_0 * Vs) * (aIo*ab*Io * A_frt - kins * (Ts - Tins) * A_s_p / (r_ins - r_H) - h_ext * A_frt * (Ts - Tamb) - em * σ * A_frt * (Ts^4 - Tamb^4) - hf * A_exchange *(Ts - Tf)),
+	eq1 = [D(Ts) ~ 1/((1-ε) * ρCp_s_0 * Vs) * (aIo*ab*Io * A_frt - kins * (r_ins/r_H) * (Ts - Tins) * A_s_p / (r_ins - r_H) - h_ext * A_frt * (Ts - Tamb) - em * σ * A_frt * (Ts^4 - Tamb^4) - hf * A_exchange *(Ts - Tf)),
 	D(Tf) ~ 1/(ε * (3.018 * exp(-0.00574*Tf) + 0.8063*exp(-0.0008381*Tf)) * Cpf * Vf) * (hf * A_exchange *(Ts - Tf) - mf * Cpf * (Tf - Tamb))
     ]
 
 	u0 = [Ts => Tamb, Tf => Tamb]
 
-	state_param = [qlpm => 10.54, Io =>456. *1e3, Tins=>(40. + 273.15)]
+	state_param = [qlpm => 10.54, Io =>456000. *1e3, Tins=>(40. + 273.15)]
 	fit_param = [aIo => 1., hfa => 1., hfn =>1.]
 	p = vcat(state_param, fit_param)
 	tspan = (0, 3600.)
@@ -386,7 +565,7 @@ end
 pnew = get_ps(res, petab_problem, condition_id = casesim)
 
 # ╔═╡ e2613b68-6e5c-44dd-a631-65a367726753
-plot(res, petab_problem; observable_ids=["obs_Tf"], condition_id=casesim, ylim=(300, 1000))
+plot(res, petab_problem; observable_ids=["obs_Tf"], condition_id=casesim, ylim=(300, 1000), ylabel = "Temperature (K)", xlabel = "Time (s)")
 
 # ╔═╡ Cell order:
 # ╠═8c28c8d1-dd57-4a04-9121-cbfed404d824
@@ -398,6 +577,8 @@ plot(res, petab_problem; observable_ids=["obs_Tf"], condition_id=casesim, ylim=(
 # ╠═2c50a54e-96bd-4f48-ae7f-33cbface0754
 # ╠═5d04df82-9b4f-43c4-83c7-13dda03f4cbb
 # ╠═ce81f78a-6722-497f-b031-9ac6f933b7fe
+# ╠═3b6fa5a1-f5ba-4e48-ba8d-0e11315fae5d
+# ╠═77c3135c-6534-49a6-8ad3-4c22a2495f71
 # ╠═d71c355c-891e-4195-a482-652749bbb5cc
 # ╠═8f9afcbf-5a98-4709-b763-844b058d155e
 # ╠═be19295e-483d-4655-8e8e-55eb349c9958
