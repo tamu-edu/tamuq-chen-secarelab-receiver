@@ -46,7 +46,7 @@ plotly()
 
 # ╔═╡ 2eb83c61-2ea3-4120-9a55-3e0b66e279bb
 begin
-	@parameters hfa hfn hfo#to be fitted
+	@parameters hfa hfn aIo#to be fitted
 	@parameters qlpm Io Tins #varying conditions
 	@variables t Tf(t) Ts(t)
 	D = Differential(t)
@@ -230,8 +230,8 @@ end;
 begin
 	ρCp_sf(T) = 3290. * (0.27 + 0.135E-4 * T -9720.0 * T^-2 + 0.204E-7 * T^2)  * 4184
 	@register_symbolic ρCp_sf(T)  #kg/m3 * J/kg.K 
-	#ρf_f(T)= 3.018 * exp(-0.00574*T) + 0.8063*exp(-0.0008381*T) #kg/m3 (Roldan et al.)
-	#@register_symbolic ρf_f(T)  #kg/m3 * J/kg.K 
+	ρf_f(T)= 3.018 * exp(-0.00574*T) + 0.8063*exp(-0.0008381*T) #kg/m3 (Roldan et al.)
+	@register_symbolic ρf_f(T)  #kg/m3 * J/kg.K 
 
 	#ρCp_s = 3290. * 46. /40. * 1000.
 	#Tx=Tamb:1000
@@ -297,17 +297,20 @@ begin
 		#measurements = vcat(measurements, meas)
 end
 
+# ╔═╡ be19295e-483d-4655-8e8e-55eb349c9958
+1.22*1000*60*A_chnl_frt_all
+
 # ╔═╡ bc5bf598-46e5-4beb-a9b9-e23c75137fa1
 begin
-	hf = hfo + hfa * qlpm^hfn
-	eq1 = [D(Ts) ~ 1/((1-ε) * ρCp_s_0 * Vs) * (ab*Io * A_frt - kins * (Ts - Tins) * A_s_p / (r_ins - r_H) - h_ext * A_frt * (Ts - Tamb) - em * σ * A_frt * (Ts^4 - Tamb^4) - hf * A_exchange *(Ts - Tf)),
-	D(Tf) ~ 1/(ε * ρf * Cpf * Vf) * (hf * A_exchange *(Ts - Tf) - mf * Cpf * (Tf - Tamb))
+	hf = hfa * qlpm^hfn
+	eq1 = [D(Ts) ~ 1/((1-ε) * ρCp_s_0 * Vs) * (aIo*ab*Io * A_frt - kins * (Ts - Tins) * A_s_p / (r_ins - r_H) - h_ext * A_frt * (Ts - Tamb) - em * σ * A_frt * (Ts^4 - Tamb^4) - hf * A_exchange *(Ts - Tf)),
+	D(Tf) ~ 1/(ε * (3.018 * exp(-0.00574*Tf) + 0.8063*exp(-0.0008381*Tf)) * Cpf * Vf) * (hf * A_exchange *(Ts - Tf) - mf * Cpf * (Tf - Tamb))
     ]
 
 	u0 = [Ts => Tamb, Tf => Tamb]
 
 	state_param = [qlpm => 10.54, Io =>456. *1e3, Tins=>(40. + 273.15)]
-	fit_param = [hfo => 1., hfa => 1., hfn =>1.]
+	fit_param = [aIo => 1., hfa => 1., hfn =>1.]
 	p = vcat(state_param, fit_param)
 	tspan = (0, 3600.)
 end
@@ -325,30 +328,30 @@ sol = solve(prob);
 # ╔═╡ 7a997a1e-9731-4824-9f59-731ada97c83e
 plot(sol)
 
-# ╔═╡ 37d17dae-3718-4a8a-bad4-407e6f4b4978
-@bind slha Slider(1.:20.)
+# ╔═╡ 8063f54c-0256-4dd3-a0bf-7e2ea10cb671
+@bind slaIo Slider(0.8:0.05:1.2, show_value=true)
 
-# ╔═╡ 7dab74f6-9019-4fec-82c4-8e2c0442bc4c
-@bind slhn Slider(1.:20.)
+# ╔═╡ 37d17dae-3718-4a8a-bad4-407e6f4b4978
+@bind slha Slider(1.:20., show_value=true)
 
 # ╔═╡ 1180068b-287b-4038-ac87-b689d42c8c98
-rmp = ModelingToolkit.varmap_to_vars([hfo => 1. , hfa => slha, hfn => slhn, Io => 304000, Tins => 313., qlpm => 12.6], parameters(odes))
+rmp = ModelingToolkit.varmap_to_vars([aIo => slaIo , hfa => slha, hfn => 0, Io => 456000, Tins => 313., qlpm => 10.54], parameters(odes))
 
 # ╔═╡ b50df44c-f6ef-44b7-b477-0e4516540e6f
 begin
 	rmprob = remake(prob; p = rmp)
 	rmsol = solve(rmprob)
 	plot(rmsol, ylim=(270, 1000.), lw=2.)
-	plot!(E72t, E72Ts, label="ETs", ls=:dash)
-	plot!(E72t, E72Tf, label="ETf", ls=:dash)
+	plot!(E67t, E67Ts, label="ETs", ls=:dash)
+	plot!(E67t, E67Tf, label="ETf", ls=:dash)
 end
 
 # ╔═╡ 634082dc-6050-42fc-a208-1a68802fe5da
 begin
-	_hfo = PEtabParameter(hfo, lb=0., ub=20., scale=:lin)
-	_hfa = PEtabParameter(hfa, lb=0.1, ub=20., scale=:lin)
+	_aIo = PEtabParameter(aIo, lb=0.7, ub=2., scale=:lin)
+	_hfa = PEtabParameter(hfa, lb=0.01, ub=20., scale=:lin)
 	_hfn = PEtabParameter(hfn, lb=0.1, ub=10., scale=:lin)
-	params = [_hfo, _hfa, _hfn]
+	params = [_aIo, _hfa, _hfn]
 	obs_Ts = PEtabObservable(Ts, 0.5)
 	obs_Tf = PEtabObservable(Tf, 0.5)
 	observables = Dict("obs_Tf" => obs_Tf)
@@ -397,12 +400,13 @@ plot(res, petab_problem; observable_ids=["obs_Tf"], condition_id=casesim, ylim=(
 # ╠═ce81f78a-6722-497f-b031-9ac6f933b7fe
 # ╠═d71c355c-891e-4195-a482-652749bbb5cc
 # ╠═8f9afcbf-5a98-4709-b763-844b058d155e
+# ╠═be19295e-483d-4655-8e8e-55eb349c9958
 # ╠═bc5bf598-46e5-4beb-a9b9-e23c75137fa1
 # ╠═50b80f28-226a-4681-8f39-a721b7aa6d67
 # ╠═a1127074-1338-4e12-8ded-bf43c4f32515
 # ╠═7a997a1e-9731-4824-9f59-731ada97c83e
+# ╠═8063f54c-0256-4dd3-a0bf-7e2ea10cb671
 # ╠═37d17dae-3718-4a8a-bad4-407e6f4b4978
-# ╠═7dab74f6-9019-4fec-82c4-8e2c0442bc4c
 # ╠═1180068b-287b-4038-ac87-b689d42c8c98
 # ╠═b50df44c-f6ef-44b7-b477-0e4516540e6f
 # ╠═634082dc-6050-42fc-a208-1a68802fe5da
