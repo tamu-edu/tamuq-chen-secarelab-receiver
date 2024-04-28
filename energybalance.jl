@@ -41,9 +41,6 @@ main {
 # ╔═╡ 232f4256-2095-470e-a669-216e1642c374
 Pkg.status()
 
-# ╔═╡ 3f7ecdc3-b35e-4cc7-8a37-4576cd0f02b9
-plotly()
-
 # ╔═╡ 2eb83c61-2ea3-4120-9a55-3e0b66e279bb
 begin
 	@parameters aCp hfa hfn aIo#to be fitted
@@ -389,21 +386,21 @@ end
 # ╔═╡ 8f9afcbf-5a98-4709-b763-844b058d155e
 #measurements and conditions#Defining simulation conditions
 begin
-    condition_E67 = Dict(Io => 456000.0, qlpm => 1.22*1000*60*A_chnl_frt_all)
-    condition_E68 = Dict(Io => 456000.0, qlpm => 1.00*1000*60*A_chnl_frt_all)
-    condition_E69 = Dict(Io => 456000.0, qlpm => 0.84*1000*60*A_chnl_frt_all)
-    condition_E70 = Dict(Io => 456000.0, qlpm => 0.73*1000*60*A_chnl_frt_all)
-    condition_E71 = Dict(Io => 456000.0, qlpm => 0.57*1000*60*A_chnl_frt_all)
-    condition_E72 = Dict(Io => 304000.0, qlpm => 1.46*1000*60*A_chnl_frt_all)
-    condition_E73 = Dict(Io => 304000.0, qlpm => 1.05*1000*60*A_chnl_frt_all)
-    condition_E74 = Dict(Io => 304000.0, qlpm => 0.72*1000*60*A_chnl_frt_all)
-    condition_E75 = Dict(Io => 304000.0, qlpm => 0.55*1000*60*A_chnl_frt_all)
-    condition_E76 = Dict(Io => 304000.0, qlpm => 0.36*1000*60*A_chnl_frt_all)
-    condition_E77 = Dict(Io => 256000.0, qlpm => 1.10*1000*60*A_chnl_frt_all)
-    condition_E78 = Dict(Io => 256000.0, qlpm => 0.80*1000*60*A_chnl_frt_all)
-    condition_E79 = Dict(Io => 256000.0, qlpm => 0.64*1000*60*A_chnl_frt_all)
-    condition_E80 = Dict(Io => 256000.0, qlpm => 0.53*1000*60*A_chnl_frt_all)
-    condition_E81 = Dict(Io => 256000.0, qlpm => 0.36*1000*60*A_chnl_frt_all)
+    condition_E67 = Dict(Io => 456000.0, qlpm => 1.22*1000*60*A_chnl_frt_all, aIo => :g1_aIo)
+    condition_E68 = Dict(Io => 456000.0, qlpm => 1.00*1000*60*A_chnl_frt_all, aIo => :g1_aIo)
+    condition_E69 = Dict(Io => 456000.0, qlpm => 0.84*1000*60*A_chnl_frt_all, aIo => :g1_aIo)
+    condition_E70 = Dict(Io => 456000.0, qlpm => 0.73*1000*60*A_chnl_frt_all, aIo => :g1_aIo)
+    condition_E71 = Dict(Io => 456000.0, qlpm => 0.57*1000*60*A_chnl_frt_all, aIo => :g1_aIo)
+    condition_E72 = Dict(Io => 304000.0, qlpm => 1.46*1000*60*A_chnl_frt_all, aIo => :g2_aIo)
+    condition_E73 = Dict(Io => 304000.0, qlpm => 1.05*1000*60*A_chnl_frt_all, aIo => :g2_aIo)
+    condition_E74 = Dict(Io => 304000.0, qlpm => 0.72*1000*60*A_chnl_frt_all, aIo => :g2_aIo)
+    condition_E75 = Dict(Io => 304000.0, qlpm => 0.55*1000*60*A_chnl_frt_all, aIo => :g2_aIo)
+    condition_E76 = Dict(Io => 304000.0, qlpm => 0.36*1000*60*A_chnl_frt_all, aIo => :g2_aIo)
+    condition_E77 = Dict(Io => 256000.0, qlpm => 1.10*1000*60*A_chnl_frt_all, aIo => :g3_aIo)
+    condition_E78 = Dict(Io => 256000.0, qlpm => 0.80*1000*60*A_chnl_frt_all, aIo => :g3_aIo)
+    condition_E79 = Dict(Io => 256000.0, qlpm => 0.64*1000*60*A_chnl_frt_all, aIo => :g3_aIo)
+    condition_E80 = Dict(Io => 256000.0, qlpm => 0.53*1000*60*A_chnl_frt_all, aIo => :g3_aIo)
+    condition_E81 = Dict(Io => 256000.0, qlpm => 0.36*1000*60*A_chnl_frt_all, aIo => :g3_aIo)
 
     simulation_conditions = Dict("E67" => condition_E67, "E68" => condition_E68,
         "E69" => condition_E69, 
@@ -481,7 +478,7 @@ end
 # ╔═╡ bc5bf598-46e5-4beb-a9b9-e23c75137fa1
 begin
 	hf = hfa * qlpm^hfn
-	eq1 = [D(Ts) ~ 1/((1-ε) * aCp * ρCp_s_0 * Vs) * (aIo*Io * A_frt - kins * (r_ins/r_H) * (Ts - Tins) * A_s_p / (r_ins - r_H) - h_ext * A_frt * (Ts - Tamb) - em * σ * A_frt * (Ts^4 - Tamb^4) - hf * A_exchange * (Ts - Tf)),
+	eq1 = [D(Ts) ~ 1/((1-ε) * aCp * (3290. * (0.27 + 0.135E-4 * Ts -9720.0 * Ts^-2 + 0.204E-7 * Ts^2)  * 4184) * Vs) * (aIo*Io * A_frt - kins * (r_ins/r_H) * (Ts - Tins) * A_s_p / (r_ins - r_H) - h_ext * A_frt * (Ts - Tamb) - em * σ * A_frt * (Ts^4 - Tamb^4) - hf * A_exchange * (Ts - Tf)),
 	D(Tf) ~ 1/(ε * (3.018 * exp(-0.00574*Tf) + 0.8063*exp(-0.0008381*Tf)) * Cpf * Vf) * (hf * A_exchange * (Ts - Tf) - mf * Cpf * (Tf - Tamb))
     ]
 
@@ -503,9 +500,6 @@ end
 # ╔═╡ a1127074-1338-4e12-8ded-bf43c4f32515
 sol = solve(prob);
 
-# ╔═╡ 7a997a1e-9731-4824-9f59-731ada97c83e
-plot(sol)
-
 # ╔═╡ 8063f54c-0256-4dd3-a0bf-7e2ea10cb671
 @bind slaIo Slider(0.8:0.05:1.5, show_value=true)
 
@@ -516,24 +510,17 @@ plot(sol)
 @bind slha Slider(1.:20., show_value=true)
 
 # ╔═╡ 1180068b-287b-4038-ac87-b689d42c8c98
-rmp = ModelingToolkit.varmap_to_vars([aCp => slaCp, aIo => slaIo , hfa => slha, hfn => 0, Io => 456000, Tins => 313., qlpm => 15.27], parameters(odes))
-
-# ╔═╡ b50df44c-f6ef-44b7-b477-0e4516540e6f
-begin
-	rmprob = remake(prob; p = rmp)
-	rmsol = solve(rmprob)
-	plot(rmsol, ylim=(270, 1000.), lw=2.)
-	plot!(E67t, E67Ts, label="ETs", ls=:dash)
-	plot!(E67t, E67Tf, label="ETf", ls=:dash)
-end
+rmp = ModelingToolkit.varmap_to_vars([aCp => slaCp, aIo => slaIo , hfa => slha, hfn => 0, Io => 456000, Tins => 313., qlpm => 16.47], parameters(odes))
 
 # ╔═╡ 634082dc-6050-42fc-a208-1a68802fe5da
 begin
-	_aIo = PEtabParameter(aIo, lb=0.7, ub=2., scale=:lin)
+	_g1_aIo = PEtabParameter(:g1_aIo, lb=0.7, ub=2., scale=:lin)
+	_g2_aIo = PEtabParameter(:g2_aIo, lb=0.7, ub=2., scale=:lin)
+	_g3_aIo = PEtabParameter(:g3_aIo, lb=0.7, ub=2., scale=:lin)
 	_hfa = PEtabParameter(hfa, lb=0.01, ub=20., scale=:lin)
 	_hfn = PEtabParameter(hfn, lb=0.1, ub=10., scale=:lin)
 	_aCp = PEtabParameter(aCp, lb=0.5, ub=5., scale=:lin)
-	params = [_aIo, _hfa, _hfn, _aCp]
+	params = [_g1_aIo, _g2_aIo, _g3_aIo, _hfa, _hfn, _aCp]
 	obs_Ts = PEtabObservable(Ts, 0.5)
 	obs_Tf = PEtabObservable(Tf, 0.5)
 	observables = Dict("obs_Tf" => obs_Tf)
@@ -544,7 +531,7 @@ end
 # ╔═╡ 4cb05ead-4ff7-4049-a5d5-c6618650d60c
 begin
 	p0 = generate_startguesses(petab_problem, 1)
-	res = calibrate_model(petab_problem, [1., 1., 1., 1.], Optim.LBFGS(), options=Optim.Options(iterations = 1000, time_limit=90))
+	res = calibrate_model(petab_problem, [1., 1., 1., 1., 1., 1.], Optim.LBFGS(), options=Optim.Options(iterations = 1000, time_limit=90))
 	#res = calibrate_model_multistart(petab_problem, IpoptOptimiser(false), 10)
 end
 
@@ -567,8 +554,76 @@ end
 # ╔═╡ af38678f-b6b8-42ad-be75-9455ea41edc3
 pnew = get_ps(res, petab_problem, condition_id = casesim)
 
+# ╔═╡ b78293e0-a118-4575-be93-a3a1c7b9b0fd
+begin
+	Tend_m = []
+	Tend_e = []
+	cond = []
+	df_bar = DataFrame(simcond=[], me=[], T=[])
+	for (k,v) in simulation_conditions
+		simcond = k
+		sim_sol = get_odesol(res, petab_problem; condition_id=simcond)
+		Temp_m = sim_sol[Tf][end]
+		push!(Tend_m, Temp_m)
+		Temp_e = subset(measurements, :simulation_id => ByRow(==(simcond)))[!, :measurement][end]
+		push!(Tend_e, Temp_e)
+		push!(cond, simcond)
+		append!(df_bar, DataFrame(simcond=simcond, me="m", T=Temp_m))
+		append!(df_bar, DataFrame(simcond=simcond, me="e", T=Temp_e))
+	end
+end
+
+# ╔═╡ 8ad40098-80a4-4a44-811d-d94b68c6980e
+# ╠═╡ disabled = true
+#=╠═╡
+
+begin
+	using StatsPlots
+	bar(cond, [Tend_m, Tend_e])
+	groupedbar(cond, [Tend_m, Tend_e], bar_position = :dodge, bar_width=0.7)
+
+end
+  ╠═╡ =#
+
+# ╔═╡ 3f7ecdc3-b35e-4cc7-8a37-4576cd0f02b9
+#=╠═╡
+plotly()
+  ╠═╡ =#
+
+# ╔═╡ 7a997a1e-9731-4824-9f59-731ada97c83e
+#=╠═╡
+plot(sol)
+  ╠═╡ =#
+
+# ╔═╡ b50df44c-f6ef-44b7-b477-0e4516540e6f
+#=╠═╡
+begin
+	rmprob = remake(prob; p = rmp)
+	rmsol = solve(rmprob)
+	plot(rmsol, ylim=(270, 1000.), lw=2.)
+	plot!(E67t, E67Ts, label="ETs", ls=:dash)
+	plot!(E67t, E67Tf, label="ETf", ls=:dash)
+end
+  ╠═╡ =#
+
 # ╔═╡ e2613b68-6e5c-44dd-a631-65a367726753
+#=╠═╡
 plot(res, petab_problem; observable_ids=["obs_Tf"], condition_id=casesim, ylim=(300, 1000), ylabel = "Temperature (K)", xlabel = "Time (s)")
+  ╠═╡ =#
+
+# ╔═╡ 0eb4b057-48c2-4f77-9be9-adace62a9544
+Tend_e
+
+# ╔═╡ ba1368c9-8cff-4c43-8d21-93e657bfc9bd
+
+
+# ╔═╡ 8fdb601b-55f4-477c-8160-0faa678e9ed1
+#=╠═╡
+begin
+	scatter(Tend_e, Tend_m)
+	plot!([500, 800], [500, 800])
+end
+  ╠═╡ =#
 
 # ╔═╡ Cell order:
 # ╠═8c28c8d1-dd57-4a04-9121-cbfed404d824
@@ -600,3 +655,8 @@ plot(res, petab_problem; observable_ids=["obs_Tf"], condition_id=casesim, ylim=(
 # ╠═de7b5502-6578-4fb4-9490-a0896bb379b4
 # ╠═af38678f-b6b8-42ad-be75-9455ea41edc3
 # ╠═e2613b68-6e5c-44dd-a631-65a367726753
+# ╠═b78293e0-a118-4575-be93-a3a1c7b9b0fd
+# ╠═0eb4b057-48c2-4f77-9be9-adace62a9544
+# ╠═8ad40098-80a4-4a44-811d-d94b68c6980e
+# ╠═ba1368c9-8cff-4c43-8d21-93e657bfc9bd
+# ╠═8fdb601b-55f4-477c-8160-0faa678e9ed1
