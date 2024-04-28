@@ -22,7 +22,6 @@ end
 
 # ╔═╡ 86c7df59-4f03-4730-9cbf-72d8fc7c34bd
 begin
-	Pkg.instantiate()
 	using ModelingToolkit, DifferentialEquations, Plots
 	#using ModelingToolkit: t_nounits as t, D_nounits as D
 	using PEtab, XLSX, Statistics, DataFrames
@@ -482,14 +481,14 @@ end
 # ╔═╡ bc5bf598-46e5-4beb-a9b9-e23c75137fa1
 begin
 	hf = hfa * qlpm^hfn
-	eq1 = [D(Ts) ~ 1/((1-ε) * ρCp_s_0 * Vs) * (aIo*ab*Io * A_frt - kins * (r_ins/r_H) * (Ts - Tins) * A_s_p / (r_ins - r_H) - h_ext * A_frt * (Ts - Tamb) - em * σ * A_frt * (Ts^4 - Tamb^4) - hf * A_exchange *(Ts - Tf)),
-	D(Tf) ~ 1/(ε * (3.018 * exp(-0.00574*Tf) + 0.8063*exp(-0.0008381*Tf)) * Cpf * Vf) * (hf * A_exchange *(Ts - Tf) - mf * Cpf * (Tf - Tamb))
+	eq1 = [D(Ts) ~ 1/((1-ε) * ρCp_s_0 * Vs) * (aIo*Io * A_frt - kins * (r_ins/r_H) * (Ts - Tins) * A_s_p / (r_ins - r_H) - h_ext * A_frt * (Ts - Tamb) - em * σ * A_frt * (Ts^4 - Tamb^4) - hf * A_exchange * (Ts - Tf)),
+	D(Tf) ~ 1/(ε * (3.018 * exp(-0.00574*Tf) + 0.8063*exp(-0.0008381*Tf)) * Cpf * Vf) * (hf * A_exchange * (Ts - Tf) - mf * Cpf * (Tf - Tamb))
     ]
 
 	u0 = [Ts => Tamb, Tf => Tamb]
 
-	state_param = [qlpm => 10.54, Io =>456. *1e3, Tins=>(40. + 273.15)]
-	fit_param = [aIo => 1., hfa => 1., hfn =>1.]
+	state_param = [qlpm => 15.27, Io =>456. *1e3, Tins=>(40. + 273.15)]
+	fit_param = [aIo => 1., hfa => 8., hfn =>0.66]
 	p = vcat(state_param, fit_param)
 	tspan = (0, 3600.)
 end
@@ -508,13 +507,13 @@ sol = solve(prob);
 plot(sol)
 
 # ╔═╡ 8063f54c-0256-4dd3-a0bf-7e2ea10cb671
-@bind slaIo Slider(0.8:0.05:1.2, show_value=true)
+@bind slaIo Slider(0.8:0.05:1.5, show_value=true)
 
 # ╔═╡ 37d17dae-3718-4a8a-bad4-407e6f4b4978
 @bind slha Slider(1.:20., show_value=true)
 
 # ╔═╡ 1180068b-287b-4038-ac87-b689d42c8c98
-rmp = ModelingToolkit.varmap_to_vars([aIo => slaIo , hfa => slha, hfn => 0, Io => 456000, Tins => 313., qlpm => 10.54], parameters(odes))
+rmp = ModelingToolkit.varmap_to_vars([aIo => slaIo , hfa => slha, hfn => 0, Io => 456000, Tins => 313., qlpm => 15.27], parameters(odes))
 
 # ╔═╡ b50df44c-f6ef-44b7-b477-0e4516540e6f
 begin
