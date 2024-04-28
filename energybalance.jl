@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.38
+# v0.19.41
 
 using Markdown
 using InteractiveUtils
@@ -46,7 +46,7 @@ plotly()
 
 # ╔═╡ 2eb83c61-2ea3-4120-9a55-3e0b66e279bb
 begin
-	@parameters hfa hfn aIo#to be fitted
+	@parameters aCp hfa hfn aIo#to be fitted
 	@parameters qlpm Io Tins #varying conditions
 	@variables t Tf(t) Ts(t)
 	D = Differential(t)
@@ -55,7 +55,7 @@ end
 # ╔═╡ 2c50a54e-96bd-4f48-ae7f-33cbface0754
 #Exp. data to extract temp.
 begin
-	starttime = 2000
+	starttime = 1
 	path = "./aysha/SolarSimulator/EXCEL/"
     #Exp 67 - T3, T8
     Z = XLSX.readxlsx(path*"Data_FPT0067_231125_161757.xlsx")["Sheet 1 - Data_FPT0067_231125_1"]["A3:C3932"]
@@ -409,11 +409,11 @@ begin
         "E69" => condition_E69, 
 		"E70" => condition_E70,
         "E71" => condition_E71, "E72" => condition_E72,
-        "E73" => condition_E73), "E74" => condition_E74,
+        "E73" => condition_E73, "E74" => condition_E74,
         "E75" => condition_E75, "E76" => condition_E76,
         "E77" => condition_E77, "E78" => condition_E78,
         "E79" => condition_E79, "E80" => condition_E80,
-        "E81" => condition_E81
+        "E81" => condition_E81)
 
 	measurements = DataFrame(simulation_id = "E67", obs_id="obs_Tf", time = E67t, measurement = E67Tf)
 		#meas = DataFrame(simulation_id = "E67", obs_id="obs_Ts", time = E67t, measurement = E67Ts)
@@ -481,14 +481,14 @@ end
 # ╔═╡ bc5bf598-46e5-4beb-a9b9-e23c75137fa1
 begin
 	hf = hfa * qlpm^hfn
-	eq1 = [D(Ts) ~ 1/((1-ε) * ρCp_s_0 * Vs) * (aIo*Io * A_frt - kins * (r_ins/r_H) * (Ts - Tins) * A_s_p / (r_ins - r_H) - h_ext * A_frt * (Ts - Tamb) - em * σ * A_frt * (Ts^4 - Tamb^4) - hf * A_exchange * (Ts - Tf)),
+	eq1 = [D(Ts) ~ 1/((1-ε) * aCp * ρCp_s_0 * Vs) * (aIo*Io * A_frt - kins * (r_ins/r_H) * (Ts - Tins) * A_s_p / (r_ins - r_H) - h_ext * A_frt * (Ts - Tamb) - em * σ * A_frt * (Ts^4 - Tamb^4) - hf * A_exchange * (Ts - Tf)),
 	D(Tf) ~ 1/(ε * (3.018 * exp(-0.00574*Tf) + 0.8063*exp(-0.0008381*Tf)) * Cpf * Vf) * (hf * A_exchange * (Ts - Tf) - mf * Cpf * (Tf - Tamb))
     ]
 
 	u0 = [Ts => Tamb, Tf => Tamb]
 
 	state_param = [qlpm => 15.27, Io =>456. *1e3, Tins=>(40. + 273.15)]
-	fit_param = [aIo => 1., hfa => 8., hfn =>0.66]
+	fit_param = [aCp => 1., aIo => 1., hfa => 8., hfn =>0.66]
 	p = vcat(state_param, fit_param)
 	tspan = (0, 3600.)
 end
@@ -509,11 +509,14 @@ plot(sol)
 # ╔═╡ 8063f54c-0256-4dd3-a0bf-7e2ea10cb671
 @bind slaIo Slider(0.8:0.05:1.5, show_value=true)
 
+# ╔═╡ 1485b13d-ab99-467f-9eb0-57db2a7f6c07
+@bind slaCp Slider(0.8:0.05:5, show_value=true)
+
 # ╔═╡ 37d17dae-3718-4a8a-bad4-407e6f4b4978
 @bind slha Slider(1.:20., show_value=true)
 
 # ╔═╡ 1180068b-287b-4038-ac87-b689d42c8c98
-rmp = ModelingToolkit.varmap_to_vars([aIo => slaIo , hfa => slha, hfn => 0, Io => 456000, Tins => 313., qlpm => 15.27], parameters(odes))
+rmp = ModelingToolkit.varmap_to_vars([aCp => slaCp, aIo => slaIo , hfa => slha, hfn => 0, Io => 456000, Tins => 313., qlpm => 15.27], parameters(odes))
 
 # ╔═╡ b50df44c-f6ef-44b7-b477-0e4516540e6f
 begin
@@ -529,7 +532,8 @@ begin
 	_aIo = PEtabParameter(aIo, lb=0.7, ub=2., scale=:lin)
 	_hfa = PEtabParameter(hfa, lb=0.01, ub=20., scale=:lin)
 	_hfn = PEtabParameter(hfn, lb=0.1, ub=10., scale=:lin)
-	params = [_aIo, _hfa, _hfn]
+	_aCp = PEtabParameter(aCp, lb=0.5, ub=5., scale=:lin)
+	params = [_aIo, _hfa, _hfn, _aCp]
 	obs_Ts = PEtabObservable(Ts, 0.5)
 	obs_Tf = PEtabObservable(Tf, 0.5)
 	observables = Dict("obs_Tf" => obs_Tf)
@@ -540,7 +544,7 @@ end
 # ╔═╡ 4cb05ead-4ff7-4049-a5d5-c6618650d60c
 begin
 	p0 = generate_startguesses(petab_problem, 1)
-	res = calibrate_model(petab_problem, [1., 1., 1.], Optim.LBFGS(), options=Optim.Options(iterations = 1000, time_limit=90))
+	res = calibrate_model(petab_problem, [1., 1., 1., 1.], Optim.LBFGS(), options=Optim.Options(iterations = 1000, time_limit=90))
 	#res = calibrate_model_multistart(petab_problem, IpoptOptimiser(false), 10)
 end
 
@@ -586,6 +590,7 @@ plot(res, petab_problem; observable_ids=["obs_Tf"], condition_id=casesim, ylim=(
 # ╠═a1127074-1338-4e12-8ded-bf43c4f32515
 # ╠═7a997a1e-9731-4824-9f59-731ada97c83e
 # ╠═8063f54c-0256-4dd3-a0bf-7e2ea10cb671
+# ╠═1485b13d-ab99-467f-9eb0-57db2a7f6c07
 # ╠═37d17dae-3718-4a8a-bad4-407e6f4b4978
 # ╠═1180068b-287b-4038-ac87-b689d42c8c98
 # ╠═b50df44c-f6ef-44b7-b477-0e4516540e6f
