@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.41
+# v0.19.38
 
 using Markdown
 using InteractiveUtils
@@ -22,28 +22,32 @@ end
 
 # ╔═╡ 86c7df59-4f03-4730-9cbf-72d8fc7c34bd
 begin
+	Pkg.resolve()
 	using ModelingToolkit, DifferentialEquations, Plots
 	#using ModelingToolkit: t_nounits as t, D_nounits as D
 	using PEtab, XLSX, Statistics, DataFrames
-	using PlutoUI
+	using PlutoUI, StatsPlots
 	using Optimization, Optim, Ipopt, OptimizationNLopt
 end
 
 # ╔═╡ 8c28c8d1-dd57-4a04-9121-cbfed404d824
 html"""<style>
 main {
-    max-width: 75%;
+    max-width: 70%;
     margin-left: 1%;
-    margin-right: 25% !important;
+    margin-right: 30% !important;
 }
 """
 
 # ╔═╡ 232f4256-2095-470e-a669-216e1642c374
 Pkg.status()
 
+# ╔═╡ 3f7ecdc3-b35e-4cc7-8a37-4576cd0f02b9
+plotly()
+
 # ╔═╡ 2eb83c61-2ea3-4120-9a55-3e0b66e279bb
 begin
-	@parameters aCp hfa hfn aIo#to be fitted
+	@parameters aCp A B C aIo #to be fitted
 	@parameters qlpm Io Tins #varying conditions
 	@variables t Tf(t) Ts(t)
 	D = Differential(t)
@@ -326,26 +330,40 @@ begin
 	th_s = 0.4e-3 #m
     th_f = 0.7e-3 #m
     w_t = 19.e-3 #m
+	Lc = 4 * (w_t * w_t) / (4 * w_t) #m
+	w_chnl = 1.5e-3 #m
+	h_ext = 10 #W/m2.K natural convection
+    kins = 0.078 #W/m*K thermal conductivity of insulation
+    r_H_chnl = 4 * (w_chnl * w_chnl) / (4 * w_chnl) #hydraulic channel diameter
+    r_H = 4 * (w_t * w_t) / (4 * w_t) #hydraulic receiver diameter
+    r_ins1 = 23e-3
+	r_ins2 = 42e-3 #m location of insulation thermocouple
+	r_ins3 = 65e-3
     A_frt = w_t * w_t #m2 - for the whole receiver (19x19mm2)
     A_s_p = w_t * L * 4 #total area solid periphery m2
-    w_chnl = 1.5e-3 #m
+	A_ins = π*(r_ins1)^2
     A_chnl_p = w_chnl * L * 4  #m2 channel periphery
 	A_chnl_frt = w_chnl * w_chnl #m2 channel front
 	n_chnl = 10*10
-    A_exchange = A_chnl_p * n_chnl #m2 - contact area between fluid and solid
+    #A_exchange = A_chnl_p * n_chnl #m2 - contact area between fluid and solid
 	A_chnl_frt_all = A_chnl_frt * n_chnl #m2 all frontal area of channels
-    #Vs = A_frt * L 
-	#Vf = n_chnl * A_chnl_frt * L 
-	Af =  (w_chnl - (th_s * 2))^2 * n_chnl #m2 - fluid area
-	Vf = Af * L #m3
-	As = A_chnl_frt_all - Af #m2 - solid area
-	Vs = As * L #m3
-    #Vf = n_chnl * A_chnl_frt * L #* deltax
-	ε = Vf / Vs #porosity
+    Vs =  A_frt * L #m3
+	Vf = n_chnl * A_chnl_frt * L #m3
+	Af = n_chnl * A_chnl_frt #m2
+	#Af =  (w_chnl - (th_s * 2))^2 * n_chnl #m2 - fluid area
+	#Vs = (w_chnl + 2 * th_s)^2 * L #m3
+	#As = A_chnl_frt_all - Af #m2 - solid area
+	#ε = Vf / Vs  #porosity
+	ε = ((w_chnl)^2 * L) /  ((w_chnl+(2*th_s))^2 * L)
+	Av = (4 * w_chnl * L) / ((w_chnl + th_s)^2 * L) #1/m
+	Vi = w_chnl^2 * L * n_chnl
+	A_exchange = Av * Vi #m2
+	dh = 4 * ε / Av
     q = qlpm / 1000 / 60 #m3/s
-    ρf = 1. #kg/m3
+    ρf = 1. #kg/m3 at lab conditions
 	mf = q * ρf #kg/s
-    
+	ρf2 = 0.5 #kg/m3 # at high temp.
+	kf = 0.056 #W/m.K
     em = 0.8
 	ab = 0.8
     σ = 5.17e-8 #W/m2.K^4 Stefan-Boltzmann constant
@@ -356,23 +374,31 @@ begin
 	ks_0 = 0.1165 * 4184 #W/m.K
 	hf_0 = 500 #W/m2.K
     μ = 2.0921e-5 #Pa.s
-          
-    h_ext = 10 #W/m2.K natural convection
-    kins = 0.078 #W/m*K thermal conductivity of insulation
-    r_H_chnl = 4 * (w_chnl * w_chnl) / (4 * w_chnl) #hydraulic channel diameter
-    r_H = 4 * (w_t * w_t) / (4 * w_t) #hydraulic receiver diameter
-    r_ins = 42e-3 #m location of insulation thermocouple
+    
 end;
+
+# ╔═╡ a94a8bd4-00f5-47db-816e-77a8e75b8ee0
+A_exchange
+
+# ╔═╡ c253cc70-ce35-4ba6-a22f-c6de75b826db
+Av
+
+# ╔═╡ 644d36c5-70e9-4f1d-88f3-52859a24e5d0
+A_ins
 
 # ╔═╡ 3b6fa5a1-f5ba-4e48-ba8d-0e11315fae5d
 ε
+
+# ╔═╡ 01553e7d-e33a-4bac-98d0-7669f410d637
+dh
 
 # ╔═╡ 77c3135c-6534-49a6-8ad3-4c22a2495f71
 r_H*1000
 
 # ╔═╡ d71c355c-891e-4195-a482-652749bbb5cc
 begin
-	ρCp_sf(T) = 3290. * (0.27 + 0.135E-4 * T -9720.0 * T^-2 + 0.204E-7 * T^2)  * 4184
+	ρCp_sf(T) = 3200. * (0.27 + 0.135E-4 * T -9720.0 * T^-2 + 0.204E-7 * T^2)  * 4187
+	# Cp_sf(T) = (0.27+(0.135e-4)*(T)-9720*((T)^-2)+(0.204e-7)*(T)^2) * 4169
 	@register_symbolic ρCp_sf(T)  #kg/m3 * J/kg.K 
 	ρf_f(T)= 3.018 * exp(-0.00574*T) + 0.8063*exp(-0.0008381*T) #kg/m3 (Roldan et al.)
 	@register_symbolic ρf_f(T)  #kg/m3 * J/kg.K 
@@ -383,24 +409,43 @@ begin
 	#plot(Tx, ρf_f.(Tx))
 end
 
+# ╔═╡ 763c37a2-1169-4ada-8a87-3dd62f0f5ff4
+Cps = ρCp_sf(2200)/3200
+
 # ╔═╡ 8f9afcbf-5a98-4709-b763-844b058d155e
 #measurements and conditions#Defining simulation conditions
 begin
-    condition_E67 = Dict(Io => 456000.0, qlpm => 1.22*1000*60*A_chnl_frt_all, aIo => :g1_aIo)
-    condition_E68 = Dict(Io => 456000.0, qlpm => 1.00*1000*60*A_chnl_frt_all, aIo => :g1_aIo)
-    condition_E69 = Dict(Io => 456000.0, qlpm => 0.84*1000*60*A_chnl_frt_all, aIo => :g1_aIo)
-    condition_E70 = Dict(Io => 456000.0, qlpm => 0.73*1000*60*A_chnl_frt_all, aIo => :g1_aIo)
-    condition_E71 = Dict(Io => 456000.0, qlpm => 0.57*1000*60*A_chnl_frt_all, aIo => :g1_aIo)
-    condition_E72 = Dict(Io => 304000.0, qlpm => 1.46*1000*60*A_chnl_frt_all, aIo => :g2_aIo)
-    condition_E73 = Dict(Io => 304000.0, qlpm => 1.05*1000*60*A_chnl_frt_all, aIo => :g2_aIo)
-    condition_E74 = Dict(Io => 304000.0, qlpm => 0.72*1000*60*A_chnl_frt_all, aIo => :g2_aIo)
-    condition_E75 = Dict(Io => 304000.0, qlpm => 0.55*1000*60*A_chnl_frt_all, aIo => :g2_aIo)
-    condition_E76 = Dict(Io => 304000.0, qlpm => 0.36*1000*60*A_chnl_frt_all, aIo => :g2_aIo)
-    condition_E77 = Dict(Io => 256000.0, qlpm => 1.10*1000*60*A_chnl_frt_all, aIo => :g3_aIo)
-    condition_E78 = Dict(Io => 256000.0, qlpm => 0.80*1000*60*A_chnl_frt_all, aIo => :g3_aIo)
-    condition_E79 = Dict(Io => 256000.0, qlpm => 0.64*1000*60*A_chnl_frt_all, aIo => :g3_aIo)
-    condition_E80 = Dict(Io => 256000.0, qlpm => 0.53*1000*60*A_chnl_frt_all, aIo => :g3_aIo)
-    condition_E81 = Dict(Io => 256000.0, qlpm => 0.36*1000*60*A_chnl_frt_all, aIo => :g3_aIo)
+    condition_E67 = Dict(Io => 456000.0, qlpm => 15.27, aIo => :g1_aIo)
+    condition_E68 = Dict(Io => 456000.0, qlpm => 12.50, aIo => :g1_aIo)
+    condition_E69 = Dict(Io => 456000.0, qlpm => 10.50, aIo => :g1_aIo)
+    condition_E70 = Dict(Io => 456000.0, qlpm => 9.10, aIo => :g1_aIo)
+    condition_E71 = Dict(Io => 456000.0, qlpm => 7.12, aIo => :g1_aIo)
+    condition_E72 = Dict(Io => 304000.0, qlpm => 18.34, aIo => :g2_aIo)
+    condition_E73 = Dict(Io => 304000.0, qlpm => 13.16, aIo => :g2_aIo)
+    condition_E74 = Dict(Io => 304000.0, qlpm => 9.03, aIo => :g2_aIo)
+    condition_E75 = Dict(Io => 304000.0, qlpm => 6.95, aIo => :g2_aIo)
+    condition_E76 = Dict(Io => 304000.0, qlpm => 4.53, aIo => :g2_aIo)
+    condition_E77 = Dict(Io => 256000.0, qlpm => 13.85, aIo => :g3_aIo)
+    condition_E78 = Dict(Io => 256000.0, qlpm => 10.02, aIo => :g3_aIo)
+    condition_E79 = Dict(Io => 256000.0, qlpm => 8.04, aIo => :g3_aIo)
+    condition_E80 = Dict(Io => 256000.0, qlpm => 6.62, aIo => :g3_aIo)
+    condition_E81 = Dict(Io => 256000.0, qlpm => 4.53, aIo => :g3_aIo)
+
+	# condition_E67 = Dict(Io => 456000.0, qlpm => 1.22*1000*60*A_chnl_frt_all, aIo => :g1_aIo)
+ #    condition_E68 = Dict(Io => 456000.0, qlpm => 1.00*1000*60*A_chnl_frt_all, aIo => :g1_aIo)
+ #    condition_E69 = Dict(Io => 456000.0, qlpm => 0.84*1000*60*A_chnl_frt_all, aIo => :g1_aIo)
+ #    condition_E70 = Dict(Io => 456000.0, qlpm => 0.73*1000*60*A_chnl_frt_all, aIo => :g1_aIo)
+ #    condition_E71 = Dict(Io => 456000.0, qlpm => 0.57*1000*60*A_chnl_frt_all, aIo => :g1_aIo)
+ #    condition_E72 = Dict(Io => 304000.0, qlpm => 1.46*1000*60*A_chnl_frt_all, aIo => :g2_aIo)
+ #    condition_E73 = Dict(Io => 304000.0, qlpm => 1.05*1000*60*A_chnl_frt_all, aIo => :g2_aIo)
+ #    condition_E74 = Dict(Io => 304000.0, qlpm => 0.72*1000*60*A_chnl_frt_all, aIo => :g2_aIo)
+ #    condition_E75 = Dict(Io => 304000.0, qlpm => 0.55*1000*60*A_chnl_frt_all, aIo => :g2_aIo)
+ #    condition_E76 = Dict(Io => 304000.0, qlpm => 0.36*1000*60*A_chnl_frt_all, aIo => :g2_aIo)
+ #    condition_E77 = Dict(Io => 256000.0, qlpm => 1.10*1000*60*A_chnl_frt_all, aIo => :g3_aIo)
+ #    condition_E78 = Dict(Io => 256000.0, qlpm => 0.80*1000*60*A_chnl_frt_all, aIo => :g3_aIo)
+ #    condition_E79 = Dict(Io => 256000.0, qlpm => 0.64*1000*60*A_chnl_frt_all, aIo => :g3_aIo)
+ #    condition_E80 = Dict(Io => 256000.0, qlpm => 0.53*1000*60*A_chnl_frt_all, aIo => :g3_aIo)
+ #    condition_E81 = Dict(Io => 256000.0, qlpm => 0.36*1000*60*A_chnl_frt_all, aIo => :g3_aIo)
 
     simulation_conditions = Dict("E67" => condition_E67, "E68" => condition_E68,
         "E69" => condition_E69, 
@@ -475,17 +520,28 @@ end
 # ╔═╡ be19295e-483d-4655-8e8e-55eb349c9958
 1.22*1000*60*A_chnl_frt_all
 
+# ╔═╡ 3e44b5ad-ca49-4799-aa9d-af1df817430c
+qlpm/(1000*60*A_chnl_frt_all)
+
 # ╔═╡ bc5bf598-46e5-4beb-a9b9-e23c75137fa1
 begin
-	hf = hfa * qlpm^hfn
-	eq1 = [D(Ts) ~ 1/((1-ε) * aCp * (3290. * (0.27 + 0.135E-4 * Ts -9720.0 * Ts^-2 + 0.204E-7 * Ts^2)  * 4184) * Vs) * (aIo*Io * A_frt - kins * (r_ins/r_H) * (Ts - Tins) * A_s_p / (r_ins - r_H) - h_ext * A_frt * (Ts - Tamb) - em * σ * A_frt * (Ts^4 - Tamb^4) - hf * A_exchange * (Ts - Tf)),
+	#hf = hfa * qlpm^hfn
+	
+	Re = ρf * (qlpm/(1000*60*A_chnl_frt_all)) * dh / μ
+	Pr = (Cpf * μ) / kf
+	Gz = Lc * Re * Pr/ L #last position point L=x since model is lumped
+	#Nu = A * (1+(B*((Gz)^n)*exp(-C/Gz)))
+	#Nu = hfa * (Re^hfb) * (Pr^hfn)
+	Nu = A * (Re^B) * (Pr^C)
+	hf = Nu * kf/ dh
+	eq1 = [D(Ts) ~ 1/((1-ε) * aCp * (3200. * (0.27 + 0.135E-4 * Ts -9720.0 * Ts^-2 + 0.204E-7 * Ts^2)  * 4187) * Vs) * (aIo*Io * A_frt - (kins * (r_ins2/r_ins1) * (Ts - Tins) * A_ins / (r_ins2 - r_ins1)) - h_ext * A_frt * (Ts - Tamb) - em * σ * A_frt * (Ts^4 - Tamb^4) - hf * A_exchange * (Ts - Tf)),
 	D(Tf) ~ 1/(ε * (3.018 * exp(-0.00574*Tf) + 0.8063*exp(-0.0008381*Tf)) * Cpf * Vf) * (hf * A_exchange * (Ts - Tf) - mf * Cpf * (Tf - Tamb))
     ]
 
 	u0 = [Ts => Tamb, Tf => Tamb]
 
-	state_param = [qlpm => 15.27, Io =>456. *1e3, Tins=>(40. + 273.15)]
-	fit_param = [aCp => 1., aIo => 1., hfa => 8., hfn =>0.66]
+	state_param = [qlpm => 15.27, Io => 456. *1e3, Tins=>(40. + 273.15)]
+	fit_param = [aCp => 1., aIo => 1., A => 69.9, B => 0.352, C => 6.5]
 	p = vcat(state_param, fit_param)
 	tspan = (0, 3600.)
 end
@@ -500,6 +556,9 @@ end
 # ╔═╡ a1127074-1338-4e12-8ded-bf43c4f32515
 sol = solve(prob);
 
+# ╔═╡ 7a997a1e-9731-4824-9f59-731ada97c83e
+plot(sol)
+
 # ╔═╡ 8063f54c-0256-4dd3-a0bf-7e2ea10cb671
 @bind slaIo Slider(0.8:0.05:1.5, show_value=true)
 
@@ -510,17 +569,32 @@ sol = solve(prob);
 @bind slha Slider(1.:20., show_value=true)
 
 # ╔═╡ 1180068b-287b-4038-ac87-b689d42c8c98
-rmp = ModelingToolkit.varmap_to_vars([aCp => slaCp, aIo => slaIo , hfa => slha, hfn => 0, Io => 456000, Tins => 313., qlpm => 16.47], parameters(odes))
+# rmp = ModelingToolkit.varmap_to_vars([aCp => slaCp, aIo => slaIo , hfa => slha, hfb => 0., hfn => 0., Io => 456000, Tins => 313., qlpm => 16.47], parameters(odes))
+rmp = ModelingToolkit.varmap_to_vars([aCp => slaCp, aIo => slaIo , A => 8., B => 0.1, C => 60., Io => 456000, Tins => 313., qlpm => 16.47], parameters(odes))
+
+# ╔═╡ b50df44c-f6ef-44b7-b477-0e4516540e6f
+begin
+	rmprob = remake(prob; p = rmp)
+	rmsol = solve(rmprob)
+	plot(rmsol, ylim=(270, 1000.), lw=2.)
+	plot!(E67t, E67Ts, label="ETs", ls=:dash)
+	plot!(E67t, E67Tf, label="ETf", ls=:dash)
+end
 
 # ╔═╡ 634082dc-6050-42fc-a208-1a68802fe5da
 begin
 	_g1_aIo = PEtabParameter(:g1_aIo, lb=0.7, ub=2., scale=:lin)
 	_g2_aIo = PEtabParameter(:g2_aIo, lb=0.7, ub=2., scale=:lin)
 	_g3_aIo = PEtabParameter(:g3_aIo, lb=0.7, ub=2., scale=:lin)
-	_hfa = PEtabParameter(hfa, lb=0.01, ub=20., scale=:lin)
-	_hfn = PEtabParameter(hfn, lb=0.1, ub=10., scale=:lin)
-	_aCp = PEtabParameter(aCp, lb=0.5, ub=5., scale=:lin)
-	params = [_g1_aIo, _g2_aIo, _g3_aIo, _hfa, _hfn, _aCp]
+	# _hfa = PEtabParameter(hfa, lb=0.01, ub=20., scale=:lin)
+	# _hfb = PEtabParameter(hfb, lb=0.1, ub=10., scale=:lin)
+	# _hfn = PEtabParameter(hfn, lb=0.01, ub=10., scale=:lin)
+	_A = PEtabParameter(A, lb=0.01, ub=50., scale=:lin)
+	_B = PEtabParameter(B, lb=0.01, ub=100., scale=:lin)
+	# _n = PEtabParameter(n, lb=0.01, ub=5., scale=:lin)
+	_C = PEtabParameter(C, lb=0.01, ub=200., scale=:lin)
+	_aCp = PEtabParameter(aCp, lb=0.5, ub=4., scale=:lin)
+	params = [_g1_aIo, _g2_aIo, _g3_aIo, _A, _B, _C, _aCp]
 	obs_Ts = PEtabObservable(Ts, 0.5)
 	obs_Tf = PEtabObservable(Tf, 0.5)
 	observables = Dict("obs_Tf" => obs_Tf)
@@ -531,7 +605,7 @@ end
 # ╔═╡ 4cb05ead-4ff7-4049-a5d5-c6618650d60c
 begin
 	p0 = generate_startguesses(petab_problem, 1)
-	res = calibrate_model(petab_problem, [1., 1., 1., 1., 1., 1.], Optim.LBFGS(), options=Optim.Options(iterations = 1000, time_limit=90))
+	res = calibrate_model(petab_problem, [1., 1., 1., 1., 1., 1., 1.], Optim.LBFGS(), options=Optim.Options(iterations = 1000, time_limit=90))
 	#res = calibrate_model_multistart(petab_problem, IpoptOptimiser(false), 10)
 end
 
@@ -545,6 +619,12 @@ begin
 end
   ╠═╡ =#
 
+# ╔═╡ add4c024-8c97-4ff8-9fe2-43d22b24c5e6
+Pr
+
+# ╔═╡ 8f110eaa-232f-4739-b1e1-d740832e919c
+Re
+
 # ╔═╡ de7b5502-6578-4fb4-9490-a0896bb379b4
 begin
 	all_cond = [k for (k,v) in simulation_conditions]
@@ -553,6 +633,9 @@ end
 
 # ╔═╡ af38678f-b6b8-42ad-be75-9455ea41edc3
 pnew = get_ps(res, petab_problem, condition_id = casesim)
+
+# ╔═╡ e2613b68-6e5c-44dd-a631-65a367726753
+plot(res, petab_problem; observable_ids=["obs_Tf"], condition_id=casesim, ylim=(300, 850), ylabel = "Temperature (K)", xlabel = "Time (s)")
 
 # ╔═╡ b78293e0-a118-4575-be93-a3a1c7b9b0fd
 begin
@@ -573,10 +656,60 @@ begin
 	end
 end
 
+# ╔═╡ 78264642-e4db-477a-ae15-80a9a086c31b
+Tend_m
+
+# ╔═╡ 9c2359ca-0956-4a9a-8706-ab96824ba35e
+df_bar
+
+# ╔═╡ af72a10b-bf37-45b3-8593-b57e4bf2ef24
+Tend_e
+
+# ╔═╡ e884b556-79a6-4cf4-a09b-0d3afe2489f8
+begin
+
+Tend_model = [726.56, 760.764, 769.829, 766.411, 737.15, 609.797, 677.812, 705.514, 685.29, 613.815, 508.378, 556.195, 564.398, 563.821, 531.047]
+Tend_exp = [763.414, 773.207, 769.76, 779.518, 753.56, 652.955, 694.626, 
+697.672, 681.066, 647.019, 525.356, 554.455, 560.033, 561.254, 550.499]
+
+# Define the group labels
+labels = ["E67", "E68", "E69","E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
+
+
+# Plot the grouped bar chart
+groupedbar([Tend_exp Tend_model], bar_position = :dodge, bar_width=0.5, xticks=(1:15, labels), label=["Experimental T" "Model T"], xlabel="Experimental Runs", ylabel="Temperature (K)", title="Air Outlet Temperature")
+end
+
+# ╔═╡ 4fd3723a-531f-4f09-8806-458e5b33f629
+begin
+	# Initialize an empty array to store relative errors
+	rel_errors = []
+	
+	# Loop through each pair of corresponding values in Tend_model and Tend_exp
+	for i in 1:length(Tend_model)
+	    rel_error = (Tend_model[i] - Tend_exp[i]) * 100/ Tend_exp[i]
+	    push!(rel_errors, rel_error)
+	end
+	
+	# Print the relative errors
+	println("Relative Errors:")
+	for (i, rel_error) in enumerate(rel_errors)
+	    println("E$i: ", rel_error)
+	end
+end
+
+# ╔═╡ ead9f712-5a2e-42b3-9cb2-3ef7656472b8
+# ╠═╡ disabled = true
+#=╠═╡
+rel_error = (Tend_model[15] - Tend_exp[15]) / Tend_exp[15]
+  ╠═╡ =#
+
+# ╔═╡ 0eb4b057-48c2-4f77-9be9-adace62a9544
+Tend_e
+
 # ╔═╡ 8ad40098-80a4-4a44-811d-d94b68c6980e
 # ╠═╡ disabled = true
 #=╠═╡
-
 begin
 	using StatsPlots
 	bar(cond, [Tend_m, Tend_e])
@@ -585,45 +718,34 @@ begin
 end
   ╠═╡ =#
 
-# ╔═╡ 3f7ecdc3-b35e-4cc7-8a37-4576cd0f02b9
-#=╠═╡
-plotly()
-  ╠═╡ =#
-
-# ╔═╡ 7a997a1e-9731-4824-9f59-731ada97c83e
-#=╠═╡
-plot(sol)
-  ╠═╡ =#
-
-# ╔═╡ b50df44c-f6ef-44b7-b477-0e4516540e6f
-#=╠═╡
-begin
-	rmprob = remake(prob; p = rmp)
-	rmsol = solve(rmprob)
-	plot(rmsol, ylim=(270, 1000.), lw=2.)
-	plot!(E67t, E67Ts, label="ETs", ls=:dash)
-	plot!(E67t, E67Tf, label="ETf", ls=:dash)
-end
-  ╠═╡ =#
-
-# ╔═╡ e2613b68-6e5c-44dd-a631-65a367726753
-#=╠═╡
-plot(res, petab_problem; observable_ids=["obs_Tf"], condition_id=casesim, ylim=(300, 1000), ylabel = "Temperature (K)", xlabel = "Time (s)")
-  ╠═╡ =#
-
-# ╔═╡ 0eb4b057-48c2-4f77-9be9-adace62a9544
-Tend_e
-
-# ╔═╡ ba1368c9-8cff-4c43-8d21-93e657bfc9bd
-
-
 # ╔═╡ 8fdb601b-55f4-477c-8160-0faa678e9ed1
-#=╠═╡
 begin
-	scatter(Tend_e, Tend_m)
-	plot!([500, 800], [500, 800])
+	scatter(Tend_e, Tend_m, label = "Experimental and Model Temperatures ", legend = :bottomright, xlabel = "Experimental Temperature (K)", ylabel = "Model Temperature (K)", title = "Air Outlet Temperature")
+	plot!([500, 800], [500, 800], label = "Best Fit")
 end
-  ╠═╡ =#
+
+# ╔═╡ dbf6e835-239d-4c71-9a0a-fbb36f0a3f48
+# begin
+# 	# Nu = A * (1+(B*((Gz)^n)*exp(-C/Gz)))
+# 	fpA, fpB, fpC, fpn = Tuple(ModelingToolkit.varmap_to_vars(pnew, [A, B, C, n]))
+# 	fNu(Gx) = fpA * (1+(fpB*((Gx)^fpn)*exp(-fpC/Gx)))
+# end
+
+# ╔═╡ 51650a85-38c5-4000-b7f7-8a36b85a40d9
+Tuple(ModelingToolkit.varmap_to_vars(pnew, [A, B, C]))
+
+# ╔═╡ 6c30cb8d-5756-4173-b867-c99992d666f8
+begin
+# Nu = A * (Re^B) * (Pr^C)
+	fpA, fpB, fpC = Tuple(ModelingToolkit.varmap_to_vars(pnew, [A, B, C]))
+	fNu(Gx) = fpA * (Re^fpB) * (Pr^fpC)
+end
+
+# ╔═╡ 351b2777-c1ae-4fb3-a89e-7742a1acfabe
+begin
+	Gzx = 10.:50.
+	plot(1 ./Gzx, fNu.(Gzx))
+end
 
 # ╔═╡ Cell order:
 # ╠═8c28c8d1-dd57-4a04-9121-cbfed404d824
@@ -635,11 +757,17 @@ end
 # ╠═2c50a54e-96bd-4f48-ae7f-33cbface0754
 # ╠═5d04df82-9b4f-43c4-83c7-13dda03f4cbb
 # ╠═ce81f78a-6722-497f-b031-9ac6f933b7fe
+# ╠═a94a8bd4-00f5-47db-816e-77a8e75b8ee0
+# ╠═c253cc70-ce35-4ba6-a22f-c6de75b826db
+# ╠═644d36c5-70e9-4f1d-88f3-52859a24e5d0
 # ╠═3b6fa5a1-f5ba-4e48-ba8d-0e11315fae5d
+# ╠═01553e7d-e33a-4bac-98d0-7669f410d637
 # ╠═77c3135c-6534-49a6-8ad3-4c22a2495f71
 # ╠═d71c355c-891e-4195-a482-652749bbb5cc
+# ╠═763c37a2-1169-4ada-8a87-3dd62f0f5ff4
 # ╠═8f9afcbf-5a98-4709-b763-844b058d155e
 # ╠═be19295e-483d-4655-8e8e-55eb349c9958
+# ╠═3e44b5ad-ca49-4799-aa9d-af1df817430c
 # ╠═bc5bf598-46e5-4beb-a9b9-e23c75137fa1
 # ╠═50b80f28-226a-4681-8f39-a721b7aa6d67
 # ╠═a1127074-1338-4e12-8ded-bf43c4f32515
@@ -652,11 +780,22 @@ end
 # ╠═634082dc-6050-42fc-a208-1a68802fe5da
 # ╠═4cb05ead-4ff7-4049-a5d5-c6618650d60c
 # ╠═b118d8a4-6de8-42b0-9811-53b6dfe82ac9
+# ╠═add4c024-8c97-4ff8-9fe2-43d22b24c5e6
+# ╠═8f110eaa-232f-4739-b1e1-d740832e919c
 # ╠═de7b5502-6578-4fb4-9490-a0896bb379b4
 # ╠═af38678f-b6b8-42ad-be75-9455ea41edc3
 # ╠═e2613b68-6e5c-44dd-a631-65a367726753
 # ╠═b78293e0-a118-4575-be93-a3a1c7b9b0fd
+# ╠═78264642-e4db-477a-ae15-80a9a086c31b
+# ╠═9c2359ca-0956-4a9a-8706-ab96824ba35e
+# ╠═af72a10b-bf37-45b3-8593-b57e4bf2ef24
+# ╠═e884b556-79a6-4cf4-a09b-0d3afe2489f8
+# ╠═4fd3723a-531f-4f09-8806-458e5b33f629
+# ╠═ead9f712-5a2e-42b3-9cb2-3ef7656472b8
 # ╠═0eb4b057-48c2-4f77-9be9-adace62a9544
 # ╠═8ad40098-80a4-4a44-811d-d94b68c6980e
-# ╠═ba1368c9-8cff-4c43-8d21-93e657bfc9bd
 # ╠═8fdb601b-55f4-477c-8160-0faa678e9ed1
+# ╠═dbf6e835-239d-4c71-9a0a-fbb36f0a3f48
+# ╠═51650a85-38c5-4000-b7f7-8a36b85a40d9
+# ╠═6c30cb8d-5756-4173-b867-c99992d666f8
+# ╠═351b2777-c1ae-4fb3-a89e-7742a1acfabe

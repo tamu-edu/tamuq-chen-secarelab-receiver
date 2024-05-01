@@ -14,17 +14,29 @@ begin #define parameters
     deltax = 0.002795918367346939 #discretization (m)
     w_t = 19 / 1000 #m
     A_t = w_t * w_t #m2 - for the whole receiver (19x19mm2)
-    A_st = 176e-6 #total area - solid m2
-    A_ft = 49e-6 # total area - fluid m2
-    channel_w = 1.5 / 1000 #m
-    A_channel = channel_w * channel_w  #m2 (1.5x1.5mm2) 
-    n_channel = 100
-    A_exchange = 162.5e-6 #m2 - contact area between fluid and solid
-    Vs = A_st * L #* deltax
-    Vf = A_ft * L #* deltax
+    #A_st = 176e-6 #total area - solid m2
+    #A_ft = 49e-6 # total area - fluid m2
+    w_t = 19.e-3 #m
+    A_frt = w_t * w_t #m2 - for the whole receiver (19x19mm2)
+    A_s_p = w_t * L * 4 #total area solid periphery m2
+    w_chnl = 1.5e-3 #m
+    A_chnl_p = w_chnl * L * 4  #m2 channel periphery
+	A_chnl_frt = w_chnl * w_chnl #m2 channel front
+	n_chnl = 10*10
+    A_exchange = A_chnl_p * n_chnl #m2 - contact area between fluid and solid
+	A_chnl_frt_all = A_chnl_frt * n_chnl #m2 all frontal area of channels
+    Vs =  A_frt * L #m3
+	Vf = n_chnl * A_chnl_frt * L 
+    # channel_w = 1.5 / 1000 #m
+    # A_channel = channel_w * channel_w  #m2 (1.5x1.5mm2) 
+    # n_channel = 100
+    # A_exchange = 162.5e-6 #m2 - contact area between fluid and solid
+    # Vs = A_st * L #* deltax
+    # Vf = A_ft * L #* deltax
     qlpm = 7.12 #lpm
     q = qlpm / (1000 * 60) #m3/s
-    m = 3.2923e-4 #kg/s
+    ρ = 1.2 #kg/m3 - density of air at lab conditions
+    m = q * ρ #kg/s
     #V= q/(A_channel*n_channel) #m/s - using the area of the whole receiver (18x18mm2)
     V = 0.57 #m/s (calculated from excel sheet and COMSOL)
     th_s = 0.4e-3 #m
@@ -35,8 +47,10 @@ begin #define parameters
     Lc = 4 * (w_t * w_t) / (4 * w_t)
     kf = 0.056 #W/m.K
     ρf = 0.5 #kg/m3
-    Cpf = 1090 #kJ/kg.K
+    Cpf = 1090 #J/kg.K
     mu = 2.0921e-5 #Pa.s
+    e = Vf/Vs
+    Af = n_chnl * A_chnl_frt #m2
     #Gz = (w_t / L) * Re * Pr
     # A = 3.657
     # B = 0.5272
@@ -46,13 +60,14 @@ begin #define parameters
     #Nu = 3.657 
     Lc = 4 * (w_t * w_t) / (4 * w_t)
     w = 1.5e-3 #width of channel (m)
-    Vi = w * w * n_channel * L #m3
+    Vi = w * w * n_chnl * L #m3
     Av = 4 * (w * L) / (w^2 * L) #specific area (m-1)
     hext = 10 #W/m2.K
     kins = 0.078 #W/m*K
     r0 = 23 / 1000 #m
     r_ins = 42 / 1000 #m
     r_H = 4 * (w_t * w_t) / (4 * w_t) #hydraulic receiver diameter
+    em = 0.8 #emissivity
 end;
 #for interpolations 
 #1. extract T2 data
@@ -66,42 +81,36 @@ begin
     Tins_f(t) = Tins(t)
     @register_symbolic Tins_f(t)
 end
-
+begin 
+    x11 = 0.0001:0.001383838383838384:0.137 #T2 (insulation)
+    Gz = (1 ./ x11) * Re * Pr * w_t
+    #2.create interpolation function
+    Gz_ = linear_interpolation(x11, Gz)
+    Gz_f(x) = Gz_(x)
+    @register_symbolic Gz_f(x)
+end
 begin
     # Parameters, variables, and derivatives for system 1
     @variables t x
-    @parameters ρsCps ks h_average #ks h_average A n
-    @parameters I0 v
+    @parameters ks A B n C #ks h_average A n
+    @parameters Io qlpm
     @variables Ts(..) Tf(..)
     Dt = Differential(t)
     Dx = Differential(x)
     Dxx = Differential(x)^2
-    e = 0.62
-    #ks = (48.78 / 1000) * 1.97 * ((1 - e)^1.5) #kW/m.K
-    ρs = 3200 * e #kg/m3
-    Cps = 1290 / 1000  #kJ/kg*K
-    Re = (ρf * v * w_t) / mu
+    ks = (48.78) * 1.97 * ((1 - e)^1.5) #W/m.K
+    ρs = 3200  #kg/m3
+    Cps = 1290  #J/kg*K
+    Re = (ρf * V * w_t) / mu
     Pr = (Cpf * mu) / kf
-    Gz = (1/L) * Re * Pr * w_t
-    #Interpolation for Gz number
-    # x11 = 0.0001:0.001383838383838384:0.137 #T2 (insulation)
-    # Gz = (1 ./ x11) * Re * Pr * w_t
-    # #2.create interpolation function
-    # Gz_ = linear_interpolation(x11, Gz)
-    # Gz_f(x) = Gz_(x)
-    # @register_symbolic Gz_f(x)
+    Nu = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
     #Cps(Ts) = (0.27+0.135e-4*(Ts)-9720*((Ts)^-2)+0.204e-7*((Ts)^2))/1000 #kJ/kg*K from manufacturer data
-    p_opt = [ρsCps => 706048., ks => 22.5, h_average => 50000.]#[A => 20., n => 0.005]
-    p_cond = [I0 => 456000.0, v => 1.22]
+    p_opt = [ks=> A => 8., B => 0.5272, n=> 0.66, C=> 50.] 
+    p_cond = [Io => 456000.0, qlpm => 15.27]
     p_math = vcat(p_opt, p_cond)
-    #Nu = A * (Gz_f(x)^n)
-    #Nu = A * (Gz)^n
-
-    #p_math_vec = collect(p_math)
-    #Nu = A * (1 + (B * ((Gz_f(x))^n) * exp(-C / Gz_f(x))))
-    #nu = 4.364 * (1 + (0.7 * ((Gz_f(0.134))^10) * exp(-40 / Gz_f(0.134))))
-    #h_average = (Nu * kf) / Lc
-
+    #h_average = hfa * (qlpm^hfn)
+    h_average = (Nu * kf) / Lc
+ 
     # MOL Discretization parameters for system 1
     x_max1 = L
     x_min1 = 0.0
@@ -122,16 +131,16 @@ begin
     #     Vf * ρf * Cpf * Dt(Tf(t, x)) ~ Vf * kf * Dxx(Tf(t, x)) - Vf * ρf * Cpf * V * Dx(Tf(t, x)) + (h_average) * Av * Vi * ((Ts(t, x) - Tf(t, x)))
     # ]
     eq1 = [
-        A_st * (ρsCps) * Dt(Ts(t, x)) ~ A_st * (ks) * Dxx(Ts(t, x)) - (((h_average)/ Av) * ((Ts(t, x)) - Tf(t, x))) .- (kins * (r_ins/r0).* (Ts(t, x) .- Tins_f(t)) * L / (r_ins - r0)),
-        A_ft * ρf * Cpf * Dt(Tf(t, x)) ~ A_ft * kf * Dxx(Tf(t, x)) -  m * Cpf * Dx(Tf(t, x)) + (((h_average)/ Av) * ((Ts(t, x)) - Tf(t, x)))
+        (1-e) * (aCp * ρs * Cps) * Vs * Dt(Ts(t, x)) ~ A_frt * ks * Dxx(Ts(t, x)) - (h_average * A_exchange * ((Ts(t, x)) - Tf(t, x))) .- (kins * (r_ins/r0).* (Ts(t, x) .- Tins_f(t)) * A_s_p/ (r_ins - r0)),
+        e * ρf * Cpf * Vf * Dt(Tf(t, x)) ~ Af * kf * Dxx(Tf(t, x)) -  m * Cpf * Dx(Tf(t, x)) + (h_average * A_exchange * ((Ts(t, x)) - Tf(t, x)))
     ]
     bcs1 = [
         Ts(0.0, x) ~ Tamb, # initial
         Tf(0.0, x) ~ Tamb, # initial
-        -A_st * (ks) * Dx(Ts(t, x_max1)) ~ 0.0, # far right
-        -A_st * (ks) * Dx(Ts(t, x_min1)) ~ I0 * A_st - ϵ * σ * A_st * (Ts(t, x_min1)^4 - Tamb^4) - hext * A_st * (Ts(t, x_min1) - Tamb),  # far left
-        -A_ft * kf * Dx(Tf(t, x_max1)) ~ 0.0, #-ρf * Cpf * V * A_ft * (Tf(t, x_max1) - Tamb), # exiting fluid
-        -A_ft * kf * Dx(Tf(t, x_min1)) ~ m * Cpf * (Tf(t, x_min1) - Tamb) # entering fluid (upstream temperature)
+        -A_frt * ks * Dx(Ts(t, x_max1)) ~ 0.0, # far right
+        -A_frt * ks * Dx(Ts(t, x_min1)) ~ aIo * Io * A_frt - ϵ * σ * A_frt * (Ts(t, x_min1)^4 - Tamb^4) - hext * A_frt * (Ts(t, x_min1) - Tamb),  # far left
+        -Af * kf * Dx(Tf(t, x_max1)) ~ 0.0, #-ρf * Cpf * V * A_ft * (Tf(t, x_max1) - Tamb), # exiting fluid
+        -Af * kf * Dx(Tf(t, x_min1)) ~ m * Cpf * (Tf(t, x_min1) - Tamb) # entering fluid (upstream temperature)
     ]
     # Space and time domain for system 1
     domains1 = [t ∈ Interval(t_min, t_max),
@@ -151,7 +160,6 @@ begin
     prob = discretize(pdesys, discretization)
 
 end
-
 
 sol1 = solve(prob, FBDF(), saveat=2)
 begin
@@ -203,21 +211,21 @@ end
 
 #measurements and conditions#Defining simulation conditions
 begin
-    condition_E67 = Dict(:I0 => 456000.0, :v => 1.22)
-    condition_E68 = Dict(:I0 => 456000.0, :v => 1.00)
-    condition_E69 = Dict(:I0 => 456000.0, :v => 0.84)
-    condition_E70 = Dict(:I0 => 456000.0, :v => 0.73)
-    condition_E71 = Dict(:I0 => 456000.0, :v => 0.57)
-    condition_E72 = Dict(:I0 => 304000.0, :v => 1.46)
-    condition_E73 = Dict(:I0 => 304000.0, :v => 1.05)
-    condition_E74 = Dict(:I0 => 304000.0, :v => 0.72)
-    condition_E75 = Dict(:I0 => 304000.0, :v => 0.55)
-    condition_E76 = Dict(:I0 => 304000.0, :v => 0.36)
-    condition_E77 = Dict(:I0 => 256000.0, :v => 1.10)
-    condition_E78 = Dict(:I0 => 256000.0, :v => 0.80)
-    condition_E79 = Dict(:I0 => 256000.0, :v => 0.64)
-    condition_E80 = Dict(:I0 => 256000.0, :v => 0.53)
-    condition_E81 = Dict(:I0 => 256000.0, :v => 0.36)
+    condition_E67 = Dict(Io => 456000.0, qlpm => 15.27, aIo => :g1_aIo)
+    condition_E68 = Dict(Io => 456000.0, qlpm => 12.50, aIo => :g1_aIo)
+    condition_E69 = Dict(Io => 456000.0, qlpm => 10.50, aIo => :g1_aIo)
+    condition_E70 = Dict(Io => 456000.0, qlpm => 9.10, aIo => :g1_aIo)
+    condition_E71 = Dict(Io => 456000.0, qlpm => 7.12, aIo => :g1_aIo)
+    condition_E72 = Dict(Io => 304000.0, qlpm => 18.34, aIo => :g2_aIo)
+    condition_E73 = Dict(Io => 304000.0, qlpm => 13.16, aIo => :g2_aIo)
+    condition_E74 = Dict(Io => 304000.0, qlpm => 9.03, aIo => :g2_aIo)
+    condition_E75 = Dict(Io => 304000.0, qlpm => 6.95, aIo => :g2_aIo)
+    condition_E76 = Dict(Io => 304000.0, qlpm => 4.53, aIo => :g2_aIo)
+    condition_E77 = Dict(Io => 256000.0, qlpm => 13.85, aIo => :g3_aIo)
+    condition_E78 = Dict(Io => 256000.0, qlpm => 10.02, aIo => :g3_aIo)
+    condition_E79 = Dict(Io => 256000.0, qlpm => 8.04, aIo => :g3_aIo)
+    condition_E80 = Dict(Io => 256000.0, qlpm => 6.62, aIo => :g3_aIo)
+    condition_E81 = Dict(Io => 256000.0, qlpm => 4.53, aIo => :g3_aIo)
 
     simulation_conditions = Dict("E67" => condition_E67, "E68" => condition_E68,
         "E69" => condition_E69, "E70" => condition_E70,
@@ -509,9 +517,9 @@ function lossAll(pguess_l, _)
 end
 
 optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
-
-lb = [0.0, 0.0, 0.0]
-ub = [1000000., 50., 100000.]
+#p_opt = [aCp => 1., hfa => 8., hfn =>0.66, aIo => 1.] 
+lb = [0.5, 0.01, 0.1, 0.7]
+ub = [4., 20., 10., 2.]
 pguess_opt = [x[2] for x in p_opt]
 initialerror = (lossAll(pguess_opt, []))
 println(initialerror)

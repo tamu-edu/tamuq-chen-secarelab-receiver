@@ -8,67 +8,62 @@ begin #libraries
     using Optimization, OptimizationNLopt, Symbolics, OptimizationOptimJL, ForwardDiff, OptimizationMOI
 end
 begin #define parameters
-
-    #ks= (37/1000)*(1-e) #C SiC- #kW/m.K using equation plotted from (Ali et al.)
-    #ks=(52000*exp(-1.24e-5*T)/(T+437))/1000 #kW/m.K (Ali et al.)
-    #kf = (0.056/1000)*e #thermal conductivity of the fluid phase kW/m.K
-    #kf=(1.52e-11*(T^3)-4.86e-8*(T^2)+1.02e-4*T-3.93e-3)/1000 #kW/m.K (Ali et al.)
-    #keff=0.82*kf+(1-0.82)*ks #using "Thermal analysis and design of a volumetric solar absorber depending on the porosity" paper - note that I still need to measure the porosity of SiC 
-    #ρf= 3.018*exp(-0.00574*T)+0.8063*exp(-0.0008381*T) #kg/m3 (Roldan et al.)
-    #Cpf=(1090/1000)*e #kJ/kg.K 
-    #Cps=1225/1000 #kJ/kg.K 
-    #ρs= (3100)*(1-e) #kg/m3
-    L= 137e-3 #m
+    L = 137e-3 #m
     #α = keff/ρ*Cp #kW/m2.K 
     Tamb = (22.448 + 273.15) #K (same for all exp) 
     deltax = 0.002795918367346939 #discretization (m)
-    w_t = 19/1000 #m
-    A_t= w_t*w_t #m2 - for the whole receiver (19x19mm2)
-    A_st= 176e-6 #total area - solid m2
-    A_ft= 49e-6 # total area - fluid m2
-    channel_w = 1.5/1000 #m
-    A_channel = channel_w * channel_w  #m2 (1.5x1.5mm2) 
-    n_channel = 100
-    A_exchange = 162.5e-6 #m2 - contact area between fluid and solid
-    Vs =  A_st * L #* deltax
-    Vf =  A_ft * L #* deltax
-    qlpm = 7.12 #lpm
-    q= qlpm/(1000*60) #m3/s
-    ρf = 0.46 #kg/m3
-    m = q * ρf 
-    #V= q/(A_channel*n_channel) #m/s - using the area of the whole receiver (18x18mm2)
-    V = 0.57 #m/s (calculated from excel sheet and COMSOL)
+    w_t = 19 / 1000 #m
+    A_t = w_t * w_t #m2 - for the whole receiver (19x19mm2)
+    #A_st = 176e-6 #total area - solid m2
+    #A_ft = 49e-6 # total area - fluid m2
     th_s = 0.4e-3 #m
     th_f = 0.7e-3 #m
-    I0 = 456*1000 #W/m2
+    w = 1.5e-3 #width of channel (m)
+    n_chnl = 10*10
+    A_frt = w * w * n_chnl #m2 - for the whole receiver (19x19mm2)
+    A_s_p = w_t * L * 4 #total area solid periphery m2
+    w_chnl = 1.5e-3 #m
+    A_chnl_p = w_chnl * L * 4  #m2 channel periphery
+	A_chnl_frt = w_chnl * w_chnl #m2 channel front
+    #A_exchange = A_chnl_p * n_chnl #m2 - contact area between fluid and solid
+	A_chnl_frt_all = A_chnl_frt * n_chnl #m2 all frontal area of channels
+    Vs =  A_frt * L #m3
+	Vf = n_chnl * A_chnl_frt * L 
+    # channel_w = 1.5 / 1000 #m
+    # A_channel = channel_w * channel_w  #m2 (1.5x1.5mm2) 
+    # n_channel = 100
+    # A_exchange = 162.5e-6 #m2 - contact area between fluid and solid
+    # Vs = A_st * L #* deltax
+    # Vf = A_ft * L #* deltax
+    qlpm = 7.12 #lpm
+    q = qlpm / (1000 * 60) #m3/s
+    ρ = 1.2 #kg/m3 - density of air at lab conditions
+    m = q * ρ #kg/s
+    #V= q/(A_channel*n_channel) #m/s - using the area of the whole receiver (18x18mm2)
+    V = 0.57 #m/s (calculated from excel sheet and COMSOL)
     #Qv= I0*exp(-1000*x)  #kW/m2 - (K extinction coefficient taken from Howell and Hendrick paper pg.86, measure pore diameter and fix)
-    Q= I0*1000 #W/m2
-    ϵ= 0.8
-    σ= 5.17e-8 #W/m2.K^4 Stefan-Boltzmann constant
-    Lc = 4*(w_t*w_t)/(4*w_t)
+    ϵ = 0.8
+    σ = 5.17e-8 #W/m2.K^4 Stefan-Boltzmann constant
+    Lc = 4 * (w_t * w_t) / (4 * w_t)
     kf = 0.056 #W/m.K
+    ρf = 0.5 #kg/m3
     Cpf = 1090 #J/kg.K
     mu = 2.0921e-5 #Pa.s
-    Re = (ρf*V*w_t)/mu
-    Pr = (Cpf*mu)/kf
-    Gz = (w_t/L)*Re*Pr
-    # A = 3.657
-    # B = 0.5272
-    # C = 55.1239
-    # n = 0.3056
-    #Nu = A*(1+(B*((Gz)^n)*exp(-C/Gz)))
-    #Nu = 3.657 
-    Lc = 4*(w_t*w_t)/(4*w_t)
-    w = 1.5e-3 #width of channel (m)
-    Vi = w * w * n_channel * L #m3
-    Av = 4*(w*L) / (w^2*L) #specific area (m-1)
+    e = 0.425
+    Af = n_chnl * (w + th_s)^2 #m2
+    Vi = w * w * n_chnl * L #m3
+    #Av = 4 * (w * L) / (w^2 * L) #specific area (m-1)
+    Av = (4 * w * L) / ((w + th_s)^2 * L) #1/m
+    A_exchange = Av * Vi #m2 - contact area between fluid and solid
     hext = 10 #W/m2.K
     kins = 0.078 #W/m*K
-    r0 = 23/1000 #m
-    r = 42/1000 #m
-    ρs = 3200 #kg/m3
-    Cps = 1290 #J/kg*K
-end
+    r0 = 23 / 1000 #m
+    r_ins = 42 / 1000 #m
+    r_H = 4 * (w_t * w_t) / (4 * w_t) #hydraulic receiver diameter
+    em = 0.8 #emissivity
+    aCp = 2.
+    aIo = 1.
+end;
     #for interpolations 
     #1. extract T2 data
     #Exp 71 
@@ -81,7 +76,10 @@ end
      Tins_f(t) = Tins(t)
      @register_symbolic Tins_f(t)
     end
+
     begin 
+        Re = (ρf * V * w_t) / mu
+        Pr = (Cpf * mu) / kf
         x11  = 0.0001:0.001383838383838384:0.137 #T2 (insulation)
         Gz = (1 ./x11)*Re*Pr*w_t
         #2.create interpolation function
@@ -91,78 +89,72 @@ end
     end
     begin
         # Parameters, variables, and derivatives for system 1
-        @variables t x 
-        @parameters ρsCps ks A n #h_average A B n C 
+        @variables t x
+        @parameters ks A B n C #ks h_average A n
+        @parameters Io qlpm
         @variables Ts(..) Tf(..)
-        Dt = Differential(t) 
+        Dt = Differential(t)
         Dx = Differential(x)
         Dxx = Differential(x)^2
-        e = 0.62
-        #ks = (48.78 / 1000) * 1.97 * ((1 - e)^1.5) #kW/m.K
-        #ρs = 3100*(1-e) #kg/m3
-        #Cps = (1225/1000)*(1-e) #kJ/kg
-        p = [ρsCps => 2e6, ks => 20., A => 10., n => 0.66]
-        #p = [psCps => 90000., ks=> 37, h_average => (Nu*kf)/w_t]
-        # p = [A => 3., B =>0.041, C => 60., n => 0.01]
-        # Nu = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
-        Nu = A * (Gz_f(x))^n
-        # nu = 4.364*(1+(0.7*((Gz_f(0.134))^10)*exp(-40/Gz_f(0.134))))
-        h_average = (Nu*kf)/Lc
-        #Cps(T)= (1110+0.15*(T-273)-425*exp(-0.003*(T-273)))/1000 #kJ/kg*K
-        #Cpf(T)= (1.93e-10*(T^3)+1.14e-3*(T^2)-4.49e-1*T+1.06e3)/1000 #kJ/kg*K
-
-        #psCps = ρs * Cps * (1-e)
-
+        #ks = (48.78) * 1.97 * ((1 - e)^1.5) #W/m.K
+        ρs = 3200  #kg/m3
+        Cps = 1290  #J/kg*K
+        #Gz = (1/L) * Re * Pr * w_t
+        #Cps(Ts) = (0.27+0.135e-4*(Ts)-9720*((Ts)^-2)+0.204e-7*((Ts)^2))/1000 #kJ/kg*K from manufacturer data
+        Nu = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
+        p_opt = [ks=> 22.5, A => 8., B => 0.5272, n=> 0.66, C=> 50.] 
+        p_cond = [Io => 456000.0, qlpm => 7.12]
+        p_math = vcat(p_opt, p_cond)
+        h_average = (Nu * kf) / Lc
+     
         # MOL Discretization parameters for system 1
         x_max1 = L
-        x_min1 = 0.
-        t_min = 0.
-        t_max = 7084.
-        
+        x_min1 = 0.0
+        t_min = 0.0
+        t_max = 7084.0
+    
         nc1 = 100
-        
-        x_num1 = range(x_min1, x_max1, length = nc1)
-        
-        
+    
+        x_num1 = range(x_min1, x_max1, length=nc1)
+    
         dx = (x_max1 - x_min1) / (nc1 - 1)
-        
-        
+    
+    
         # PDE equation for system 1
-        
+    
         # eq1 = [
-        #        Vs * (ρs*Cps) * Dt(Ts(t,x)) ~ Vs * (ks) * Dxx(Ts(t,x)) - ((h_average) * Av * Vi * ((Ts(t,x)) - Tf(t,x))) .- (kins * (r/r0) .* (Ts(t,x) .- Tins_f(t)) * A_t / (r-r0)),
-        #        Vf* ρf * Cpf * Dt(Tf(t,x)) ~ Vf * kf * Dxx(Tf(t,x)) - Vf * ρf * Cpf * V * Dx(Tf(t,x)) + (h_average) * Av * Vi * ((Ts(t,x) - Tf(t,x)))
-        #        ]
+        #     Vs * (ρs*Cps) * Dt(Ts(t, x)) ~ Vs * (ks) * Dxx(Ts(t, x)) - ((h_average) * Av * Vi * ((Ts(t, x)) - Tf(t, x))) .- (kins * (r / r0) .* (Ts(t, x) .- Tins_f(t)) * A_t / (r - r0)),
+        #     Vf * ρf * Cpf * Dt(Tf(t, x)) ~ Vf * kf * Dxx(Tf(t, x)) - Vf * ρf * Cpf * V * Dx(Tf(t, x)) + (h_average) * Av * Vi * ((Ts(t, x) - Tf(t, x)))
+        # ]
         eq1 = [
-                A_st * (ρsCps) * Dt(Ts(t, x)) ~ A_st * (ks) * Dxx(Ts(t, x)) - (((h_average)/ Av) * ((Ts(t, x)) - Tf(t, x))) .- (kins * (r / r0) .* (Ts(t, x) .- Tins_f(t)) * L / (r - r0)),
-                A_ft * ρf * Cpf * Dt(Tf(t, x)) ~ A_ft * kf * Dxx(Tf(t, x)) -  m * Cpf * Dx(Tf(t, x)) + (((h_average)/ Av) * ((Ts(t, x)) - Tf(t, x)))
-               ]
-              
+            (1-e) * (aCp * ρs * Cps) * Vs * Dt(Ts(t, x)) ~ A_frt * ks * Dxx(Ts(t, x)) - (h_average * A_exchange * ((Ts(t, x)) - Tf(t, x))) .- (kins * (r_ins/r0).* (Ts(t, x) .- Tins_f(t)) * A_frt/ (r_ins - r0)),
+            e * ρf * Cpf * Vf * Dt(Tf(t, x)) ~ Af * kf * Dxx(Tf(t, x)) -  m * Cpf * Dx(Tf(t, x)) + (h_average * A_exchange * ((Ts(t, x)) - Tf(t, x)))
+        ]
         bcs1 = [
-            Ts(0., x) ~ Tamb, # initial
-            Tf(0., x) ~ Tamb, # initial
-            -A_st * (ks) * Dx(Ts(t, x_max1)) ~ 0.0, # far right
-            -A_st * (ks) * Dx(Ts(t, x_min1)) ~ I0 * A_st - ϵ * σ * A_st * (Ts(t,x_min1)^4 - Tamb^4) - hext * A_st * (Ts(t, x_min1) - Tamb),  # far left
-            -A_ft * kf * Dx(Tf(t, x_max1)) ~ 0.0, #-ρf * Cpf * V * A_ft * (Tf(t, x_max1) - Tamb), # exiting fluid
-            -A_ft * kf * Dx(Tf(t, x_min1)) ~ m * Cpf * (Tf(t, x_min1) - Tamb) # entering fluid (upstream temperature)# entering fluid (upstream temperature)
-              ] 
+            Ts(0.0, x) ~ Tamb, # initial
+            Tf(0.0, x) ~ Tamb, # initial
+            -A_frt * ks * Dx(Ts(t, x_max1)) ~ 0.0, # far right
+            -A_frt * ks * Dx(Ts(t, x_min1)) ~ aIo * Io * A_frt - ϵ * σ * A_frt * (Ts(t, x_min1)^4 - Tamb^4) - hext * A_frt * (Ts(t, x_min1) - Tamb),  # far left
+            -Af * kf * Dx(Tf(t, x_max1)) ~ 0.0, #-ρf * Cpf * V * A_ft * (Tf(t, x_max1) - Tamb), # exiting fluid
+            -Af * kf * Dx(Tf(t, x_min1)) ~ m * Cpf * (Tf(t, x_min1) - Tamb) # entering fluid (upstream temperature)
+        ]
         # Space and time domain for system 1
         domains1 = [t ∈ Interval(t_min, t_max),
-                    x ∈ Interval(x_min1, x_max1)]
-        
+            x ∈ Interval(x_min1, x_max1)]
+    
         # ODE system for system 1
-        @named pdesys = PDESystem(eq1, bcs1, domains1, [t, x], [Ts(t, x), Tf(t,x)], p)
-        
-    #end
-    #begin
-
-            # MOL parameters for system 1
-            
-            order = 2
-            discretization = MOLFiniteDifference([x => dx], t, approx_order=order)
-            
-            prob = discretize(pdesys, discretization)
-            
+        @named pdesys = PDESystem(eq1, bcs1, domains1, [t, x], [Ts(t, x), Tf(t, x)], p_math)
+    
+        #end
+        #begin
+    
+        # MOL parameters for system 1
+    
+        order = 2
+        discretization = MOLFiniteDifference([x => dx], t, approx_order=order)
+    
+        prob = discretize(pdesys, discretization)
+    
     end
    
             
@@ -231,6 +223,7 @@ end
         end
     begin
         # model results for different thermocouples
+       sol1.u[Ts(t,x)][:, 4]
        sol1.u[Ts(t,x)][:,40] #T9 model 55mm (external)
        sol1.u[Ts(t,x)][:,77] #T10 model 106mm (external)
        sol1.u[Tf(t,x)][:,59] #T11 model 82mm (internal-gas)
@@ -243,13 +236,13 @@ end
        # T11_model = sol1.u[Tf(t,x)][:,59], sol1.u[Ts(t,x)][:,59]
         #T11_modelmean = mean(T11_model)
     end
-        p0 = [x[2] for x in p]
+        p0 = [x[2] for x in p_opt]
         #expdata = append!(copy(y2d1_data), y1d2_data, y2d2_data, y1d1_data, y3d2_data, y4d2_data)
         expdata =  append!(copy(y2d1_data), y1d2_data, y2d2_data, y1d1_data, y3d2_data, y4d2_data)
         length(expdata)
         
         
-        pguess = p
+        pguess = p0
 
             #Optimization using NLOpt
             function NLmodeloptim(xvalues, p_vary)
@@ -273,15 +266,16 @@ end
             end
         
             #loss([1.], [])
+
+        rmp = ModelingToolkit.varmap_to_vars([Io => 456000, ks => 22.5, A => 0.0263, B => 1.8, n=> 0.66, C=> 50., qlpm => 7.12], parameters(pdesys))
     
         initialerror=(loss(p0, []))
 
         optf = OptimizationFunction(loss, Optimization.AutoForwardDiff())
         
-        lb = [1e3, 0.0, 0.0, 0.0]
-        ub = [1e8, 40., 25., 1.]
-        #lb = [100.]
-        #ub = [1000.]
+        lb = [0.01, 5., 0.01, 0.01, 0.01]
+        ub = [50., 20., 0.9, 5., 50.]
+
         optprob = Optimization.OptimizationProblem(optf, p0, [], lb=lb, ub=ub)
         
         optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method = NLopt.LN_NELDERMEAD(), maxtime = 1200, local_maxiters = 10000)
@@ -296,7 +290,7 @@ begin
         #pnew = [0.3]
         res_error = loss(pnew, [])
         display(res_error)
-        modelfit = remake(prob, p = pnew)
+        modelfit = remake(prob, p = rmp)
         modelfit_sol = solve(modelfit, FBDF(), saveat = xd1_data, reltol=1e-12, abstol = 1e-12)
         
     
