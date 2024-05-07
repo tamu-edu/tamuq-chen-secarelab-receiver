@@ -105,7 +105,7 @@ begin
     Pr = (Cpf * mu) / kf
     Nu = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
     #Cps(Ts) = (0.27+0.135e-4*(Ts)-9720*((Ts)^-2)+0.204e-7*((Ts)^2))/1000 #kJ/kg*K from manufacturer data
-    p_opt = [ks=> A => 8., B => 0.5272, n=> 0.66, C=> 50.] 
+    p_opt = [A => 8., B => 0.5272, n=> 0.66, C=> 50.] 
     p_cond = [Io => 456000.0, qlpm => 15.27]
     p_math = vcat(p_opt, p_cond)
     #h_average = hfa * (qlpm^hfn)
@@ -132,7 +132,7 @@ begin
     # ]
     eq1 = [
         (1-e) * (aCp * ρs * Cps) * Vs * Dt(Ts(t, x)) ~ A_frt * ks * Dxx(Ts(t, x)) - (h_average * A_exchange * ((Ts(t, x)) - Tf(t, x))) .- (kins * (r_ins/r0).* (Ts(t, x) .- Tins_f(t)) * A_s_p/ (r_ins - r0)),
-        e * ρf * Cpf * Vf * Dt(Tf(t, x)) ~ Af * kf * Dxx(Tf(t, x)) -  m * Cpf * Dx(Tf(t, x)) + (h_average * A_exchange * ((Ts(t, x)) - Tf(t, x)))
+        e * ρf * Cpf * Vf * Dt(Tf(t, x)) ~ Af * e * kf * Dxx(Tf(t, x)) - e * m * Cpf * Dx(Tf(t, x)) + (h_average * A_exchange * ((Ts(t, x)) - Tf(t, x)))
     ]
     bcs1 = [
         Ts(0.0, x) ~ Tamb, # initial
@@ -519,7 +519,7 @@ end
 optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
 #p_opt = [aCp => 1., hfa => 8., hfn =>0.66, aIo => 1.] 
 lb = [0.5, 0.01, 0.1, 0.7]
-ub = [4., 20., 10., 2.]
+ub = [10., 20., 10., 80.]
 pguess_opt = [x[2] for x in p_opt]
 initialerror = (lossAll(pguess_opt, []))
 println(initialerror)

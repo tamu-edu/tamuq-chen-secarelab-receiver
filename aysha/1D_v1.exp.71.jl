@@ -61,8 +61,9 @@ begin #define parameters
     r_ins = 42 / 1000 #m
     r_H = 4 * (w_t * w_t) / (4 * w_t) #hydraulic receiver diameter
     em = 0.8 #emissivity
-    aCp = 2.
-    aIo = 1.
+    aCp = 4.
+    aIo = 2.
+    al = 0.22
 end;
     #for interpolations 
     #1. extract T2 data
@@ -90,22 +91,23 @@ end;
     begin
         # Parameters, variables, and derivatives for system 1
         @variables t x
-        @parameters ks A B n C #ks h_average A n
+         @parameters h_average #A B ks h_average A n
         @parameters Io qlpm
         @variables Ts(..) Tf(..)
         Dt = Differential(t)
         Dx = Differential(x)
         Dxx = Differential(x)^2
-        #ks = (48.78) * 1.97 * ((1 - e)^1.5) #W/m.K
+        ks = (48.78) * 1.97 * ((1 - e)^1.5) #W/m.K
         ρs = 3200  #kg/m3
         Cps = 1290  #J/kg*K
         #Gz = (1/L) * Re * Pr * w_t
         #Cps(Ts) = (0.27+0.135e-4*(Ts)-9720*((Ts)^-2)+0.204e-7*((Ts)^2))/1000 #kJ/kg*K from manufacturer data
-        Nu = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
-        p_opt = [ks=> 22.5, A => 8., B => 0.5272, n=> 0.66, C=> 50.] 
+        # Nu = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
+        # Nu = A * (Re)^B
+        p_opt = [h_average => 13.6]
         p_cond = [Io => 456000.0, qlpm => 7.12]
         p_math = vcat(p_opt, p_cond)
-        h_average = (Nu * kf) / Lc
+        # h_average = (Nu * kf) / Lc
      
         # MOL Discretization parameters for system 1
         x_max1 = L
@@ -127,8 +129,8 @@ end;
         #     Vf * ρf * Cpf * Dt(Tf(t, x)) ~ Vf * kf * Dxx(Tf(t, x)) - Vf * ρf * Cpf * V * Dx(Tf(t, x)) + (h_average) * Av * Vi * ((Ts(t, x) - Tf(t, x)))
         # ]
         eq1 = [
-            (1-e) * (aCp * ρs * Cps) * Vs * Dt(Ts(t, x)) ~ A_frt * ks * Dxx(Ts(t, x)) - (h_average * A_exchange * ((Ts(t, x)) - Tf(t, x))) .- (kins * (r_ins/r0).* (Ts(t, x) .- Tins_f(t)) * A_frt/ (r_ins - r0)),
-            e * ρf * Cpf * Vf * Dt(Tf(t, x)) ~ Af * kf * Dxx(Tf(t, x)) -  m * Cpf * Dx(Tf(t, x)) + (h_average * A_exchange * ((Ts(t, x)) - Tf(t, x)))
+            (1-e) * (aCp * ρs * Cps) * Vs * Dt(Ts(t, x)) ~ A_frt * ks * Dxx(Ts(t, x)) - (h_average * A_exchange * ((Ts(t, x)) - Tf(t, x))) .-  al * (kins * (r_ins/r0).* (Ts(t, x) .- Tins_f(t)) * A_s_p/ (r_ins - r0)),
+            e * ρf * Cpf * Vf * Dt(Tf(t, x)) ~ Af * kf * e * Dxx(Tf(t, x)) -  e * m * Cpf * Dx(Tf(t, x)) + (h_average * A_exchange * ((Ts(t, x)) - Tf(t, x)))
         ]
         bcs1 = [
             Ts(0.0, x) ~ Tamb, # initial
@@ -264,38 +266,37 @@ end;
                 lossr = (Temp .- expdata).^2
                 return sqrt(sum(lossr) / length(expdata)) #MSE
             end
-        
+
             #loss([1.], [])
 
-        rmp = ModelingToolkit.varmap_to_vars([Io => 456000, ks => 22.5, A => 0.0263, B => 1.8, n=> 0.66, C=> 50., qlpm => 7.12], parameters(pdesys))
+        rmp = ModelingToolkit.varmap_to_vars([Io => 456000, ks => 22.5, h_average=> 13.6, qlpm => 7.12], parameters(pdesys))
     
-        initialerror=(loss(p0, []))
+        initialerror=(loss(pguess, []))
 
         optf = OptimizationFunction(loss, Optimization.AutoForwardDiff())
         
-        lb = [0.01, 5., 0.01, 0.01, 0.01]
-        ub = [50., 20., 0.9, 5., 50.]
+        lb = [8.]
+        ub = [15.]
 
         optprob = Optimization.OptimizationProblem(optf, p0, [], lb=lb, ub=ub)
         
-        optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method = NLopt.LN_NELDERMEAD(), maxtime = 1200, local_maxiters = 10000)
+        optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method = NLopt.LN_NELDERMEAD(), maxtime = 500, local_maxiters = 1000)
         
         
         println(optsol.retcode)
         
         
         pnew = optsol.u
-begin
+        println("Size of pnew: ", size(pnew))
+        println("Contents of pnew: ", pnew)
         
-        #pnew = [0.3]
-        res_error = loss(pnew, [])
-        display(res_error)
-        modelfit = remake(prob, p = rmp)
-        modelfit_sol = solve(modelfit, FBDF(), saveat = xd1_data, reltol=1e-12, abstol = 1e-12)
-        
-    
-        psol = modelfit_sol
-end
+        begin
+            # res_error = loss(pnew, [])
+            # display(res_error)
+            modelfit = remake(prob, p = rmp)
+            modelfit_sol = solve(modelfit, FBDF(), saveat = xd1_data, reltol=1e-12, abstol = 1e-12)
+            psol = modelfit_sol
+        end
 begin
     plot1 =  plot(
         psol.t, 
