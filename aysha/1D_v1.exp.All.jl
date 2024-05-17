@@ -78,7 +78,7 @@ begin
     y1d3_data = D3[:, 2] .+ 273.0 #T2 (insulation)
     x1 = D3[:, 1]
     #2.create interpolation function
-    Tins = linear_interpolation(x1, y1d3_data, extrapolation_bc=y1d3_data[end])
+    Tins = LinearInterpolation(x1, y1d3_data, extrapolation_bc=y1d3_data[end])
     Tins_f(t) = Tins(t)
     @register_symbolic Tins_f(t)
 end
@@ -89,7 +89,7 @@ begin
     Pr = (Cpf * mu) / kf
     Gz = (1 ./ x11) * Re * Pr * w_t
     #2.create interpolation function
-    Gz_ = linear_interpolation(x11, Gz)
+    Gz_ = LinearInterpolation(x11, Gz)
     Gz_f(x) = Gz_(x)
     @register_symbolic Gz_f(x)
 end
@@ -498,19 +498,27 @@ function lossAll(pguess_l, _)
 
     sim_key = collect(keys(simulation_conditions))
     lossr = zeros(length(sim_key))
-   Threads.@threads for it in 1:length(sim_key)
+   #Threads.@threads 
+   for it in 1:length(sim_key)
         # Retrieve from measurements the experimental data for the current simulation condition
         sm = sim_key[it]
         #println(sm)
         cond = simulation_conditions[sm]
         expdata = (measurements[measurements.simulation_id.==sm, :temperatures])
         time_opt = (measurements[measurements.simulation_id.==sm, :time])
-        p_math_vec = copy(cond)
-        j = 1
-        for (k, v) in p_opt #FIX DICTIONARY PARAMETERS OR VECTORS
-            merge!(p_math_vec, Dict(Symbol(k) => pguess_l[j]))
-            j += 1
-        end  # pguess is the initial guess for the optimization
+        #p_math_vec = copy(cond)
+        # Initialize a new p_math vector
+        p_math_vec = Vector{Pair{Symbol, Float64}}(undef, length(pguess_l) + length(cond))
+
+        # Fill the new_p_math with values from pguess_l
+        for i in 1:length(pguess_l)
+            p_math_vec[i] = Symbol(p_math[i][1]) => pguess_l[i]
+        end
+
+        # Fill the new_p_math with values from cond
+        for (i, (key, value)) in enumerate(cond)
+            p_math_vec[length(pguess_l) + i] = Symbol(key) => value
+        end# pguess is the initial guess for the optimization
         temp_T = NLmodeloptim(time_opt, p_math_vec)
         temp_error = (temp_T .- expdata) .^ 2
         lossr[it] = sqrt(sum(temp_error))
