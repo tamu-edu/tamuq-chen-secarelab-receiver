@@ -104,7 +104,7 @@ end;
         #Cps(Ts) = (0.27+0.135e-4*(Ts)-9720*((Ts)^-2)+0.204e-7*((Ts)^2))/1000 #kJ/kg*K from manufacturer data
         # Nu = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
         # Nu = A * (Re)^B
-        p_opt = [h_average => 13.6]
+        p_opt = [h_average => 200.]
         p_cond = [Io => 456000.0, qlpm => 7.12]
         p_math = vcat(p_opt, p_cond)
         # h_average = (Nu * kf) / Lc
@@ -245,11 +245,12 @@ end;
         
         
         pguess = p0
+        rmp = ModelingToolkit.varmap_to_vars([Io => 456000, ks => 22.5, h_average=> 20., qlpm => 7.12], parameters(pdesys))
 
             #Optimization using NLOpt
-            function NLmodeloptim(xvalues, p_vary)
+            function NLmodeloptim(xvalues, rmp)
                 #p = [hlocal => p_vary[1]]
-                modeloptim = remake(prob, p = p_vary, tspan=(xvalues[1], xvalues[end]))
+                modeloptim = remake(prob, p = rmp, tspan=(xvalues[1], xvalues[end]))
                 modeloptim_sol = solve(modeloptim, FBDF(), saveat = xvalues)#, reltol=1e-12, abstol = 1e-12)
                 #time = modelfit_sol.t
                 tempT8_op = modeloptim_sol.u[Ts(t,x)][:, 4]
@@ -269,14 +270,12 @@ end;
 
             #loss([1.], [])
 
-        rmp = ModelingToolkit.varmap_to_vars([Io => 456000, ks => 22.5, h_average=> 13.6, qlpm => 7.12], parameters(pdesys))
-    
         initialerror=(loss(pguess, []))
 
         optf = OptimizationFunction(loss, Optimization.AutoForwardDiff())
         
-        lb = [8.]
-        ub = [15.]
+        lb = [200.]
+        ub = [400.]
 
         optprob = Optimization.OptimizationProblem(optf, p0, [], lb=lb, ub=ub)
         

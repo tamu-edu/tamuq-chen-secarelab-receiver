@@ -49,7 +49,7 @@ begin #define parameters
     ρf = 0.5 #kg/m3
     Cpf = 1090 #J/kg.K
     mu = 2.0921e-5 #Pa.s
-    e = Vf/Vs
+    e = 0.425
     Af = n_chnl * A_chnl_frt #m2
     #Gz = (w_t / L) * Re * Pr
     # A = 3.657
@@ -68,6 +68,7 @@ begin #define parameters
     r_ins = 42 / 1000 #m
     r_H = 4 * (w_t * w_t) / (4 * w_t) #hydraulic receiver diameter
     em = 0.8 #emissivity
+    aCp = 3.4
 end;
 #for interpolations 
 #1. extract T2 data
@@ -81,8 +82,11 @@ begin
     Tins_f(t) = Tins(t)
     @register_symbolic Tins_f(t)
 end
+
 begin 
     x11 = 0.0001:0.001383838383838384:0.137 #T2 (insulation)
+    Re = (ρf * V * w_t) / mu
+    Pr = (Cpf * mu) / kf
     Gz = (1 ./ x11) * Re * Pr * w_t
     #2.create interpolation function
     Gz_ = linear_interpolation(x11, Gz)
@@ -101,8 +105,6 @@ begin
     ks = (48.78) * 1.97 * ((1 - e)^1.5) #W/m.K
     ρs = 3200  #kg/m3
     Cps = 1290  #J/kg*K
-    Re = (ρf * V * w_t) / mu
-    Pr = (Cpf * mu) / kf
     Nu = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
     #Cps(Ts) = (0.27+0.135e-4*(Ts)-9720*((Ts)^-2)+0.204e-7*((Ts)^2))/1000 #kJ/kg*K from manufacturer data
     p_opt = [A => 8., B => 0.5272, n=> 0.66, C=> 50.] 
@@ -110,6 +112,7 @@ begin
     p_math = vcat(p_opt, p_cond)
     #h_average = hfa * (qlpm^hfn)
     h_average = (Nu * kf) / Lc
+    
  
     # MOL Discretization parameters for system 1
     x_max1 = L
@@ -132,13 +135,13 @@ begin
     # ]
     eq1 = [
         (1-e) * (aCp * ρs * Cps) * Vs * Dt(Ts(t, x)) ~ A_frt * ks * Dxx(Ts(t, x)) - (h_average * A_exchange * ((Ts(t, x)) - Tf(t, x))) .- (kins * (r_ins/r0).* (Ts(t, x) .- Tins_f(t)) * A_s_p/ (r_ins - r0)),
-        e * ρf * Cpf * Vf * Dt(Tf(t, x)) ~ Af * e * kf * Dxx(Tf(t, x)) - e * m * Cpf * Dx(Tf(t, x)) + (h_average * A_exchange * ((Ts(t, x)) - Tf(t, x)))
+        e * ρf * Cpf * Vf * Dt(Tf(t, x)) ~ Af * e * kf * Dxx(Tf(t, x)) - m * Cpf * Dx(Tf(t, x)) + (h_average * A_exchange * ((Ts(t, x)) - Tf(t, x)))
     ]
     bcs1 = [
         Ts(0.0, x) ~ Tamb, # initial
         Tf(0.0, x) ~ Tamb, # initial
         -A_frt * ks * Dx(Ts(t, x_max1)) ~ 0.0, # far right
-        -A_frt * ks * Dx(Ts(t, x_min1)) ~ aIo * Io * A_frt - ϵ * σ * A_frt * (Ts(t, x_min1)^4 - Tamb^4) - hext * A_frt * (Ts(t, x_min1) - Tamb),  # far left
+        -A_frt * ks * Dx(Ts(t, x_min1)) ~ Io * A_frt - ϵ * σ * A_frt * (Ts(t, x_min1)^4 - Tamb^4) - hext * A_frt * (Ts(t, x_min1) - Tamb),  # far left
         -Af * kf * Dx(Tf(t, x_max1)) ~ 0.0, #-ρf * Cpf * V * A_ft * (Tf(t, x_max1) - Tamb), # exiting fluid
         -Af * kf * Dx(Tf(t, x_min1)) ~ m * Cpf * (Tf(t, x_min1) - Tamb) # entering fluid (upstream temperature)
     ]
@@ -211,21 +214,21 @@ end
 
 #measurements and conditions#Defining simulation conditions
 begin
-    condition_E67 = Dict(Io => 456000.0, qlpm => 15.27, aIo => :g1_aIo)
-    condition_E68 = Dict(Io => 456000.0, qlpm => 12.50, aIo => :g1_aIo)
-    condition_E69 = Dict(Io => 456000.0, qlpm => 10.50, aIo => :g1_aIo)
-    condition_E70 = Dict(Io => 456000.0, qlpm => 9.10, aIo => :g1_aIo)
-    condition_E71 = Dict(Io => 456000.0, qlpm => 7.12, aIo => :g1_aIo)
-    condition_E72 = Dict(Io => 304000.0, qlpm => 18.34, aIo => :g2_aIo)
-    condition_E73 = Dict(Io => 304000.0, qlpm => 13.16, aIo => :g2_aIo)
-    condition_E74 = Dict(Io => 304000.0, qlpm => 9.03, aIo => :g2_aIo)
-    condition_E75 = Dict(Io => 304000.0, qlpm => 6.95, aIo => :g2_aIo)
-    condition_E76 = Dict(Io => 304000.0, qlpm => 4.53, aIo => :g2_aIo)
-    condition_E77 = Dict(Io => 256000.0, qlpm => 13.85, aIo => :g3_aIo)
-    condition_E78 = Dict(Io => 256000.0, qlpm => 10.02, aIo => :g3_aIo)
-    condition_E79 = Dict(Io => 256000.0, qlpm => 8.04, aIo => :g3_aIo)
-    condition_E80 = Dict(Io => 256000.0, qlpm => 6.62, aIo => :g3_aIo)
-    condition_E81 = Dict(Io => 256000.0, qlpm => 4.53, aIo => :g3_aIo)
+    condition_E67 = Dict(Io => 456000.0, qlpm => 15.27)
+    condition_E68 = Dict(Io => 456000.0, qlpm => 12.50)
+    condition_E69 = Dict(Io => 456000.0, qlpm => 10.50)
+    condition_E70 = Dict(Io => 456000.0, qlpm => 9.10)
+    condition_E71 = Dict(Io => 456000.0, qlpm => 7.12)
+    condition_E72 = Dict(Io => 304000.0, qlpm => 18.34)
+    condition_E73 = Dict(Io => 304000.0, qlpm => 13.16)
+    condition_E74 = Dict(Io => 304000.0, qlpm => 9.03)
+    condition_E75 = Dict(Io => 304000.0, qlpm => 6.95)
+    condition_E76 = Dict(Io => 304000.0, qlpm => 4.53)
+    condition_E77 = Dict(Io => 256000.0, qlpm => 13.85)
+    condition_E78 = Dict(Io => 256000.0, qlpm => 10.02)
+    condition_E79 = Dict(Io => 256000.0, qlpm => 8.04)
+    condition_E80 = Dict(Io => 256000.0, qlpm => 6.62)
+    condition_E81 = Dict(Io => 256000.0, qlpm => 4.53)
 
     simulation_conditions = Dict("E67" => condition_E67, "E68" => condition_E68,
         "E69" => condition_E69, "E70" => condition_E70,
@@ -512,7 +515,6 @@ function lossAll(pguess_l, _)
         temp_error = (temp_T .- expdata) .^ 2
         lossr[it] = sqrt(sum(temp_error))
     end
-
     return sum(lossr) #MSE
 end
 
@@ -520,6 +522,7 @@ optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
 #p_opt = [aCp => 1., hfa => 8., hfn =>0.66, aIo => 1.] 
 lb = [0.5, 0.01, 0.1, 0.7]
 ub = [10., 20., 10., 80.]
+
 pguess_opt = [x[2] for x in p_opt]
 initialerror = (lossAll(pguess_opt, []))
 println(initialerror)
@@ -532,6 +535,8 @@ println(optsol.retcode)
 pnew = optsol.u
 println(pnew)
 res_error = lossAll(pnew, [])
+
+
 display(res_error)
 
 # begin

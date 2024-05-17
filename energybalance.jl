@@ -47,7 +47,7 @@ plotly()
 
 # ╔═╡ 2eb83c61-2ea3-4120-9a55-3e0b66e279bb
 begin
-	@parameters aCp A B C al aIo #to be fitted
+	@parameters aCp A al aIo #to be fitted
 	@parameters qlpm Io Tins #varying conditions
 	@variables t Tf(t) Ts(t)
 	D = Differential(t)
@@ -434,21 +434,21 @@ Cps = ρCp_sf(2200)/3200
 # ╔═╡ 8f9afcbf-5a98-4709-b763-844b058d155e
 #measurements and conditions#Defining simulation conditions
 begin
-    condition_E67 = Dict(Io => 456000.0, qlpm => 15.27, aIo => :g1_aIo, Tins => 326.437)	
-    condition_E68 = Dict(Io => 456000.0, qlpm => 12.50, aIo => :g1_aIo, Tins => 338.52)
-    condition_E69 = Dict(Io => 456000.0, qlpm => 10.50, aIo => :g1_aIo, Tins => 344.308)
-    condition_E70 = Dict(Io => 456000.0, qlpm => 9.10, aIo => :g1_aIo, Tins => 352.422)
-    condition_E71 = Dict(Io => 456000.0, qlpm => 7.12, aIo => :g1_aIo, Tins => 356.004)	
-    condition_E72 = Dict(Io => 304000.0, qlpm => 18.34, aIo => :g2_aIo, Tins => 309.928)
-    condition_E73 = Dict(Io => 304000.0, qlpm => 13.16, aIo => :g2_aIo, Tins => 325.12)
-    condition_E74 = Dict(Io => 304000.0, qlpm => 9.03, aIo => :g2_aIo, Tins => 333.964)	
-    condition_E75 = Dict(Io => 304000.0, qlpm => 6.95, aIo => :g2_aIo, Tins=> 336.517)	
-    condition_E76 = Dict(Io => 304000.0, qlpm => 4.53, aIo => :g2_aIo, Tins => 338.123)	
-    condition_E77 = Dict(Io => 256000.0, qlpm => 13.85, aIo => :g3_aIo, Tins => 308.37)	
-    condition_E78 = Dict(Io => 256000.0, qlpm => 10.02, aIo => :g3_aIo, Tins => 312.959)	
-    condition_E79 = Dict(Io => 256000.0, qlpm => 8.04, aIo => :g3_aIo, Tins => 314.96)	
-    condition_E80 = Dict(Io => 256000.0, qlpm => 6.62, aIo => :g3_aIo, Tins => 316.119)	
-    condition_E81 = Dict(Io => 256000.0, qlpm => 4.53, aIo => :g3_aIo, Tins => 319.315)	
+    condition_E67 = Dict(Io => 456000.0, qlpm => 15.27, aIo => :g1_aIo, Tins => 326.437) #, al => 0.553)	
+    condition_E68 = Dict(Io => 456000.0, qlpm => 12.50, aIo => :g1_aIo, Tins => 338.52) #, al => 0.553) 
+    condition_E69 = Dict(Io => 456000.0, qlpm => 10.50, aIo => :g1_aIo, Tins => 344.308) #, al => 0.553)
+    condition_E70 = Dict(Io => 456000.0, qlpm => 9.10, aIo => :g1_aIo, Tins => 352.422) #, al => 0.553)
+    condition_E71 = Dict(Io => 456000.0, qlpm => 7.12, aIo => :g1_aIo, Tins => 356.004) #, al => 0.553)
+    condition_E72 = Dict(Io => 304000.0, qlpm => 18.34, aIo => :g2_aIo, Tins => 309.928) #, al => 0.672)
+    condition_E73 = Dict(Io => 304000.0, qlpm => 13.16, aIo => :g2_aIo, Tins => 325.12) #, al => 0.672)
+    condition_E74 = Dict(Io => 304000.0, qlpm => 9.03, aIo => :g2_aIo, Tins => 333.964) #, al => 0.672)
+    condition_E75 = Dict(Io => 304000.0, qlpm => 6.95, aIo => :g2_aIo, Tins=> 336.517) #, al => 0.672)
+    condition_E76 = Dict(Io => 304000.0, qlpm => 4.53, aIo => :g2_aIo, Tins => 338.123) #, al => 0.672)	
+    condition_E77 = Dict(Io => 256000.0, qlpm => 13.85, aIo => :g3_aIo, Tins => 308.37) #, al => 0.515)	
+    condition_E78 = Dict(Io => 256000.0, qlpm => 10.02, aIo => :g3_aIo, Tins => 312.959) #, al => 0.515)	
+    condition_E79 = Dict(Io => 256000.0, qlpm => 8.04, aIo => :g3_aIo, Tins => 314.96) #, al => 0.515)
+    condition_E80 = Dict(Io => 256000.0, qlpm => 6.62, aIo => :g3_aIo, Tins => 316.119) #, al => 0.515)
+    condition_E81 = Dict(Io => 256000.0, qlpm => 4.53, aIo => :g3_aIo, Tins => 319.315) #, al => 0.515)
 
 	# condition_E67 = Dict(Io => 456000.0, qlpm => 1.22*1000*60*A_chnl_frt_all, aIo => :g1_aIo)
  #    condition_E68 = Dict(Io => 456000.0, qlpm => 1.00*1000*60*A_chnl_frt_all, aIo => :g1_aIo)
@@ -477,64 +477,50 @@ begin
         "E81" => condition_E81)
 
 	measurements = DataFrame(simulation_id = "E67", obs_id="obs_Tf", time = E67t, measurement = E67Tf)
-		meas = DataFrame(simulation_id = "E67", obs_id="obs_Ts", time = E67t, measurement = E67Ts)
-		measurements = vcat(measurements, meas)
+		#meas = DataFrame(simulation_id = "E67", obs_id="obs_Ts", time = E67t, measurement = E67Ts)
+		#measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E68", obs_id="obs_Tf", time = E68t, measurement = E68Tf)
-		measurements = vcat(measurements, meas)
-		meas = DataFrame(simulation_id = "E68", obs_id="obs_Ts", time = E68t, measurement = E68Ts)
-		measurements = vcat(measurements, meas)
+		#meas = DataFrame(simulation_id = "E68", obs_id="obs_Ts", time = E68t, measurement = E68Ts)
+		#measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E69", obs_id="obs_Tf", time = E69t, measurement = E69Tf)
-		measurements = vcat(measurements, meas)
-		meas = DataFrame(simulation_id = "E69", obs_id="obs_Ts", time = E69t, measurement = E69Ts)
-		measurements = vcat(measurements, meas)
+		#meas = DataFrame(simulation_id = "E69", obs_id="obs_Ts", time = E69t, measurement = E69Ts)
+		#measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E70", obs_id="obs_Tf", time = E70t, measurement = E70Tf)
-		measurements = vcat(measurements, meas)
-		meas = DataFrame(simulation_id = "E70", obs_id="obs_Ts", time = E70t, measurement = E70Ts)
-		measurements = vcat(measurements, meas)
+		#meas = DataFrame(simulation_id = "E70", obs_id="obs_Ts", time = E70t, measurement = E70Ts)
+		#measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E71", obs_id="obs_Tf", time = E71t, measurement = E71Tf)
-		measurements = vcat(measurements, meas)
-		meas = DataFrame(simulation_id = "E71", obs_id="obs_Ts", time = E71t, measurement = E71Ts)
-		measurements = vcat(measurements, meas)
+		#meas = DataFrame(simulation_id = "E71", obs_id="obs_Ts", time = E71t, measurement = E71Ts)
+		#measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E72", obs_id="obs_Tf", time = E72t, measurement = E72Tf)
-		measurements = vcat(measurements, meas)
-		meas = DataFrame(simulation_id = "E72", obs_id="obs_Ts", time = E72t, measurement = E72Ts)
-		measurements = vcat(measurements, meas)
+		#meas = DataFrame(simulation_id = "E72", obs_id="obs_Ts", time = E72t, measurement = E72Ts)
+		#measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E73", obs_id="obs_Tf", time = E73t, measurement = E73Tf)
-		measurements = vcat(measurements, meas)
-		meas = DataFrame(simulation_id = "E73", obs_id="obs_Ts", time = E73t, measurement = E73Ts)
-		measurements = vcat(measurements, meas)
+		#meas = DataFrame(simulation_id = "E73", obs_id="obs_Ts", time = E73t, measurement = E73Ts)
+		#measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E74", obs_id="obs_Tf", time = E74t, measurement = E74Tf)
-		measurements = vcat(measurements, meas)
-		meas = DataFrame(simulation_id = "E74", obs_id="obs_Ts", time = E74t, measurement = E74Ts)
-		measurements = vcat(measurements, meas)
+		#meas = DataFrame(simulation_id = "E74", obs_id="obs_Ts", time = E74t, measurement = E74Ts)
+		#measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E75", obs_id="obs_Tf", time = E75t, measurement = E75Tf)
-		measurements = vcat(measurements, meas)
-		meas = DataFrame(simulation_id = "E75", obs_id="obs_Ts", time = E75t, measurement = E75Ts)
-		measurements = vcat(measurements, meas)
+		#meas = DataFrame(simulation_id = "E75", obs_id="obs_Ts", time = E75t, measurement = E75Ts)
+		#measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E76", obs_id="obs_Tf", time = E76t, measurement = E76Tf)
-		measurements = vcat(measurements, meas)
-		meas = DataFrame(simulation_id = "E76", obs_id="obs_Ts", time = E76t, measurement = E76Ts)
-		measurements = vcat(measurements, meas)
+		#meas = DataFrame(simulation_id = "E76", obs_id="obs_Ts", time = E76t, measurement = E76Ts)
+		#measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E77", obs_id="obs_Tf", time = E77t, measurement = E77Tf)
-		measurements = vcat(measurements, meas)
-		meas = DataFrame(simulation_id = "E77", obs_id="obs_Ts", time = E77t, measurement = E77Ts)
-		measurements = vcat(measurements, meas)
+		#meas = DataFrame(simulation_id = "E77", obs_id="obs_Ts", time = E77t, measurement = E77Ts)
+		#measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E78", obs_id="obs_Tf", time = E78t, measurement = E78Tf)
-		measurements = vcat(measurements, meas)
-		meas = DataFrame(simulation_id = "E78", obs_id="obs_Ts", time = E78t, measurement = E78Ts)
-		measurements = vcat(measurements, meas)
+		#meas = DataFrame(simulation_id = "E78", obs_id="obs_Ts", time = E78t, measurement = E78Ts)
+		#measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E79", obs_id="obs_Tf", time = E79t, measurement = E79Tf)
-		measurements = vcat(measurements, meas)
-		meas = DataFrame(simulation_id = "E79", obs_id="obs_Ts", time = E79t, measurement = E79Ts)
-		measurements = vcat(measurements, meas)
+		#meas = DataFrame(simulation_id = "E79", obs_id="obs_Ts", time = E79t, measurement = E79Ts)
+		#measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E80", obs_id="obs_Tf", time = E80t, measurement = E80Tf)
-		measurements = vcat(measurements, meas)
-		meas = DataFrame(simulation_id = "E80", obs_id="obs_Ts", time = E80t, measurement = E80Ts)
-		measurements = vcat(measurements, meas)
+		#meas = DataFrame(simulation_id = "E80", obs_id="obs_Ts", time = E80t, measurement = E80Ts)
+		#measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E81", obs_id="obs_Tf", time = E81t, measurement = E81Tf)
-		measurements = vcat(measurements, meas)
-		meas = DataFrame(simulation_id = "E81", obs_id="obs_Ts", time = E81t, measurement = E81Ts)
-		measurements = vcat(measurements, meas)
+		#meas = DataFrame(simulation_id = "E81", obs_id="obs_Ts", time = E81t, measurement = E81Ts)
+		#measurements = vcat(measurements, meas)
 end
 
 # ╔═╡ be19295e-483d-4655-8e8e-55eb349c9958
@@ -582,7 +568,7 @@ begin
 	u0 = [Ts => Tamb, Tf => Tamb]
 
 	state_param = [qlpm => 15.27, Io => 456. *1e3, Tins=>(40. + 273.15)]
-	fit_param = [aCp => 1., aIo => 1., A => 69.9, B => 0.352, C => 6.5, al => 2.]
+	fit_param = [aCp => 1., aIo => 1., A => 2., al => 1.5]
 	p = vcat(state_param, fit_param)
 	tspan = (0, 3600.)
 end
@@ -611,7 +597,7 @@ plot(sol)
 
 # ╔═╡ 1180068b-287b-4038-ac87-b689d42c8c98
 # rmp = ModelingToolkit.varmap_to_vars([aCp => slaCp, aIo => slaIo , hfa => slha, hfb => 0., hfn => 0., Io => 456000, Tins => 313., qlpm => 16.47], parameters(odes))
-rmp = ModelingToolkit.varmap_to_vars([aCp => slaCp, aIo => slaIo , A => 8, 0*B => 0.352, 0*C => 6.5, al => 1., Io => 456000, Tins => 313., qlpm => 16.47], parameters(odes))
+rmp = ModelingToolkit.varmap_to_vars([aCp => slaCp, aIo => slaIo, A => 2., al => 1.5, Io => 456000, Tins => 313., qlpm => 16.47], parameters(odes))
 
 # ╔═╡ b50df44c-f6ef-44b7-b477-0e4516540e6f
 begin
@@ -624,26 +610,27 @@ end
 
 # ╔═╡ 634082dc-6050-42fc-a208-1a68802fe5da
 begin
-	_g1_aIo = PEtabParameter(:g1_aIo, lb=1., ub=3., scale=:lin)
-	_g2_aIo = PEtabParameter(:g2_aIo, lb=1., ub=3., scale=:lin)
-	_g3_aIo = PEtabParameter(:g3_aIo, lb=1., ub=3., scale=:lin)
+	_g1_aIo = PEtabParameter(:g1_aIo, lb=0.7, ub=2., scale=:lin)
+	_g2_aIo = PEtabParameter(:g2_aIo, lb=0.7, ub=2., scale=:lin)
+	_g3_aIo = PEtabParameter(:g3_aIo, lb=0.7, ub=2., scale=:lin)
 	#_g1_al = PEtabParameter(:g1_al, lb=0.221, ub=3., scale=:lin)
 	#_g2_al = PEtabParameter(:g2_al, lb=0.269, ub=3., scale=:lin)
     #_g3_al = PEtabParameter(:g3_al, lb=0.206, ub=3., scale=:lin)	
-	# _hfa = PEtabParameter(hfa, lb=0.01, ub=20., scale=:lin)
+	#_hfa = PEtabParameter(hfa, lb=0.001, ub=5., scale=:lin)
 	# _hfb = PEtabParameter(hfb, lb=0.1, ub=10., scale=:lin)
-	# _hfn = PEtabParameter(hfn, lb=0.01, ub=10., scale=:lin)
-	_A = PEtabParameter(A, lb=0.001, ub=5., scale=:lin)
+	#_hfn = PEtabParameter(hfn, lb=0.001, ub=10., scale=:lin)
+	_A = PEtabParameter(A, lb=0.01, ub=20., scale=:lin)
 	#_B = PEtabParameter(B, lb=0.01, ub=1., scale=:lin)
-	# _n = PEtabParameter(n, lb=0.01, ub=5., scale=:lin)
-	#_C = PEtabParameter(C, lb=0.01, ub=20., scale=:lin)
-	#_al = PEtabParameter(al, lb=0.01, ub=6., scale=:lin)
-	_aCp = PEtabParameter(aCp, lb=0.05, ub=4., scale=:lin)
+	#_n = PEtabParameter(n, lb=0.01, ub=10., scale=:lin)
+	#_C = PEtabParameter(C, lb=0.001, ub=60., scale=:lin)
+	_al = PEtabParameter(al, lb=0.01, ub=1., scale=:lin)
+	_aCp = PEtabParameter(aCp, lb=0.05, ub=5., scale=:lin)
 	params = [_g1_aIo, _g2_aIo, _g3_aIo, _A, _aCp]
-	obs_Ts = PEtabObservable(Ts, 0.5)
+	#obs_Ts = PEtabObservable(Ts, 0.5)
 	obs_Tf = PEtabObservable(Tf, 0.5)
-	observables = Dict("obs_Tf" => obs_Tf, "obs_Ts" => obs_Ts)
-	petab_model = PEtabModel(odes, simulation_conditions, observables, measurements, params, state_map = [:Tf => 295., :Ts => 295.], parameter_map = [Tins => 313.15], verbose=false)
+	#observables = Dict("obs_Tf" => obs_Tf, "obs_Ts" => obs_Ts)
+	observables = Dict("obs_Tf" => obs_Tf)
+	petab_model = PEtabModel(odes, simulation_conditions, observables, measurements, params, state_map = [:Tf => 295.], parameter_map = [Tins => 313.15], verbose=false)
 	petab_problem = PEtabODEProblem(petab_model, verbose=false)
 end
 
@@ -668,7 +655,7 @@ end
 # ╔═╡ 7477df3b-f6e0-4c52-8279-63e9a836ff2b
 begin
 	optprob = PEtab.OptimizationProblem(petab_problem)
-	optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method = NLopt.LD_LBFGS(), maxtime = 500.0, local_maxiters = 10000)
+	optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method = NLopt.LD_LBFGS(), maxtime = 600.0, local_maxiters = 10000000)
 	optsol.u
 end
 
@@ -682,10 +669,17 @@ Pr
 Re
 
 # ╔═╡ 3cb41c98-5494-4276-8147-f3b2e361debd
-Nu__ = 67.272*0.00309208*10.5
+begin
+	Nu__ = 81.836*0.0030354*13.16
+	#Nu___ = A * (1+(B*((Gz)^n)*exp(-C/Gz))) 
+	Nu___= 0.0346668 * (1+(((4.6216*15.27)^0.756264)*4.55617*exp(-8.97307/4.6216*15.27)))
+end
+
+# ╔═╡ f62e04d1-5d34-4e91-9fce-cc371d205414
+1+(((4.6216*15.27)^0.756264)*4.55617*exp(-8.97307/4.6216*15.27))
 
 # ╔═╡ 3f090dba-5a3d-483e-b40b-e51d5002e9a0
-h_f = (Nu__ *kf)/ Lc
+h_f = (Nu___ *kf)/ Lc
 
 # ╔═╡ de7b5502-6578-4fb4-9490-a0896bb379b4
 begin
@@ -697,10 +691,10 @@ end
 pnew = get_ps(res, petab_problem, condition_id = casesim)
 
 # ╔═╡ e2613b68-6e5c-44dd-a631-65a367726753
-plot(res, petab_problem; observable_ids=["obs_Tf"], condition_id=casesim, ylim=(300, 800), ylabel = "Temperature (K)", xlabel = "Time (s)")
+plot(res, petab_problem; observable_ids=["obs_Tf"], condition_id=casesim, ylim=(300, 950), ylabel = "Temperature (K)", xlabel = "Time (s)")
 
 # ╔═╡ fef4139f-caad-4cc8-ab05-dcbad38f49f0
-plot(res, petab_problem; observable_ids=["obs_Ts"], condition_id=casesim, ylim=(0, 1500), ylabel = "Temperature (K)", xlabel = "Time (s)")
+plot(res, petab_problem; observable_ids=["obs_Ts"], condition_id=casesim, ylim=(300, 1200), ylabel = "Temperature (K)", xlabel = "Time (s)")
 
 # ╔═╡ b78293e0-a118-4575-be93-a3a1c7b9b0fd
 begin
@@ -858,6 +852,7 @@ end
 # ╠═add4c024-8c97-4ff8-9fe2-43d22b24c5e6
 # ╠═8f110eaa-232f-4739-b1e1-d740832e919c
 # ╠═3cb41c98-5494-4276-8147-f3b2e361debd
+# ╠═f62e04d1-5d34-4e91-9fce-cc371d205414
 # ╠═3f090dba-5a3d-483e-b40b-e51d5002e9a0
 # ╠═de7b5502-6578-4fb4-9490-a0896bb379b4
 # ╠═af38678f-b6b8-42ad-be75-9455ea41edc3
