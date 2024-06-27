@@ -96,7 +96,7 @@ end
 begin
     # Parameters, variables, and derivatives for system 1
     @variables t x
-    @parameters ks A B n C #ks h_average A n
+    @parameters A B C #ks h_average A n
     @parameters Io qlpm
     @variables Ts(..) Tf(..)
     Dt = Differential(t)
@@ -105,9 +105,10 @@ begin
     ks = (48.78) * 1.97 * ((1 - e)^1.5) #W/m.K
     ρs = 3200  #kg/m3
     Cps = 1290  #J/kg*K
-    Nu = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
+    #Nu = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
+    Nu = A*(Re^B)*(Pr^C)
     #Cps(Ts) = (0.27+0.135e-4*(Ts)-9720*((Ts)^-2)+0.204e-7*((Ts)^2))/1000 #kJ/kg*K from manufacturer data
-    p_opt = [A => 8., B => 0.5272, n=> 0.66, C=> 50.] 
+    p_opt = [A => 150., B => 0.77, C=> 8.]
     p_cond = [Io => 456000.0, qlpm => 15.27]
     p_math = vcat(p_opt, p_cond)
     #h_average = hfa * (qlpm^hfn)
@@ -258,6 +259,12 @@ begin
             677.817, 694.156, 595.766, 622.325, 716.314, 560.033,
             711.537, 713.686, 601.77, 626.485, 735.984, 561.254,
             763.299, 729.461, 597.766, 618.975, 751.15, 550.499])
+    # measurements = DataFrame( #T3 only
+    #             simulation_id=repeat(["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"], inner=1, outer=1),
+    #             obs_id=repeat(["_T3"], inner=1, outer=15),
+    #             time=repeat([3929, 5362, 5363, 6702, 7084, 3214, 4572, 6015, 6351, 7144, 3041, 5381, 5230, 5811, 5986], inner=1, outer=1),
+    #             temperatures=[763.859, 773.207, 769.76, 779.53, 753.56, 652.955, 694.626, 697.672, 681.066,
+    #                 647.019, 525.356, 554.455, 560.033, 561.254, 550.499])
 end
 
 #Exp. data to extract temp.
@@ -428,10 +435,10 @@ begin
     y6k1_data = K1[:, 5] .+ 273.15
     
     #Exp 79 - T3, T8
-    L = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0079_231204_172244.xlsx")["Sheet 1 - Data_FPT0079_231204_1"]["A3:C5233"]
-    xl_data = L[:, 1]
-    y1l_data = L[:, 2] .+ 273.15
-    y2l_data = L[:, 3] .+ 273.15  
+    L0 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0079_231204_172244.xlsx")["Sheet 1 - Data_FPT0079_231204_1"]["A3:C5233"]
+    xl_data = L0[:, 1]
+    y1l_data = L0[:, 2] .+ 273.15
+    y2l_data = L0[:, 3] .+ 273.15  
     
     #Exp 79 - T9, T10, T11, T12
 
@@ -472,10 +479,11 @@ begin
     y6n1_data = N1[:, 5] .+ 273.15
 end
 #Optimization using NLOpt
-function NLmodeloptim(tvalues, p_math_vec)
+rmp = ModelingToolkit.varmap_to_vars([Io => 456000, A => 2., B => 0.77, C=> 20., qlpm => 7.12], parameters(pdesys))
+function NLmodeloptim(tvalues, rmp)
 
     #p = [hlocal => p_vary[1]]
-    modeloptim = remake(prob, p=p_math_vec, tspan=(1.0, tvalues[end]))
+    modeloptim = remake(prob, p=rmp, tspan=(1.0, tvalues[end]))
     modeloptim_sol = solve(modeloptim, FBDF(), saveat=tvalues[end])#, reltol=1e-12, abstol=1e-12)
     #time = modelfit_sol.t
     tempT8_op = modeloptim_sol.u[Ts(t, x)][end, 4]
@@ -484,11 +492,28 @@ function NLmodeloptim(tvalues, p_math_vec)
     tempT3_op = modeloptim_sol.u[Tf(t, x)][end, end-1]
     T12_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 20] .+ modeloptim_sol.u[Ts(t, x)][end, 20]) ./ 2
     T11_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 59] .+ modeloptim_sol.u[Ts(t, x)][end, 59]) ./ 2
-
-    #return append!(tempT8_op, tempT9_op, tempT10_op, tempT3_op, T12_modelmean, T11_modelmean)
-    return [tempT8_op, tempT9_op, tempT10_op, tempT3_op, T12_modelmean, T11_modelmean]
+    #tempT11_op = modeloptim_sol.u[Ts(t, x)][end, 59]
+    #tempT12_op = modeloptim_sol.u[Ts(t, x)][end, 20]
+    return append!([tempT8_op, tempT9_op, tempT10_op, tempT3_op, T12_modelmean, T11_modelmean])
+    #return [tempT3_op]
 end
 
+
+function remakeAysha(pguess_l, cond, time_opt)
+        #p_math_vec = copy(cond)
+        # Initialize a new p_math vector
+        rmp = Vector{Pair{Symbol, Float64}}(undef, length(pguess_l) + length(cond))
+        # Fill the new_p_math with values from pguess_l
+        for i in 1:length(pguess_l)
+            rmp[i] = Symbol(p_math[i][1]) => pguess_l[i]
+        end
+        # Fill the new_p_math with values from cond
+        for (i, (key, value)) in enumerate(cond)
+            rmp[length(pguess_l) + i] = Symbol(key) => value
+        end# pguess is the initial guess for the optimization
+        temp_T = NLmodeloptim(time_opt, rmp)
+        return temp_T
+end
 #the first entry in the simulation_conditions
 pguess = p_opt
 
@@ -500,44 +525,34 @@ function lossAll(pguess_l, _)
     lossr = zeros(length(sim_key))
    #Threads.@threads 
    for it in 1:length(sim_key)
-        # Retrieve from measurements the experimental data for the current simulation condition
+    # Retrieve from measurements the experimental data for the current simulation condition
         sm = sim_key[it]
         #println(sm)
         cond = simulation_conditions[sm]
         expdata = (measurements[measurements.simulation_id.==sm, :temperatures])
         time_opt = (measurements[measurements.simulation_id.==sm, :time])
-        #p_math_vec = copy(cond)
-        # Initialize a new p_math vector
-        p_math_vec = Vector{Pair{Symbol, Float64}}(undef, length(pguess_l) + length(cond))
+        
+        #run selected simulation and get the steady temperature values
+        temp_T = remakeAysha(pguess_l, cond, time_opt)
 
-        # Fill the new_p_math with values from pguess_l
-        for i in 1:length(pguess_l)
-            p_math_vec[i] = Symbol(p_math[i][1]) => pguess_l[i]
-        end
-
-        # Fill the new_p_math with values from cond
-        for (i, (key, value)) in enumerate(cond)
-            p_math_vec[length(pguess_l) + i] = Symbol(key) => value
-        end# pguess is the initial guess for the optimization
-        temp_T = NLmodeloptim(time_opt, p_math_vec)
         temp_error = (temp_T .- expdata) .^ 2
         lossr[it] = sqrt(sum(temp_error))
     end
     return sum(lossr) #MSE
 end
-
+p0 = [x[2] for x in p_opt]
 optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
 #p_opt = [aCp => 1., hfa => 8., hfn =>0.66, aIo => 1.] 
-lb = [0.5, 0.01, 0.1, 0.7]
-ub = [10., 20., 10., 80.]
+lb = [70., 0.1, 5.]
+ub = [500., 0.9, 17.]
 
-pguess_opt = [x[2] for x in p_opt]
-initialerror = (lossAll(pguess_opt, []))
+#pguess_opt = ModelingToolkit.varmap_to_vars([Io => 456000, h_average => 14., qlpm => 7.12], parameters(pdesys))
+initialerror = (lossAll(p0, []))
 println(initialerror)
 
-optprob = Optimization.OptimizationProblem(optf, pguess_opt, [], lb=lb, ub=ub)
-#optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method=NLopt.LN_NELDERMEAD(), maxtime=10, local_maxiters=10)
-optsol = solve(optprob, NLopt.LN_NELDERMEAD(), maxtime=100, local_maxiters=10)
+optprob = Optimization.OptimizationProblem(optf, p0, [], lb=lb, ub=ub)
+optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method=NLopt.LN_NELDERMEAD(), maxtime=1000, local_maxiters=10000)
+#optsol = solve(optprob, NLopt.LN_NELDERMEAD(), maxtime=10000, local_maxiters=10000)
 
 println(optsol.retcode)
 pnew = optsol.u
@@ -547,22 +562,27 @@ res_error = lossAll(pnew, [])
 
 display(res_error)
 
-# begin
+#pnew = [0.01, 0.6, 5.]
+begin
+    T_steady = DataFrame(sim_id=[], T_mod=[], T_exp=[])
+    sim_key = collect(keys(simulation_conditions))
+    lossr = zeros(length(sim_key))
+   #Threads.@threads 
+   for it in 1:length(sim_key)
+    # Retrieve from measurements the experimental data for the current simulation condition
+        sm = sim_key[it]
+        #println(sm)
+        cond = simulation_conditions[sm]
+        expdata = (measurements[measurements.simulation_id.==sm, :temperatures])
+        time_opt = (measurements[measurements.simulation_id.==sm, :time])
+        
+        #run selected simulation and get the steady temperature values
+        temp_T = remakeAysha(pnew, cond, time_opt)
+        #push!(T_steady, [sm, temp_T, expdata])
+        push!(T_steady, (sm, temp_T, expdata))
+   end
 
-#     #p_opt = [A => 8.0, B => 0.5, C => 55.0, n => 0.2]
-#     case = "E71" #"E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E78", "E79", "E80", "E81")
-#     p_cond = simulation_conditions[case]
-#     j=1
-#     for (k, v) in p_opt #FIX DICTIONARY PARAMETERS OR VECTORS
-#         merge!(p_cond, Dict(Symbol(k) => pnew[j]))
-#         j += 1
-#     end
-#     modelfit = remake(prob, p=p_cond)
-#     modelfit_sol = solve(modelfit, FBDF(), saveat=xd1_data)
-
-
-#     psol = modelfit_sol
-# end
+end
 
 # plot1 = plot(
 #         psol.t,
@@ -571,22 +591,25 @@ display(res_error)
 #         label="model",
 #         xlabel="Time (s)",
 #         ylabel="Temperature (K)")
-begin
-plot1 =  bar([psol.u[Tf(t, x)][end, end-1]],[measurements[6, :temperatures]], label="E67", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[12, :temperatures]], label="E68", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[18, :temperatures]], label="E69", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[24, :temperatures]], label="E70", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[30, :temperatures]], label="E71", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[36, :temperatures]], label="E72", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[42, :temperatures]], label="E73", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[48, :temperatures]], label="E74", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[54, :temperatures]], label="E75", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[60, :temperatures]], label="E76", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[66, :temperatures]], label="E77", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[72, :temperatures]], label="E78", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[78, :temperatures]], label="E79", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[84, :temperatures]], label="E80", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Tf(t, x)][end, end-1]],[measurements[90, :temperatures]], label="E81", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+begin #TI-8
+    color_model = :blue
+    color_exp = :orange
+    ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
+    order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
+    plot1 = bar(
+        [1, 2], [T_steady[order_indices[1], :T_mod][1], T_steady[order_indices[1], :T_exp][1]],
+        title="TI-8 Steady State Temperature", ylabel="Temperature (K)", xlabel="Experimental Runs",
+        bar_width=0.4, xticks=(1:2:30, ordered_sim_conditions),
+       label="T_model", color=[color_model, color_exp], ylimit=(0, 1250))
+ 
+    # Loop through the remaining data to add the bars without labels
+    for i in 2:15
+        bar!(plot1, [2i-1, 2i], [T_steady[order_indices[i], :T_mod][1], T_steady[order_indices[i], :T_exp][1]], bar_width=0.4, label=["" ""], color=[color_model, color_exp])
+    end
+    # Manually add a legend entry for T_exp and T_model
+    plot1 = bar!(plot1, [0], [0], label="T_exp", color=color_exp)
+    xlims!(plot1, (0, 31))
+end
 
 # plot2 = plot(
 #         psol.t,
@@ -596,21 +619,25 @@ plot1 =  bar([psol.u[Tf(t, x)][end, end-1]],[measurements[6, :temperatures]], la
 #         xlabel="Time (s)",
 #         ylabel="Temperature (K)")
 
-plot2 = bar([psol.u[Ts(t, x)][end, 4]],[measurements[1, :temperatures]], label="E67", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[7, :temperatures]], label="E68", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[13, :temperatures]], label="E69", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[19, :temperatures]], label="E70", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[25, :temperatures]], label="E71", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[31, :temperatures]], label="E72", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[37, :temperatures]], label="E73", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[43, :temperatures]], label="E74", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)") 
-    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[49, :temperatures]], label="E75", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[55, :temperatures]], label="E76", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[61, :temperatures]], label="E77", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[67, :temperatures]], label="E78", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[73, :temperatures]], label="E79", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[79, :temperatures]], label="E80", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-    bar!([psol.u[Ts(t, x)][end, 4]],[measurements[85, :temperatures]], label="E81", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
+begin #TI-9
+    color_model = :blue
+    color_exp = :orange
+    ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
+    order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
+    plot1 = bar(
+        [1, 2], [T_steady[order_indices[1], :T_mod][2], T_steady[order_indices[1], :T_exp][2]],
+        title="TI-9 Steady State Temperature", ylabel="Temperature (K)", xlabel="Experimental Runs",
+        bar_width=0.4, xticks=(1:2:30, ordered_sim_conditions),
+       label="T_model", color=[color_model, color_exp])
+ 
+    # Loop through the remaining data to add the bars without labels
+    for i in 2:15
+        bar!(plot1, [2i-1, 2i], [T_steady[order_indices[i], :T_mod][2], T_steady[order_indices[i], :T_exp][2]], bar_width=0.4, label=["" ""], color=[color_model, color_exp])
+    end
+    # Manually add a legend entry for T_exp and T_model
+    plot1 = bar!(plot1, [0], [0], label="T_exp", color=color_exp)
+    xlims!(plot1, (0, 31))
+end
 
     # plot!(
     #     psol.t,
@@ -624,22 +651,25 @@ plot2 = bar([psol.u[Ts(t, x)][end, 4]],[measurements[1, :temperatures]], label="
     #     label="model",
     #     xlabel="Time (s)",
     #     ylabel="Temperature (K)")
-plot3 = bar([psol.u[Ts(t, x)][end, 40]],[measurements[2, :temperatures]], label="E67", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[8, :temperatures]], label="E68", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[14, :temperatures]], label="E69", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[20, :temperatures]], label="E70", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[26, :temperatures]], label="E71", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[32, :temperatures]], label="E72", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[38, :temperatures]], label="E73", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[44, :temperatures]], label="E74", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[50, :temperatures]], label="E75", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[56, :temperatures]], label="E76", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[62, :temperatures]], label="E77", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[68, :temperatures]], label="E78", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[74, :temperatures]], label="E79", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[80, :temperatures]], label="E80", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-        bar!([psol.u[Ts(t, x)][end, 40]],[measurements[86, :temperatures]], label="E81", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-
+    begin #TI-10
+        color_model = :blue
+        color_exp = :orange
+        ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
+        order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
+        plot1 = bar(
+            [1, 2], [T_steady[order_indices[1], :T_mod][3], T_steady[order_indices[1], :T_exp][3]],
+            title="TI-10 Steady State Temperature", ylabel="Temperature (K)", xlabel="Experimental Runs",
+            bar_width=0.4, xticks=(1:2:30, ordered_sim_conditions),
+           label="T_model", color=[color_model, color_exp], ylimit=(0, 1000))
+     
+        # Loop through the remaining data to add the bars without labels
+        for i in 2:15
+            bar!(plot1, [2i-1, 2i], [T_steady[order_indices[i], :T_mod][3], T_steady[order_indices[i], :T_exp][3]], bar_width=0.4, label=["" ""], color=[color_model, color_exp])
+        end
+        # Manually add a legend entry for T_exp and T_model
+        plot1 = bar!(plot1, [0], [0], label="T_exp", color=color_exp)
+        xlims!(plot1, (0, 31))
+    end
     # plot!(
     #     psol.t,
     #     psol.u[Tf(t, x)][:, 40],
@@ -652,21 +682,25 @@ plot3 = bar([psol.u[Ts(t, x)][end, 40]],[measurements[2, :temperatures]], label=
 #         label="model",
 #         xlabel="Time (s)",
 #         ylabel="Temperature (K)")
-plot4 = bar([psol.u[Ts(t, x)][end, 77]],[measurements[3, :temperatures]], label="E67", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[9, :temperatures]], label="E68", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[15, :temperatures]], label="E69", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[21, :temperatures]], label="E70")
-        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[27, :temperatures]], label="E71")
-        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[33, :temperatures]], label="E72")
-        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[39, :temperatures]], label="E73")
-        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[45, :temperatures]], label="E74")
-        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[51, :temperatures]], label="E75")
-        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[57, :temperatures]], label="E76")
-        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[63, :temperatures]], label="E77")
-        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[69, :temperatures]], label="E78")
-        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[75, :temperatures]], label="E79")
-        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[81, :temperatures]], label="E80")
-        bar!([psol.u[Ts(t, x)][end, 77]],[measurements[87, :temperatures]], label="E81")
+begin #TI-11
+    color_model = :blue
+    color_exp = :orange
+    ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
+    order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
+    plot1 = bar(
+        [1, 2], [T_steady[order_indices[1], :T_mod][4], T_steady[order_indices[1], :T_exp][4]],
+        title="TI-11 Steady State Temperature", ylabel="Temperature (K)", xlabel="Experimental Runs",
+        bar_width=0.4, xticks=(1:2:30, ordered_sim_conditions),
+       label="T_model", color=[color_model, color_exp], ylimit =(0, 1000))
+ 
+    # Loop through the remaining data to add the bars without labels
+    for i in 2:15
+        bar!(plot1, [2i-1, 2i], [T_steady[order_indices[i], :T_mod][4], T_steady[order_indices[i], :T_exp][4]], bar_width=0.4, label=["" ""], color=[color_model, color_exp])
+    end
+    # Manually add a legend entry for T_exp and T_model
+    plot1 = bar!(plot1, [0], [0], label="T_exp", color=color_exp)
+    xlims!(plot1, (0, 31))
+end
     
     # plot!(
     #     psol.t,
@@ -679,22 +713,25 @@ plot4 = bar([psol.u[Ts(t, x)][end, 77]],[measurements[3, :temperatures]], label=
     #     label="model",
     #     xlabel="Time (s)",
     #     ylabel="Temperature (K)")
-plot5 = bar([psol.u[Ts(t, x)][end, 59]],[measurements[4, :temperatures]], label="E67", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[10, :temperatures]], label="E68")
-        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[16, :temperatures]], label="E69")
-        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[22, :temperatures]], label="E70")
-        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[28, :temperatures]], label="E71")
-        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[34, :temperatures]], label="E72")
-        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[40, :temperatures]], label="E73")
-        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[46, :temperatures]], label="E74")
-        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[52, :temperatures]], label="E75")
-        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[58, :temperatures]], label="E76")
-        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[64, :temperatures]], label="E77")
-        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[70, :temperatures]], label="E78")
-        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[76, :temperatures]], label="E79")
-        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[82, :temperatures]], label="E80")
-        bar!([psol.u[Ts(t, x)][end, 59]],[measurements[88, :temperatures]], label="E81")
-   
+    begin #TI-12
+        color_model = :blue
+        color_exp = :orange
+        ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
+        order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
+        plot1 = bar(
+            [1, 2], [T_steady[order_indices[1], :T_mod][5], T_steady[order_indices[1], :T_exp][5]],
+            title="TI-12 Steady State Temperature", ylabel="Temperature (K)", xlabel="Experimental Runs",
+            bar_width=0.4, xticks=(1:2:30, ordered_sim_conditions),
+           label="T_model", color=[color_model, color_exp], ylimit =(0, 1200))
+     
+        # Loop through the remaining data to add the bars without labels
+        for i in 2:15
+            bar!(plot1, [2i-1, 2i], [T_steady[order_indices[i], :T_mod][5], T_steady[order_indices[i], :T_exp][5]], bar_width=0.4, label=["" ""], color=[color_model, color_exp])
+        end
+        # Manually add a legend entry for T_exp and T_model
+        plot1 = bar!(plot1, [0], [0], label="T_exp", color=color_exp)
+        xlims!(plot1, (0, 31))
+    end
     # plot!(
     #     psol.t,
     #     psol.u[Tf(t, x)][:, 59],
@@ -706,38 +743,48 @@ plot5 = bar([psol.u[Ts(t, x)][end, 59]],[measurements[4, :temperatures]], label=
     #     label="model",
     #     xlabel="Time (s)",
     #     ylabel="Temperature (K)")
-plot6 = bar([psol.u[Ts(t, x)][end, 20]],[measurements[5, :temperatures]], label="E67", ylabel="Experimental Temperature (K)", xlabel="Model Temperature (K)")
-        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[11, :temperatures]], label="E68")
-        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[17, :temperatures]], label="E69")
-        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[23, :temperatures]], label="E70")
-        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[29, :temperatures]], label="E71")
-        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[35, :temperatures]], label="E72")
-        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[41, :temperatures]], label="E73")
-        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[47, :temperatures]], label="E74")
-        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[53, :temperatures]], label="E75")
-        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[59, :temperatures]], label="E76")
-        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[65, :temperatures]], label="E77")
-        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[71, :temperatures]], label="E78")
-        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[77, :temperatures]], label="E79")
-        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[83, :temperatures]], label="E80")
-        bar!([psol.u[Ts(t, x)][end, 20]],[measurements[89, :temperatures]], label="E81")
+    begin #TI-3
+        color_model = :blue
+        color_exp = :orange
+        ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
+        order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
+        plot1 = bar(
+            [1, 2], [T_steady[order_indices[1], :T_mod][6], T_steady[order_indices[1], :T_exp][6]],
+            title="TI-3 Steady State Temperature", ylabel="Temperature (K)", xlabel="Experimental Runs",
+            bar_width=0.4, xticks=(1:2:30, ordered_sim_conditions),
+           label="T_model", color=[color_model, color_exp], ylimit =(0, 1000))
+     
+        # Loop through the remaining data to add the bars without labels
+        for i in 2:15
+            bar!(plot1, [2i-1, 2i], [T_steady[order_indices[i], :T_mod][6], T_steady[order_indices[i], :T_exp][6]], bar_width=0.4, label=["" ""], color=[color_model, color_exp])
+        end
+        # Manually add a legend entry for T_exp and T_model
+        plot1 = bar!(plot1, [0], [0], label="T_exp", color=color_exp)
+        xlims!(plot1, (0, 31))
+    end
  
     # plot!(
     #     psol.t,
     #     psol.u[Tf(t, x)][:, 20],
     #     label="gas 27mm")
-plot7 = plot(
-        collect(x_num1),
-        psol.u[Tf(t, x)][end, :],
-        label="gas",
-        xlabel="Length (m)",
-        ylabel="Temperature (K)")
-plot!(
-        collect(x_num1),
-        psol.u[Ts(t, x)][end, :],
-        label="solid",
-        xlabel="Length (m)",
-        ylabel="Temperature (K)")
-
-plot(plot1, plot2, plot3, plot4, plot5, plot6, plot7, layout=(10, 2), size=(1500, 1500))
+# Extract T_mod values
+T_mod_values = [row.T_mod for row in eachrow(T_steady)]
+begin
+# Plot T_mod as a function of x
+plot(
+    x_num1, T_mod_values,
+    label="T_mod",
+    xlabel="Length (m)",
+    ylabel="Temperature (K)",
+    title="T_mod vs Length",
+    legend=:topright
+)
 end
+#plot!(
+        # collect(x_num1),
+        # optsol.u[Ts(t, x)][end, :],
+        # label="solid",
+        # xlabel="Length (m)",
+        # ylabel="Temperature (K)")
+
+#plot(plot1, plot2, plot3, plot4, plot5, plot6, plot7, layout=(10, 2), size=(1500, 1500)) 

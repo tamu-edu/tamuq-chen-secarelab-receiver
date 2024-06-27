@@ -104,7 +104,7 @@ end;
         #Cps(Ts) = (0.27+0.135e-4*(Ts)-9720*((Ts)^-2)+0.204e-7*((Ts)^2))/1000 #kJ/kg*K from manufacturer data
         # Nu = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
         # Nu = A * (Re)^B
-        p_opt = [h_average => 200.]
+        p_opt = [h_average => 0.5]
         p_cond = [Io => 456000.0, qlpm => 7.12]
         p_math = vcat(p_opt, p_cond)
         # h_average = (Nu * kf) / Lc
@@ -130,7 +130,7 @@ end;
         # ]
         eq1 = [
             (1-e) * (aCp * ρs * Cps) * Vs * Dt(Ts(t, x)) ~ A_frt * ks * Dxx(Ts(t, x)) - (h_average * A_exchange * ((Ts(t, x)) - Tf(t, x))) .-  al * (kins * (r_ins/r0).* (Ts(t, x) .- Tins_f(t)) * A_s_p/ (r_ins - r0)),
-            e * ρf * Cpf * Vf * Dt(Tf(t, x)) ~ Af * kf * e * Dxx(Tf(t, x)) -  e * m * Cpf * Dx(Tf(t, x)) + (h_average * A_exchange * ((Ts(t, x)) - Tf(t, x)))
+            e * ρf * Cpf * Vf * Dt(Tf(t, x)) ~ Af * kf * e * Dxx(Tf(t, x)) -  m * Cpf * Dx(Tf(t, x)) + (h_average * A_exchange * ((Ts(t, x)) - Tf(t, x)))
         ]
         bcs1 = [
             Ts(0.0, x) ~ Tamb, # initial
@@ -274,8 +274,8 @@ end;
 
         optf = OptimizationFunction(loss, Optimization.AutoForwardDiff())
         
-        lb = [200.]
-        ub = [400.]
+        lb = [0.01]
+        ub = [100.]
 
         optprob = Optimization.OptimizationProblem(optf, p0, [], lb=lb, ub=ub)
         
