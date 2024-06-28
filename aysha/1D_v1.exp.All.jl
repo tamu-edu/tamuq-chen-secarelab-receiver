@@ -114,6 +114,9 @@ begin
     p_math = vcat(p_opt, p_cond)
     #h_average = hfa * (qlpm^hfn)
     h_average = (Nu * kf) / Lc
+    Re_f(qlpm) = (ρf * (qlpm/60/1000/Af) * w_t) / mu
+    Nu_f(qlpm) = A*(Re_f(qlpm)^B)*(Pr^C)
+    h_avg_f(qlpm) = (Nu_f(qlpm) * kf) / Lc
     
  
     # MOL Discretization parameters for system 1
@@ -136,8 +139,8 @@ begin
     #     Vf * ρf * Cpf * Dt(Tf(t, x)) ~ Vf * kf * Dxx(Tf(t, x)) - Vf * ρf * Cpf * V * Dx(Tf(t, x)) + (h_average) * Av * Vi * ((Ts(t, x) - Tf(t, x)))
     # ]
     eq1 = [
-        (1-e) * (aCp * ρs * Cps) * Vs * Dt(Ts(t, x)) ~ A_frt * ks * Dxx(Ts(t, x)) - (h_average * A_exchange * ((Ts(t, x)) - Tf(t, x))) .- (kins * (r_ins/r0).* (Ts(t, x) .- Tins_f(t)) * A_s_p/ (r_ins - r0)),
-        e * ρf * Cpf * Vf * Dt(Tf(t, x)) ~ Af * e * kf * Dxx(Tf(t, x)) - m * Cpf * Dx(Tf(t, x)) + (h_average * A_exchange * ((Ts(t, x)) - Tf(t, x)))
+        (1-e) * (aCp * ρs * Cps) * Vs * Dt(Ts(t, x)) ~ A_frt * ks * Dxx(Ts(t, x)) - (h_avg_f(qlpm) * A_exchange * ((Ts(t, x)) - Tf(t, x))) .- (kins * (r_ins/r0).* (Ts(t, x) .- Tins_f(t)) * A_s_p/ (r_ins - r0)),
+        e * ρf * Cpf * Vf * Dt(Tf(t, x)) ~ Af * e * kf * Dxx(Tf(t, x)) - m * Cpf * Dx(Tf(t, x)) + (h_avg_f(qlpm) * A_exchange * ((Ts(t, x)) - Tf(t, x)))
     ]
     bcs1 = [
         Ts(0.0, x) ~ Tamb, # initial
