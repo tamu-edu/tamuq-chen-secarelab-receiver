@@ -108,7 +108,8 @@ begin
     #Nu = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
     Nu = A*(Re^B)*(Pr^C)
     #Cps(Ts) = (0.27+0.135e-4*(Ts)-9720*((Ts)^-2)+0.204e-7*((Ts)^2))/1000 #kJ/kg*K from manufacturer data
-    p_opt = [A => 150., B => 0.77, C=> 8.]
+    #p_opt = [A => 2., B => 0.5, n=> 0.5, C=> 20.]
+    p_opt = [A => 1., B => 0.5, C=> 19.]
     p_cond = [Io => 456000.0, qlpm => 15.27]
     p_math = vcat(p_opt, p_cond)
     #h_average = hfa * (qlpm^hfn)
@@ -205,12 +206,12 @@ begin
 end
 begin
     # model results for different thermocouples
-    sol1.u[Ts(t, x)][:, 40] #T9 model 55mm (external)
-    sol1.u[Ts(t, x)][:, 77] #T10 model 106mm (external)
-    sol1.u[Tf(t, x)][:, 59] #T11 model 82mm (internal-gas)
-    sol1.u[Ts(t, x)][:, 59] #T11 model 82mm (internal-solid)
-    sol1.u[Tf(t, x)][:, 20] #T12 model 27mm (internal-gas)
-    sol1.u[Ts(t, x)][:, 20] #T12 model 27mm (internal-solid)
+    sol1.u[Ts(t, x)][:, 40] #T9 model 58mm (external)
+    sol1.u[Ts(t, x)][:, 77] #T10 model 107mm (external)
+    sol1.u[Tf(t, x)][:, 77] #T11 model 107mm (internal-gas)
+    sol1.u[Ts(t, x)][:, 77] #T11 model 107mm (internal-solid)
+    sol1.u[Tf(t, x)][:, 40] #T12 model 58mm (internal-gas)
+    sol1.u[Ts(t, x)][:, 40] #T12 model 58mm (internal-solid)
 end
 
 #measurements and conditions#Defining simulation conditions
@@ -479,25 +480,24 @@ begin
     y6n1_data = N1[:, 5] .+ 273.15
 end
 #Optimization using NLOpt
-rmp = ModelingToolkit.varmap_to_vars([Io => 456000, A => 2., B => 0.77, C=> 20., qlpm => 7.12], parameters(pdesys))
+rmp = ModelingToolkit.varmap_to_vars([Io => 456000, A => 100., B => 0.1, C=> 10., qlpm => 7.12], parameters(pdesys))
 function NLmodeloptim(tvalues, rmp)
 
     #p = [hlocal => p_vary[1]]
     modeloptim = remake(prob, p=rmp, tspan=(1.0, tvalues[end]))
     modeloptim_sol = solve(modeloptim, FBDF(), saveat=tvalues[end])#, reltol=1e-12, abstol=1e-12)
     #time = modelfit_sol.t
-    tempT8_op = modeloptim_sol.u[Ts(t, x)][end, 4]
-    tempT9_op = modeloptim_sol.u[Ts(t, x)][end, 40]
-    tempT10_op = modeloptim_sol.u[Ts(t, x)][end, 77]
-    tempT3_op = modeloptim_sol.u[Tf(t, x)][end, end-1]
-    T12_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 20] .+ modeloptim_sol.u[Ts(t, x)][end, 20]) ./ 2
-    T11_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 59] .+ modeloptim_sol.u[Ts(t, x)][end, 59]) ./ 2
-    #tempT11_op = modeloptim_sol.u[Ts(t, x)][end, 59]
-    #tempT12_op = modeloptim_sol.u[Ts(t, x)][end, 20]
-    return append!([tempT8_op, tempT9_op, tempT10_op, tempT3_op, T12_modelmean, T11_modelmean])
-    #return [tempT3_op]
+    tempT8_op = modeloptim_sol.u[Ts(t, x)][end, 8]
+    tempT9_op = modeloptim_sol.u[Ts(t, x)][end, 42]
+    tempT10_op = modeloptim_sol.u[Ts(t, x)][end, 78]
+     tempT3_op = modeloptim_sol.u[Tf(t, x)][end, end-1]
+    #T12_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 20] .+ modeloptim_sol.u[Ts(t, x)][end, 20]) ./ 2
+    #T11_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 59] .+ modeloptim_sol.u[Ts(t, x)][end, 59]) ./ 2
+    tempT11_op = modeloptim_sol.u[Ts(t, x)][end, 78]
+    tempT12_op = modeloptim_sol.u[Ts(t, x)][end, 42]
+    return append!([tempT8_op, tempT9_op, tempT10_op, tempT3_op, tempT12_op, tempT11_op])
+    # return ([tempT3_op])
 end
-
 
 function remakeAysha(pguess_l, cond, time_opt)
         #p_math_vec = copy(cond)
@@ -543,16 +543,18 @@ end
 p0 = [x[2] for x in p_opt]
 optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
 #p_opt = [aCp => 1., hfa => 8., hfn =>0.66, aIo => 1.] 
-lb = [70., 0.1, 5.]
-ub = [500., 0.9, 17.]
+lb = [1., 0.1, 16.]
+ub = [70., 1., 30.]
 
 #pguess_opt = ModelingToolkit.varmap_to_vars([Io => 456000, h_average => 14., qlpm => 7.12], parameters(pdesys))
 initialerror = (lossAll(p0, []))
 println(initialerror)
 
 optprob = Optimization.OptimizationProblem(optf, p0, [], lb=lb, ub=ub)
+
 optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method=NLopt.LN_NELDERMEAD(), maxtime=1000, local_maxiters=10000)
 #optsol = solve(optprob, NLopt.LN_NELDERMEAD(), maxtime=10000, local_maxiters=10000)
+
 
 println(optsol.retcode)
 pnew = optsol.u
@@ -583,6 +585,12 @@ begin
    end
 
 end
+
+
+
+
+
+
 
 # plot1 = plot(
 #         psol.t,
@@ -780,11 +788,88 @@ plot(
     legend=:topright
 )
 end
-#plot!(
-        # collect(x_num1),
-        # optsol.u[Ts(t, x)][end, :],
-        # label="solid",
-        # xlabel="Length (m)",
-        # ylabel="Temperature (K)")
 
-#plot(plot1, plot2, plot3, plot4, plot5, plot6, plot7, layout=(10, 2), size=(1500, 1500)) 
+
+# Initialize the DataFrame
+    T_steady = DataFrame(sim_id=[], T_mod=[], T_exp=[])
+    sim_key = collect(keys(simulation_conditions))
+    lossr = zeros(length(sim_key))
+   #Threads.@threads 
+   for it in 1:length(sim_key)
+    # Retrieve from measurements the experimental data for the current simulation condition
+        sm = sim_key[it]
+        #println(sm)
+        cond = simulation_conditions[sm]
+        expdata = (measurements[measurements.simulation_id.==sm, :temperatures])
+        time_opt = (measurements[measurements.simulation_id.==sm, :time])
+        
+        #run selected simulation and get the steady temperature values
+        temp_T = remakeAysha(pnew, cond, time_opt)
+        #push!(T_steady, [sm, temp_T, expdata])
+        push!(T_steady, (sm, temp_T, expdata))
+   end
+# Extract T_mod and T_exp from T_steady (TI-8)
+T_mod = [row[2][1] for row in eachrow(T_steady)]
+T_exp = [row[3][1] for row in eachrow(T_steady)]
+
+# Create scatter plot
+scatter(T_exp, T_mod, label="Experimental and Model Temperatures", legend=:bottomright,
+        xlabel="Experimental Temperature (K)", ylabel="Model Temperature (K)", title=" External Solid Temperature (TI-8)")
+
+# Add the best fit line to the plot
+plot!([490, 1250], [490, 1250], label="Best Fit", color=:red)
+
+# Extract T_mod and T_exp from T_steady (TI-9)
+T_mod = [row[2][2] for row in eachrow(T_steady)]
+T_exp = [row[3][2] for row in eachrow(T_steady)]
+
+# Create scatter plot
+scatter(T_exp, T_mod, label="Experimental and Model Temperatures", legend=:bottomright,
+        xlabel="Experimental Temperature (K)", ylabel="Model Temperature (K)", title=" External Solid Temperature (TI-9)")
+
+# Add the best fit line to the plot
+plot!([550, 1100], [550, 1100], label="Best Fit", color=:red)
+
+# Extract T_mod and T_exp from T_steady (TI-10)
+T_mod = [row[2][3] for row in eachrow(T_steady)]
+T_exp = [row[3][3] for row in eachrow(T_steady)]
+
+# Create scatter plot
+scatter(T_exp, T_mod, label="Experimental and Model Temperatures", legend=:bottomright,
+        xlabel="Experimental Temperature (K)", ylabel="Model Temperature (K)", title=" External Solid Temperature (TI-10)")
+
+# Add the best fit line to the plot
+plot!([550, 1000], [550, 1000], label="Best Fit", color=:red)
+
+# Extract T_mod and T_exp from T_steady (TI-11)
+T_mod = [row[2][4] for row in eachrow(T_steady)]
+T_exp = [row[3][4] for row in eachrow(T_steady)]
+
+# Create scatter plot
+scatter(T_exp, T_mod, label="Experimental and Model Temperatures", legend=:bottomright,
+        xlabel="Experimental Temperature (K)", ylabel="Model Temperature (K)", title=" Internal Solid Temperature (TI-11)")
+
+# Add the best fit line to the plot
+plot!([550, 1000], [550, 1000], label="Best Fit", color=:red)
+
+# Extract T_mod and T_exp from T_steady (TI-12)
+T_mod = [row[2][5] for row in eachrow(T_steady)]
+T_exp = [row[3][5] for row in eachrow(T_steady)]
+
+# Create scatter plot
+scatter(T_exp, T_mod, label="Experimental and Model Temperatures", legend=:bottomright,
+        xlabel="Experimental Temperature (K)", ylabel="Model Temperature (K)", title=" Internal Solid Temperature (TI-12)")
+
+# Add the best fit line to the plot
+plot!([550, 1150], [550, 1150], label="Best Fit", color=:red)
+
+# Extract T_mod and T_exp from T_steady (TI-3)
+T_mod = [row[2][6] for row in eachrow(T_steady)]
+T_exp = [row[3][6] for row in eachrow(T_steady)]
+
+# Create scatter plot
+scatter(T_exp, T_mod, label="Experimental and Model Temperatures", legend=:bottomright,
+        xlabel="Experimental Temperature (K)", ylabel="Model Temperature (K)", title=" Air Outlet Temperature (TI-3)")
+
+# Add the best fit line to the plot
+plot!([500, 1000], [500, 1000], label="Best Fit", color=:red)
