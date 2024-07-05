@@ -61,9 +61,9 @@ begin #define parameters
     r_ins = 42 / 1000 #m
     r_H = 4 * (w_t * w_t) / (4 * w_t) #hydraulic receiver diameter
     em = 0.8 #emissivity
-    aCp = 4.
-    aIo = 2.
-    al = 0.22
+    aCp = 1.
+    aIo = 1.
+    al = 1.
 end;
     #for interpolations 
     #1. extract T2 data
@@ -89,9 +89,9 @@ end;
         @register_symbolic Gz_f(x)
     end
     begin
-        # Parameters, variables, and derivatives for system 1
+       # Parameters, variables, and derivatives for system 1
         @variables t x
-         @parameters h_average #A B ks h_average A n
+        @parameters A B C #ks h_average A n
         @parameters Io qlpm
         @variables Ts(..) Tf(..)
         Dt = Differential(t)
@@ -99,15 +99,20 @@ end;
         Dxx = Differential(x)^2
         ks = (48.78) * 1.97 * ((1 - e)^1.5) #W/m.K
         ρs = 3200  #kg/m3
-        Cps = 1290  #J/kg*K
-        #Gz = (1/L) * Re * Pr * w_t
-        #Cps(Ts) = (0.27+0.135e-4*(Ts)-9720*((Ts)^-2)+0.204e-7*((Ts)^2))/1000 #kJ/kg*K from manufacturer data
-        # Nu = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
-        # Nu = A * (Re)^B
-        p_opt = [h_average => 0.5]
-        p_cond = [Io => 456000.0, qlpm => 7.12]
+        Cps = 1290 * 6.6 #J/kg*K
+        #Nu = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
+        #Nu = A*(Re^B)*(Pr^C)
+        #Cps(Ts) = (0.27+0.135e-4*(Ts(t,x))-9720*((Ts(t,x))^-2)+0.204e-7*((Ts(t,x))^2))/1000 #kJ/kg*K from manufacturer data
+        #p_opt = [A => 2., B => 0.5, n=> 0.5, C=> 20.]
+        p_opt = [A => 700., B => 0.5, C=> 7.5]
+        p_cond = [Io => 442320.0, qlpm => 7.12]
         p_math = vcat(p_opt, p_cond)
-        # h_average = (Nu * kf) / Lc
+        #h_average = hfa * (qlpm^hfn)
+        #h_average = (Nu * kf) / Lc
+        Re_f(qlpm) = (ρf * (qlpm/60/1000/Af) * w_t) / mu
+        Nu_f(qlpm) = A*(Re_f(qlpm)^B)*(Pr^C)
+        h_avg_f(qlpm) = (Nu_f(qlpm) * kf) / Lc
+    
      
         # MOL Discretization parameters for system 1
         x_max1 = L
@@ -128,10 +133,14 @@ end;
         #     Vs * (ρs*Cps) * Dt(Ts(t, x)) ~ Vs * (ks) * Dxx(Ts(t, x)) - ((h_average) * Av * Vi * ((Ts(t, x)) - Tf(t, x))) .- (kins * (r / r0) .* (Ts(t, x) .- Tins_f(t)) * A_t / (r - r0)),
         #     Vf * ρf * Cpf * Dt(Tf(t, x)) ~ Vf * kf * Dxx(Tf(t, x)) - Vf * ρf * Cpf * V * Dx(Tf(t, x)) + (h_average) * Av * Vi * ((Ts(t, x) - Tf(t, x)))
         # ]
+        # eq1 = [
+        #     (1-e) * (aCp * ρs * Cps) * Vs * Dt(Ts(t, x)) ~ A_frt * ks * Dxx(Ts(t, x)) - (h_avg_f(qlpm) * A_exchange * ((Ts(t, x)) - Tf(t, x))) .-  al * (kins * (r_ins/r0).* (Ts(t, x) .- Tins_f(t)) * A_s_p/ (r_ins - r0)),
+        #     e * ρf * Cpf * Vf * Dt(Tf(t, x)) ~ Af * kf * e * Dxx(Tf(t, x)) -  m * Cpf * Dx(Tf(t, x)) + (h_avg_f(qlpm) * A_exchange * ((Ts(t, x)) - Tf(t, x)))
+        # ]
         eq1 = [
-            (1-e) * (aCp * ρs * Cps) * Vs * Dt(Ts(t, x)) ~ A_frt * ks * Dxx(Ts(t, x)) - (h_average * A_exchange * ((Ts(t, x)) - Tf(t, x))) .-  al * (kins * (r_ins/r0).* (Ts(t, x) .- Tins_f(t)) * A_s_p/ (r_ins - r0)),
-            e * ρf * Cpf * Vf * Dt(Tf(t, x)) ~ Af * kf * e * Dxx(Tf(t, x)) -  m * Cpf * Dx(Tf(t, x)) + (h_average * A_exchange * ((Ts(t, x)) - Tf(t, x)))
-        ]
+        (1-e) * (aCp * ρs * Cps) * Vs * Dt(Ts(t, x)) ~  A_frt * ks * Dxx(Ts(t, x)) - (h_avg_f(qlpm) * A_exchange * (Ts(t, x) - Tf(t, x))) - al * (kins * (r_ins / r0) * (Ts(t, x) .- Tins_f(t)) * A_s_p / (r_ins - r0)),
+        e * ρf * Cpf * Vf * Dt(Tf(t, x)) ~ Af * kf * e * Dxx(Tf(t, x)) - m * Cpf * Dx(Tf(t, x)) + (h_avg_f(qlpm) * A_exchange * (Ts(t, x) - Tf(t, x)))
+    ]
         bcs1 = [
             Ts(0.0, x) ~ Tamb, # initial
             Tf(0.0, x) ~ Tamb, # initial
@@ -193,10 +202,10 @@ end;
         end
         # Model solution plotted with experimental data
         begin
-            plot(title = "Solid Temperature Profile T8")
+            plot()
             plot!(sol1.t, 
-                sol1.u[Ts(t,x)][:,4], # around 5 mm in T8
-                title = "Solid Temperature Profile T8", 
+                sol1.u[Ts(t,x)][:,8], # around 11 mm in T8
+                title = "Solid Temperature Profile for TI-8", 
                 label = "Numerical", 
                 xlabel = "Time (s)", 
                 ylabel = "Temperature (K)")
@@ -206,13 +215,13 @@ end;
                     label = "Experimental",
                     xlabel = "Time (s)", 
                     ylabel = "Temperature (K)")
-            
         end
+        
         begin
             plot()
                 plot!(sol1.t, 
                 sol1.u[Tf(t,x)][:,end-1], # around 136 mm in T3
-                title = "Gas Temperature Profile T3", 
+                title = "Gas Temperature Profile for TI-3", 
                 label = "Numerical", 
                 xlabel = "Time (s)", 
                 ylabel = "Temperature (K)")
@@ -223,15 +232,58 @@ end;
                     xlabel = "Time (s)", 
                     ylabel = "Temperature (K)")
         end
+        begin
+            plot()
+            plot!(sol1.t, 
+            sol1.u[Ts(t,x)][:, 42], # around 58 mm in T9
+            title = "Solid Temperature Profile for TI-9 and TI-12", 
+            label = "Numerical", 
+            xlabel = "Time (s)", 
+            ylabel = "Temperature (K)")
+            scatter!(
+                xd1_data, 
+                y1d2_data,  
+                label = "Experimental TI-9",
+                xlabel = "Time (s)", 
+                ylabel = "Temperature (K)")
+            scatter!(
+                xd1_data, 
+                y4d2_data,  
+                label = "Experimental TI-12",
+                xlabel = "Time (s)", 
+                ylabel = "Temperature (K)")
+        end
+
+        begin
+            plot()
+            plot!(sol1.t, 
+            sol1.u[Ts(t,x)][:, 78], # around 107 mm in T10 and TI-11
+            title = "Solid Temperature Profile for TI-10 and TI-11", 
+            label = "Numerical", 
+            xlabel = "Time (s)", 
+            ylabel = "Temperature (K)")
+            scatter!(
+                xd1_data, 
+                y2d2_data,  
+                label = "Experimental TI-10",
+                xlabel = "Time (s)", 
+                ylabel = "Temperature (K)")
+            scatter!(
+                xd1_data, 
+                y3d2_data,  
+                label = "Experimental TI-11",
+                xlabel = "Time (s)", 
+                ylabel = "Temperature (K)")
+        end
+ 
+    
     begin
         # model results for different thermocouples
-       sol1.u[Ts(t,x)][:, 4]
-       sol1.u[Ts(t,x)][:,40] #T9 model 55mm (external)
-       sol1.u[Ts(t,x)][:,77] #T10 model 106mm (external)
-       sol1.u[Tf(t,x)][:,59] #T11 model 82mm (internal-gas)
-       sol1.u[Ts(t,x)][:,59] #T11 model 82mm (internal-solid)
-       sol1.u[Tf(t,x)][:,20] #T12 model 27mm (internal-gas)
-       sol1.u[Ts(t,x)][:,20] #T12 model 27mm (internal-solid)
+       sol1.u[Ts(t,x)][:, 8] #T8 model 11mm (external)
+       sol1.u[Ts(t,x)][:,42] #T9 model 55mm (external)
+       sol1.u[Ts(t,x)][:,78] #T10 model 106mm (external)
+       sol1.u[Ts(t,x)][:,78] #T11 model 82mm (internal-solid)
+       sol1.u[Ts(t,x)][:,42] #T12 model 27mm (internal-solid)
         # taking averages of internal thermocouples
        # T12_model = sol1.u[Tf(t,x)][:,20], sol1.u[Ts(t,x)][:,20]
        # T12_modelmean = mean(T12_model)
@@ -240,12 +292,13 @@ end;
     end
         p0 = [x[2] for x in p_opt]
         #expdata = append!(copy(y2d1_data), y1d2_data, y2d2_data, y1d1_data, y3d2_data, y4d2_data)
-        expdata =  append!(copy(y2d1_data), y1d2_data, y2d2_data, y1d1_data, y3d2_data, y4d2_data)
+        # expdata =  append!(y2d1_data, y1d2_data, y2d2_data, y1d1_data, y3d2_data, y4d2_data)
+        expdata = y1d1_data #T3 - exp. 71
         length(expdata)
         
         
         pguess = p0
-        rmp = ModelingToolkit.varmap_to_vars([Io => 456000, ks => 22.5, h_average=> 20., qlpm => 7.12], parameters(pdesys))
+        rmp = ModelingToolkit.varmap_to_vars([Io => 456000, A => 70., B => 0.3, C=> 10., qlpm => 7.12], parameters(pdesys))
 
             #Optimization using NLOpt
             function NLmodeloptim(xvalues, rmp)
@@ -253,29 +306,29 @@ end;
                 modeloptim = remake(prob, p = rmp, tspan=(xvalues[1], xvalues[end]))
                 modeloptim_sol = solve(modeloptim, FBDF(), saveat = xvalues)#, reltol=1e-12, abstol = 1e-12)
                 #time = modelfit_sol.t
-                tempT8_op = modeloptim_sol.u[Ts(t,x)][:, 4]
-                tempT9_op = modeloptim_sol.u[Ts(t,x)][:,40]
-                tempT10_op = modeloptim_sol.u[Ts(t,x)][:,77]
+                # tempT8_op = modeloptim_sol.u[Ts(t,x)][:, 8]
+                # tempT9_op = modeloptim_sol.u[Ts(t,x)][:,42]
+                # tempT10_op = modeloptim_sol.u[Ts(t,x)][:,78]
                 tempT3_op = modeloptim_sol.u[Tf(t,x)][:, end-1]
-                T12_modelmean = (modeloptim_sol.u[Tf(t,x)][:,20] .+  modeloptim_sol.u[Ts(t,x)][:,20]) ./2
-                T11_modelmean = (modeloptim_sol.u[Tf(t,x)][:,59] .+ modeloptim_sol.u[Ts(t,x)][:,59]) ./2
-                return append!(tempT8_op, tempT9_op, tempT10_op, tempT3_op, T12_modelmean, T11_modelmean) 
+                # tempT11_op = modeloptim_sol.u[Ts(t, x)][:, 78]
+                # tempT12_op = modeloptim_sol.u[Ts(t, x)][:, 42]
+                #result = vcat(tempT8_op, tempT9_op, tempT10_op, tempT3_op, tempT12_op, tempT11_op)
+                #result_length = length(result)
+                return tempT3_op
             end
-        
             function loss(pguess, _)
-                Temp = NLmodeloptim(xd1_data, pguess)
+                Temp = NLmodeloptim(xd1_data, p0)
                 lossr = (Temp .- expdata).^2
-                return sqrt(sum(lossr) / length(expdata)) #MSE
+                return sqrt(sum(lossr) / (length(expdata))) #MSE
             end
-
             #loss([1.], [])
 
         initialerror=(loss(pguess, []))
 
         optf = OptimizationFunction(loss, Optimization.AutoForwardDiff())
         
-        lb = [0.01]
-        ub = [100.]
+        lb = [70., 0.31, 6.5]
+        ub = [1359., 0.9, 16.5]
 
         optprob = Optimization.OptimizationProblem(optf, p0, [], lb=lb, ub=ub)
         
@@ -310,108 +363,96 @@ begin
         label = "Experimental",
         xlabel = "Time (s)", 
         ylabel = "Temperature (K)")
-        plot!(
-        psol.t, 
-        psol.u[Ts(t,x)][:,end-1], 
-        label = "solid 136 mm")
-            
-    plot2 = plot(
-        psol.t, 
-        psol.u[Ts(t,x)][:,4], # around 5 mm in T8
-        title = "Solid Temperature Profile T8 - exp. 71", 
-        label = "Numerical", 
-        xlabel = "Time (s)", 
-        ylabel = "Temperature (K)")
-        scatter!(
-        xd1_data, 
-        y2d1_data,  
-        label = "Experimental",
-        xlabel = "Time (s)", 
-        ylabel = "Temperature (K)")
-        plot!(
-        psol.t, 
-        psol.u[Tf(t,x)][:,4], # around 5 mm in T8
-        label = "gas 5mm")
-    plot3 = plot(
-        psol.t, 
-        psol.u[Ts(t,x)][:,40], # around 55 mm in T9
-        title = "Solid Temperature Profile T9 - exp. 71", 
-        label = "Numerical", 
-        xlabel = "Time (s)", 
-        ylabel = "Temperature (K)")
-        scatter!(
-        xd1_data, 
-        y1d2_data,  
-        label = "Experimental",
-        xlabel = "Time (s)", 
-        ylabel = "Temperature (K)")
-        plot!(
-        psol.t, 
-        psol.u[Tf(t,x)][:,40], 
-        label = "gas 55mm")
-    plot4 = plot(
-        psol.t, 
-        psol.u[Ts(t,x)][:,77], # around 106 mm in T10
-        title = "Solid Temperature Profile T10 - exp. 71", 
-        label = "Numerical", 
-        xlabel = "Time (s)", 
-        ylabel = "Temperature (K)")
-        scatter!(
-        xd1_data, 
-        y2d2_data,  
-        label = "Experimental",
-        xlabel = "Time (s)", 
-        ylabel = "Temperature (K)")
-        plot!(
-        psol.t, 
-        psol.u[Tf(t,x)][:,77], 
-        label = "gas 106mm")
-    plot5 = plot(
-        psol.t, 
-        psol.u[Ts(t,x)][:,20], # around 27 mm in T12
-        title = "Solid Temperature Profile T12 - exp. 71", 
-        label = "Numerical", 
-        xlabel = "Time (s)", 
-        ylabel = "Temperature (K)")
-        scatter!(
-        xd1_data, 
-        y4d2_data,  
-        label = "Experimental",
-        xlabel = "Time (s)", 
-        ylabel = "Temperature (K)")
-        plot!(
-        psol.t, 
-        psol.u[Tf(t,x)][:,20], 
-        label = "gas 27mm")
-    plot6 = plot(
-        psol.t, 
-        psol.u[Ts(t,x)][:,59], # around 82 mm in T11
-        title = "Solid Temperature Profile T11 - exp. 71", 
-        label = "Numerical", 
-        xlabel = "Time (s)", 
-        ylabel = "Temperature (K)")
-        scatter!(
-        xd1_data, 
-        y3d2_data,  
-        label = "Experimental",
-        xlabel = "Time (s)", 
-        ylabel = "Temperature (K)")
-        plot!(
-        psol.t, 
-        psol.u[Tf(t,x)][:,59], 
-        label = "gas 82mm")
-    plot7 = plot(
-        collect(x_num1),
-        psol.u[Tf(t,x)][end,:],
-        label = "gas",
-        xlabel = "Length (m)",
-        ylabel = "Temperature (K)")
-        plot!(
-        collect(x_num1),
-        psol.u[Ts(t,x)][end,:],
-        label = "solid",
-        xlabel = "Length (m)",
-        ylabel = "Temperature (K)")
+end     
+
+
+
+    # plot2 = plot(
+    #     psol.t, 
+    #     psol.u[Ts(t,x)][:,8], # around 11 mm in T8
+    #     title = "Solid Temperature Profile T8 - exp. 71", 
+    #     label = "Numerical", 
+    #     xlabel = "Time (s)", 
+    #     ylabel = "Temperature (K)")
+    #     scatter!(
+    #     xd1_data, 
+    #     y2d1_data,  
+    #     label = "Experimental",
+    #     xlabel = "Time (s)", 
+    #     ylabel = "Temperature (K)")
+      
+    # plot3 = plot(
+    #     psol.t, 
+    #     psol.u[Ts(t,x)][:,42], # around 58 mm in T9
+    #     title = "Solid Temperature Profile T9 - exp. 71", 
+    #     label = "Numerical", 
+    #     xlabel = "Time (s)", 
+    #     ylabel = "Temperature (K)")
+    #     scatter!(
+    #     xd1_data, 
+    #     y1d2_data,  
+    #     label = "Experimental",
+    #     xlabel = "Time (s)", 
+    #     ylabel = "Temperature (K)")
+    
+    # plot4 = plot(
+    #     psol.t, 
+    #     psol.u[Ts(t,x)][:,78], # around 107 mm in T10
+    #     title = "Solid Temperature Profile T10 - exp. 71", 
+    #     label = "Numerical", 
+    #     xlabel = "Time (s)", 
+    #     ylabel = "Temperature (K)")
+    #     scatter!(
+    #     xd1_data, 
+    #     y2d2_data,  
+    #     label = "Experimental",
+    #     xlabel = "Time (s)", 
+    #     ylabel = "Temperature (K)")
+    
+    # plot5 = plot(
+    #     psol.t, 
+    #     psol.u[Ts(t,x)][:,42], # around 58 mm in T12
+    #     title = "Solid Temperature Profile T12 - exp. 71", 
+    #     label = "Numerical", 
+    #     xlabel = "Time (s)", 
+    #     ylabel = "Temperature (K)")
+    #     scatter!(
+    #     xd1_data, 
+    #     y4d2_data,  
+    #     label = "Experimental",
+    #     xlabel = "Time (s)", 
+    #     ylabel = "Temperature (K)")
+    #     plot!(
+    #     psol.t, 
+    #     psol.u[Tf(t,x)][:,20], 
+    #     label = "gas 27mm")
+    # plot6 = plot(
+    #     psol.t, 
+    #     psol.u[Ts(t,x)][:, 78], # around 107 mm in T11
+    #     title = "Solid Temperature Profile T11 - exp. 71", 
+    #     label = "Numerical", 
+    #     xlabel = "Time (s)", 
+    #     ylabel = "Temperature (K)")
+    #     scatter!(
+    #     xd1_data, 
+    #     y3d2_data,  
+    #     label = "Experimental",
+    #     xlabel = "Time (s)", 
+    #     ylabel = "Temperature (K)")
+    
+    # plot7 = plot(
+    #     collect(x_num1),
+    #     psol.u[Tf(t,x)][end,:],
+    #     label = "gas",
+    #     xlabel = "Length (m)",
+    #     ylabel = "Temperature (K)")
+    #     plot!(
+    #     collect(x_num1),
+    #     psol.u[Ts(t,x)][end,:],
+    #     label = "solid",
+    #     xlabel = "Length (m)",
+    #     ylabel = "Temperature (K)")
         
-    plot(plot1, plot2, plot3, plot4, plot5, plot6, plot7, layout=(10,2), size=(1500, 1500))
-end
+    #plot(plot1, plot2, plot3, plot4, plot5, plot6, plot7, layout=(10,2), size=(1500, 1500))
+  
+# end

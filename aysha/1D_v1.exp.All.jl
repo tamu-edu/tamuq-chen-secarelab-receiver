@@ -85,6 +85,7 @@ end
 
 begin 
     x11 = 0.0001:0.001383838383838384:0.137 #T2 (insulation)
+    #Re_f(qlpm) = (ρf * (qlpm/60/1000/Af) * w_t) / mu
     Re = (ρf * V * w_t) / mu
     Pr = (Cpf * mu) / kf
     Gz = (1 ./ x11) * Re * Pr * w_t
@@ -106,14 +107,14 @@ begin
     ρs = 3200  #kg/m3
     Cps = 1290  #J/kg*K
     #Nu = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
-    Nu = A*(Re^B)*(Pr^C)
+    #Nu = A*(Re^B)*(Pr^C)
     #Cps(Ts) = (0.27+0.135e-4*(Ts)-9720*((Ts)^-2)+0.204e-7*((Ts)^2))/1000 #kJ/kg*K from manufacturer data
     #p_opt = [A => 2., B => 0.5, n=> 0.5, C=> 20.]
-    p_opt = [A => 1., B => 0.5, C=> 19.]
+    p_opt = [A => 70., B => 0.3, C=> 10.]
     p_cond = [Io => 456000.0, qlpm => 15.27]
     p_math = vcat(p_opt, p_cond)
     #h_average = hfa * (qlpm^hfn)
-    h_average = (Nu * kf) / Lc
+    #h_average = (Nu * kf) / Lc
     Re_f(qlpm) = (ρf * (qlpm/60/1000/Af) * w_t) / mu
     Nu_f(qlpm) = A*(Re_f(qlpm)^B)*(Pr^C)
     h_avg_f(qlpm) = (Nu_f(qlpm) * kf) / Lc
@@ -217,23 +218,430 @@ begin
     sol1.u[Ts(t, x)][:, 40] #T12 model 58mm (internal-solid)
 end
 
+#Exp. data to extract temp.
+begin
+    #Exp 67 - T3, T8
+    Z = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0067_231125_161757.xlsx")["Sheet 1 - Data_FPT0067_231125_1"]["A3:C3932"]
+    E67t = float.(Z[:, 1]) #xz_data
+    E67Tf = Z[:, 2] .+ 273.15 #y1z_data
+    y2z_data = Z[:, 3] .+ 273.15
+end 
+begin #decimate experimental data E67 for T3
+    dec = 100
+    function decimate!(x, step)
+        x = [x[i] for i in 1:step:length(x)]
+    end
+    E67t = decimate!(E67t, dec)
+    E67Tf = decimate!(E67Tf, dec)
+    scatter(E67t, E67Tf)
+end
+
+
+begin
+    #Exp 67 - T9, T10, T11, T12
+    Z1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0067_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0067_T9"]["A3:E3932"]
+    y3z_data = Z1[:, 2] .+ 273.15
+    y4z_data = Z1[:, 3] .+ 273.15
+    y5z_data = Z1[:, 4] .+ 273.15
+    y6z_data = Z1[:, 5] .+ 273.15
+end
+
+
+begin
+    #Exp 68 - T3, T8
+    A1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0068_231126_115725.xlsx")["Sheet 1 - Data_FPT0068_231126_1"]["A3:C5365"]
+    E68t = float.(A1[:, 1]) #xa1_data
+    E68Tf = A1[:, 2] .+ 273.15 #y1a1_data
+    y2a1_data = A1[:, 3] .+ 273.15
+end
+begin #decimate experimental data E68 for T3
+    dec = 100
+    function decimate!(x, step)
+        x = [x[i] for i in 1:step:length(x)]
+    end
+    E68t = decimate!(E68t, dec)
+    E68Tf = decimate!(E68Tf, dec)
+    scatter(E68t, E68Tf)
+end
+
+begin
+    #Exp 68 - T9, T10, T11, T12
+    A11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0068_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0068_231126_1"]["A3:E5365"]
+    y3a_data = A11[:, 2] .+ 273.15
+    y4a_data = A11[:, 3] .+ 273.15
+    y5a_data = A11[:, 4] .+ 273.15
+    y6a_data = A11[:, 5] .+ 273.15
+end
+
+begin
+    #Exp 69 - T3, T8
+    B1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0069_231126_140153.xlsx")["Sheet 1 - Data_FPT0069_231126_1"]["A3:C5366"]
+    E69t = float.(B1[:, 1])
+    E69Tf = B1[:, 2] .+ 273.15
+    y2b1_data = B1[:, 3] .+ 273.15
+end
+begin #decimate experimental data E69 for T3
+    dec = 100
+    function decimate!(x, step)
+        x = [x[i] for i in 1:step:length(x)]
+    end
+    E69t = decimate!(E69t, dec)
+    E69Tf = decimate!(E69Tf, dec)
+    scatter(E69t, E69Tf)
+end
+
+
+begin
+    #Exp 69 - T9, T10, T11, T12
+    B11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0069_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0069_231126_1"]["A3:E5366"]
+    y3b_data = B11[:, 2] .+ 273.15
+    y4b_data = B11[:, 3] .+ 273.15
+    y5b_data = B11[:, 4] .+ 273.15
+    y6b_data = B11[:, 5] .+ 273.15
+end
+
+begin
+    #Exp 70 - T3, T8
+    C1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0070_231127_090339.xlsx")["Sheet 1 - Data_FPT0070_231127_0"]["A3:C6705"]
+    E70t = float.(C1[:, 1]) #xc1_data 
+    E70Tf = C1[:, 2] .+ 273.15 #y1c1_data
+    y2c1_data = C1[:, 3] .+ 273.15
+end 
+begin #decimate experimental data E70 for T3
+    dec = 100
+    function decimate!(x, step)
+        x = [x[i] for i in 1:step:length(x)]
+    end
+    E70t = decimate!(E70t, dec)
+    E70Tf = decimate!(E70Tf, dec)
+    scatter(E70t, E70Tf)
+end
+
+begin
+    #Exp 70 - T9, T10, T11, T12
+    C11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0070_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0070_231127_0"]["A3:E6705"]
+    y3c_data = C11[:, 2] .+ 273.15
+    y4c_data = C11[:, 3] .+ 273.15
+    y5c_data = C11[:, 4] .+ 273.15
+    y6c_data = C11[:, 5] .+ 273.15
+end
+
+begin
+    #Exp 71 - T3, T8
+    D1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0071_231128_102707.xlsx")["Sheet 1 - Data_FPT0071_231128_1"]["A3:C7087"]
+    E71t = float.(D1[:, 1]) #xd1_data  
+    E71Tf = D1[:, 2] .+ 273.15 #y1d1_data
+    y2d1_data = D1[:, 3] .+ 273.15
+end
+begin #decimate experimental data E71 for T3
+    dec = 100
+    function decimate!(x, step)
+        x = [x[i] for i in 1:step:length(x)]
+    end
+    E71t = decimate!(E71t, dec)
+    E71Tf = decimate!(E71Tf, dec)
+    scatter(E71t, E71Tf)
+end
+
+begin
+    #Exp 71 - T9, T10, T11, T12
+    D11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0071_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0071_231128_1"]["A3:E7087"]
+    y3d_data = D11[:, 2] .+ 273.15
+    y4d_data = D11[:, 3] .+ 273.15
+    y5d_data = D11[:, 4] .+ 273.15
+    y6d_data = D11[:, 5] .+ 273.15
+end
+
+begin
+    #Exp 72 - T3, T8
+    E1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0072_231129_104140.xlsx")["Sheet 1 - Data_FPT0072_231129_1"]["A3:C3217"]
+    E72t = float.(E1[:, 1]) #xe1_data
+    E72Tf = E1[:, 2] .+ 273.15 #y1e1_data
+    y2e1_data = E1[:, 3] .+ 273.15
+end
+begin #decimate experimental data E72 for T3
+    dec = 100
+    function decimate!(x, step)
+        x = [x[i] for i in 1:step:length(x)]
+    end
+    E72t = decimate!(E72t , dec)
+    E72Tf = decimate!(E72Tf, dec)
+    scatter(E72t, E72Tf)
+end
+
+
+begin
+    #Exp 72 - T9, T10, T11, T12
+    E11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0072_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0072_231129_1"]["A3:E3217"]
+    y3e_data = E11[:, 2] .+ 273.15
+    y4e_data = E11[:, 3] .+ 273.15
+    y5e_data = E11[:, 4] .+ 273.15
+    y6e_data = E11[:, 5] .+ 273.15
+end
+
+begin
+    #Exp 73 - T3, T8
+    F1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0073_231129_132744.xlsx")["Sheet 1 - Data_FPT0073_231129_1"]["A3:C4575"]
+    E73t = float.(F1[:, 1])#xf1_data
+    E73Tf = F1[:, 2] .+ 273.15 #y1f1_data
+    y2f1_data = F1[:, 3] .+ 273.15
+end
+begin #decimate experimental data E73 for T3
+    dec = 100
+    function decimate!(x, step)
+        x = [x[i] for i in 1:step:length(x)]
+    end
+    E73t = decimate!(E73t, dec)
+    E73Tf = decimate!(E73Tf, dec)
+    scatter(E73t, E73Tf)
+end
+
+
+begin
+    #Exp 73 - T9, T10, T11, T12
+    F11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0073_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0073_231129_1"]["A3:E4575"]
+    y3f_data = F11[:, 2] .+ 273.15
+    y4f_data = F11[:, 3] .+ 273.15
+    y5f_data = F11[:, 4] .+ 273.15
+    y6f_data = F11[:, 5] .+ 273.15
+end
+
+
+begin
+    #Exp 74 - T3, T8
+    G = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0074_231130_123228.xlsx")["Sheet 1 - Data_FPT0074_231130_1"]["A3:C6018"]
+    E74t = float.(G[:, 1]) #xg_data 
+    E74Tf = G[:, 2] .+ 273.15 #y1g_data 
+    y2g_data = G[:, 3] .+ 273.15
+end
+begin #decimate experimental data E74 for T3
+    dec = 100
+    function decimate!(x, step)
+        x = [x[i] for i in 1:step:length(x)]
+    end
+    E74t = decimate!(E74t, dec)
+    E74Tf = decimate!(E74Tf, dec)
+    scatter(E74t, E74Tf)
+end
+
+
+begin
+    #Exp 74 - T9, T10, T11, T12
+    G1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0074_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0074_231130_1"]["A3:E6018"]
+    y3g1_data = G1[:, 2] .+ 273.15
+    y4g1_data = G1[:, 3] .+ 273.15
+    y5g1_data = G1[:, 4] .+ 273.15
+    y6g1_data = G1[:, 5] .+ 273.15
+end
+
+
+begin
+    #Exp 75 - T3, T8
+    H = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0075_231201_162138.xlsx")["Sheet 1 - Data_FPT0075_231201_1"]["A3:C6354"]
+    E75t= float.(H[:, 1]) #xh_data
+    E75Tf = H[:, 2] .+ 273.15 #y1h_data
+    y2h_data = H[:, 3] .+ 273.15
+end
+begin #decimate experimental data E75 for T3
+    dec = 100
+    function decimate!(x, step)
+        x = [x[i] for i in 1:step:length(x)]
+    end
+    E75t= decimate!(E75t, dec)
+    E75Tf = decimate!(E75Tf, dec)
+    scatter(E75t, E75Tf)
+end
+
+begin
+    #Exp 75 - T9, T10, T11, T12
+    H1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0075_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0075_231201_1"]["A3:E6354"]
+    y3h1_data = H1[:, 2] .+ 273.15
+    y4h1_data = H1[:, 3] .+ 273.15
+    y5h1_data = H1[:, 4] .+ 273.15
+    y6h1_data = H1[:, 5] .+ 273.15
+end
+
+
+begin
+    #Exp 76 - T3, T8
+    I = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0076_231203_120521.xlsx")["Sheet 1 - Data_FPT0076_231203_1"]["A3:C7147"]
+    E76t = float.(I[:, 1]) #xi_data
+    E76Tf = I[:, 2] .+ 273.15 #y1i_data
+    y2i_data = I[:, 3] .+ 273.15
+end
+begin #decimate experimental data E76 for T3
+    dec = 100
+    function decimate!(x, step)
+        x = [x[i] for i in 1:step:length(x)]
+    end
+    E76t = decimate!(E76t, dec)
+    E76Tf = decimate!(E76Tf, dec)
+    scatter(E76t, E76Tf)
+end
+
+
+begin
+    #Exp 76 - T9, T10, T11, T12
+    I1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0076_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0076_231203_1"]["A3:E7147"]
+    y3i1_data = I1[:, 2] .+ 273.15
+    y4i1_data = I1[:, 3] .+ 273.15
+    y5i1_data = I1[:, 4] .+ 273.15
+    y6i1_data = I1[:, 5] .+ 273.15
+end
+
+
+begin
+    #Exp 77 - T3, T8
+    J = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0077_231203_161315.xlsx")["Sheet 1 - Data_FPT0077_231203_1"]["A3:C3044"]
+    E77t = float.(J[:, 1]) #xj_data
+    E77Tf = J[:, 2] .+ 273.15 #y1j_data
+    y2j_data = J[:, 3] .+ 273.15
+end
+begin #decimate experimental data E77 for T3
+    dec = 100
+    function decimate!(x, step)
+        x = [x[i] for i in 1:step:length(x)]
+    end
+    E77t = decimate!(E77t, dec)
+    E77Tf = decimate!(E77Tf, dec)
+    scatter(E77t, E77Tf)
+end
+
+begin
+    #Exp 77 - T9, T10, T11, T12
+    J1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0077_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0077_231203_1"]["A3:E3044"]
+    y3j1_data = J1[:, 2] .+ 273.15
+    y4j1_data = J1[:, 3] .+ 273.15
+    y5j1_data = J1[:, 4] .+ 273.15
+    y6j1_data = J1[:, 5] .+ 273.15
+end
+
+
+begin
+    #Exp 78 - T3, T8
+    K = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0078_231204_132252.xlsx")["Sheet 1 - Data_FPT0078_231204_1"]["A3:C5384"]
+    E78t = float.(K[:, 1]) #xk_data
+    E78Tf = K[:, 2] .+ 273.15 #y1k_data
+    y2k_data = K[:, 3] .+ 273.15
+end
+begin #decimate experimental data E78 for T3
+dec = 100
+function decimate!(x, step)
+    x = [x[i] for i in 1:step:length(x)]
+end
+E78t = decimate!(E78t, dec)
+E78Tf = decimate!(E78Tf, dec)
+scatter(E78t, E78Tf)
+end
+
+begin
+    #Exp 78 - T9, T10, T11, T12
+    K1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0078_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0078_231204_1"]["A3:E5384"]
+    y3k1_data = K1[:, 2] .+ 273.15
+    y4k1_data = K1[:, 3] .+ 273.15
+    y5k1_data = K1[:, 4] .+ 273.15
+    y6k1_data = K1[:, 5] .+ 273.15
+end   
+
+begin
+    #Exp 79 - T3, T8
+    L0 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0079_231204_172244.xlsx")["Sheet 1 - Data_FPT0079_231204_1"]["A3:C5233"]
+    E79t = float.(L0[:, 1]) #xl_data 
+    E79Tf = L0[:, 2] .+ 273.15 #y1l_data
+    y2l_data = L0[:, 3] .+ 273.15  
+end
+begin #decimate experimental data E79 for T3
+    dec = 100
+    function decimate!(x, step)
+        x = [x[i] for i in 1:step:length(x)]
+    end
+    E79t= decimate!(E79t, dec)
+    E79Tf = decimate!(E79Tf, dec)
+    scatter(E79t, E79Tf)
+end    
+
+begin
+    #Exp 79 - T9, T10, T11, T12
+    L1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0079_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0079_231204_1"]["A3:E5233"]
+    y3l1_data = L1[:, 2] .+ 273.15
+    y4l1_data = L1[:, 3] .+ 273.15
+    y5l1_data = L1[:, 4] .+ 273.15
+    y6l1_data = L1[:, 5] .+ 273.15
+end
+   
+   
+begin
+    #Exp 80 - T3, T8
+    M = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0080_231205_095122.xlsx")["Sheet 1 - Data_FPT0080_231205_0"]["A3:C5814"]
+    E80t = float.(M[:, 1]) # xm_data
+    E80Tf = M[:, 2] .+ 273.15 #y1m_data
+    y2m_data = M[:, 3] .+ 273.15   
+end
+begin #decimate experimental data E80 for T3
+    dec = 100
+    function decimate!(x, step)
+        x = [x[i] for i in 1:step:length(x)]
+    end
+    E80t = decimate!(E80t, dec)
+    E80Tf = decimate!(E80Tf, dec)
+    scatter(E80t, E80Tf)
+end
+
+begin
+    #Exp 80 - T9, T10, T11, T12
+    M1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0080_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0080_231205_0"]["A3:E5814"]
+    y3m1_data = M1[:, 2] .+ 273.15
+    y4m1_data = M1[:, 3] .+ 273.15
+    y5m1_data = M1[:, 4] .+ 273.15
+    y6m1_data = M1[:, 5] .+ 273.15
+end
+
+
+begin
+    #Exp 81 - T3, T8
+    N = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0081_231205_135354.xlsx")["Sheet 1 - Data_FPT0081_231205_1"]["A3:C5989"]
+    E81t= float.(N[:, 1]) #xn_data 
+    E81Tf = N[:, 2] .+ 273.15 #y1n_data 
+    y2n_data = N[:, 3] .+ 273.15   
+end
+begin #decimate experimental data E81 for T3
+    dec = 100
+    function decimate!(x, step)
+        x = [x[i] for i in 1:step:length(x)]
+    end
+    E81t = decimate!(E81t, dec)
+    E81Tf = decimate!(E81Tf, dec)
+    scatter(E81t, E81Tf)
+end
+
+
+begin
+    #Exp 81 - T9, T10, T11, T12
+    N1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0081_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0081_231205_1"]["A3:E5989"]
+    y3n1_data = N1[:, 2] .+ 273.15
+    y4n1_data = N1[:, 3] .+ 273.15
+    y5n1_data = N1[:, 4] .+ 273.15
+    y6n1_data = N1[:, 5] .+ 273.15
+end
+
+
 #measurements and conditions#Defining simulation conditions
 begin
-    condition_E67 = Dict(Io => 456000.0, qlpm => 15.27)
-    condition_E68 = Dict(Io => 456000.0, qlpm => 12.50)
-    condition_E69 = Dict(Io => 456000.0, qlpm => 10.50)
-    condition_E70 = Dict(Io => 456000.0, qlpm => 9.10)
-    condition_E71 = Dict(Io => 456000.0, qlpm => 7.12)
-    condition_E72 = Dict(Io => 304000.0, qlpm => 18.34)
-    condition_E73 = Dict(Io => 304000.0, qlpm => 13.16)
-    condition_E74 = Dict(Io => 304000.0, qlpm => 9.03)
-    condition_E75 = Dict(Io => 304000.0, qlpm => 6.95)
-    condition_E76 = Dict(Io => 304000.0, qlpm => 4.53)
-    condition_E77 = Dict(Io => 256000.0, qlpm => 13.85)
-    condition_E78 = Dict(Io => 256000.0, qlpm => 10.02)
-    condition_E79 = Dict(Io => 256000.0, qlpm => 8.04)
-    condition_E80 = Dict(Io => 256000.0, qlpm => 6.62)
-    condition_E81 = Dict(Io => 256000.0, qlpm => 4.53)
+    condition_E67 = Dict(Io => 442320.0, qlpm => 15.27)
+    condition_E68 = Dict(Io => 442320.0, qlpm => 12.50)
+    condition_E69 = Dict(Io => 442320.0, qlpm => 10.50)
+    condition_E70 = Dict(Io => 442320.0, qlpm => 9.10)
+    condition_E71 = Dict(Io => 442320.0, qlpm => 7.12)
+    condition_E72 = Dict(Io => 370880.0, qlpm => 18.34)
+    condition_E73 = Dict(Io => 370880.0, qlpm => 13.16)
+    condition_E74 = Dict(Io => 370880.0, qlpm => 9.03)
+    condition_E75 = Dict(Io => 370880.0, qlpm => 6.95)
+    condition_E76 = Dict(Io => 370880.0, qlpm => 4.53)
+    condition_E77 = Dict(Io => 199680.0, qlpm => 13.85)
+    condition_E78 = Dict(Io => 199680.0, qlpm => 10.02)
+    condition_E79 = Dict(Io => 199680.0, qlpm => 8.04)
+    condition_E80 = Dict(Io => 199680.0, qlpm => 6.62)
+    condition_E81 = Dict(Io => 199680.0, qlpm => 4.53)
 
     simulation_conditions = Dict("E67" => condition_E67, "E68" => condition_E68,
         "E69" => condition_E69, "E70" => condition_E70,
@@ -244,262 +652,59 @@ begin
         "E79" => condition_E79, "E80" => condition_E80,
         "E81" => condition_E81)
     #Defining measurement data
-    measurements = DataFrame(
-        simulation_id=repeat(["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"], inner=6, outer=1),
-        obs_id=repeat(["_T8", "_T9", "_T10", "_T11", "_T12", "_T3"], inner=1, outer=15),
-        time=repeat([3929, 5362, 5363, 6702, 7084, 3214, 4572, 6015, 6351, 7144, 3041, 5381, 5230, 5811, 5986], inner=6, outer=1),
-        temperatures=[965.407, 975.144, 825.592, 880.867, 1004.165, 763.859,
-            1031.574, 1023.115, 850.099, 898.754, 1050.691, 773.207,
-            1070.803, 1045.898, 852.837, 896.788, 1072.727, 769.76,
-            1167.978, 1093.849, 871.496, 912.173, 1120.42, 779.53,
-            1210.945, 1095.322, 847.476, 882.823, 1120.417, 753.56,
-            742.125, 778.592, 684.246, 736.626, 807.125, 652.955,
-            844.257, 870.26, 747.444, 791.958, 898.081, 694.626,
-            962.113, 938.106, 767.803, 804.082, 965.702, 697.672,
-            1015.081, 954.214, 757.393, 788.678, 979.795, 681.066,
-            1069.567, 947.372, 726.308, 751.159, 970.498, 647.019,
-            569.248, 604.984, 543.727, 574.299, 627.16, 525.356,
-            634.731, 664.296, 583.704, 612.092, 686.936, 554.455,
-            677.817, 694.156, 595.766, 622.325, 716.314, 560.033,
-            711.537, 713.686, 601.77, 626.485, 735.984, 561.254,
-            763.299, 729.461, 597.766, 618.975, 751.15, 550.499])
+    # measurements = DataFrame(
+    #     simulation_id=repeat(["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"], inner=6, outer=1),
+    #     obs_id=repeat(["_T8", "_T9", "_T10", "_T11", "_T12", "_T3"], inner=1, outer=15),
+    #     time=repeat([3929, 5362, 5363, 6702, 7084, 3214, 4572, 6015, 6351, 7144, 3041, 5381, 5230, 5811, 5986], inner=6, outer=1),
+    #     temperatures=[965.407, 975.144, 825.592, 880.867, 1004.165, 763.859,
+    #         1031.574, 1023.115, 850.099, 898.754, 1050.691, 773.207,
+    #         1070.803, 1045.898, 852.837, 896.788, 1072.727, 769.76,
+    #         1167.978, 1093.849, 871.496, 912.173, 1120.42, 779.53,
+    #         1210.945, 1095.322, 847.476, 882.823, 1120.417, 753.56,
+    #         742.125, 778.592, 684.246, 736.626, 807.125, 652.955,
+    #         844.257, 870.26, 747.444, 791.958, 898.081, 694.626,
+    #         962.113, 938.106, 767.803, 804.082, 965.702, 697.672,
+    #         1015.081, 954.214, 757.393, 788.678, 979.795, 681.066,
+    #         1069.567, 947.372, 726.308, 751.159, 970.498, 647.019,
+    #         569.248, 604.984, 543.727, 574.299, 627.16, 525.356,
+    #         634.731, 664.296, 583.704, 612.092, 686.936, 554.455,
+    #         677.817, 694.156, 595.766, 622.325, 716.314, 560.033,
+    #         711.537, 713.686, 601.77, 626.485, 735.984, 561.254,
+    #         763.299, 729.461, 597.766, 618.975, 751.15, 550.499])
     # measurements = DataFrame( #T3 only
     #             simulation_id=repeat(["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"], inner=1, outer=1),
     #             obs_id=repeat(["_T3"], inner=1, outer=15),
     #             time=repeat([3929, 5362, 5363, 6702, 7084, 3214, 4572, 6015, 6351, 7144, 3041, 5381, 5230, 5811, 5986], inner=1, outer=1),
     #             temperatures=[763.859, 773.207, 769.76, 779.53, 753.56, 652.955, 694.626, 697.672, 681.066,
     #                 647.019, 525.356, 554.455, 560.033, 561.254, 550.499])
-end
+    measurements = DataFrame(
+        simulation_id = repeat(["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"], inner=1, outer=1),
+        obs_id=repeat(["_T3"], inner=1, outer=15),
+        time= repeat([E67t, E68t, E69t, E70t, E71t, E72t, E73t, E74t, E75t, E76t, E77t, E78t, E79t, E80t, E81t], inner=1, outer=1),
+        temperatures= [E67Tf, E68Tf, E69Tf, E70Tf, E71Tf, E72Tf, E73Tf, E74Tf, E75Tf, E76Tf, E77Tf, E78Tf, E79Tf, E80Tf, E81Tf]
+    )
+    end
 
-#Exp. data to extract temp.
-begin
-    #Exp 67 - T3, T8
-    Z = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0067_231125_161757.xlsx")["Sheet 1 - Data_FPT0067_231125_1"]["A3:C3932"]
-    xz_data = Z[:, 1]
-    y1z_data = Z[:, 2] .+ 273.15
-    y2z_data = Z[:, 3] .+ 273.15
 
-    #Exp 67 - T9, T10, T11, T12
-    Z1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0067_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0067_T9"]["A3:E3932"]
-    y3z_data = Z1[:, 2] .+ 273.15
-    y4z_data = Z1[:, 3] .+ 273.15
-    y5z_data = Z1[:, 4] .+ 273.15
-    y6z_data = Z1[:, 5] .+ 273.15
 
-    #Exp 68 - T3, T8
-    A1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0068_231126_115725.xlsx")["Sheet 1 - Data_FPT0068_231126_1"]["A3:C5365"]
-    xa1_data = A1[:, 1]
-    y1a1_data = A1[:, 2] .+ 273.15
-    y2a1_data = A1[:, 3] .+ 273.15
-
-    #Exp 68 - T9, T10, T11, T12
-    A11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0068_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0068_231126_1"]["A3:E5365"]
-    y3a_data = A11[:, 2] .+ 273.15
-    y4a_data = A11[:, 3] .+ 273.15
-    y5a_data = A11[:, 4] .+ 273.15
-    y6a_data = A11[:, 5] .+ 273.15
-
-    #Exp 69 - T3, T8
-    B1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0069_231126_140153.xlsx")["Sheet 1 - Data_FPT0069_231126_1"]["A3:C5366"]
-    xb1_data = B1[:, 1]
-    y1b1_data = B1[:, 2] .+ 273.15
-    y2b1_data = B1[:, 3] .+ 273.15
-
-    #Exp 69 - T9, T10, T11, T12
-    B11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0069_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0069_231126_1"]["A3:E5366"]
-    y3b_data = B11[:, 2] .+ 273.15
-    y4b_data = B11[:, 3] .+ 273.15
-    y5b_data = B11[:, 4] .+ 273.15
-    y6b_data = B11[:, 5] .+ 273.15
-
-    #Exp 70 - T3, T8
-    C1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0070_231127_090339.xlsx")["Sheet 1 - Data_FPT0070_231127_0"]["A3:C6705"]
-    xc1_data = C1[:, 1]
-    y1c1_data = C1[:, 2] .+ 273.15
-    y2c1_data = C1[:, 3] .+ 273.15
-
-    #Exp 70 - T9, T10, T11, T12
-
-    C11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0070_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0070_231127_0"]["A3:E6705"]
-    y3c_data = C11[:, 2] .+ 273.15
-    y4c_data = C11[:, 3] .+ 273.15
-    y5c_data = C11[:, 4] .+ 273.15
-    y6c_data = C11[:, 5] .+ 273.15
-
-    #Exp 71 - T3, T8
-    D1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0071_231128_102707.xlsx")["Sheet 1 - Data_FPT0071_231128_1"]["A3:C7087"]
-    xd1_data = D1[:, 1]
-    y1d1_data = D1[:, 2] .+ 273.15
-    y2d1_data = D1[:, 3] .+ 273.15
-
-    #Exp 71 - T9, T10, T11, T12
-
-    D11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0071_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0071_231128_1"]["A3:E7087"]
-    y3d_data = D11[:, 2] .+ 273.15
-    y4d_data = D11[:, 3] .+ 273.15
-    y5d_data = D11[:, 4] .+ 273.15
-    y6d_data = D11[:, 5] .+ 273.15
-
-    #Exp 72 - T3, T8
-    E1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0072_231129_104140.xlsx")["Sheet 1 - Data_FPT0072_231129_1"]["A3:C3217"]
-    xe1_data = E1[:, 1]
-    y1e1_data = E1[:, 2] .+ 273.15
-    y2e1_data = E1[:, 3] .+ 273.15
-
-    #Exp 72 - T9, T10, T11, T12
-
-    E11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0072_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0072_231129_1"]["A3:E3217"]
-    y3e_data = E11[:, 2] .+ 273.15
-    y4e_data = E11[:, 3] .+ 273.15
-    y5e_data = E11[:, 4] .+ 273.15
-    y6e_data = E11[:, 5] .+ 273.15
-
-    #Exp 73 - T3, T8
-    F1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0073_231129_132744.xlsx")["Sheet 1 - Data_FPT0073_231129_1"]["A3:C4575"]
-    xf1_data = F1[:, 1]
-    y1f1_data = F1[:, 2] .+ 273.15
-    y2f1_data = F1[:, 3] .+ 273.15
-
-    #Exp 73 - T9, T10, T11, T12
-
-    F11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0073_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0073_231129_1"]["A3:E4575"]
-    y3f_data = F11[:, 2] .+ 273.15
-    y4f_data = F11[:, 3] .+ 273.15
-    y5f_data = F11[:, 4] .+ 273.15
-    y6f_data = F11[:, 5] .+ 273.15
-    
-    #Exp 74 - T3, T8
-    G = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0074_231130_123228.xlsx")["Sheet 1 - Data_FPT0074_231130_1"]["A3:C6018"]
-    xg_data = G[:, 1]
-    y1g_data = G[:, 2] .+ 273.15
-    y2g_data = G[:, 3] .+ 273.15
-
-    #Exp 74 - T9, T10, T11, T12
-
-    G1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0074_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0074_231130_1"]["A3:E6018"]
-    y3g1_data = G1[:, 2] .+ 273.15
-    y4g1_data = G1[:, 3] .+ 273.15
-    y5g1_data = G1[:, 4] .+ 273.15
-    y6g1_data = G1[:, 5] .+ 273.15
-
-    #Exp 75 - T3, T8
-    H = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0075_231201_162138.xlsx")["Sheet 1 - Data_FPT0075_231201_1"]["A3:C6354"]
-    xh_data = H[:, 1]
-    y1h_data = H[:, 2] .+ 273.15
-    y2h_data = H[:, 3] .+ 273.15
-
-    #Exp 75 - T9, T10, T11, T12
-
-    H1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0075_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0075_231201_1"]["A3:E6354"]
-    y3h1_data = H1[:, 2] .+ 273.15
-    y4h1_data = H1[:, 3] .+ 273.15
-    y5h1_data = H1[:, 4] .+ 273.15
-    y6h1_data = H1[:, 5] .+ 273.15
-
-    #Exp 76 - T3, T8
-    I = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0076_231203_120521.xlsx")["Sheet 1 - Data_FPT0076_231203_1"]["A3:C7147"]
-    xi_data = I[:, 1]
-    y1i_data = I[:, 2] .+ 273.15
-    y2i_data = I[:, 3] .+ 273.15
-
-    #Exp 76 - T9, T10, T11, T12
-
-    I1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0076_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0076_231203_1"]["A3:E7147"]
-    y3i1_data = I1[:, 2] .+ 273.15
-    y4i1_data = I1[:, 3] .+ 273.15
-    y5i1_data = I1[:, 4] .+ 273.15
-    y6i1_data = I1[:, 5] .+ 273.15
-
-    #Exp 77 - T3, T8
-    J = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0077_231203_161315.xlsx")["Sheet 1 - Data_FPT0077_231203_1"]["A3:C3044"]
-    xj_data = J[:, 1]
-    y1j_data = J[:, 2] .+ 273.15
-    y2j_data = J[:, 3] .+ 273.15
-
-    #Exp 77 - T9, T10, T11, T12
-
-    J1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0077_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0077_231203_1"]["A3:E3044"]
-    y3j1_data = J1[:, 2] .+ 273.15
-    y4j1_data = J1[:, 3] .+ 273.15
-    y5j1_data = J1[:, 4] .+ 273.15
-    y6j1_data = J1[:, 5] .+ 273.15
-
-    #Exp 78 - T3, T8
-    K = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0078_231204_132252.xlsx")["Sheet 1 - Data_FPT0078_231204_1"]["A3:C5384"]
-    xk_data = K[:, 1]
-    y1k_data = K[:, 2] .+ 273.15
-    y2k_data = K[:, 3] .+ 273.15
-
-    #Exp 78 - T9, T10, T11, T12
-
-    K1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0078_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0078_231204_1"]["A3:E5384"]
-    y3k1_data = K1[:, 2] .+ 273.15
-    y4k1_data = K1[:, 3] .+ 273.15
-    y5k1_data = K1[:, 4] .+ 273.15
-    y6k1_data = K1[:, 5] .+ 273.15
-    
-    #Exp 79 - T3, T8
-    L0 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0079_231204_172244.xlsx")["Sheet 1 - Data_FPT0079_231204_1"]["A3:C5233"]
-    xl_data = L0[:, 1]
-    y1l_data = L0[:, 2] .+ 273.15
-    y2l_data = L0[:, 3] .+ 273.15  
-    
-    #Exp 79 - T9, T10, T11, T12
-
-    L1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0079_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0079_231204_1"]["A3:E5233"]
-    y3l1_data = L1[:, 2] .+ 273.15
-    y4l1_data = L1[:, 3] .+ 273.15
-    y5l1_data = L1[:, 4] .+ 273.15
-    y6l1_data = L1[:, 5] .+ 273.15
-     
-      
-    #Exp 80 - T3, T8
-    M = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0080_231205_095122.xlsx")["Sheet 1 - Data_FPT0080_231205_0"]["A3:C5814"]
-    xm_data = M[:, 1]
-    y1m_data = M[:, 2] .+ 273.15
-    y2m_data = M[:, 3] .+ 273.15   
-
-    #Exp 80 - T9, T10, T11, T12
-
-    M1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0080_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0080_231205_0"]["A3:E5814"]
-    y3m1_data = M1[:, 2] .+ 273.15
-    y4m1_data = M1[:, 3] .+ 273.15
-    y5m1_data = M1[:, 4] .+ 273.15
-    y6m1_data = M1[:, 5] .+ 273.15
-     
-
-    #Exp 81 - T3, T8
-    N = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0081_231205_135354.xlsx")["Sheet 1 - Data_FPT0081_231205_1"]["A3:C5989"]
-    xn_data = N[:, 1]
-    y1n_data = N[:, 2] .+ 273.15
-    y2n_data = N[:, 3] .+ 273.15   
-
-    #Exp 81 - T9, T10, T11, T12
-
-    N1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0081_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0081_231205_1"]["A3:E5989"]
-    y3n1_data = N1[:, 2] .+ 273.15
-    y4n1_data = N1[:, 3] .+ 273.15
-    y5n1_data = N1[:, 4] .+ 273.15
-    y6n1_data = N1[:, 5] .+ 273.15
-end
 #Optimization using NLOpt
-rmp = ModelingToolkit.varmap_to_vars([Io => 456000, A => 100., B => 0.1, C=> 10., qlpm => 7.12], parameters(pdesys))
+rmp = ModelingToolkit.varmap_to_vars([Io => 442320.0, A => 70., B => 0.3, C=> 10., qlpm => 7.12], parameters(pdesys))
 function NLmodeloptim(tvalues, rmp)
 
     #p = [hlocal => p_vary[1]]
     modeloptim = remake(prob, p=rmp, tspan=(1.0, tvalues[end]))
     modeloptim_sol = solve(modeloptim, FBDF(), saveat=tvalues[end])#, reltol=1e-12, abstol=1e-12)
     #time = modelfit_sol.t
-    tempT8_op = modeloptim_sol.u[Ts(t, x)][end, 8]
-    tempT9_op = modeloptim_sol.u[Ts(t, x)][end, 42]
-    tempT10_op = modeloptim_sol.u[Ts(t, x)][end, 78]
-     tempT3_op = modeloptim_sol.u[Tf(t, x)][end, end-1]
-    #T12_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 20] .+ modeloptim_sol.u[Ts(t, x)][end, 20]) ./ 2
-    #T11_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 59] .+ modeloptim_sol.u[Ts(t, x)][end, 59]) ./ 2
-    tempT11_op = modeloptim_sol.u[Ts(t, x)][end, 78]
-    tempT12_op = modeloptim_sol.u[Ts(t, x)][end, 42]
-    return append!([tempT8_op, tempT9_op, tempT10_op, tempT3_op, tempT12_op, tempT11_op])
-    # return ([tempT3_op])
+    # tempT8_op = modeloptim_sol.u[Ts(t, x)][end, 8]
+    # tempT9_op = modeloptim_sol.u[Ts(t, x)][end, 42]
+    # tempT10_op = modeloptim_sol.u[Ts(t, x)][end, 78]
+    tempT3_op = float.(modeloptim_sol.u[Tf(t, x)][end, end-1])
+    # T12_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 20] .+ modeloptim_sol.u[Ts(t, x)][end, 20]) ./ 2
+    # T11_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 59] .+ modeloptim_sol.u[Ts(t, x)][end, 59]) ./ 2
+    # tempT11_op = modeloptim_sol.u[Ts(t, x)][end, 78]
+    # tempT12_op = modeloptim_sol.u[Ts(t, x)][end, 42]
+    # return append!([tempT8_op, tempT9_op, tempT10_op, tempT3_op, tempT12_op, tempT11_op])
+    return ([tempT3_op])
 end
 
 function remakeAysha(pguess_l, cond, time_opt)
@@ -532,12 +737,15 @@ function lossAll(pguess_l, _)
         sm = sim_key[it]
         #println(sm)
         cond = simulation_conditions[sm]
-        expdata = (measurements[measurements.simulation_id.==sm, :temperatures])
-        time_opt = (measurements[measurements.simulation_id.==sm, :time])
+        expdata = float.(measurements[measurements.simulation_id.==sm, :temperatures])
+        time_opt = float.(measurements[measurements.simulation_id.==sm, :time])
+
+        # Ensure time_opt are vectors of floats
         
         #run selected simulation and get the steady temperature values
-        temp_T = remakeAysha(pguess_l, cond, time_opt)
 
+        temp_T = remakeAysha(pguess_l, cond, time_opt)
+        
         temp_error = (temp_T .- expdata) .^ 2
         lossr[it] = sqrt(sum(temp_error))
     end
@@ -546,9 +754,9 @@ end
 p0 = [x[2] for x in p_opt]
 optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
 #p_opt = [aCp => 1., hfa => 8., hfn =>0.66, aIo => 1.] 
-lb = [1., 0.1, 16.]
-ub = [70., 1., 30.]
-
+lb = [50., 0.1, 5.]
+ub = [1000., 1., 20.]
+ 
 #pguess_opt = ModelingToolkit.varmap_to_vars([Io => 456000, h_average => 14., qlpm => 7.12], parameters(pdesys))
 initialerror = (lossAll(p0, []))
 println(initialerror)
@@ -567,7 +775,7 @@ res_error = lossAll(pnew, [])
 
 display(res_error)
 
-#pnew = [0.01, 0.6, 5.]
+# pnew = [0.01, 0.6, 5.]
 begin
     T_steady = DataFrame(sim_id=[], T_mod=[], T_exp=[])
     sim_key = collect(keys(simulation_conditions))
@@ -588,12 +796,6 @@ begin
    end
 
 end
-
-
-
-
-
-
 
 # plot1 = plot(
 #         psol.t,
@@ -875,4 +1077,4 @@ scatter(T_exp, T_mod, label="Experimental and Model Temperatures", legend=:botto
         xlabel="Experimental Temperature (K)", ylabel="Model Temperature (K)", title=" Air Outlet Temperature (TI-3)")
 
 # Add the best fit line to the plot
-plot!([500, 1000], [500, 1000], label="Best Fit", color=:red)
+plot!([550, 1100], [550, 1100], label="Best Fit", color=:red)
