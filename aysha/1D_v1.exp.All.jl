@@ -25,6 +25,7 @@ begin #define parameters
 	n_chnl = 10*10
     A_exchange = A_chnl_p * n_chnl #m2 - contact area between fluid and solid
 	A_chnl_frt_all = A_chnl_frt * n_chnl #m2 all frontal area of channels
+    A_frt_solid = A_frt - A_chnl_frt_all #m2 - frontal area of solid
     Vs =  A_frt * L #m3
 	Vf = n_chnl * A_chnl_frt * L 
     # channel_w = 1.5 / 1000 #m
@@ -147,7 +148,7 @@ begin
         Ts(0.0, x) ~ Tamb, # initial
         Tf(0.0, x) ~ Tamb, # initial
         -A_frt * ks * Dx(Ts(t, x_max1)) ~ 0.0, # far right
-        -A_frt * ks * Dx(Ts(t, x_min1)) ~ Io * A_frt - ϵ * σ * A_frt * (Ts(t, x_min1)^4 - Tamb^4) - hext * A_frt * (Ts(t, x_min1) - Tamb),  # far left
+        -A_frt * ks * Dx(Ts(t, x_min1)) ~ Io * A_frt - ϵ * σ * A_frt_solid * (Ts(t, x_min1)^4 - Tamb^4),# - hext * A_frt * (Ts(t, x_min1) - Tamb),  # far left
         -Af * kf * Dx(Tf(t, x_max1)) ~ 0.0, #-ρf * Cpf * V * A_ft * (Tf(t, x_max1) - Tamb), # exiting fluid
         -Af * kf * Dx(Tf(t, x_min1)) ~ m * Cpf * (Tf(t, x_min1) - Tamb) # entering fluid (upstream temperature)
     ]
@@ -620,7 +621,7 @@ println(initialerror)
 
 optprob = Optimization.OptimizationProblem(optf, p0, [], lb=lb, ub=ub)
 
-optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method=NLopt.LN_NELDERMEAD(), maxtime=1000, local_maxiters=10000)
+optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method=NLopt.LN_NELDERMEAD(), maxtime=100, local_maxiters=10000)
 #optsol = solve(optprob, NLopt.LN_NELDERMEAD(), maxtime=10000, local_maxiters=10000)
 
 
