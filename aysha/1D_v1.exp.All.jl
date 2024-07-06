@@ -218,6 +218,11 @@ begin
     sol1.u[Ts(t, x)][:, 40] #T12 model 58mm (internal-solid)
 end
 
+dec = 100
+function decimate!(x, step)
+    x = [x[i] for i in 1:step:length(x)]
+end
+
 #Exp. data to extract temp.
 begin
     #Exp 67 - T3, T8
@@ -225,397 +230,249 @@ begin
     E67t = float.(Z[:, 1]) #xz_data
     E67Tf = Z[:, 2] .+ 273.15 #y1z_data
     y2z_data = Z[:, 3] .+ 273.15
-end 
-begin #decimate experimental data E67 for T3
-    dec = 100
-    function decimate!(x, step)
-        x = [x[i] for i in 1:step:length(x)]
-    end
+ #decimate experimental data E67 for T3
     E67t = decimate!(E67t, dec)
     E67Tf = decimate!(E67Tf, dec)
     scatter(E67t, E67Tf)
-end
 
-
-begin
     #Exp 67 - T9, T10, T11, T12
     Z1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0067_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0067_T9"]["A3:E3932"]
     y3z_data = Z1[:, 2] .+ 273.15
     y4z_data = Z1[:, 3] .+ 273.15
     y5z_data = Z1[:, 4] .+ 273.15
     y6z_data = Z1[:, 5] .+ 273.15
-end
 
-
-begin
     #Exp 68 - T3, T8
     A1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0068_231126_115725.xlsx")["Sheet 1 - Data_FPT0068_231126_1"]["A3:C5365"]
     E68t = float.(A1[:, 1]) #xa1_data
     E68Tf = A1[:, 2] .+ 273.15 #y1a1_data
     y2a1_data = A1[:, 3] .+ 273.15
-end
-begin #decimate experimental data E68 for T3
-    dec = 100
-    function decimate!(x, step)
-        x = [x[i] for i in 1:step:length(x)]
-    end
+ #decimate experimental data E68 for T3
     E68t = decimate!(E68t, dec)
     E68Tf = decimate!(E68Tf, dec)
     scatter(E68t, E68Tf)
-end
 
-begin
     #Exp 68 - T9, T10, T11, T12
     A11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0068_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0068_231126_1"]["A3:E5365"]
     y3a_data = A11[:, 2] .+ 273.15
     y4a_data = A11[:, 3] .+ 273.15
     y5a_data = A11[:, 4] .+ 273.15
     y6a_data = A11[:, 5] .+ 273.15
-end
 
-begin
     #Exp 69 - T3, T8
     B1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0069_231126_140153.xlsx")["Sheet 1 - Data_FPT0069_231126_1"]["A3:C5366"]
     E69t = float.(B1[:, 1])
     E69Tf = B1[:, 2] .+ 273.15
     y2b1_data = B1[:, 3] .+ 273.15
-end
-begin #decimate experimental data E69 for T3
-    dec = 100
-    function decimate!(x, step)
-        x = [x[i] for i in 1:step:length(x)]
-    end
+#decimate experimental data E69 for T3
     E69t = decimate!(E69t, dec)
     E69Tf = decimate!(E69Tf, dec)
     scatter(E69t, E69Tf)
-end
 
-
-begin
     #Exp 69 - T9, T10, T11, T12
     B11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0069_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0069_231126_1"]["A3:E5366"]
     y3b_data = B11[:, 2] .+ 273.15
     y4b_data = B11[:, 3] .+ 273.15
     y5b_data = B11[:, 4] .+ 273.15
     y6b_data = B11[:, 5] .+ 273.15
-end
 
-begin
     #Exp 70 - T3, T8
     C1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0070_231127_090339.xlsx")["Sheet 1 - Data_FPT0070_231127_0"]["A3:C6705"]
     E70t = float.(C1[:, 1]) #xc1_data 
     E70Tf = C1[:, 2] .+ 273.15 #y1c1_data
     y2c1_data = C1[:, 3] .+ 273.15
-end 
-begin #decimate experimental data E70 for T3
-    dec = 100
-    function decimate!(x, step)
-        x = [x[i] for i in 1:step:length(x)]
-    end
+ #decimate experimental data E70 for T3
     E70t = decimate!(E70t, dec)
     E70Tf = decimate!(E70Tf, dec)
     scatter(E70t, E70Tf)
-end
 
-begin
     #Exp 70 - T9, T10, T11, T12
     C11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0070_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0070_231127_0"]["A3:E6705"]
     y3c_data = C11[:, 2] .+ 273.15
     y4c_data = C11[:, 3] .+ 273.15
     y5c_data = C11[:, 4] .+ 273.15
     y6c_data = C11[:, 5] .+ 273.15
-end
 
-begin
     #Exp 71 - T3, T8
     D1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0071_231128_102707.xlsx")["Sheet 1 - Data_FPT0071_231128_1"]["A3:C7087"]
     E71t = float.(D1[:, 1]) #xd1_data  
     E71Tf = D1[:, 2] .+ 273.15 #y1d1_data
     y2d1_data = D1[:, 3] .+ 273.15
-end
-begin #decimate experimental data E71 for T3
-    dec = 100
-    function decimate!(x, step)
-        x = [x[i] for i in 1:step:length(x)]
-    end
+#decimate experimental data E71 for T3
     E71t = decimate!(E71t, dec)
     E71Tf = decimate!(E71Tf, dec)
     scatter(E71t, E71Tf)
-end
 
-begin
     #Exp 71 - T9, T10, T11, T12
     D11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0071_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0071_231128_1"]["A3:E7087"]
     y3d_data = D11[:, 2] .+ 273.15
     y4d_data = D11[:, 3] .+ 273.15
     y5d_data = D11[:, 4] .+ 273.15
     y6d_data = D11[:, 5] .+ 273.15
-end
 
-begin
     #Exp 72 - T3, T8
     E1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0072_231129_104140.xlsx")["Sheet 1 - Data_FPT0072_231129_1"]["A3:C3217"]
     E72t = float.(E1[:, 1]) #xe1_data
     E72Tf = E1[:, 2] .+ 273.15 #y1e1_data
     y2e1_data = E1[:, 3] .+ 273.15
-end
-begin #decimate experimental data E72 for T3
-    dec = 100
-    function decimate!(x, step)
-        x = [x[i] for i in 1:step:length(x)]
-    end
+ #decimate experimental data E72 for T3
     E72t = decimate!(E72t , dec)
     E72Tf = decimate!(E72Tf, dec)
     scatter(E72t, E72Tf)
-end
 
-
-begin
     #Exp 72 - T9, T10, T11, T12
     E11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0072_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0072_231129_1"]["A3:E3217"]
     y3e_data = E11[:, 2] .+ 273.15
     y4e_data = E11[:, 3] .+ 273.15
     y5e_data = E11[:, 4] .+ 273.15
     y6e_data = E11[:, 5] .+ 273.15
-end
 
-begin
     #Exp 73 - T3, T8
     F1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0073_231129_132744.xlsx")["Sheet 1 - Data_FPT0073_231129_1"]["A3:C4575"]
     E73t = float.(F1[:, 1])#xf1_data
     E73Tf = F1[:, 2] .+ 273.15 #y1f1_data
     y2f1_data = F1[:, 3] .+ 273.15
-end
-begin #decimate experimental data E73 for T3
-    dec = 100
-    function decimate!(x, step)
-        x = [x[i] for i in 1:step:length(x)]
-    end
+ #decimate experimental data E73 for T3
     E73t = decimate!(E73t, dec)
     E73Tf = decimate!(E73Tf, dec)
     scatter(E73t, E73Tf)
-end
 
-
-begin
     #Exp 73 - T9, T10, T11, T12
     F11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0073_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0073_231129_1"]["A3:E4575"]
     y3f_data = F11[:, 2] .+ 273.15
     y4f_data = F11[:, 3] .+ 273.15
     y5f_data = F11[:, 4] .+ 273.15
     y6f_data = F11[:, 5] .+ 273.15
-end
 
-
-begin
     #Exp 74 - T3, T8
     G = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0074_231130_123228.xlsx")["Sheet 1 - Data_FPT0074_231130_1"]["A3:C6018"]
     E74t = float.(G[:, 1]) #xg_data 
     E74Tf = G[:, 2] .+ 273.15 #y1g_data 
     y2g_data = G[:, 3] .+ 273.15
-end
-begin #decimate experimental data E74 for T3
-    dec = 100
-    function decimate!(x, step)
-        x = [x[i] for i in 1:step:length(x)]
-    end
+ #decimate experimental data E74 for T3
     E74t = decimate!(E74t, dec)
     E74Tf = decimate!(E74Tf, dec)
     scatter(E74t, E74Tf)
-end
 
-
-begin
     #Exp 74 - T9, T10, T11, T12
     G1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0074_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0074_231130_1"]["A3:E6018"]
     y3g1_data = G1[:, 2] .+ 273.15
     y4g1_data = G1[:, 3] .+ 273.15
     y5g1_data = G1[:, 4] .+ 273.15
     y6g1_data = G1[:, 5] .+ 273.15
-end
 
-
-begin
     #Exp 75 - T3, T8
     H = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0075_231201_162138.xlsx")["Sheet 1 - Data_FPT0075_231201_1"]["A3:C6354"]
     E75t= float.(H[:, 1]) #xh_data
     E75Tf = H[:, 2] .+ 273.15 #y1h_data
     y2h_data = H[:, 3] .+ 273.15
-end
-begin #decimate experimental data E75 for T3
-    dec = 100
-    function decimate!(x, step)
-        x = [x[i] for i in 1:step:length(x)]
-    end
+ #decimate experimental data E75 for T3
     E75t= decimate!(E75t, dec)
     E75Tf = decimate!(E75Tf, dec)
     scatter(E75t, E75Tf)
-end
 
-begin
     #Exp 75 - T9, T10, T11, T12
     H1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0075_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0075_231201_1"]["A3:E6354"]
     y3h1_data = H1[:, 2] .+ 273.15
     y4h1_data = H1[:, 3] .+ 273.15
     y5h1_data = H1[:, 4] .+ 273.15
     y6h1_data = H1[:, 5] .+ 273.15
-end
 
-
-begin
     #Exp 76 - T3, T8
     I = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0076_231203_120521.xlsx")["Sheet 1 - Data_FPT0076_231203_1"]["A3:C7147"]
     E76t = float.(I[:, 1]) #xi_data
     E76Tf = I[:, 2] .+ 273.15 #y1i_data
     y2i_data = I[:, 3] .+ 273.15
-end
-begin #decimate experimental data E76 for T3
-    dec = 100
-    function decimate!(x, step)
-        x = [x[i] for i in 1:step:length(x)]
-    end
+ #decimate experimental data E76 for T3
     E76t = decimate!(E76t, dec)
     E76Tf = decimate!(E76Tf, dec)
     scatter(E76t, E76Tf)
-end
 
-
-begin
     #Exp 76 - T9, T10, T11, T12
     I1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0076_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0076_231203_1"]["A3:E7147"]
     y3i1_data = I1[:, 2] .+ 273.15
     y4i1_data = I1[:, 3] .+ 273.15
     y5i1_data = I1[:, 4] .+ 273.15
     y6i1_data = I1[:, 5] .+ 273.15
-end
 
-
-begin
     #Exp 77 - T3, T8
     J = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0077_231203_161315.xlsx")["Sheet 1 - Data_FPT0077_231203_1"]["A3:C3044"]
     E77t = float.(J[:, 1]) #xj_data
     E77Tf = J[:, 2] .+ 273.15 #y1j_data
     y2j_data = J[:, 3] .+ 273.15
-end
-begin #decimate experimental data E77 for T3
-    dec = 100
-    function decimate!(x, step)
-        x = [x[i] for i in 1:step:length(x)]
-    end
+ #decimate experimental data E77 for T3
     E77t = decimate!(E77t, dec)
     E77Tf = decimate!(E77Tf, dec)
     scatter(E77t, E77Tf)
-end
 
-begin
     #Exp 77 - T9, T10, T11, T12
     J1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0077_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0077_231203_1"]["A3:E3044"]
     y3j1_data = J1[:, 2] .+ 273.15
     y4j1_data = J1[:, 3] .+ 273.15
     y5j1_data = J1[:, 4] .+ 273.15
     y6j1_data = J1[:, 5] .+ 273.15
-end
 
-
-begin
     #Exp 78 - T3, T8
     K = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0078_231204_132252.xlsx")["Sheet 1 - Data_FPT0078_231204_1"]["A3:C5384"]
     E78t = float.(K[:, 1]) #xk_data
     E78Tf = K[:, 2] .+ 273.15 #y1k_data
     y2k_data = K[:, 3] .+ 273.15
-end
-begin #decimate experimental data E78 for T3
-dec = 100
-function decimate!(x, step)
-    x = [x[i] for i in 1:step:length(x)]
-end
-E78t = decimate!(E78t, dec)
-E78Tf = decimate!(E78Tf, dec)
-scatter(E78t, E78Tf)
-end
+ #decimate experimental data E78 for T3
+    E78t = decimate!(E78t, dec)
+    E78Tf = decimate!(E78Tf, dec)
+    scatter(E78t, E78Tf)
 
-begin
     #Exp 78 - T9, T10, T11, T12
     K1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0078_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0078_231204_1"]["A3:E5384"]
     y3k1_data = K1[:, 2] .+ 273.15
     y4k1_data = K1[:, 3] .+ 273.15
     y5k1_data = K1[:, 4] .+ 273.15
     y6k1_data = K1[:, 5] .+ 273.15
-end   
 
-begin
     #Exp 79 - T3, T8
     L0 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0079_231204_172244.xlsx")["Sheet 1 - Data_FPT0079_231204_1"]["A3:C5233"]
     E79t = float.(L0[:, 1]) #xl_data 
     E79Tf = L0[:, 2] .+ 273.15 #y1l_data
     y2l_data = L0[:, 3] .+ 273.15  
-end
-begin #decimate experimental data E79 for T3
-    dec = 100
-    function decimate!(x, step)
-        x = [x[i] for i in 1:step:length(x)]
-    end
+ #decimate experimental data E79 for T3
     E79t= decimate!(E79t, dec)
     E79Tf = decimate!(E79Tf, dec)
     scatter(E79t, E79Tf)
-end    
 
-begin
     #Exp 79 - T9, T10, T11, T12
     L1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0079_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0079_231204_1"]["A3:E5233"]
     y3l1_data = L1[:, 2] .+ 273.15
     y4l1_data = L1[:, 3] .+ 273.15
     y5l1_data = L1[:, 4] .+ 273.15
     y6l1_data = L1[:, 5] .+ 273.15
-end
-   
-   
-begin
+
     #Exp 80 - T3, T8
     M = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0080_231205_095122.xlsx")["Sheet 1 - Data_FPT0080_231205_0"]["A3:C5814"]
     E80t = float.(M[:, 1]) # xm_data
     E80Tf = M[:, 2] .+ 273.15 #y1m_data
     y2m_data = M[:, 3] .+ 273.15   
-end
-begin #decimate experimental data E80 for T3
-    dec = 100
-    function decimate!(x, step)
-        x = [x[i] for i in 1:step:length(x)]
-    end
+ #decimate experimental data E80 for T3
     E80t = decimate!(E80t, dec)
     E80Tf = decimate!(E80Tf, dec)
     scatter(E80t, E80Tf)
-end
 
-begin
     #Exp 80 - T9, T10, T11, T12
     M1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0080_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0080_231205_0"]["A3:E5814"]
     y3m1_data = M1[:, 2] .+ 273.15
     y4m1_data = M1[:, 3] .+ 273.15
     y5m1_data = M1[:, 4] .+ 273.15
     y6m1_data = M1[:, 5] .+ 273.15
-end
 
-
-begin
     #Exp 81 - T3, T8
     N = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0081_231205_135354.xlsx")["Sheet 1 - Data_FPT0081_231205_1"]["A3:C5989"]
     E81t= float.(N[:, 1]) #xn_data 
     E81Tf = N[:, 2] .+ 273.15 #y1n_data 
     y2n_data = N[:, 3] .+ 273.15   
-end
-begin #decimate experimental data E81 for T3
-    dec = 100
-    function decimate!(x, step)
-        x = [x[i] for i in 1:step:length(x)]
-    end
+ #decimate experimental data E81 for T3
     E81t = decimate!(E81t, dec)
     E81Tf = decimate!(E81Tf, dec)
     scatter(E81t, E81Tf)
-end
 
-
-begin
     #Exp 81 - T9, T10, T11, T12
     N1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0081_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0081_231205_1"]["A3:E5989"]
     y3n1_data = N1[:, 2] .+ 273.15
@@ -627,11 +484,11 @@ end
 
 #measurements and conditions#Defining simulation conditions
 begin
-    condition_E67 = Dict(Io => 442320.0, qlpm => 15.27)
-    condition_E68 = Dict(Io => 442320.0, qlpm => 12.50)
-    condition_E69 = Dict(Io => 442320.0, qlpm => 10.50)
-    condition_E70 = Dict(Io => 442320.0, qlpm => 9.10)
-    condition_E71 = Dict(Io => 442320.0, qlpm => 7.12)
+    condition_E67 = Dict(Io => 456320.0, qlpm => 15.27)
+    condition_E68 = Dict(Io => 456320.0, qlpm => 12.50)
+    condition_E69 = Dict(Io => 456320.0, qlpm => 10.50)
+    condition_E70 = Dict(Io => 456320.0, qlpm => 9.10)
+    condition_E71 = Dict(Io => 456320.0, qlpm => 7.12)
     condition_E72 = Dict(Io => 370880.0, qlpm => 18.34)
     condition_E73 = Dict(Io => 370880.0, qlpm => 13.16)
     condition_E74 = Dict(Io => 370880.0, qlpm => 9.03)
@@ -692,13 +549,13 @@ rmp = ModelingToolkit.varmap_to_vars([Io => 442320.0, A => 70., B => 0.3, C=> 10
 function NLmodeloptim(tvalues, rmp)
 
     #p = [hlocal => p_vary[1]]
-    modeloptim = remake(prob, p=rmp, tspan=(1.0, tvalues[end]))
-    modeloptim_sol = solve(modeloptim, FBDF(), saveat=tvalues[end])#, reltol=1e-12, abstol=1e-12)
+    modeloptim = remake(prob, p=rmp, tspan=(0.0, tvalues[end]))
+    modeloptim_sol = solve(modeloptim, FBDF(), saveat=tvalues)#, reltol=1e-12, abstol=1e-12)
     #time = modelfit_sol.t
     # tempT8_op = modeloptim_sol.u[Ts(t, x)][end, 8]
     # tempT9_op = modeloptim_sol.u[Ts(t, x)][end, 42]
     # tempT10_op = modeloptim_sol.u[Ts(t, x)][end, 78]
-    tempT3_op = float.(modeloptim_sol.u[Tf(t, x)][end, end-1])
+    tempT3_op = float.(modeloptim_sol.u[Tf(t, x)][:, end-1])
     # T12_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 20] .+ modeloptim_sol.u[Ts(t, x)][end, 20]) ./ 2
     # T11_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 59] .+ modeloptim_sol.u[Ts(t, x)][end, 59]) ./ 2
     # tempT11_op = modeloptim_sol.u[Ts(t, x)][end, 78]
@@ -737,14 +594,14 @@ function lossAll(pguess_l, _)
         sm = sim_key[it]
         #println(sm)
         cond = simulation_conditions[sm]
-        expdata = float.(measurements[measurements.simulation_id.==sm, :temperatures])
-        time_opt = float.(measurements[measurements.simulation_id.==sm, :time])
+        expdata = float.(measurements[measurements.simulation_id.==sm, :temperatures][1])
+        time_opt = float.(measurements[measurements.simulation_id.==sm, :time][1])
 
         # Ensure time_opt are vectors of floats
         
         #run selected simulation and get the steady temperature values
 
-        temp_T = remakeAysha(pguess_l, cond, time_opt)
+        temp_T = remakeAysha(pguess_l, cond, time_opt)[1]
         
         temp_error = (temp_T .- expdata) .^ 2
         lossr[it] = sqrt(sum(temp_error))
@@ -786,11 +643,11 @@ begin
         sm = sim_key[it]
         #println(sm)
         cond = simulation_conditions[sm]
-        expdata = (measurements[measurements.simulation_id.==sm, :temperatures])
-        time_opt = (measurements[measurements.simulation_id.==sm, :time])
+        expdata = (measurements[measurements.simulation_id.==sm, :temperatures][1])
+        time_opt = (measurements[measurements.simulation_id.==sm, :time][1])
         
         #run selected simulation and get the steady temperature values
-        temp_T = remakeAysha(pnew, cond, time_opt)
+        temp_T = remakeAysha(pnew, cond, time_opt)[1]
         #push!(T_steady, [sm, temp_T, expdata])
         push!(T_steady, (sm, temp_T, expdata))
    end
@@ -810,14 +667,14 @@ begin #TI-8
     ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
     order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
     plot1 = bar(
-        [1, 2], [T_steady[order_indices[1], :T_mod][1], T_steady[order_indices[1], :T_exp][1]],
+        [1, 2], [T_steady[order_indices[1], :T_mod][end], T_steady[order_indices[1], :T_exp][end]],
         title="TI-8 Steady State Temperature", ylabel="Temperature (K)", xlabel="Experimental Runs",
         bar_width=0.4, xticks=(1:2:30, ordered_sim_conditions),
-       label="T_model", color=[color_model, color_exp], ylimit=(0, 1250))
+       label="T_model", color=[color_model, color_exp], ylimit=(0, 850))
  
     # Loop through the remaining data to add the bars without labels
     for i in 2:15
-        bar!(plot1, [2i-1, 2i], [T_steady[order_indices[i], :T_mod][1], T_steady[order_indices[i], :T_exp][1]], bar_width=0.4, label=["" ""], color=[color_model, color_exp])
+        bar!(plot1, [2i-1, 2i], [T_steady[order_indices[i], :T_mod][end], T_steady[order_indices[i], :T_exp][end]], bar_width=0.4, label=["" ""], color=[color_model, color_exp])
     end
     # Manually add a legend entry for T_exp and T_model
     plot1 = bar!(plot1, [0], [0], label="T_exp", color=color_exp)
