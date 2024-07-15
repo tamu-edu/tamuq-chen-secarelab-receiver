@@ -115,7 +115,7 @@ begin
     p_math = vcat(p_opt, p_cond)
     #h_average = hfa * (qlpm^hfn)
     #h_average = (Nu * kf) / Lc
-    Re_f(qlpm) = (ρf * (qlpm/60/1000/Af) * w_t) / mu
+    Re_f(qlpm) = (ρf * (qlpm/60/1000/Af) * w) / mu
     Nu_f(qlpm) = A*(Re_f(qlpm)^B)*(Pr^C)
     h_avg_f(qlpm) = (Nu_f(qlpm) * kf) / Lc
     
@@ -147,7 +147,7 @@ begin
         Ts(0.0, x) ~ Tamb, # initial
         Tf(0.0, x) ~ Tamb, # initial
         -A_frt * ks * Dx(Ts(t, x_max1)) ~ 0.0, # far right
-        -A_frt * ks * Dx(Ts(t, x_min1)) ~ Io * A_frt - ϵ * σ * A_frt * (Ts(t, x_min1)^4 - Tamb^4) - hext * A_frt * (Ts(t, x_min1) - Tamb),  # far left
+        -A_frt * ks * Dx(Ts(t, x_min1)) ~ Io * A_chnl_frt_all - ϵ * σ * A_chnl_frt_all * (Ts(t, x_min1)^4 - Tamb^4) - hext * A_chnl_frt_all * (Ts(t, x_min1) - Tamb),  # far left
         -Af * kf * Dx(Tf(t, x_max1)) ~ 0.0, #-ρf * Cpf * V * A_ft * (Tf(t, x_max1) - Tamb), # exiting fluid
         -Af * kf * Dx(Tf(t, x_min1)) ~ m * Cpf * (Tf(t, x_min1) - Tamb) # entering fluid (upstream temperature)
     ]
@@ -824,15 +824,15 @@ function NLmodeloptim(tvalues, rmp)
     modeloptim = remake(prob, p=rmp, tspan=(0.0, tvalues[end]))
     modeloptim_sol = solve(modeloptim, FBDF(), saveat=tvalues)#, reltol=1e-12, abstol=1e-12)
     #time = modelfit_sol.t
-    tempT8_op = float.(modeloptim_sol.u[Ts(t, x)][end, 8])
-    tempT9_op = float.(modeloptim_sol.u[Ts(t, x)][end, 42])
-    tempT10_op = float.(modeloptim_sol.u[Ts(t, x)][end, 78])
+    tempT8_op = float.(modeloptim_sol.u[Ts(t, x)][:, 8])
+    tempT9_op = float.(modeloptim_sol.u[Ts(t, x)][:, 42])
+    tempT10_op = float.(modeloptim_sol.u[Ts(t, x)][:, 78])
     tempT3_op = float.(modeloptim_sol.u[Tf(t, x)][:, end-1])
     # T12_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 20] .+ modeloptim_sol.u[Ts(t, x)][end, 20]) ./ 2
     # T11_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 59] .+ modeloptim_sol.u[Ts(t, x)][end, 59]) ./ 2
-    tempT11_op = float.(modeloptim_sol.u[Ts(t, x)][end, 78])
-    tempT12_op = float.(modeloptim_sol.u[Ts(t, x)][end, 42])
-    return append!([tempT8_op, tempT9_op, tempT10_op, tempT3_op, tempT12_op, tempT11_op])
+    tempT11_op = float.(modeloptim_sol.u[Ts(t, x)][:, 78])
+    tempT12_op = float.(modeloptim_sol.u[Ts(t, x)][:, 42])
+    return append!(tempT8_op, tempT9_op, tempT10_op, tempT3_op, tempT12_op, tempT11_op)
     #return ([tempT3_op])
 end
 
@@ -848,6 +848,7 @@ function remakeAysha(pguess_l, cond, time_opt)
         for (i, (key, value)) in enumerate(cond)
             rmp[length(pguess_l) + i] = Symbol(key) => value
         end# pguess is the initial guess for the optimization
+        #println(rmp)
         temp_T = NLmodeloptim(time_opt, rmp)
         return temp_T
 end
@@ -866,14 +867,14 @@ function lossAll(pguess_l, _)
         sm = sim_key[it]
         #println(sm)
         cond = simulation_conditions[sm]
-        expdata = float.(measurements[measurements.simulation_id.==sm, :temperatures][1])
-        time_opt = float.(measurements[measurements.simulation_id.==sm, :time][1])
+        expdata = reduce(vcat, measurements[measurements.simulation_id.==sm, :temperatures])
+        time_opt = measurements[measurements.simulation_id.==sm, :time][1]
 
         # Ensure time_opt are vectors of floats
         
         #run selected simulation and get the steady temperature values
-
-        temp_T = remakeAysha(pguess_l, cond, time_opt)[1]
+        #print(sm)
+        temp_T = remakeAysha(pguess_l, cond, time_opt)
         
         temp_error = (temp_T .- expdata) .^ 2
         lossr[it] = sqrt(sum(temp_error))
@@ -884,7 +885,7 @@ p0 = [x[2] for x in p_opt]
 optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
 #p_opt = [aCp => 1., hfa => 8., hfn =>0.66, aIo => 1.] 
 lb = [70., 0.2, 5.]
-ub = [1000., 1., 20.]
+ub = [5000., 2., 20.]
  
 #pguess_opt = ModelingToolkit.varmap_to_vars([Io => 456000, h_average => 14., qlpm => 7.12], parameters(pdesys))
 initialerror = (lossAll(p0, []))
@@ -892,7 +893,7 @@ println(initialerror)
 
 optprob = Optimization.OptimizationProblem(optf, p0, [], lb=lb, ub=ub)
 
-optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method=NLopt.LN_NELDERMEAD(), maxtime=1000, local_maxiters=100000)
+optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method=NLopt.LN_NELDERMEAD(), maxtime=100, local_maxiters=100000)
 
 println(optsol.retcode)
 pnew = optsol.u
@@ -913,11 +914,13 @@ begin
         sm = sim_key[it]
         #println(sm)
         cond = simulation_conditions[sm]
-        expdata = (measurements[measurements.simulation_id.==sm, :temperatures][1])
-        time_opt = (measurements[measurements.simulation_id.==sm, :time][1])
+        expdata = measurements[measurements.simulation_id.==sm, :temperatures]
+        time_opt = measurements[measurements.simulation_id.==sm, :time][1]
         
         #run selected simulation and get the steady temperature values
         temp_T = remakeAysha(pnew, cond, time_opt)
+        temp_T = reshape(temp_T, length(expdata[1]), length(expdata))
+        temp_T = [temp_T[:, i] for i in 1:length(expdata)]
         push!(T_steady, (sm, temp_T, expdata))
    end
 
@@ -929,14 +932,14 @@ begin #TI-8
     ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
     order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
     plot1 = bar(
-        [1, 2], [T_steady[order_indices[1], :T_mod][end][end], T_steady[order_indices[1], :T_exp][end]],
+        [1, 2], [T_steady[order_indices[1], :T_mod][end][end], T_steady[order_indices[1], :T_exp][end][end]],
         title="TI-8 Steady State Temperature", ylabel="Temperature (K)", xlabel="Experimental Runs",
         bar_width=0.4, xticks=(1:2:30, ordered_sim_conditions),
        label="T_model", color=[color_model, color_exp], ylimit=(0, 1250))
  
     # Loop through the remaining data to add the bars without labels
     for i in 2:15
-        bar!(plot1, [2i-1, 2i], [T_steady[order_indices[i], :T_mod][end][end], T_steady[order_indices[i], :T_exp][end]], bar_width=0.4, label=["" ""], color=[color_model, color_exp])
+        bar!(plot1, [2i-1, 2i], [T_steady[order_indices[i], :T_mod][end][end], T_steady[order_indices[i], :T_exp][end][end]], bar_width=0.4, label=["" ""], color=[color_model, color_exp])
     end
     # Manually add a legend entry for T_exp and T_model
     plot1 = bar!(plot1, [0], [0], label="T_exp", color=color_exp)
@@ -950,7 +953,7 @@ begin
 
     # Extract the data for the scatter plot
     model_temps = [T_steady[order_indices[i], :T_mod][end][end] for i in 1:15]
-    exp_temps = [T_steady[order_indices[i], :T_exp][end] for i in 1:15]
+    exp_temps = [T_steady[order_indices[i], :T_exp][end][end] for i in 1:15]
 
     # Create the scatter plot
     plot1 = scatter(
@@ -1169,7 +1172,7 @@ begin #TI-9
     ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
     order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
     plot1 = bar(
-        [1, 2], [T_steady[order_indices[1], :T_mod][end][2], T_steady[order_indices[1], :T_exp][end]],
+        [1, 2], [T_steady[order_indices[1], :T_mod][end][2], T_steady[order_indices[1], :T_exp][end][2]],
         title="TI-9 Steady State Temperature", ylabel="Temperature (K)", xlabel="Experimental Runs",
         bar_width=0.4, xticks=(1:2:30, ordered_sim_conditions),
        label="T_model", color=[color_model, color_exp],  ylimit=(0, 850))
