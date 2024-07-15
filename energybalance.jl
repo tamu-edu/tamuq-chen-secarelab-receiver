@@ -20,6 +20,15 @@ begin
 	Pkg.activate("energy")
 end
 
+# ╔═╡ 86c7df59-4f03-4730-9cbf-72d8fc7c34bd
+begin
+	using ModelingToolkit, DifferentialEquations, Plots
+	#using ModelingToolkit: t_nounits as t, D_nounits as D
+	using PEtab, XLSX, Statistics, DataFrames
+	using PlutoUI, StatsPlots
+	using Optimization, Optim, Ipopt, OptimizationNLopt
+end
+
 # ╔═╡ 8c28c8d1-dd57-4a04-9121-cbfed404d824
 html"""<style>
 main {
@@ -614,7 +623,7 @@ plot(sol)
 
 # ╔═╡ 1180068b-287b-4038-ac87-b689d42c8c98
 # rmp = ModelingToolkit.varmap_to_vars([aCp => slaCp, aIo => slaIo , hfa => slha, hfb => 0., hfn => 0., Io => 456000, Tins => 313., qlpm => 16.47], parameters(odes))
-rmp = ModelingToolkit.varmap_to_vars([aCp => slaCp, aIo => slaIo, A => 80., B => 0.2, C => 10., Io => 456000, Tins => 313., qlpm => 16.47], parameters(odes))
+rmp = ModelingToolkit.varmap_to_vars([aCp => slaCp, aIo => slaIo, A => 250., B => 1.6, C => 18., Io => 456000, Tins => 313., qlpm => 16.47], parameters(odes))
 
 # ╔═╡ aa2059e5-fcde-4cca-b9d7-f78120bd1b33
 
@@ -630,7 +639,7 @@ end
 
 # ╔═╡ 634082dc-6050-42fc-a208-1a68802fe5da
 begin
-	_g1_aIo = PEtabParameter(:g1_aIo, lb=1., ub=1., scale=:lin)
+	_g1_aIo = PEtabParameter(:g1_aIo, lb=1., ub=1.03, scale=:lin)
 	_g2_aIo = PEtabParameter(:g2_aIo, lb=1., ub=1., scale=:lin)
 	_g3_aIo = PEtabParameter(:g3_aIo, lb=1., ub=1., scale=:lin)
 	#_g1_al = PEtabParameter(:g1_al, lb=0.221, ub=3., scale=:lin)
@@ -639,10 +648,10 @@ begin
 	#_hfa = PEtabParameter(hfa, lb=0.001, ub=5., scale=:lin)
 	# _hfb = PEtabParameter(hfb, lb=0.1, ub=10., scale=:lin)
 	#_hfn = PEtabParameter(hfn, lb=0.001, ub=10., scale=:lin)
-	_A = PEtabParameter(A, lb=70., ub=500., scale=:lin)
-	_B = PEtabParameter(B, lb=0.3, ub=0.9, scale=:lin)
+	_A = PEtabParameter(A, lb=200., ub=300., scale=:lin)
+	_B = PEtabParameter(B, lb=1., ub=1.7, scale=:lin)
 	#_n = PEtabParameter(n, lb=0.01, ub=0.9, scale=:lin)
-	_C = PEtabParameter(C, lb=5., ub=17., scale=:lin)
+	_C = PEtabParameter(C, lb=15., ub=20., scale=:lin)
 	#_al = PEtabParameter(al, lb=0.01, ub=3., scale=:lin)
 	_aCp = PEtabParameter(aCp, lb=0.5, ub=4.4, scale=:lin)
 	params = [_g1_aIo, _g2_aIo, _g3_aIo, _A, _B, _C, _aCp]
@@ -705,7 +714,7 @@ h_f = (10.02^0.995134)*0.784718
 hf
 
 # ╔═╡ 24b350f4-92df-4652-aa7a-264a8165eb74
-2.9574*((81.836*12.5)^1.44171)*((0.40721)^14.082)*54.389
+2.9474*((81.836*12.5)^1.594)*((0.40721)^17.3506)*236.74
 
 # ╔═╡ 737f33e9-74e6-4e87-82f1-ef7451643c1f
 2.9474*0.110197*(1+(((4.6216*15.27)^0.66)*2.85619*exp(-26.153/(4.6216*15.27))))
@@ -812,6 +821,17 @@ rel_error = (Tend_model[15] - Tend_exp[15]) / Tend_exp[15]
 # ╔═╡ 0eb4b057-48c2-4f77-9be9-adace62a9544
 Tend_e
 
+# ╔═╡ 8ad40098-80a4-4a44-811d-d94b68c6980e
+# ╠═╡ disabled = true
+#=╠═╡
+begin
+	using StatsPlots
+	bar(cond, [Tend_m, Tend_e])
+	groupedbar(cond, [Tend_m, Tend_e], bar_position = :dodge, bar_width=0.7)
+
+end
+  ╠═╡ =#
+
 # ╔═╡ 8fdb601b-55f4-477c-8160-0faa678e9ed1
 begin
 	scatter(Tend_e, Tend_m, label = "Experimental and Model Temperatures ", legend = :bottomright, xlabel = "Experimental Temperature (K)", ylabel = "Model Temperature (K)", title = "Air Outlet Temperature")
@@ -846,28 +866,6 @@ begin
 	Gzx = 10.:50.
 	plot(1 ./Gzx, fNu.(Gzx))
 end
-
-# ╔═╡ 86c7df59-4f03-4730-9cbf-72d8fc7c34bd
-#=╠═╡
-begin
-	using ModelingToolkit, DifferentialEquations, Plots
-	#using ModelingToolkit: t_nounits as t, D_nounits as D
-	using PEtab, XLSX, Statistics, DataFrames
-	using PlutoUI, StatsPlots
-	using Optimization, Optim, Ipopt, OptimizationNLopt
-end
-  ╠═╡ =#
-
-# ╔═╡ 8ad40098-80a4-4a44-811d-d94b68c6980e
-# ╠═╡ disabled = true
-#=╠═╡
-begin
-	using StatsPlots
-	bar(cond, [Tend_m, Tend_e])
-	groupedbar(cond, [Tend_m, Tend_e], bar_position = :dodge, bar_width=0.7)
-
-end
-  ╠═╡ =#
 
 # ╔═╡ Cell order:
 # ╠═8c28c8d1-dd57-4a04-9121-cbfed404d824
