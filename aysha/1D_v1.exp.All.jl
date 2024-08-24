@@ -82,22 +82,22 @@ begin
     Tins_f(t) = Tins(t)
     @register_symbolic Tins_f(t)
 end
-
 begin 
     x11 = 0.0001:0.001383838383838384:0.137 #T2 (insulation)
-    #Re_f(qlpm) = (ρf * (qlpm/60/1000/Af) * w_t) / mu
-    Re = (ρf * V * w_t) / mu
+    Re_f(qlpm) = (ρf * (qlpm/60/1000/Af) * w_t) / mu
+    Re = (ρ * V * w) / mu
     Pr = (Cpf * mu) / kf
-    Gz = (1 ./ x11) * Re * Pr * w_t
+    Gz = (1 ./ x11) * Re_f(qlpm) * Pr * w
     #2.create interpolation function
     Gz_ = LinearInterpolation(x11, Gz)
     Gz_f(x) = Gz_(x)
     @register_symbolic Gz_f(x)
 end
+
 begin
     # Parameters, variables, and derivatives for system 1
     @variables t x
-    @parameters A B C #ks h_average A n
+    @parameters A B n C #ks h_average A n
     @parameters Io qlpm
     @variables Ts(..) Tf(..)
     Dt = Differential(t)
@@ -110,16 +110,16 @@ begin
     #Nu = A*(Re^B)*(Pr^C)
     #Cps(Ts) = (0.27+0.135e-4*(Ts)-9720*((Ts)^-2)+0.204e-7*((Ts)^2))/1000 #kJ/kg*K from manufacturer data
     #p_opt = [A => 2., B => 0.5, n=> 0.5, C=> 20.]
-    p_opt = [A => 250., B => 0.5, C=> 5.]
+    p_opt = [A => 700., B => 0.4, n=> 0.5, C=> 30.]
     p_cond = [Io => 456000.0, qlpm => 15.27]
     p_math = vcat(p_opt, p_cond)
     #h_average = hfa * (qlpm^hfn)
     #h_average = (Nu * kf) / Lc
-    Re_f(qlpm) = (ρf * (qlpm/60/1000/Af) * w) / mu
-    Nu_f(qlpm) = A*(Re_f(qlpm)^B)*(Pr^C)
+    Re_f(qlpm) = (ρ * (qlpm/60/1000/Af) * w) / mu
+    #Nu_f(qlpm) = A*(Re_f(qlpm)^B)*(Pr^C)
+    Nu_f(qlpm) = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
     h_avg_f(qlpm) = (Nu_f(qlpm) * kf) / Lc
-    
- 
+
     # MOL Discretization parameters for system 1
     x_max1 = L
     x_min1 = 0.0
@@ -220,7 +220,7 @@ dec = 100
 function decimate!(x, step)
     x = [x[i] for i in 1:step:length(x)]
 end
-
+begin
 #Exp. data to extract temp.
 begin
     #Exp 67 - T3, T8
@@ -738,25 +738,25 @@ begin
     scatter(E81t, E81T12)
 
 end
+end
 
-
-#measurements and conditions#Defining simulation conditions
+#Defining simulation conditions
 begin
-    condition_E67 = Dict(Io => 469680.0, qlpm => 15.27)
-    condition_E68 = Dict(Io => 469680.0, qlpm => 12.50)
-    condition_E69 = Dict(Io => 469680.0, qlpm => 10.50)
-    condition_E70 = Dict(Io => 469680.0, qlpm => 9.10)
-    condition_E71 = Dict(Io => 469680.0, qlpm => 7.12)
-    condition_E72 = Dict(Io => 370880.0, qlpm => 18.34)
-    condition_E73 = Dict(Io => 370880.0, qlpm => 13.16)
-    condition_E74 = Dict(Io => 370880.0, qlpm => 9.03)
-    condition_E75 = Dict(Io => 370880.0, qlpm => 6.95)
-    condition_E76 = Dict(Io => 370880.0, qlpm => 4.53)
-    condition_E77 = Dict(Io => 248320.0, qlpm => 13.85)
-    condition_E78 = Dict(Io => 248320.0, qlpm => 10.02)
-    condition_E79 = Dict(Io => 248320.0, qlpm => 8.04)
-    condition_E80 = Dict(Io => 248320.0, qlpm => 6.62)
-    condition_E81 = Dict(Io => 248320.0, qlpm => 4.53)
+    condition_E67 = Dict(Io => 442320.0, qlpm => 15.27)
+    condition_E68 = Dict(Io => 442320.0, qlpm => 12.50)
+    condition_E69 = Dict(Io => 442320.0, qlpm => 10.50)
+    condition_E70 = Dict(Io => 442320.0, qlpm => 9.10)
+    condition_E71 = Dict(Io => 442320.0, qlpm => 7.12)
+    condition_E72 = Dict(Io => 371792.0, qlpm => 18.34)
+    condition_E73 = Dict(Io => 371792.0, qlpm => 13.16)
+    condition_E74 = Dict(Io => 371792.0, qlpm => 9.03)
+    condition_E75 = Dict(Io => 371792.0, qlpm => 6.95)
+    condition_E76 = Dict(Io => 371792.0, qlpm => 4.53)
+    condition_E77 = Dict(Io => 256000.0, qlpm => 13.85)
+    condition_E78 = Dict(Io => 256000.0, qlpm => 10.02)
+    condition_E79 = Dict(Io => 256000.0, qlpm => 8.04)
+    condition_E80 = Dict(Io => 256000.0, qlpm => 6.62)
+    condition_E81 = Dict(Io => 256000.0, qlpm => 4.53)
 
 
     simulation_conditions = Dict("E67" => condition_E67, "E68" => condition_E68,
@@ -812,12 +812,19 @@ begin
             E79T8, E79T9, E79T10, E79T11, E79T12, E79Tf,
             E80T8, E80T9, E80T10, E80T11, E80T12, E80Tf,
             E81T8, E81T9, E81T10, E81T11, E81T12, E81Tf])   
+        # measurements = DataFrame(
+        # simulation_id = repeat(["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"], inner=1, outer=1),
+        # obs_id=repeat(["_T3"], inner=1, outer=15),
+        # time= repeat([E67t, E68t, E69t, E70t, E71t, E72t, E73t, E74t, E75t, E76t, E77t, E78t, E79t, E80t, E81t], inner=1, outer=1),
+        #     temperatures= [E67Tf, E68Tf, E69Tf, E70Tf,
+        #     E71Tf, E72Tf, E73Tf, E74Tf, E75Tf, E76Tf,
+        #     E77Tf, E78Tf, E79Tf, E80Tf, E81Tf])   
     end
 
 
 
 #Optimization using NLOpt
-rmp = ModelingToolkit.varmap_to_vars([Io => 469680.0, A => 250.1, B => 0.5, C=> 5., qlpm => 7.12], parameters(pdesys))
+rmp = ModelingToolkit.varmap_to_vars([Io => 442320.0, A => 700., B => 0.4, n=> 0.5, C=> 30., qlpm => 7.12], parameters(pdesys))
 function NLmodeloptim(tvalues, rmp)
 
     #p = [hlocal => p_vary[1]]
@@ -874,7 +881,7 @@ function lossAll(pguess_l, _)
         
         #run selected simulation and get the steady temperature values
         #print(sm)
-        temp_T = remakeAysha(pguess_l, cond, time_opt)
+        temp_T = remakeAysha(pguess_l, cond, time_opt)[1]
         
         temp_error = (temp_T .- expdata) .^ 2
         lossr[it] = sqrt(sum(temp_error))
@@ -884,8 +891,8 @@ end
 p0 = [x[2] for x in p_opt]
 optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
 #p_opt = [aCp => 1., hfa => 8., hfn =>0.66, aIo => 1.] 
-lb = [70., 0.2, 5.]
-ub = [5000., 2., 20.]
+lb = [500., 0.01, 0.1, 22.]
+ub = [1500., 0.5, 0.7, 55.]
  
 #pguess_opt = ModelingToolkit.varmap_to_vars([Io => 456000, h_average => 14., qlpm => 7.12], parameters(pdesys))
 initialerror = (lossAll(p0, []))
@@ -932,18 +939,22 @@ begin #TI-8
     ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
     order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
     plot1 = bar(
-        [1, 2], [T_steady[order_indices[1], :T_mod][end][end], T_steady[order_indices[1], :T_exp][end][end]],
+        [1, 2], [T_steady[order_indices[1], :T_mod][end][end], T_steady[order_indices[2], :T_exp][end][end]],
         title="TI-8 Steady State Temperature", ylabel="Temperature (K)", xlabel="Experimental Runs",
         bar_width=0.4, xticks=(1:2:30, ordered_sim_conditions),
        label="T_model", color=[color_model, color_exp], ylimit=(0, 1250))
  
-    # Loop through the remaining data to add the bars without labels
-    for i in 2:15
-        bar!(plot1, [2i-1, 2i], [T_steady[order_indices[i], :T_mod][end][end], T_steady[order_indices[i], :T_exp][end][end]], bar_width=0.4, label=["" ""], color=[color_model, color_exp])
-    end
-    # Manually add a legend entry for T_exp and T_model
-    plot1 = bar!(plot1, [0], [0], label="T_exp", color=color_exp)
-    xlims!(plot1, (0, 31))
+   # Loop through the remaining data to add the bars without labels
+for i in 2:15
+    bar!(plot1, [2i-1, 2i], [T_steady[order_indices[i], :T_mod][end][end], T_steady[order_indices[i], :T_exp][end][end]], bar_width=0.4, label=["" ""], color=[color_model, color_exp])
+end
+
+# Manually add a legend entry for T_exp and T_model
+bar!(plot1, [0], [0], label="T_exp", color=color_exp)
+
+xlims!(plot1, (0, 31))
+plot1
+
 end
 
 begin
@@ -952,8 +963,8 @@ begin
     order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
 
     # Extract the data for the scatter plot
-    model_temps = [T_steady[order_indices[i], :T_mod][end][end] for i in 1:15]
-    exp_temps = [T_steady[order_indices[i], :T_exp][end][end] for i in 1:15]
+    model_temps = [T_steady[order_indices[i], :T_mod][1][end] for i in 1:15]
+    exp_temps = [T_steady[order_indices[i], :T_exp][1][end] for i in 1:15]
 
     # Create the scatter plot
     plot1 = scatter(
@@ -962,179 +973,364 @@ begin
         xlabel="Experimental Temperature (K)",
         ylabel="Model Temperature (K)",
         label="Temperature data points",
-        color=color_model
+        color=color_model, 
+        legend=:bottomright
     )
     # Add the best fit line to the plot
-plot!([500, 1250], [500, 1250], label="Ideal case (y=x)", color=:red)
+plot!([500, 900], [500, 900], label="Ideal case (y=x)", color=:red)
 end
+begin
+
+    ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
+    order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
+
+    # Extract the data for the scatter plot
+    model_temps = [T_steady[order_indices[i], :T_mod][1][end] for i in 1:15]
+    exp_temps = [T_steady[order_indices[i], :T_exp][1][end] for i in 1:15]
+
+    # Create the scatter plot
+    plot1 = scatter(
+        exp_temps, model_temps,
+        title="TI-3 Steady State Temperature",
+        xlabel="Experimental Temperature (K)",
+        ylabel="Model Temperature (K)",
+        label="Temperature data points",
+        color=color_model, 
+        legend=:bottomright
+    )
+    # Add the best fit line to the plot
+plot!([500, 800], [500, 800], label="Ideal case (y=x)", color=:red)
+end
+
+begin
+
+    ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
+    order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
+
+    # Extract the data for the scatter plot
+    model_temps = [T_steady[order_indices[i], :T_mod][2][end] for i in 1:15]
+    exp_temps = [T_steady[order_indices[i], :T_exp][2][end] for i in 1:15]
+
+    # Create the scatter plot
+    plot1 = scatter(
+        exp_temps, model_temps,
+        title="TI-9 Steady State Temperature",
+        xlabel="Experimental Temperature (K)",
+        ylabel="Model Temperature (K)",
+        label="Temperature data points",
+        color=color_model, 
+        legend=:bottomright
+    )
+    # Add the best fit line to the plot
+plot!([500, 1150], [500, 1150], label="Ideal case (y=x)", color=:red)
+end
+
+begin
+
+    ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
+    order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
+
+    # Extract the data for the scatter plot
+    model_temps = [T_steady[order_indices[i], :T_mod][3][end] for i in 1:15]
+    exp_temps = [T_steady[order_indices[i], :T_exp][3][end] for i in 1:15]
+
+    # Create the scatter plot
+    plot1 = scatter(
+        exp_temps, model_temps,
+        title="TI-10 Steady State Temperature",
+        xlabel="Experimental Temperature (K)",
+        ylabel="Model Temperature (K)",
+        label="Temperature data points",
+        color=color_model,
+        legend=:bottomright
+    )
+    # Add the best fit line to the plot
+plot!([500, 900], [500, 900], label="Ideal case (y=x)", color=:red)
+end
+
+begin
+
+    ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
+    order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
+
+    # Extract the data for the scatter plot
+    model_temps = [T_steady[order_indices[i], :T_mod][4][end] for i in 1:15]
+    exp_temps = [T_steady[order_indices[i], :T_exp][4][end] for i in 1:15]
+
+    # Create the scatter plot
+    plot1 = scatter(
+        exp_temps, model_temps,
+        title="TI-11 Steady State Temperature",
+        xlabel="Experimental Temperature (K)",
+        ylabel="Model Temperature (K)",
+        label="Temperature data points",
+        color=color_model, 
+        legend=:bottomright
+    )
+    # Add the best fit line to the plot
+plot!([500, 950], [500, 950], label="Ideal case (y=x)", color=:red)
+end
+
+begin
+
+    ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
+    order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
+
+    # Extract the data for the scatter plot
+    model_temps = [T_steady[order_indices[i], :T_mod][5][end] for i in 1:15]
+    exp_temps = [T_steady[order_indices[i], :T_exp][5][end] for i in 1:15]
+
+    # Create the scatter plot
+    plot1 = scatter(
+    exp_temps, model_temps,
+    title="TI-12 Steady State Temperature",
+    xlabel="Experimental Temperature (K)",
+    ylabel="Model Temperature (K)",
+    label="Temperature data points",
+    color=color_model, 
+    legend=:bottomright
+    )
+    # Add the best fit line to the plot
+plot!([500, 1150], [500, 1150], label="Ideal case (y=x)", color=:red)
+end
+
 
 new_78t = LinRange(sol1.t[1], sol1.t[end], 54) #E78
 begin
 plot1 = plot(
-        new_78t,
-        T_steady[1, :T_mod], # around 136 mm in T3
-        title="Gas Temperature Profile T3 in E78",
-        label="model",
-        xlabel="Time (s)",
-        ylabel="Temperature (K)", xlimit = (0, 4050))
-        scatter!(E78t, E78Tf, label="experiment")
-        display(plot1)
+    new_78t,
+    T_steady[1, :T_mod][1], # around 136 mm in T3
+    title="Gas Temperature Profile T3 in E78",
+    label="model",
+    xlabel="Time (s)",
+    ylabel="Temperature (K)", xlimit = (0, 4050),
+    legend=:bottomright)
+    scatter!(E78t, E78Tf, label="experiment")
+    display(plot1)
 end 
+
+
+begin
+plot1 = plot(
+    new_78t,
+    T_steady[1, :T_mod][1], # around 136 mm in T3
+    title="Solid Temperature Profile T8 in E78",
+    label="model",
+    xlabel="Time (s)",
+    ylabel="Temperature (K)", xlimit = (0, 4050), 
+    legend=:bottomright)
+    scatter!(E78t, E78Tf, label="experiment")
+    display(plot1)
+end 
+begin
+plot1 = plot(
+    new_78t,
+    T_steady[1, :T_mod][2], # around 136 mm in T3
+    title="Solid Temperature Profile T9 in E78",
+    label="model",
+    xlabel="Time (s)",
+    ylabel="Temperature (K)", xlimit = (0, 4050),
+    legend=:bottomright)
+    scatter!(E78t, E78Tf, label="experiment")
+    display(plot1)
+end
+
+begin
+plot1 = plot(
+    new_78t,
+    T_steady[1, :T_mod][3], # around 136 mm in T3
+    title="Solid Temperature Profile T10 in E78",
+    label="model",
+    xlabel="Time (s)",
+    ylabel="Temperature (K)", xlimit = (0, 4050), 
+    legend=:bottomright)
+   scatter!(E78t, E78Tf, label="experiment")
+   display(plot1)
+end
+
+begin
+    plot1 = plot(
+    new_78t,
+    T_steady[1, :T_mod][4], # around 136 mm in T3
+    title="Solid Temperature Profile T11 in E78",
+    label="model",
+    xlabel="Time (s)",
+    ylabel="Temperature (K)", xlimit = (0, 4050),
+    legend=:bottomright)
+    scatter!(E78t, E78Tf, label="experiment")
+    display(plot1)
+end
+
+begin
+    plot1 = plot(
+    new_78t,
+    T_steady[1, :T_mod][5], # around 136 mm in T3
+    title="Solid Temperature Profile T12 in E78",
+    label="model",
+    xlabel="Time (s)",
+    ylabel="Temperature (K)", xlimit = (0, 4050),
+    legend=:bottomright)
+    scatter!(E78t, E78Tf, label="experiment")
+    display(plot1)
+end
 
 new_69t = LinRange(sol1.t[1], sol1.t[end], 54)
 begin
 plot1 = plot(
         new_69t,
-        T_steady[2, :T_mod], # around 136 mm in T3
+        T_steady[2, :T_mod][6], # around 136 mm in T3
         title="Gas Temperature Profile T3 in E69",
         label="model",
         xlabel="Time (s)",
-        ylabel="Temperature (K)", xlimit = (0, 4050))
+        ylabel="Temperature (K)", xlimit = (0, 4050),
+        legend=:bottomright)
         scatter!(E69t, E69Tf, label="experiment")
         display(plot1)
-end 
+end
 
 new_79t = LinRange(sol1.t[1], sol1.t[end], 53)
 begin
     plot1 = plot(
-            new_79t,
-            T_steady[3, :T_mod], # around 136 mm in T3
-            title="Gas Temperature Profile T3 in E79",
-            label="model",
-            xlabel="Time (s)",
-            ylabel="Temperature (K)", xlimit = (0, 10050))
-            scatter!(E79t, E79Tf, label="experiment")
-            display(plot1)
+    new_79t,
+    T_steady[3, :T_mod][6], # around 136 mm in T3
+    title="Gas Temperature Profile T3 in E79",
+    label="model",
+    xlabel="Time (s)",
+    ylabel="Temperature (K)", xlimit = (0, 5100),
+    legend=:bottomright)
+    scatter!(E79t, E79Tf, label="experiment")
+    display(plot1)
 end 
 
 new_73t = LinRange(sol1.t[1], sol1.t[end], 46)
 begin
     plot1 = plot(
-            new_73t,
-            T_steady[4, :T_mod], # around 136 mm in T3
-            title="Gas Temperature Profile T3 in E73",
-            label="model",
-            xlabel="Time (s)",
-            ylabel="Temperature (K)", xlimit = (0, 4050))
-            scatter!(E73t, E73Tf, label="experiment")
-            display(plot1)
+    new_73t,
+    T_steady[4, :T_mod][6], # around 136 mm in T3
+    title="Gas Temperature Profile T3 in E73",
+    label="model",
+    xlabel="Time (s)",
+    ylabel="Temperature (K)", xlimit = (0, 4050),
+    legend=:bottomright)
+    scatter!(E73t, E73Tf, label="experiment")
+    display(plot1)
 end 
     
 new_81t = LinRange(sol1.t[1], sol1.t[end], 60)
 begin
     plot1 = plot(
-            new_81t,
-            T_steady[5, :T_mod], # around 136 mm in T3
-            title="Gas Temperature Profile T3 in E81",
-            label="model",
-            xlabel="Time (s)",
-            ylabel="Temperature (K)", xlimit = (0, 4050))
-            scatter!(E81t, E81Tf, label="experiment")
-            display(plot1)
+    new_81t,
+    T_steady[5, :T_mod][6], # around 136 mm in T3
+    title="Gas Temperature Profile T3 in E81",
+    label="model",
+    xlabel="Time (s)",
+    ylabel="Temperature (K)", xlimit = (0, 4050))
+    scatter!(E81t, E81Tf, label="experiment")
+    display(plot1)
 end 
 
 new_72t = LinRange(sol1.t[1], sol1.t[end], 33)
 begin
     plot1 = plot(
-            new_72t,
-            T_steady[6, :T_mod], # around 136 mm in T3
-            title="Gas Temperature Profile T3 in E72",
-            label="model",
-            xlabel="Time (s)",
-            ylabel="Temperature (K)", xlimit = (0, 3150))
-            scatter!(E72t, E72Tf, label="experiment")
-            display(plot1)
+    new_72t,
+    T_steady[6, :T_mod][6], # around 136 mm in T3
+    title="Gas Temperature Profile T3 in E72",
+    label="model",
+    xlabel="Time (s)",
+    ylabel="Temperature (K)", xlimit = (0, 3150))
+    scatter!(E72t, E72Tf, label="experiment")
+    display(plot1)
 end 
 
 new_76t = LinRange(sol1.t[1], sol1.t[end], 72)
 begin
     plot1 = plot(
-            new_76t,
-            T_steady[7, :T_mod], # around 136 mm in T3
-            title="Gas Temperature Profile T3 in E76",
-            label="model",
-            xlabel="Time (s)",
-            ylabel="Temperature (K)", xlimit = (0, 3600))
-            scatter!(E76t, E76Tf, label="experiment")
-            display(plot1)
+    new_76t,
+    T_steady[7, :T_mod][6], # around 136 mm in T3
+    title="Gas Temperature Profile T3 in E76",
+    label="model",
+    xlabel="Time (s)",
+    ylabel="Temperature (K)", xlimit = (0, 3600))
+    scatter!(E76t, E76Tf, label="experiment")
+    display(plot1)
 end 
 
 new_77t = LinRange(sol1.t[1], sol1.t[end], 31)
 begin
     plot1 = plot(
-            new_77t,
-            T_steady[8, :T_mod], # around 136 mm in T3
-            title="Gas Temperature Profile T3 in E77",
-            label="model",
-            xlabel="Time (s)",
-            ylabel="Temperature (K)", xlimit = (0, 3050))
-            scatter!(E77t, E77Tf, label="experiment")
-            display(plot1)
+    new_77t,
+    T_steady[8, :T_mod][6], # around 136 mm in T3
+    title="Gas Temperature Profile T3 in E77",
+    label="model",
+    xlabel="Time (s)",
+    ylabel="Temperature (K)", xlimit = (0, 3050))
+    scatter!(E77t, E77Tf, label="experiment")
+    display(plot1)
 end 
 
 new_71t = LinRange(sol1.t[1], sol1.t[end], 71)
 begin
     plot1 = plot(
-            new_71t,
-            T_steady[9, :T_mod], # around 136 mm in T3
-            title="Gas Temperature Profile T3 in E71",
-            label="model",
-            xlabel="Time (s)",
-            ylabel="Temperature (K)", xlimit = (0, 3050))
-            scatter!(E71t, E71Tf, label="experiment")
-            display(plot1)
+    new_71t,
+    T_steady[9, :T_mod][6], # around 136 mm in T3
+    title="Gas Temperature Profile T3 in E71",
+    label="model",
+    xlabel="Time (s)",
+    ylabel="Temperature (K)", xlimit = (0, 3050))
+    scatter!(E71t, E71Tf, label="experiment")
+    display(plot1)
 end 
 
 new_75t = LinRange(sol1.t[1], sol1.t[end], 64)
 begin
     plot1 = plot(
-            new_75t,
-            T_steady[10, :T_mod], # around 136 mm in T3
-            title="Gas Temperature Profile T3 in E75",
-            label="model",
-            xlabel="Time (s)",
-            ylabel="Temperature (K)", xlimit = (0, 3050))
-            scatter!(E75t, E75Tf, label="experiment")
-            display(plot1)
+    new_75t,
+    T_steady[10, :T_mod][6], # around 136 mm in T3
+    title="Gas Temperature Profile T3 in E75",
+    label="model",
+    xlabel="Time (s)",
+    ylabel="Temperature (K)", xlimit = (0, 3050))
+    scatter!(E75t, E75Tf, label="experiment")
+    display(plot1)
 end 
 
 new_67t = LinRange(sol1.t[1], sol1.t[end], 40)
 begin
     plot1 = plot(
-            new_67t,
-            T_steady[11, :T_mod], # around 136 mm in T3
-            title="Gas Temperature Profile T3 in E67",
-            label="model",
-            xlabel="Time (s)",
-            ylabel="Temperature (K)", xlimit = (0, 3050))
-            scatter!(E67t, E67Tf, label="experiment")
-            display(plot1)
+    new_67t,
+    T_steady[11, :T_mod][6], # around 136 mm in T3
+    title="Gas Temperature Profile T3 in E67",
+    label="model",
+    xlabel="Time (s)",
+    ylabel="Temperature (K)", xlimit = (0, 3050))
+    scatter!(E67t, E67Tf, label="experiment")
+    display(plot1)
 end
 
 new_68t = LinRange(sol1.t[1], sol1.t[end], 54)
 begin
     plot1 = plot(
-            new_68t,
-            T_steady[12, :T_mod], # around 136 mm in T3
-            title="Gas Temperature Profile T3 in E68",
-            label="model",
-            xlabel="Time (s)",
-            ylabel="Temperature (K)", xlimit = (0, 3050))
-            scatter!(E68t, E68Tf, label="experiment")
-            display(plot1)
+    new_68t,
+    T_steady[12, :T_mod][6], # around 136 mm in T3
+    title="Gas Temperature Profile T3 in E68",
+    label="model",
+    xlabel="Time (s)",
+    ylabel="Temperature (K)", xlimit = (0, 3050))
+    scatter!(E68t, E68Tf, label="experiment")
+    display(plot1)
 end 
 
 new_70t = LinRange(sol1.t[1], sol1.t[end], 68)
 begin
     plot1 = plot(
-            new_70t,
-            T_steady[13, :T_mod], # around 136 mm in T3
-            title="Gas Temperature Profile T3 in E70",
-            label="model",
-            xlabel="Time (s)",
-            ylabel="Temperature (K)", xlimit = (0, 3050))
-            scatter!(E70t, E70Tf, label="experiment")
-            display(plot1)
+    new_70t,
+    T_steady[13, :T_mod][6], # around 136 mm in T3
+    title="Gas Temperature Profile T3 in E70",
+    label="model",
+    xlabel="Time (s)",
+    ylabel="Temperature (K)", xlimit = (0, 3050))
+    scatter!(E70t, E70Tf, label="experiment")
+    display(plot1)
 end 
 
 plotly()
@@ -1142,273 +1338,25 @@ plotly()
 new_80t = LinRange(sol1.t[1], sol1.t[end], 59)
 begin
     plot1 = plot(
-            new_80t,
-            T_steady[14, :T_mod], # around 136 mm in T3
-            title="Gas Temperature Profile T3 in E80",
-            label="model",
-            xlabel="Time (s)",
-            ylabel="Temperature (K)", xlimit = (0,3050))
-            scatter!(E80t, E80Tf, label="experiment")
-            display(plot1)
+    new_80t,
+    T_steady[14, :T_mod][6], # around 136 mm in T3
+    title="Gas Temperature Profile T3 in E80",
+    label="model",
+    xlabel="Time (s)",
+    ylabel="Temperature (K)", xlimit = (0,3050))
+    scatter!(E80t, E80Tf, label="experiment")
+    display(plot1)
 end 
 
 new_74t = LinRange(sol1.t[1], sol1.t[end], 61)
 begin
     plot1 = plot(
-            new_74t,
-            T_steady[15, :T_mod], # around 136 mm in T3
-            title="Gas Temperature Profile T3 in E74",
-            label="model",
-            xlabel="Time (s)",
-            ylabel="Temperature (K)", xlimit = (0, 3050))
-            scatter!(E74t, E74Tf, label="experiment")
-            display(plot1)
+    new_74t,
+    T_steady[15, :T_mod][6], # around 136 mm in T3
+    title="Gas Temperature Profile T3 in E74",
+    label="model",
+    xlabel="Time (s)",
+    ylabel="Temperature (K)", xlimit = (0, 3050))
+    scatter!(E74t, E74Tf, label="experiment")
+    display(plot1)
 end 
-
-
-begin #TI-9
-    color_model = :blue
-    color_exp = :orange
-    ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
-    order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
-    plot1 = bar(
-        [1, 2], [T_steady[order_indices[1], :T_mod][end][2], T_steady[order_indices[1], :T_exp][end][2]],
-        title="TI-9 Steady State Temperature", ylabel="Temperature (K)", xlabel="Experimental Runs",
-        bar_width=0.4, xticks=(1:2:30, ordered_sim_conditions),
-       label="T_model", color=[color_model, color_exp],  ylimit=(0, 850))
- 
-    # Loop through the remaining data to add the bars without labels
-    for i in 2:15
-        bar!(plot1, [2i-1, 2i], [T_steady[order_indices[i], :T_mod][2], T_steady[order_indices[i], :T_exp][2]], bar_width=0.4, label=["" ""], color=[color_model, color_exp])
-    end
-    # Manually add a legend entry for T_exp and T_model
-    plot1 = bar!(plot1, [0], [0], label="T_exp", color=color_exp)
-    xlims!(plot1, (0, 31))
-end
-
-    # plot!(
-    #     psol.t,
-    #     psol.u[Tf(t, x)][:, 4], # around 5 mm in T8
-    #     label="gas 5mm")
-
-    # plot3 = plot(
-    #     psol.t,
-    #     psol.u[Ts(t, x)][:, 40], # around 55 mm in T9
-    #     title="Solid Temperature Profile T9",
-    #     label="model",
-    #     xlabel="Time (s)",
-    #     ylabel="Temperature (K)")
-    begin #TI-10
-        color_model = :blue
-        color_exp = :orange
-        ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
-        order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
-        plot1 = bar(
-            [1, 2], [T_steady[order_indices[1], :T_mod][3], T_steady[order_indices[1], :T_exp][3]],
-            title="TI-10 Steady State Temperature", ylabel="Temperature (K)", xlabel="Experimental Runs",
-            bar_width=0.4, xticks=(1:2:30, ordered_sim_conditions),
-           label="T_model", color=[color_model, color_exp], ylimit=(0, 850))
-     
-        # Loop through the remaining data to add the bars without labels
-        for i in 2:15
-            bar!(plot1, [2i-1, 2i], [T_steady[order_indices[i], :T_mod][3], T_steady[order_indices[i], :T_exp][3]], bar_width=0.4, label=["" ""], color=[color_model, color_exp])
-        end
-        # Manually add a legend entry for T_exp and T_model
-        plot1 = bar!(plot1, [0], [0], label="T_exp", color=color_exp)
-        xlims!(plot1, (0, 31))
-    end
-    # plot!(
-    #     psol.t,
-    #     psol.u[Tf(t, x)][:, 40],
-    #     label="gas 55mm")
-   
-# plot4 = plot(
-#         psol.t,
-#         psol.u[Ts(t, x)][:, 77], # around 106 mm in T10
-#         title="Solid Temperature Profile T10",
-#         label="model",
-#         xlabel="Time (s)",
-#         ylabel="Temperature (K)")
-begin #TI-11
-    color_model = :blue
-    color_exp = :orange
-    ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
-    order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
-    plot1 = bar(
-        [1, 2], [T_steady[order_indices[1], :T_mod][4], T_steady[order_indices[1], :T_exp][4]],
-        title="TI-11 Steady State Temperature", ylabel="Temperature (K)", xlabel="Experimental Runs",
-        bar_width=0.4, xticks=(1:2:30, ordered_sim_conditions),
-       label="T_model", color=[color_model, color_exp], ylimit =(0, 1000))
- 
-    # Loop through the remaining data to add the bars without labels
-    for i in 2:15
-        bar!(plot1, [2i-1, 2i], [T_steady[order_indices[i], :T_mod][4], T_steady[order_indices[i], :T_exp][4]], bar_width=0.4, label=["" ""], color=[color_model, color_exp])
-    end
-    # Manually add a legend entry for T_exp and T_model
-    plot1 = bar!(plot1, [0], [0], label="T_exp", color=color_exp)
-    xlims!(plot1, (0, 31))
-end
-    
-    # plot!(
-    #     psol.t,
-    #     psol.u[Tf(t, x)][:, 77],
-    #     label="gas 106mm")
-    # plot5 = plot(
-    #     psol.t,
-    #     psol.u[Ts(t, x)][:, 59], # around 82 mm in T11
-    #     title="Solid Temperature Profile T11",
-    #     label="model",
-    #     xlabel="Time (s)",
-    #     ylabel="Temperature (K)")
-    begin #TI-12
-        color_model = :blue
-        color_exp = :orange
-        ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
-        order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
-        plot1 = bar(
-            [1, 2], [T_steady[order_indices[1], :T_mod][5], T_steady[order_indices[1], :T_exp][5]],
-            title="TI-12 Steady State Temperature", ylabel="Temperature (K)", xlabel="Experimental Runs",
-            bar_width=0.4, xticks=(1:2:30, ordered_sim_conditions),
-           label="T_model", color=[color_model, color_exp], ylimit =(0, 1200))
-     
-        # Loop through the remaining data to add the bars without labels
-        for i in 2:15
-            bar!(plot1, [2i-1, 2i], [T_steady[order_indices[i], :T_mod][5], T_steady[order_indices[i], :T_exp][5]], bar_width=0.4, label=["" ""], color=[color_model, color_exp])
-        end
-        # Manually add a legend entry for T_exp and T_model
-        plot1 = bar!(plot1, [0], [0], label="T_exp", color=color_exp)
-        xlims!(plot1, (0, 31))
-    end
-    # plot!(
-    #     psol.t,
-    #     psol.u[Tf(t, x)][:, 59],
-    #     label="gas 82mm")
-    # plot6 = plot(
-    #     psol.t,
-    #     psol.u[Ts(t, x)][:, 20], # around 27 mm in T12
-    #     title="Solid Temperature Profile T12",
-    #     label="model",
-    #     xlabel="Time (s)",
-    #     ylabel="Temperature (K)")
-    begin #TI-3
-        color_model = :blue
-        color_exp = :orange
-        ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
-        order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
-        plot1 = bar(
-            [1, 2], [T_steady[order_indices[1], :T_mod][end][end], T_steady[order_indices[2], :T_exp][end][end]],
-            title="TI-3 Steady State Temperature", ylabel="Temperature (K)", xlabel="Experimental Runs",
-            bar_width=0.4, xticks=(1:2:30, ordered_sim_conditions),
-           label="T_model", color=[color_model, color_exp], ylimit =(0, 1000))
-     
-        # Loop through the remaining data to add the bars without labels
-        for i in 2:15
-            bar!(plot1, [2i-1, 2i], [T_steady[order_indices[i], :T_mod][6], T_steady[order_indices[i], :T_exp][6]], bar_width=0.4, label=["" ""], color=[color_model, color_exp])
-        end
-        # Manually add a legend entry for T_exp and T_model
-        plot1 = bar!(plot1, [0], [0], label="T_exp", color=color_exp)
-        xlims!(plot1, (0, 31))
-    end
- 
-    # plot!(
-    #     psol.t,
-    #     psol.u[Tf(t, x)][:, 20],
-    #     label="gas 27mm")
-# Extract T_mod values
-T_mod_values = [row.T_mod for row in eachrow(T_steady)]
-begin
-# Plot T_mod as a function of x
-plot(
-    x_num1, T_mod_values,
-    label="T_mod",
-    xlabel="Length (m)",
-    ylabel="Temperature (K)",
-    title="T_mod vs Length",
-    legend=:topright
-)
-end
-
-
-# Initialize the DataFrame
-    T_steady = DataFrame(sim_id=[], T_mod=[], T_exp=[])
-    sim_key = collect(keys(simulation_conditions))
-    lossr = zeros(length(sim_key))
-   #Threads.@threads 
-   for it in 1:length(sim_key)
-    # Retrieve from measurements the experimental data for the current simulation condition
-        sm = sim_key[it]
-        #println(sm)
-        cond = simulation_conditions[sm]
-        expdata = (measurements[measurements.simulation_id.==sm, :temperatures][1])
-        time_opt = (measurements[measurements.simulation_id.==sm, :time][1])
-        
-        #run selected simulation and get the steady temperature values
-        temp_T = remakeAysha(pnew, cond, time_opt)
-        #push!(T_steady, [sm, temp_T, expdata])
-        push!(T_steady, (sm, temp_T, expdata))
-   end
-# Extract T_mod and T_exp from T_steady (TI-8)
-T_mod = [row[2][1] for row in eachrow(T_steady)]
-T_exp = [row[3][1] for row in eachrow(T_steady)]
-
-# Create scatter plot
-scatter(T_exp, T_mod, label="Experimental and Model Temperatures", legend=:bottomright,
-        xlabel="Experimental Temperature (K)", ylabel="Model Temperature (K)", title=" External Solid Temperature (TI-8)")
-
-# Add the best fit line to the plot
-plot!([490, 1250], [490, 1250], label="Best Fit", color=:red)
-
-# Extract T_mod and T_exp from T_steady (TI-9)
-T_mod = [row[2][2] for row in eachrow(T_steady)]
-T_exp = [row[3][2] for row in eachrow(T_steady)]
-
-# Create scatter plot
-scatter(T_exp, T_mod, label="Experimental and Model Temperatures", legend=:bottomright,
-        xlabel="Experimental Temperature (K)", ylabel="Model Temperature (K)", title=" External Solid Temperature (TI-9)")
-
-# Add the best fit line to the plot
-plot!([550, 1100], [550, 1100], label="Best Fit", color=:red)
-
-# Extract T_mod and T_exp from T_steady (TI-10)
-T_mod = [row[2][3] for row in eachrow(T_steady)]
-T_exp = [row[3][3] for row in eachrow(T_steady)]
-
-# Create scatter plot
-scatter(T_exp, T_mod, label="Experimental and Model Temperatures", legend=:bottomright,
-        xlabel="Experimental Temperature (K)", ylabel="Model Temperature (K)", title=" External Solid Temperature (TI-10)")
-
-# Add the best fit line to the plot
-plot!([550, 1000], [550, 1000], label="Best Fit", color=:red)
-
-# Extract T_mod and T_exp from T_steady (TI-11)
-T_mod = [row[2][4] for row in eachrow(T_steady)]
-T_exp = [row[3][4] for row in eachrow(T_steady)]
-
-# Create scatter plot
-scatter(T_exp, T_mod, label="Experimental and Model Temperatures", legend=:bottomright,
-        xlabel="Experimental Temperature (K)", ylabel="Model Temperature (K)", title=" Internal Solid Temperature (TI-11)")
-
-# Add the best fit line to the plot
-plot!([550, 1000], [550, 1000], label="Best Fit", color=:red)
-
-# Extract T_mod and T_exp from T_steady (TI-12)
-T_mod = [row[2][5] for row in eachrow(T_steady)]
-T_exp = [row[3][5] for row in eachrow(T_steady)]
-
-# Create scatter plot
-scatter(T_exp, T_mod, label="Experimental and Model Temperatures", legend=:bottomright,
-        xlabel="Experimental Temperature (K)", ylabel="Model Temperature (K)", title=" Internal Solid Temperature (TI-12)")
-
-# Add the best fit line to the plot
-plot!([550, 1150], [550, 1150], label="Best Fit", color=:red)
-
-# Extract T_mod and T_exp from T_steady (TI-3)
-T_mod = [row[2][6] for row in eachrow(T_steady)]
-T_exp = [row[3][6] for row in eachrow(T_steady)]
-
-# Create scatter plot
-scatter(T_exp, T_mod, label="Experimental and Model Temperatures", legend=:bottomright,
-        xlabel="Experimental Temperature (K)", ylabel="Model Temperature (K)", title=" Air Outlet Temperature (TI-3)")
-
-# Add the best fit line to the plot
-plot!([550, 1100], [550, 1100], label="Best Fit", color=:red)
