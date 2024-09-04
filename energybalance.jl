@@ -20,6 +20,15 @@ begin
 	Pkg.activate("energy")
 end
 
+# ╔═╡ 86c7df59-4f03-4730-9cbf-72d8fc7c34bd
+begin
+	using ModelingToolkit, DifferentialEquations, Plots
+	#using ModelingToolkit: t_nounits as t, D_nounits as D
+	using PEtab, XLSX, Statistics, DataFrames
+	using PlutoUI, StatsPlots
+	using Optimization, Optim, Ipopt, OptimizationNLopt
+end
+
 # ╔═╡ 8c28c8d1-dd57-4a04-9121-cbfed404d824
 html"""<style>
 main {
@@ -427,21 +436,21 @@ Cps = ρCp_sf(2200)/3200
 # ╔═╡ 8f9afcbf-5a98-4709-b763-844b058d155e
 #measurements and conditions#Defining simulation conditions
 begin
-    condition_E67 = Dict(Io => 442320.0, qlpm => 15.27, aIo => :g1_aIo, Tins => 326.437) #, al => 0.553)	
-    condition_E68 = Dict(Io => 442320.0, qlpm => 12.50, aIo => :g1_aIo, Tins => 338.52) #, al => 0.553) 
+    condition_E67 = Dict(Io => 500000.0, qlpm => 15.27, aIo => :g1_aIo, Tins => 326.437) #, al => 0.553)	
+    condition_E68 = Dict(Io => 469680.0, qlpm => 12.50, aIo => :g1_aIo, Tins => 338.52) #, al => 0.553) 
     condition_E69 = Dict(Io => 442320.0, qlpm => 10.50, aIo => :g1_aIo, Tins => 344.308) #, al => 0.553)
     condition_E70 = Dict(Io => 442320.0, qlpm => 9.10, aIo => :g1_aIo, Tins => 352.422) #, al => 0.553)
     condition_E71 = Dict(Io => 442320.0, qlpm => 7.12, aIo => :g1_aIo, Tins => 356.004) #, al => 0.553)
-    condition_E72 = Dict(Io => 371792.0, qlpm => 18.34, aIo => :g2_aIo, Tins => 309.928) #, al => 0.672)
-    condition_E73 = Dict(Io => 371792.0, qlpm => 13.16, aIo => :g2_aIo, Tins => 325.12) #, al => 0.672)
+    condition_E72 = Dict(Io => 450000.0, qlpm => 18.34, aIo => :g2_aIo, Tins => 309.928) #, al => 0.672)
+    condition_E73 = Dict(Io => 400000.0, qlpm => 13.16, aIo => :g2_aIo, Tins => 325.12) #, al => 0.672)
     condition_E74 = Dict(Io => 371792.0, qlpm => 9.03, aIo => :g2_aIo, Tins => 333.964) #, al => 0.672)
     condition_E75 = Dict(Io => 371792.0, qlpm => 6.95, aIo => :g2_aIo, Tins=> 336.517) #, al => 0.672)
-    condition_E76 = Dict(Io => 371792.0, qlpm => 4.53, aIo => :g2_aIo, Tins => 338.123) #, al => 0.672)	
-    condition_E77 = Dict(Io => 256000.0, qlpm => 13.85, aIo => :g3_aIo, Tins => 308.37) #, al => 0.515)	
-    condition_E78 = Dict(Io => 256000.0, qlpm => 10.02, aIo => :g3_aIo, Tins => 312.959) #, al => 0.515)	
-    condition_E79 = Dict(Io => 256000.0, qlpm => 8.04, aIo => :g3_aIo, Tins => 314.96) #, al => 0.515)
-    condition_E80 = Dict(Io => 256000.0, qlpm => 6.62, aIo => :g3_aIo, Tins => 316.119) #, al => 0.515)
-    condition_E81 = Dict(Io => 256000.0, qlpm => 4.53, aIo => :g3_aIo, Tins => 319.315) #, al => 0.515)
+    condition_E76 = Dict(Io => 470000.0, qlpm => 4.53, aIo => :g2_aIo, Tins => 338.123) #, al => 0.672)	
+    condition_E77 = Dict(Io => 240000.0, qlpm => 13.85, aIo => :g3_aIo, Tins => 308.37) #, al => 0.515)	
+    condition_E78 = Dict(Io => 240000.0, qlpm => 10.02, aIo => :g3_aIo, Tins => 312.959) #, al => 0.515)	
+    condition_E79 = Dict(Io => 240000.0, qlpm => 8.04, aIo => :g3_aIo, Tins => 314.96) #, al => 0.515)
+    condition_E80 = Dict(Io => 248320.0, qlpm => 6.62, aIo => :g3_aIo, Tins => 316.119) #, al => 0.515)
+    condition_E81 = Dict(Io => 300000.0, qlpm => 4.53, aIo => :g3_aIo, Tins => 319.315) #, al => 0.515)
 
 #    condition_E67 = Dict(Io => 456000.0, qlpm => 1.22*1000*60*A_chnl_frt_all, aIo  =>  :g1_aIo)
  #    condition_E68 = Dict(Io => 456000.0, qlpm => 1.00*1000*60*A_chnl_frt_all, aIo => :g1_aIo)
@@ -620,12 +629,12 @@ begin
 	#_hfa = PEtabParameter(hfa, lb=0.001, ub=5., scale=:lin)
 	# _hfb = PEtabParameter(hfb, lb=0.1, ub=10., scale=:lin)
 	#_hfn = PEtabParameter(hfn, lb=0.001, ub=10., scale=:lin)
-	_A = PEtabParameter(A, lb=10., ub=1300., scale=:lin)
-	_B = PEtabParameter(B, lb=0.2, ub=2.5, scale=:lin)
+	_A = PEtabParameter(A, lb=200., ub=1300., scale=:lin)
+	_B = PEtabParameter(B, lb=0.2, ub=3., scale=:lin)
 	#_n = PEtabParameter(n, lb=0.01, ub=0.9, scale=:lin)
-	_C = PEtabParameter(C, lb=5., ub=18., scale=:lin)
+	_C = PEtabParameter(C, lb=5., ub=70., scale=:lin)
 	#_al = PEtabParameter(al, lb=0.01, ub=3., scale=:lin)
-	_aCp = PEtabParameter(aCp, lb=0.5, ub=4.4, scale=:lin)
+	_aCp = PEtabParameter(aCp, lb=0.5, ub=3., scale=:lin)
 	params = [_g1_aIo, _g2_aIo, _g3_aIo, _A, _B, _C, _aCp]
 	#obs_Ts = PEtabObservable(Ts, 0.5)
 	obs_Tf = PEtabObservable(Tf, 0.5)
@@ -712,7 +721,7 @@ end
 pnew = get_ps(res, petab_problem, condition_id = casesim)
 
 # ╔═╡ e2613b68-6e5c-44dd-a631-65a367726753
-plot(res, petab_problem; observable_ids=["obs_Tf"], condition_id=casesim, ylim=(300, 650), ylabel = "Temperature (K)", xlabel = "Time (s)")
+plot(res, petab_problem; observable_ids=["obs_Tf"], condition_id=casesim, ylim=(300, 850), ylabel = "Temperature (K)", xlabel = "Time (s)")
 
 # ╔═╡ fef4139f-caad-4cc8-ab05-dcbad38f49f0
 #plot(res, petab_problem; observable_ids=["obs_Ts"], condition_id=casesim, ylim=(300, 1100), ylabel = "Temperature (K)", xlabel = "Time (s)")
@@ -793,6 +802,17 @@ rel_error = (Tend_model[15] - Tend_exp[15]) / Tend_exp[15]
 # ╔═╡ 0eb4b057-48c2-4f77-9be9-adace62a9544
 Tend_e
 
+# ╔═╡ 8ad40098-80a4-4a44-811d-d94b68c6980e
+# ╠═╡ disabled = true
+#=╠═╡
+begin
+	using StatsPlots
+	bar(cond, [Tend_m, Tend_e])
+	groupedbar(cond, [Tend_m, Tend_e], bar_position = :dodge, bar_width=0.7)
+
+end
+  ╠═╡ =#
+
 # ╔═╡ 8fdb601b-55f4-477c-8160-0faa678e9ed1
 begin
 	scatter(Tend_e, Tend_m, label = "Temperature data points", legend = :bottomright, xlabel = "Experimental Temperature (K)", ylabel = "Model Temperature (K)", title = "TI-3 Steady State Temperature")
@@ -827,28 +847,6 @@ begin
 	Gzx = 10.:50.
 	plot(1 ./Gzx, fNu.(Gzx))
 end
-
-# ╔═╡ 86c7df59-4f03-4730-9cbf-72d8fc7c34bd
-#=╠═╡
-begin
-	using ModelingToolkit, DifferentialEquations, Plots
-	#using ModelingToolkit: t_nounits as t, D_nounits as D
-	using PEtab, XLSX, Statistics, DataFrames
-	using PlutoUI, StatsPlots
-	using Optimization, Optim, Ipopt, OptimizationNLopt
-end
-  ╠═╡ =#
-
-# ╔═╡ 8ad40098-80a4-4a44-811d-d94b68c6980e
-# ╠═╡ disabled = true
-#=╠═╡
-begin
-	using StatsPlots
-	bar(cond, [Tend_m, Tend_e])
-	groupedbar(cond, [Tend_m, Tend_e], bar_position = :dodge, bar_width=0.7)
-
-end
-  ╠═╡ =#
 
 # ╔═╡ Cell order:
 # ╠═8c28c8d1-dd57-4a04-9121-cbfed404d824
@@ -897,7 +895,7 @@ end
 # ╠═3cb41c98-5494-4276-8147-f3b2e361debd
 # ╠═f62e04d1-5d34-4e91-9fce-cc371d205414
 # ╠═3f090dba-5a3d-483e-b40b-e51d5002e9a0
-# ╠═2320e9e2-9192-413f-9462-687703a49bd8
+# ╟─2320e9e2-9192-413f-9462-687703a49bd8
 # ╠═24b350f4-92df-4652-aa7a-264a8165eb74
 # ╠═737f33e9-74e6-4e87-82f1-ef7451643c1f
 # ╠═44bb862e-e6fa-4f13-992a-5d24761536b9

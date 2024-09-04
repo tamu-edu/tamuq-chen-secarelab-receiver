@@ -97,27 +97,28 @@ end
 begin
     # Parameters, variables, and derivatives for system 1
     @variables t x
-    @parameters A B n C #ks h_average A n
+    @parameters A B C #ks h_average A n
     @parameters Io qlpm
     @variables Ts(..) Tf(..)
     Dt = Differential(t)
     Dx = Differential(x)
     Dxx = Differential(x)^2
-    ks = (48.78) * 1.97 * ((1 - e)^1.5) #W/m.K
+    #ks = (6.) * 1.97 * ((1 - e)^1.5) #W/m.K
+    ks = 6.
     ρs = 3200  #kg/m3
     Cps = 1290  #J/kg*K
     #Nu = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
     #Nu = A*(Re^B)*(Pr^C)
     #Cps(Ts) = (0.27+0.135e-4*(Ts)-9720*((Ts)^-2)+0.204e-7*((Ts)^2))/1000 #kJ/kg*K from manufacturer data
     #p_opt = [A => 2., B => 0.5, n=> 0.5, C=> 20.]
-    p_opt = [A => 700., B => 0.4, n=> 0.5, C=> 30.]
+    p_opt = [A => 1000., B => 2., C=> 21.]
     p_cond = [Io => 456000.0, qlpm => 15.27]
     p_math = vcat(p_opt, p_cond)
     #h_average = hfa * (qlpm^hfn)
     #h_average = (Nu * kf) / Lc
     Re_f(qlpm) = (ρ * (qlpm/60/1000/Af) * w) / mu
-    #Nu_f(qlpm) = A*(Re_f(qlpm)^B)*(Pr^C)
-    Nu_f(qlpm) = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
+    Nu_f(qlpm) = A*(Re_f(qlpm)^B)*(Pr^C)
+    #Nu_f(qlpm) = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
     h_avg_f(qlpm) = (Nu_f(qlpm) * kf) / Lc
 
     # MOL Discretization parameters for system 1
@@ -758,6 +759,21 @@ begin
     condition_E80 = Dict(Io => 256000.0, qlpm => 6.62)
     condition_E81 = Dict(Io => 256000.0, qlpm => 4.53)
 
+    # condition_E67 = Dict(Io => 456000.0, qlpm => 15.27)
+    # condition_E68 = Dict(Io => 456000.0, qlpm => 12.50)
+    # condition_E69 = Dict(Io => 456000.0, qlpm => 10.50)
+    # condition_E70 = Dict(Io => 456000.0, qlpm => 9.10)
+    # condition_E71 = Dict(Io => 456000.0, qlpm => 7.12)
+    # condition_E72 = Dict(Io => 304000.0, qlpm => 18.34)
+    # condition_E73 = Dict(Io => 304000.0, qlpm => 13.16)
+    # condition_E74 = Dict(Io => 304000.0, qlpm => 9.03)
+    # condition_E75 = Dict(Io => 304000.0, qlpm => 6.95)
+    # condition_E76 = Dict(Io => 304000.0, qlpm => 4.53)
+    # condition_E77 = Dict(Io => 256000.0, qlpm => 13.85)
+    # condition_E78 = Dict(Io => 256000.0, qlpm => 10.02)
+    # condition_E79 = Dict(Io => 256000.0, qlpm => 8.04)
+    # condition_E80 = Dict(Io => 256000.0, qlpm => 6.62)
+    # condition_E81 = Dict(Io => 256000.0, qlpm => 4.53)
 
     simulation_conditions = Dict("E67" => condition_E67, "E68" => condition_E68,
         "E69" => condition_E69, "E70" => condition_E70,
@@ -793,54 +809,54 @@ begin
     #             time=repeat([3929, 5362, 5363, 6702, 7084, 3214, 4572, 6015, 6351, 7144, 3041, 5381, 5230, 5811, 5986], inner=1, outer=1),
     #             temperatures=[763.859, 773.207, 769.76, 779.53, 753.56, 652.955, 694.626, 697.672, 681.066,
     #                 647.019, 525.356, 554.455, 560.033, 561.254, 550.499])
-    measurements = DataFrame(
-        simulation_id = repeat(["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"], inner=6, outer=1),
-        obs_id=repeat(["_T8", "_T9", "_T10", "_T11", "_T12", "_T3"], inner=1, outer=15),
-        time= repeat([E67t, E68t, E69t, E70t, E71t, E72t, E73t, E74t, E75t, E76t, E77t, E78t, E79t, E80t, E81t], inner=6, outer=1),
-            temperatures= [E67T8, E67T9, E67T10, E67T11, E67T12, E67Tf,
-            E68T8, E68T9, E68T10, E68T11, E68T12, E68Tf,
-            E69T8, E69T9, E69T10, E69T11, E69T12, E69Tf,
-            E70T8, E70T9, E70T10, E70T11, E70T12, E70Tf,
-            E71T8, E71T9, E71T10, E71T11, E71T12, E71Tf,
-            E72T8, E72T9, E72T10, E72T11, E72T12, E72Tf,
-            E73T8, E73T9, E73T10, E73T11, E73T12, E73Tf,
-            E74T8, E74T9, E74T10, E74T11, E74T12, E74Tf,
-            E75T8, E75T9, E75T10, E75T11, E75T12, E75Tf,
-            E76T8, E76T9, E76T10, E76T11, E76T12, E76Tf,
-            E77T8, E77T9, E77T10, E77T11, E77T12, E77Tf,
-            E78T8, E78T9, E78T10, E78T11, E78T12, E78Tf,
-            E79T8, E79T9, E79T10, E79T11, E79T12, E79Tf,
-            E80T8, E80T9, E80T10, E80T11, E80T12, E80Tf,
-            E81T8, E81T9, E81T10, E81T11, E81T12, E81Tf])   
-        # measurements = DataFrame(
-        # simulation_id = repeat(["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"], inner=1, outer=1),
-        # obs_id=repeat(["_T3"], inner=1, outer=15),
-        # time= repeat([E67t, E68t, E69t, E70t, E71t, E72t, E73t, E74t, E75t, E76t, E77t, E78t, E79t, E80t, E81t], inner=1, outer=1),
-        #     temperatures= [E67Tf, E68Tf, E69Tf, E70Tf,
-        #     E71Tf, E72Tf, E73Tf, E74Tf, E75Tf, E76Tf,
-        #     E77Tf, E78Tf, E79Tf, E80Tf, E81Tf])   
+    # measurements = DataFrame(
+    #     simulation_id = repeat(["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"], inner=6, outer=1),
+    #     obs_id=repeat(["_T8", "_T9", "_T10", "_T11", "_T12", "_T3"], inner=1, outer=15),
+    #     time= repeat([E67t, E68t, E69t, E70t, E71t, E72t, E73t, E74t, E75t, E76t, E77t, E78t, E79t, E80t, E81t], inner=6, outer=1),
+    #         temperatures= [E67T8, E67T9, E67T10, E67T11, E67T12, E67Tf,
+    #         E68T8, E68T9, E68T10, E68T11, E68T12, E68Tf,
+    #         E69T8, E69T9, E69T10, E69T11, E69T12, E69Tf,
+    #         E70T8, E70T9, E70T10, E70T11, E70T12, E70Tf,
+    #         E71T8, E71T9, E71T10, E71T11, E71T12, E71Tf,
+    #         E72T8, E72T9, E72T10, E72T11, E72T12, E72Tf,
+    #         E73T8, E73T9, E73T10, E73T11, E73T12, E73Tf,
+    #         E74T8, E74T9, E74T10, E74T11, E74T12, E74Tf,
+    #         E75T8, E75T9, E75T10, E75T11, E75T12, E75Tf,
+    #         E76T8, E76T9, E76T10, E76T11, E76T12, E76Tf,
+    #         E77T8, E77T9, E77T10, E77T11, E77T12, E77Tf,
+    #         E78T8, E78T9, E78T10, E78T11, E78T12, E78Tf,
+    #         E79T8, E79T9, E79T10, E79T11, E79T12, E79Tf,
+    #         E80T8, E80T9, E80T10, E80T11, E80T12, E80Tf,
+    #         E81T8, E81T9, E81T10, E81T11, E81T12, E81Tf])   
+        measurements = DataFrame(
+        simulation_id = repeat(["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"], inner=1, outer=1),
+        obs_id=repeat(["_T3"], inner=1, outer=15),
+        time= repeat([E67t, E68t, E69t, E70t, E71t, E72t, E73t, E74t, E75t, E76t, E77t, E78t, E79t, E80t, E81t], inner=1, outer=1),
+            temperatures= [E67Tf, E68Tf, E69Tf, E70Tf,
+            E71Tf, E72Tf, E73Tf, E74Tf, E75Tf, E76Tf,
+            E77Tf, E78Tf, E79Tf, E80Tf, E81Tf])   
     end
 
 
 
 #Optimization using NLOpt
-rmp = ModelingToolkit.varmap_to_vars([Io => 442320.0, A => 700., B => 0.4, n=> 0.5, C=> 30., qlpm => 7.12], parameters(pdesys))
+rmp = ModelingToolkit.varmap_to_vars([Io => 442320.0, A => 700., B => 0.4, C=> 30., qlpm => 7.12], parameters(pdesys))
 function NLmodeloptim(tvalues, rmp)
 
     #p = [hlocal => p_vary[1]]
     modeloptim = remake(prob, p=rmp, tspan=(0.0, tvalues[end]))
     modeloptim_sol = solve(modeloptim, FBDF(), saveat=tvalues)#, reltol=1e-12, abstol=1e-12)
     #time = modelfit_sol.t
-    tempT8_op = float.(modeloptim_sol.u[Ts(t, x)][:, 8])
-    tempT9_op = float.(modeloptim_sol.u[Ts(t, x)][:, 42])
-    tempT10_op = float.(modeloptim_sol.u[Ts(t, x)][:, 78])
+    #tempT8_op = float.(modeloptim_sol.u[Ts(t, x)][:, 8])
+    #tempT9_op = float.(modeloptim_sol.u[Ts(t, x)][:, 42])
+    #tempT10_op = float.(modeloptim_sol.u[Ts(t, x)][:, 78])
     tempT3_op = float.(modeloptim_sol.u[Tf(t, x)][:, end-1])
     # T12_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 20] .+ modeloptim_sol.u[Ts(t, x)][end, 20]) ./ 2
     # T11_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 59] .+ modeloptim_sol.u[Ts(t, x)][end, 59]) ./ 2
     tempT11_op = float.(modeloptim_sol.u[Ts(t, x)][:, 78])
     tempT12_op = float.(modeloptim_sol.u[Ts(t, x)][:, 42])
-    return append!(tempT8_op, tempT9_op, tempT10_op, tempT3_op, tempT12_op, tempT11_op)
-    #return ([tempT3_op])
+    #return append!(tempT8_op, tempT9_op, tempT10_op, tempT3_op, tempT12_op, tempT11_op)
+    return ([tempT3_op])
 end
 
 function remakeAysha(pguess_l, cond, time_opt)
@@ -891,8 +907,8 @@ end
 p0 = [x[2] for x in p_opt]
 optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
 #p_opt = [aCp => 1., hfa => 8., hfn =>0.66, aIo => 1.] 
-lb = [500., 0.01, 0.1, 22.]
-ub = [1500., 0.5, 0.7, 55.]
+lb = [200., 0.2, 5.]
+ub = [1300., 3., 30.]
  
 #pguess_opt = ModelingToolkit.varmap_to_vars([Io => 456000, h_average => 14., qlpm => 7.12], parameters(pdesys))
 initialerror = (lossAll(p0, []))
@@ -926,7 +942,8 @@ begin
         
         #run selected simulation and get the steady temperature values
         temp_T = remakeAysha(pnew, cond, time_opt)
-        temp_T = reshape(temp_T, length(expdata[1]), length(expdata))
+        #temp_T = reshape(temp_T, length(expdata[1]), length(expdata))
+        temp_T = reshape(temp_T, length(expdata), length(expdata))
         temp_T = [temp_T[:, i] for i in 1:length(expdata)]
         push!(T_steady, (sm, temp_T, expdata))
    end
@@ -999,7 +1016,7 @@ begin
         legend=:bottomright
     )
     # Add the best fit line to the plot
-plot!([500, 800], [500, 800], label="Ideal case (y=x)", color=:red)
+plot!([500, 1200], [500, 1200], label="Ideal case (y=x)", color=:red)
 end
 
 begin
@@ -1113,64 +1130,64 @@ end
 begin
 plot1 = plot(
     new_78t,
-    T_steady[1, :T_mod][1], # around 136 mm in T3
+    T_steady[1, :T_mod][1], 
     title="Solid Temperature Profile T8 in E78",
     label="model",
     xlabel="Time (s)",
     ylabel="Temperature (K)", xlimit = (0, 4050), 
     legend=:bottomright)
-    scatter!(E78t, E78Tf, label="experiment")
+    scatter!(E78t, E78T8, label="experiment")
     display(plot1)
 end 
 begin
 plot1 = plot(
     new_78t,
-    T_steady[1, :T_mod][2], # around 136 mm in T3
+    T_steady[1, :T_mod][2], 
     title="Solid Temperature Profile T9 in E78",
     label="model",
     xlabel="Time (s)",
     ylabel="Temperature (K)", xlimit = (0, 4050),
     legend=:bottomright)
-    scatter!(E78t, E78Tf, label="experiment")
+    scatter!(E78t, E78T9, label="experiment")
     display(plot1)
 end
 
 begin
 plot1 = plot(
     new_78t,
-    T_steady[1, :T_mod][3], # around 136 mm in T3
+    T_steady[1, :T_mod][3], 
     title="Solid Temperature Profile T10 in E78",
     label="model",
     xlabel="Time (s)",
     ylabel="Temperature (K)", xlimit = (0, 4050), 
     legend=:bottomright)
-   scatter!(E78t, E78Tf, label="experiment")
+   scatter!(E78t, E78T10, label="experiment")
    display(plot1)
 end
 
 begin
     plot1 = plot(
     new_78t,
-    T_steady[1, :T_mod][4], # around 136 mm in T3
+    T_steady[1, :T_mod][4], 
     title="Solid Temperature Profile T11 in E78",
     label="model",
     xlabel="Time (s)",
     ylabel="Temperature (K)", xlimit = (0, 4050),
     legend=:bottomright)
-    scatter!(E78t, E78Tf, label="experiment")
+    scatter!(E78t, E78T11, label="experiment")
     display(plot1)
 end
 
 begin
     plot1 = plot(
     new_78t,
-    T_steady[1, :T_mod][5], # around 136 mm in T3
+    T_steady[1, :T_mod][5],
     title="Solid Temperature Profile T12 in E78",
     label="model",
     xlabel="Time (s)",
     ylabel="Temperature (K)", xlimit = (0, 4050),
     legend=:bottomright)
-    scatter!(E78t, E78Tf, label="experiment")
+    scatter!(E78t, E78T12, label="experiment")
     display(plot1)
 end
 
@@ -1178,7 +1195,7 @@ new_69t = LinRange(sol1.t[1], sol1.t[end], 54)
 begin
 plot1 = plot(
         new_69t,
-        T_steady[2, :T_mod][6], # around 136 mm in T3
+        T_steady[2, :T_mod][6], 
         title="Gas Temperature Profile T3 in E69",
         label="model",
         xlabel="Time (s)",
@@ -1192,7 +1209,7 @@ new_79t = LinRange(sol1.t[1], sol1.t[end], 53)
 begin
     plot1 = plot(
     new_79t,
-    T_steady[3, :T_mod][6], # around 136 mm in T3
+    T_steady[3, :T_mod][1], 
     title="Gas Temperature Profile T3 in E79",
     label="model",
     xlabel="Time (s)",
@@ -1206,7 +1223,7 @@ new_73t = LinRange(sol1.t[1], sol1.t[end], 46)
 begin
     plot1 = plot(
     new_73t,
-    T_steady[4, :T_mod][6], # around 136 mm in T3
+    T_steady[4, :T_mod][1], # around 136 mm in T3
     title="Gas Temperature Profile T3 in E73",
     label="model",
     xlabel="Time (s)",
@@ -1220,7 +1237,7 @@ new_81t = LinRange(sol1.t[1], sol1.t[end], 60)
 begin
     plot1 = plot(
     new_81t,
-    T_steady[5, :T_mod][6], # around 136 mm in T3
+    T_steady[5, :T_mod][1], # around 136 mm in T3
     title="Gas Temperature Profile T3 in E81",
     label="model",
     xlabel="Time (s)",
@@ -1233,7 +1250,7 @@ new_72t = LinRange(sol1.t[1], sol1.t[end], 33)
 begin
     plot1 = plot(
     new_72t,
-    T_steady[6, :T_mod][6], # around 136 mm in T3
+    T_steady[6, :T_mod][1], # around 136 mm in T3
     title="Gas Temperature Profile T3 in E72",
     label="model",
     xlabel="Time (s)",
@@ -1246,7 +1263,7 @@ new_76t = LinRange(sol1.t[1], sol1.t[end], 72)
 begin
     plot1 = plot(
     new_76t,
-    T_steady[7, :T_mod][6], # around 136 mm in T3
+    T_steady[7, :T_mod][1], # around 136 mm in T3
     title="Gas Temperature Profile T3 in E76",
     label="model",
     xlabel="Time (s)",
@@ -1259,7 +1276,7 @@ new_77t = LinRange(sol1.t[1], sol1.t[end], 31)
 begin
     plot1 = plot(
     new_77t,
-    T_steady[8, :T_mod][6], # around 136 mm in T3
+    T_steady[8, :T_mod][1], # around 136 mm in T3
     title="Gas Temperature Profile T3 in E77",
     label="model",
     xlabel="Time (s)",
@@ -1272,7 +1289,7 @@ new_71t = LinRange(sol1.t[1], sol1.t[end], 71)
 begin
     plot1 = plot(
     new_71t,
-    T_steady[9, :T_mod][6], # around 136 mm in T3
+    T_steady[9, :T_mod][1], # around 136 mm in T3
     title="Gas Temperature Profile T3 in E71",
     label="model",
     xlabel="Time (s)",
@@ -1285,7 +1302,7 @@ new_75t = LinRange(sol1.t[1], sol1.t[end], 64)
 begin
     plot1 = plot(
     new_75t,
-    T_steady[10, :T_mod][6], # around 136 mm in T3
+    T_steady[10, :T_mod][1], # around 136 mm in T3
     title="Gas Temperature Profile T3 in E75",
     label="model",
     xlabel="Time (s)",
@@ -1298,7 +1315,7 @@ new_67t = LinRange(sol1.t[1], sol1.t[end], 40)
 begin
     plot1 = plot(
     new_67t,
-    T_steady[11, :T_mod][6], # around 136 mm in T3
+    T_steady[11, :T_mod][1], # around 136 mm in T3
     title="Gas Temperature Profile T3 in E67",
     label="model",
     xlabel="Time (s)",
@@ -1311,7 +1328,7 @@ new_68t = LinRange(sol1.t[1], sol1.t[end], 54)
 begin
     plot1 = plot(
     new_68t,
-    T_steady[12, :T_mod][6], # around 136 mm in T3
+    T_steady[12, :T_mod][1], # around 136 mm in T3
     title="Gas Temperature Profile T3 in E68",
     label="model",
     xlabel="Time (s)",
@@ -1324,7 +1341,7 @@ new_70t = LinRange(sol1.t[1], sol1.t[end], 68)
 begin
     plot1 = plot(
     new_70t,
-    T_steady[13, :T_mod][6], # around 136 mm in T3
+    T_steady[13, :T_mod][1], # around 136 mm in T3
     title="Gas Temperature Profile T3 in E70",
     label="model",
     xlabel="Time (s)",
@@ -1339,7 +1356,7 @@ new_80t = LinRange(sol1.t[1], sol1.t[end], 59)
 begin
     plot1 = plot(
     new_80t,
-    T_steady[14, :T_mod][6], # around 136 mm in T3
+    T_steady[14, :T_mod][1], # around 136 mm in T3
     title="Gas Temperature Profile T3 in E80",
     label="model",
     xlabel="Time (s)",
@@ -1352,7 +1369,7 @@ new_74t = LinRange(sol1.t[1], sol1.t[end], 61)
 begin
     plot1 = plot(
     new_74t,
-    T_steady[15, :T_mod][6], # around 136 mm in T3
+    T_steady[15, :T_mod][1], # around 136 mm in T3
     title="Gas Temperature Profile T3 in E74",
     label="model",
     xlabel="Time (s)",
