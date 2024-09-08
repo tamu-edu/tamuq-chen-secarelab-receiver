@@ -27,12 +27,6 @@ begin #define parameters
 	A_chnl_frt_all = A_chnl_frt * n_chnl #m2 all frontal area of channels
     Vs =  A_frt * L #m3
 	Vf = n_chnl * A_chnl_frt * L 
-    # channel_w = 1.5 / 1000 #m
-    # A_channel = channel_w * channel_w  #m2 (1.5x1.5mm2) 
-    # n_channel = 100
-    # A_exchange = 162.5e-6 #m2 - contact area between fluid and solid
-    # Vs = A_st * L #* deltax
-    # Vf = A_ft * L #* deltax
     qlpm = 7.12 #lpm
     q = qlpm / (1000 * 60) #m3/s
     ρ = 1.2 #kg/m3 - density of air at lab conditions
@@ -51,13 +45,6 @@ begin #define parameters
     mu = 2.0921e-5 #Pa.s
     e = 0.425
     Af = n_chnl * A_chnl_frt #m2
-    #Gz = (w_t / L) * Re * Pr
-    # A = 3.657
-    # B = 0.5272
-    # C = 55.1239
-    # n = 0.3056
-    #Nu = A*(1+(B*((Gz)^n)*exp(-C/Gz)))
-    #Nu = 3.657 
     Lc = 4 * (w_t * w_t) / (4 * w_t)
     w = 1.5e-3 #width of channel (m)
     Vi = w * w * n_chnl * L #m3
@@ -103,15 +90,15 @@ begin
     Dt = Differential(t)
     Dx = Differential(x)
     Dxx = Differential(x)^2
-    #ks = (6.) * 1.97 * ((1 - e)^1.5) #W/m.K
-    ks = 6.
+    ks = (500.) * 1.97 * ((1 - e)^1.5) #W/m.K
+    #ks = 6.
     ρs = 3200  #kg/m3
     Cps = 1290  #J/kg*K
     #Nu = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
     #Nu = A*(Re^B)*(Pr^C)
     #Cps(Ts) = (0.27+0.135e-4*(Ts)-9720*((Ts)^-2)+0.204e-7*((Ts)^2))/1000 #kJ/kg*K from manufacturer data
     #p_opt = [A => 2., B => 0.5, n=> 0.5, C=> 20.]
-    p_opt = [A => 1000., B => 2., C=> 21.]
+    p_opt = [A => 1000., B => 0.6, C=> 10.]
     p_cond = [Io => 456000.0, qlpm => 15.27]
     p_math = vcat(p_opt, p_cond)
     #h_average = hfa * (qlpm^hfn)
@@ -200,12 +187,6 @@ begin
         label="Numerical",
         xlabel="Time (s)",
         ylabel="Temperature (K)")
-    # scatter!(
-    #     xd1_data,
-    #     y1d1_data,
-    #     label="Experimental",
-    #     xlabel="Time (s)",
-    #     ylabel="Temperature (K)")
 end
 begin
     # model results for different thermocouples
@@ -775,6 +756,22 @@ begin
     # condition_E80 = Dict(Io => 256000.0, qlpm => 6.62)
     # condition_E81 = Dict(Io => 256000.0, qlpm => 4.53)
 
+    # condition_E67 = Dict(Io => 550000.0, qlpm => 15.27)
+    # condition_E68 = Dict(Io => 550000.0, qlpm => 12.50)
+    # condition_E69 = Dict(Io => 550000.0, qlpm => 10.50)
+    # condition_E70 = Dict(Io => 550000.0, qlpm => 9.10)
+    # condition_E71 = Dict(Io => 550000.0, qlpm => 7.12)
+    # condition_E72 = Dict(Io => 400000.0, qlpm => 18.34)
+    # condition_E73 = Dict(Io => 450000.0, qlpm => 13.16)
+    # condition_E74 = Dict(Io => 550000.0, qlpm => 9.03)
+    # condition_E75 = Dict(Io => 450000.0, qlpm => 6.95)
+    # condition_E76 = Dict(Io => 470000.0, qlpm => 4.53)
+    # condition_E77 = Dict(Io => 240000.0, qlpm => 13.85)
+    # condition_E78 = Dict(Io => 240000.0, qlpm => 10.02)
+    # condition_E79 = Dict(Io => 300000.0, qlpm => 8.04)
+    # condition_E80 = Dict(Io => 248320.0, qlpm => 6.62)
+    # condition_E81 = Dict(Io => 300000.0, qlpm => 4.53)
+
     simulation_conditions = Dict("E67" => condition_E67, "E68" => condition_E68,
         "E69" => condition_E69, "E70" => condition_E70,
         "E71" => condition_E71, "E72" => condition_E72,
@@ -870,7 +867,8 @@ function remakeAysha(pguess_l, cond, time_opt)
         # Fill the new_p_math with values from cond
         for (i, (key, value)) in enumerate(cond)
             rmp[length(pguess_l) + i] = Symbol(key) => value
-        end# pguess is the initial guess for the optimization
+        end
+        # pguess is the initial guess for the optimization
         #println(rmp)
         temp_T = NLmodeloptim(time_opt, rmp)
         return temp_T
@@ -907,8 +905,8 @@ end
 p0 = [x[2] for x in p_opt]
 optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
 #p_opt = [aCp => 1., hfa => 8., hfn =>0.66, aIo => 1.] 
-lb = [200., 0.2, 5.]
-ub = [1300., 3., 30.]
+lb = [700., 0.2, 1.]
+ub = [1700., 1., 15.]
  
 #pguess_opt = ModelingToolkit.varmap_to_vars([Io => 456000, h_average => 14., qlpm => 7.12], parameters(pdesys))
 initialerror = (lossAll(p0, []))
@@ -916,7 +914,7 @@ println(initialerror)
 
 optprob = Optimization.OptimizationProblem(optf, p0, [], lb=lb, ub=ub)
 
-optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method=NLopt.LN_NELDERMEAD(), maxtime=100, local_maxiters=100000)
+optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method=NLopt.LN_NELDERMEAD(), maxtime=300, local_maxiters=100000)
 
 println(optsol.retcode)
 pnew = optsol.u
@@ -950,6 +948,8 @@ begin
 
 end
 
+#plotting the scatter plots for the different thermocouples for the steady state temperatures
+
 begin #TI-8
     color_model = :blue
     color_exp = :orange
@@ -959,7 +959,7 @@ begin #TI-8
         [1, 2], [T_steady[order_indices[1], :T_mod][end][end], T_steady[order_indices[2], :T_exp][end][end]],
         title="TI-8 Steady State Temperature", ylabel="Temperature (K)", xlabel="Experimental Runs",
         bar_width=0.4, xticks=(1:2:30, ordered_sim_conditions),
-       label="T_model", color=[color_model, color_exp], ylimit=(0, 1250))
+        label="T_model", color=[color_model, color_exp], ylimit=(0, 1250))
  
    # Loop through the remaining data to add the bars without labels
 for i in 2:15
@@ -974,13 +974,13 @@ plot1
 
 end
 
-begin
+
 
     ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
     order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
 
     # Extract the data for the scatter plot
-    model_temps = [T_steady[order_indices[i], :T_mod][1][end] for i in 1:15]
+    model_temps = [T_steady[order_indices[i], :T_mod][1][1][end] for i in 1:15]
     exp_temps = [T_steady[order_indices[i], :T_exp][1][end] for i in 1:15]
 
     # Create the scatter plot
@@ -996,30 +996,8 @@ begin
     # Add the best fit line to the plot
 plot!([500, 900], [500, 900], label="Ideal case (y=x)", color=:red)
 end
-begin
 
-    ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
-    order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
-
-    # Extract the data for the scatter plot
-    model_temps = [T_steady[order_indices[i], :T_mod][1][end] for i in 1:15]
-    exp_temps = [T_steady[order_indices[i], :T_exp][1][end] for i in 1:15]
-
-    # Create the scatter plot
-    plot1 = scatter(
-        exp_temps, model_temps,
-        title="TI-3 Steady State Temperature",
-        xlabel="Experimental Temperature (K)",
-        ylabel="Model Temperature (K)",
-        label="Temperature data points",
-        color=color_model, 
-        legend=:bottomright
-    )
-    # Add the best fit line to the plot
-plot!([500, 1200], [500, 1200], label="Ideal case (y=x)", color=:red)
-end
-
-begin
+begin #TI-9
 
     ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
     order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
@@ -1042,7 +1020,7 @@ begin
 plot!([500, 1150], [500, 1150], label="Ideal case (y=x)", color=:red)
 end
 
-begin
+begin #TI-10
 
     ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
     order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
@@ -1065,7 +1043,7 @@ begin
 plot!([500, 900], [500, 900], label="Ideal case (y=x)", color=:red)
 end
 
-begin
+begin #TI-11
 
     ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
     order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
@@ -1088,7 +1066,7 @@ begin
 plot!([500, 950], [500, 950], label="Ideal case (y=x)", color=:red)
 end
 
-begin
+begin #TI-12
 
     ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
     order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
@@ -1111,6 +1089,7 @@ begin
 plot!([500, 1150], [500, 1150], label="Ideal case (y=x)", color=:red)
 end
 
+#Plotting the temperature profiles for the gas domanin and a few solid domain profiles across all experimental conditions
 
 new_78t = LinRange(sol1.t[1], sol1.t[end], 54) #E78
 begin
@@ -1195,7 +1174,7 @@ new_69t = LinRange(sol1.t[1], sol1.t[end], 54)
 begin
 plot1 = plot(
         new_69t,
-        T_steady[2, :T_mod][6], 
+        T_steady[2, :T_mod][1], 
         title="Gas Temperature Profile T3 in E69",
         label="model",
         xlabel="Time (s)",
