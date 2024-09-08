@@ -1,7 +1,7 @@
 # Read Me
 
 ## Summary of Cases
-This repository includes parametric sweep results conducted in the studies described in [published work] ...
+This repository includes parametric sweep results conducted in the studies described in the published work [Energy Conversion and Management 291 (2023) 117306](https://www.sciencedirect.com/science/article/pii/S0196890423006520)
 
 Each folder describes one reflectivity distribution applied to a square channel honeycomb receiver:
 
