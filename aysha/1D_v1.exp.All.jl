@@ -84,7 +84,7 @@ end
 begin
     # Parameters, variables, and derivatives for system 1
     @variables t x
-    @parameters A B C #ks h_average A n
+    @parameters A B C aloss#ks h_average A n
     @parameters Io qlpm
     @variables Ts(..) Tf(..)
     Dt = Differential(t)
@@ -98,7 +98,7 @@ begin
     #Nu = A*(Re^B)*(Pr^C)
     #Cps(Ts) = (0.27+0.135e-4*(Ts)-9720*((Ts)^-2)+0.204e-7*((Ts)^2))/1000 #kJ/kg*K from manufacturer data
     #p_opt = [A => 2., B => 0.5, n=> 0.5, C=> 20.]
-    p_opt = [A => 1000., B => 0.6, C=> 10.]
+    p_opt = [A => 1000., B => 0.6, C=> 7., aloss => 1.]
     p_cond = [Io => 456000.0, qlpm => 15.27]
     p_math = vcat(p_opt, p_cond)
     #h_average = hfa * (qlpm^hfn)
@@ -128,7 +128,7 @@ begin
     #     Vf * ρf * Cpf * Dt(Tf(t, x)) ~ Vf * kf * Dxx(Tf(t, x)) - Vf * ρf * Cpf * V * Dx(Tf(t, x)) + (h_average) * Av * Vi * ((Ts(t, x) - Tf(t, x)))
     # ]
     eq1 = [
-        (1-e) * (aCp * ρs * Cps) * Vs * Dt(Ts(t, x)) ~ A_frt * ks * Dxx(Ts(t, x)) - (h_avg_f(qlpm) * A_exchange * ((Ts(t, x)) - Tf(t, x))) .- (kins * (r_ins/r0).* (Ts(t, x) .- Tins_f(t)) * A_s_p/ (r_ins - r0)),
+        (1-e) * (aCp * ρs * Cps) * Vs * Dt(Ts(t, x)) ~ A_frt * ks * Dxx(Ts(t, x)) - (h_avg_f(qlpm) * A_exchange * ((Ts(t, x)) - Tf(t, x))) .- aloss * (kins * (r_ins/r0).* (Ts(t, x) .- Tins_f(t)) * A_s_p/ (r_ins - r0)),
         e * ρf * Cpf * Vf * Dt(Tf(t, x)) ~ Af * e * kf * Dxx(Tf(t, x)) - m * Cpf * Dx(Tf(t, x)) + (h_avg_f(qlpm) * A_exchange * ((Ts(t, x)) - Tf(t, x)))
     ]
     bcs1 = [
@@ -724,21 +724,38 @@ end
 
 #Defining simulation conditions
 begin
+
     condition_E67 = Dict(Io => 442320.0, qlpm => 15.27)
     condition_E68 = Dict(Io => 442320.0, qlpm => 12.50)
     condition_E69 = Dict(Io => 442320.0, qlpm => 10.50)
     condition_E70 = Dict(Io => 442320.0, qlpm => 9.10)
     condition_E71 = Dict(Io => 442320.0, qlpm => 7.12)
-    condition_E72 = Dict(Io => 371792.0, qlpm => 18.34)
-    condition_E73 = Dict(Io => 371792.0, qlpm => 13.16)
-    condition_E74 = Dict(Io => 371792.0, qlpm => 9.03)
-    condition_E75 = Dict(Io => 371792.0, qlpm => 6.95)
-    condition_E76 = Dict(Io => 371792.0, qlpm => 4.53)
-    condition_E77 = Dict(Io => 256000.0, qlpm => 13.85)
-    condition_E78 = Dict(Io => 256000.0, qlpm => 10.02)
-    condition_E79 = Dict(Io => 256000.0, qlpm => 8.04)
-    condition_E80 = Dict(Io => 256000.0, qlpm => 6.62)
-    condition_E81 = Dict(Io => 256000.0, qlpm => 4.53)
+    condition_E72 = Dict(Io => 400000.0, qlpm => 18.34)
+    condition_E73 = Dict(Io => 450000.0, qlpm => 13.16)
+    condition_E74 = Dict(Io => 550000.0, qlpm => 9.03)
+    condition_E75 = Dict(Io => 450000.0, qlpm => 6.95)
+    condition_E76 = Dict(Io => 470000.0, qlpm => 4.53)
+    condition_E77 = Dict(Io => 240000.0, qlpm => 13.85)
+    condition_E78 = Dict(Io => 240000.0, qlpm => 10.02)
+    condition_E79 = Dict(Io => 300000.0, qlpm => 8.04)
+    condition_E80 = Dict(Io => 248320.0, qlpm => 6.62)
+    condition_E81 = Dict(Io => 300000.0, qlpm => 4.53)
+
+    # condition_E67 = Dict(Io => 442320.0, qlpm => 15.27)
+    # condition_E68 = Dict(Io => 442320.0, qlpm => 12.50)
+    # condition_E69 = Dict(Io => 442320.0, qlpm => 10.50)
+    # condition_E70 = Dict(Io => 442320.0, qlpm => 9.10)
+    # condition_E71 = Dict(Io => 442320.0, qlpm => 7.12)
+    # condition_E72 = Dict(Io => 371792.0, qlpm => 18.34)
+    # condition_E73 = Dict(Io => 371792.0, qlpm => 13.16)
+    # condition_E74 = Dict(Io => 371792.0, qlpm => 9.03)
+    # condition_E75 = Dict(Io => 371792.0, qlpm => 6.95)
+    # condition_E76 = Dict(Io => 371792.0, qlpm => 4.53)
+    # condition_E77 = Dict(Io => 313088.0, qlpm => 13.85)
+    # condition_E78 = Dict(Io => 313088.0, qlpm => 10.02)
+    # condition_E79 = Dict(Io => 313088.0, qlpm => 8.04)
+    # condition_E80 = Dict(Io => 313088.0, qlpm => 6.62)
+    # condition_E81 = Dict(Io => 313088.0, qlpm => 4.53)
 
     # condition_E67 = Dict(Io => 456000.0, qlpm => 15.27)
     # condition_E68 = Dict(Io => 456000.0, qlpm => 12.50)
@@ -756,21 +773,6 @@ begin
     # condition_E80 = Dict(Io => 256000.0, qlpm => 6.62)
     # condition_E81 = Dict(Io => 256000.0, qlpm => 4.53)
 
-    # condition_E67 = Dict(Io => 550000.0, qlpm => 15.27)
-    # condition_E68 = Dict(Io => 550000.0, qlpm => 12.50)
-    # condition_E69 = Dict(Io => 550000.0, qlpm => 10.50)
-    # condition_E70 = Dict(Io => 550000.0, qlpm => 9.10)
-    # condition_E71 = Dict(Io => 550000.0, qlpm => 7.12)
-    # condition_E72 = Dict(Io => 400000.0, qlpm => 18.34)
-    # condition_E73 = Dict(Io => 450000.0, qlpm => 13.16)
-    # condition_E74 = Dict(Io => 550000.0, qlpm => 9.03)
-    # condition_E75 = Dict(Io => 450000.0, qlpm => 6.95)
-    # condition_E76 = Dict(Io => 470000.0, qlpm => 4.53)
-    # condition_E77 = Dict(Io => 240000.0, qlpm => 13.85)
-    # condition_E78 = Dict(Io => 240000.0, qlpm => 10.02)
-    # condition_E79 = Dict(Io => 300000.0, qlpm => 8.04)
-    # condition_E80 = Dict(Io => 248320.0, qlpm => 6.62)
-    # condition_E81 = Dict(Io => 300000.0, qlpm => 4.53)
 
     simulation_conditions = Dict("E67" => condition_E67, "E68" => condition_E68,
         "E69" => condition_E69, "E70" => condition_E70,
@@ -837,7 +839,7 @@ begin
 
 
 #Optimization using NLOpt
-rmp = ModelingToolkit.varmap_to_vars([Io => 442320.0, A => 700., B => 0.4, C=> 30., qlpm => 7.12], parameters(pdesys))
+rmp = ModelingToolkit.varmap_to_vars([Io => 442320.0, A => 700., B => 0.4, C=> 30., aloss=> 1., qlpm => 7.12], parameters(pdesys))
 function NLmodeloptim(tvalues, rmp)
 
     #p = [hlocal => p_vary[1]]
@@ -905,8 +907,8 @@ end
 p0 = [x[2] for x in p_opt]
 optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
 #p_opt = [aCp => 1., hfa => 8., hfn =>0.66, aIo => 1.] 
-lb = [700., 0.2, 1.]
-ub = [1700., 1., 15.]
+lb = [200., 0.1, 3., 0.4]
+ub = [1700., 0.9, 9., 2.5]
  
 #pguess_opt = ModelingToolkit.varmap_to_vars([Io => 456000, h_average => 14., qlpm => 7.12], parameters(pdesys))
 initialerror = (lossAll(p0, []))
@@ -975,6 +977,7 @@ plot1
 end
 
 
+begin #TI-3
 
     ordered_sim_conditions = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
     order_indices = [findfirst(x -> x == condition, T_steady.sim_id) for condition in ordered_sim_conditions]
@@ -1355,4 +1358,4 @@ begin
     ylabel="Temperature (K)", xlimit = (0, 3050))
     scatter!(E74t, E74Tf, label="experiment")
     display(plot1)
-end 
+end   

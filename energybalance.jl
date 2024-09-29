@@ -630,9 +630,9 @@ begin
 	# _hfb = PEtabParameter(hfb, lb=0.1, ub=10., scale=:lin)
 	#_hfn = PEtabParameter(hfn, lb=0.001, ub=10., scale=:lin)
 	_A = PEtabParameter(A, lb=200., ub=1300., scale=:lin)
-	_B = PEtabParameter(B, lb=0.2, ub=3., scale=:lin)
+	_B = PEtabParameter(B, lb=0.1, ub=3., scale=:lin)
 	#_n = PEtabParameter(n, lb=0.01, ub=0.9, scale=:lin)
-	_C = PEtabParameter(C, lb=5., ub=70., scale=:lin)
+	_C = PEtabParameter(C, lb=3., ub=70., scale=:lin)
 	#_al = PEtabParameter(al, lb=0.01, ub=3., scale=:lin)
 	_aCp = PEtabParameter(aCp, lb=0.5, ub=3., scale=:lin)
 	params = [_g1_aIo, _g2_aIo, _g3_aIo, _A, _B, _C, _aCp]
