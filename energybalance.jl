@@ -20,6 +20,15 @@ begin
 	Pkg.activate("energy")
 end
 
+# ╔═╡ 86c7df59-4f03-4730-9cbf-72d8fc7c34bd
+begin
+	using ModelingToolkit, DifferentialEquations, Plots
+	#using ModelingToolkit: t_nounits as t, D_nounits as D
+	using PEtab, XLSX, Statistics, DataFrames
+	using PlutoUI, StatsPlots
+	using Optimization, Optim, Ipopt, OptimizationNLopt
+end
+
 # ╔═╡ 8c28c8d1-dd57-4a04-9121-cbfed404d824
 html"""<style>
 main {
@@ -334,7 +343,7 @@ begin
     th_f = 0.7e-3 #m
     w_t = 19.e-3 #m
 	Lc = 4 * (w_t * w_t) / (4 * w_t) #m
-	w_chnl = 1.36e-3 #m
+	w_chnl = 1.5e-3 #m
 	h_ext = 10 #W/m2.K natural convection
     kins = 0.078 #W/m*K thermal conductivity of insulation
     r_H_chnl = 4 * (w_chnl * w_chnl) / (4 * w_chnl) #hydraulic channel diameter
@@ -427,23 +436,23 @@ Cps = ρCp_sf(2200)/3200
 # ╔═╡ 8f9afcbf-5a98-4709-b763-844b058d155e
 #measurements and conditions#Defining simulation conditions
 begin
-    condition_E67 = Dict(Io => 456000.0, qlpm => 15.27, aIo => :g1_aIo, Tins => 326.437) #, al => 0.553)	
-    condition_E68 = Dict(Io => 456000.0, qlpm => 12.50, aIo => :g1_aIo, Tins => 338.52) #, al => 0.553) 
-    condition_E69 = Dict(Io => 456000.0, qlpm => 10.50, aIo => :g1_aIo, Tins => 344.308) #, al => 0.553)
-    condition_E70 = Dict(Io => 456000.0, qlpm => 9.10, aIo => :g1_aIo, Tins => 352.422) #, al => 0.553)
-    condition_E71 = Dict(Io => 456000.0, qlpm => 7.12, aIo => :g1_aIo, Tins => 356.004) #, al => 0.553)
-    condition_E72 = Dict(Io => 304000.0, qlpm => 18.34, aIo => :g2_aIo, Tins => 309.928) #, al => 0.672)
-    condition_E73 = Dict(Io => 304000.0, qlpm => 13.16, aIo => :g2_aIo, Tins => 325.12) #, al => 0.672)
-    condition_E74 = Dict(Io => 304000.0, qlpm => 9.03, aIo => :g2_aIo, Tins => 333.964) #, al => 0.672)
-    condition_E75 = Dict(Io => 304000.0, qlpm => 6.95, aIo => :g2_aIo, Tins=> 336.517) #, al => 0.672)
-    condition_E76 = Dict(Io => 304000.0, qlpm => 4.53, aIo => :g2_aIo, Tins => 338.123) #, al => 0.672)	
-    condition_E77 = Dict(Io => 256000.0, qlpm => 13.85, aIo => :g3_aIo, Tins => 308.37) #, al => 0.515)	
-    condition_E78 = Dict(Io => 256000.0, qlpm => 10.02, aIo => :g3_aIo, Tins => 312.959) #, al => 0.515)	
-    condition_E79 = Dict(Io => 256000.0, qlpm => 8.04, aIo => :g3_aIo, Tins => 314.96) #, al => 0.515)
-    condition_E80 = Dict(Io => 256000.0, qlpm => 6.62, aIo => :g3_aIo, Tins => 316.119) #, al => 0.515)
-    condition_E81 = Dict(Io => 256000.0, qlpm => 4.53, aIo => :g3_aIo, Tins => 319.315) #, al => 0.515)
+    condition_E67 = Dict(Io => 500000.0, qlpm => 15.27, aIo => :g1_aIo, Tins => 326.437) #, al => 0.553)	
+    condition_E68 = Dict(Io => 469680.0, qlpm => 12.50, aIo => :g1_aIo, Tins => 338.52) #, al => 0.553) 
+    condition_E69 = Dict(Io => 442320.0, qlpm => 10.50, aIo => :g1_aIo, Tins => 344.308) #, al => 0.553)
+    condition_E70 = Dict(Io => 442320.0, qlpm => 9.10, aIo => :g1_aIo, Tins => 352.422) #, al => 0.553)
+    condition_E71 = Dict(Io => 442320.0, qlpm => 7.12, aIo => :g1_aIo, Tins => 356.004) #, al => 0.553)
+    condition_E72 = Dict(Io => 450000.0, qlpm => 18.34, aIo => :g2_aIo, Tins => 309.928) #, al => 0.672)
+    condition_E73 = Dict(Io => 400000.0, qlpm => 13.16, aIo => :g2_aIo, Tins => 325.12) #, al => 0.672)
+    condition_E74 = Dict(Io => 371792.0, qlpm => 9.03, aIo => :g2_aIo, Tins => 333.964) #, al => 0.672)
+    condition_E75 = Dict(Io => 371792.0, qlpm => 6.95, aIo => :g2_aIo, Tins=> 336.517) #, al => 0.672)
+    condition_E76 = Dict(Io => 470000.0, qlpm => 4.53, aIo => :g2_aIo, Tins => 338.123) #, al => 0.672)	
+    condition_E77 = Dict(Io => 240000.0, qlpm => 13.85, aIo => :g3_aIo, Tins => 308.37) #, al => 0.515)	
+    condition_E78 = Dict(Io => 240000.0, qlpm => 10.02, aIo => :g3_aIo, Tins => 312.959) #, al => 0.515)	
+    condition_E79 = Dict(Io => 240000.0, qlpm => 8.04, aIo => :g3_aIo, Tins => 314.96) #, al => 0.515)
+    condition_E80 = Dict(Io => 248320.0, qlpm => 6.62, aIo => :g3_aIo, Tins => 316.119) #, al => 0.515)
+    condition_E81 = Dict(Io => 300000.0, qlpm => 4.53, aIo => :g3_aIo, Tins => 319.315) #, al => 0.515)
 
-	# condition_E67 = Dict(Io => 456000.0, qlpm => 1.22*1000*60*A_chnl_frt_all, aIo => :g1_aIo)
+#    condition_E67 = Dict(Io => 456000.0, qlpm => 1.22*1000*60*A_chnl_frt_all, aIo  =>  :g1_aIo)
  #    condition_E68 = Dict(Io => 456000.0, qlpm => 1.00*1000*60*A_chnl_frt_all, aIo => :g1_aIo)
  #    condition_E69 = Dict(Io => 456000.0, qlpm => 0.84*1000*60*A_chnl_frt_all, aIo => :g1_aIo)
  #    condition_E70 = Dict(Io => 456000.0, qlpm => 0.73*1000*60*A_chnl_frt_all, aIo => :g1_aIo)
@@ -470,64 +479,64 @@ begin
         "E81" => condition_E81)
 
 		measurements = DataFrame(simulation_id = "E67", obs_id="obs_Tf", time = E67t, measurement = E67Tf)
-		#meas = DataFrame(simulation_id = "E67", obs_id="obs_Ts", time = E67t, measurement = E67Ts)
-		#measurements = vcat(measurements, meas)
+		# meas = DataFrame(simulation_id = "E67", obs_id="obs_Ts", time = E67t, measurement = E67Ts)
+		# measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E68", obs_id="obs_Tf", time = E68t, measurement = E68Tf)
 		measurements = vcat(measurements, meas)
-		#meas = DataFrame(simulation_id = "E68", obs_id="obs_Ts", time = E68t, measurement = E68Ts)
-		#measurements = vcat(measurements, meas)
+		# meas = DataFrame(simulation_id = "E68", obs_id="obs_Ts", time = E68t, measurement = E68Ts)
+		# measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E69", obs_id="obs_Tf", time = E69t, measurement = E69Tf)
 	measurements = vcat(measurements, meas)
-		#meas = DataFrame(simulation_id = "E69", obs_id="obs_Ts", time = E69t, measurement = E69Ts)
-		#measurements = vcat(measurements, meas)
+		# meas = DataFrame(simulation_id = "E69", obs_id="obs_Ts", time = E69t, measurement = E69Ts)
+		# measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E70", obs_id="obs_Tf", time = E70t, measurement = E70Tf)
 		measurements = vcat(measurements, meas)
-		#meas = DataFrame(simulation_id = "E70", obs_id="obs_Ts", time = E70t, measurement = E70Ts)
-		#measurements = vcat(measurements, meas)
+		# meas = DataFrame(simulation_id = "E70", obs_id="obs_Ts", time = E70t, measurement = E70Ts)
+		# measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E71", obs_id="obs_Tf", time = E71t, measurement = E71Tf)
 		measurements = vcat(measurements, meas)
-		#meas = DataFrame(simulation_id = "E71", obs_id="obs_Ts", time = E71t, measurement = E71Ts)
-		#measurements = vcat(measurements, meas)
+		# meas = DataFrame(simulation_id = "E71", obs_id="obs_Ts", time = E71t, measurement = E71Ts)
+		# measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E72", obs_id="obs_Tf", time = E72t, measurement = E72Tf)
 		measurements = vcat(measurements, meas)
-		#meas = DataFrame(simulation_id = "E72", obs_id="obs_Ts", time = E72t, measurement = E72Ts)
-		#measurements = vcat(measurements, meas)
+		# meas = DataFrame(simulation_id = "E72", obs_id="obs_Ts", time = E72t, measurement = E72Ts)
+		# measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E73", obs_id="obs_Tf", time = E73t, measurement = E73Tf)
 		measurements = vcat(measurements, meas)
-		#meas = DataFrame(simulation_id = "E73", obs_id="obs_Ts", time = E73t, measurement = E73Ts)
-		#measurements = vcat(measurements, meas)
+		# meas = DataFrame(simulation_id = "E73", obs_id="obs_Ts", time = E73t, measurement = E73Ts)
+		# measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E74", obs_id="obs_Tf", time = E74t, measurement = E74Tf)
 		measurements = vcat(measurements, meas)
-		#meas = DataFrame(simulation_id = "E74", obs_id="obs_Ts", time = E74t, measurement = E74Ts)
-		#measurements = vcat(measurements, meas)
+		# meas = DataFrame(simulation_id = "E74", obs_id="obs_Ts", time = E74t, measurement = E74Ts)
+		# measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E75", obs_id="obs_Tf", time = E75t, measurement = E75Tf)
 		measurements = vcat(measurements, meas)
-		#meas = DataFrame(simulation_id = "E75", obs_id="obs_Ts", time = E75t, measurement = E75Ts)
-		#measurements = vcat(measurements, meas)
+		# meas = DataFrame(simulation_id = "E75", obs_id="obs_Ts", time = E75t, measurement = E75Ts)
+		# measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E76", obs_id="obs_Tf", time = E76t, measurement = E76Tf)
 		measurements = vcat(measurements, meas)
-		#meas = DataFrame(simulation_id = "E76", obs_id="obs_Ts", time = E76t, measurement = E76Ts)
-		#measurements = vcat(measurements, meas)
+		# meas = DataFrame(simulation_id = "E76", obs_id="obs_Ts", time = E76t, measurement = E76Ts)
+		# measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E77", obs_id="obs_Tf", time = E77t, measurement = E77Tf)
 		measurements = vcat(measurements, meas)
-		#meas = DataFrame(simulation_id = "E77", obs_id="obs_Ts", time = E77t, measurement = E77Ts)
-		#measurements = vcat(measurements, meas)
+		# meas = DataFrame(simulation_id = "E77", obs_id="obs_Ts", time = E77t, measurement = E77Ts)
+		# measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E78", obs_id="obs_Tf", time = E78t, measurement = E78Tf)
 		measurements = vcat(measurements, meas)
-		#meas = DataFrame(simulation_id = "E78", obs_id="obs_Ts", time = E78t, measurement = E78Ts)
-		#measurements = vcat(measurements, meas)
+		# meas = DataFrame(simulation_id = "E78", obs_id="obs_Ts", time = E78t, measurement = E78Ts)
+		# measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E79", obs_id="obs_Tf", time = E79t, measurement = E79Tf)
 		measurements = vcat(measurements, meas)
-		#meas = DataFrame(simulation_id = "E79", obs_id="obs_Ts", time = E79t, measurement = E79Ts)
-		#measurements = vcat(measurements, meas)
+		# meas = DataFrame(simulation_id = "E79", obs_id="obs_Ts", time = E79t, measurement = E79Ts)
+		# measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E80", obs_id="obs_Tf", time = E80t, measurement = E80Tf)
 		measurements = vcat(measurements, meas)
-		#meas = DataFrame(simulation_id = "E80", obs_id="obs_Ts", time = E80t, measurement = E80Ts)
-		#measurements = vcat(measurements, meas)
+		# meas = DataFrame(simulation_id = "E80", obs_id="obs_Ts", time = E80t, measurement = E80Ts)
+		# measurements = vcat(measurements, meas)
 	meas = DataFrame(simulation_id = "E81", obs_id="obs_Tf", time = E81t, measurement = E81Tf)
 		measurements = vcat(measurements, meas)
-		#meas = DataFrame(simulation_id = "E81", obs_id="obs_Ts", time = E81t, measurement = E81Ts)
-		#measurements = vcat(measurements, meas)
+		# meas = DataFrame(simulation_id = "E81", obs_id="obs_Ts", time = E81t, measurement = E81Ts)
+		# measurements = vcat(measurements, meas)
 end
 
 # ╔═╡ be19295e-483d-4655-8e8e-55eb349c9958
@@ -538,45 +547,26 @@ qlpm/(1000*60*A_chnl_frt_all)
 
 # ╔═╡ bc5bf598-46e5-4beb-a9b9-e23c75137fa1
 begin
-	# #hf = hfa * qlpm^hfn
-	
-	# Re = ρf * (qlpm/(1000*60*A_chnl_frt_all)) * dh / μ
-	# Pr = (Cpf * μ) / kf
-	# Gz = Lc * Re * Pr/ L #last position point L=x since model is lumped
-	# #Nu = A * (1+(B*((Gz)^n)*exp(-C/Gz)))
-	# #Nu = hfa * (Re^hfb) * (Pr^hfn)
-	# Nu = A * (Re^B) * (Pr^C)
-	# hf = Nu * kf/ dh
-	# eq1 = [D(Ts) ~ (1/((1-ε) * aCp * (3200. * (0.27 + 0.135E-4 * Ts -9720.0 * Ts^-2 + 0.204E-7 * Ts^2)  * 4187) * Vs)) * (aIo*Io * A_frt - al * (kins * (r_ins2/r_ins1) * (Ts - Tins) * A_ins / (r_ins2 - r_ins1)) - h_ext * A_frt * (Ts - Tamb) - em * σ * A_frt * (Ts^4 - Tamb^4) - hf * A_exchange * (Ts - Tf)),
-	# D(Tf) ~ (1/(ε * (3.018 * exp(-0.00574*Tf) + 0.8063*exp(-0.0008381*Tf)) * Cpf * Vf)) * (hf * A_exchange * (Ts - Tf) - mf * Cpf * (Tf - Tamb))
- #    ]
-
-	# u0 = [Ts => Tamb, Tf => Tamb]
-
-	# state_param = [qlpm => 15.27, Io => 456. *1e3, Tins=>(40. + 273.15)]
-	# fit_param = [aCp => 1., aIo => 1., A => 69.9, B => 0.352, C => 6.5, al => 2.]
-	# p = vcat(state_param, fit_param)
-	# tspan = (0, 3600.)
 
 	#hf = hfa * qlpm^hfn
 	
-	Re = (ρf * (qlpm/(1000*60*A_chnl_frt_all)) * Lc) / μ
+	Re = (ρf * (qlpm/(1000*60*A_chnl_frt_all)) * w_chnl) / μ
 	Pr = (Cpf * μ) / kf
-	Gz = Lc * Re * Pr/ L #last position point L=x since model is lumped
+	Gz = w_chnl * Re * Pr/ L #last position point L=x since model is lumped
 	#Nu = A * (1+(B*((Gz)^n)*exp(-C/Gz)))
 	#Nu = hfa * (Re^hfb) * (Pr^hfn)
 	Nu = A * (Re^B) * (Pr^C)
 	#Nu = A * Re
 	#hf = A * (qlpm^B)
-	hf = Nu * kf/ Lc
+	hf = Nu * kf/ w_chnl
 	eq1 = [D(Ts) ~ (1/((1-ε) * aCp * (3200. * (0.27 + 0.135E-4 * Ts -9720.0 * Ts^-2 + 0.204E-7 * Ts^2)  * 4187) * Vs)) * (aIo*Io * A_frt - (kins * (r_ins2/r_ins1) * (Ts - Tins) * A_s_p / (r_ins2 - r_ins1)) - h_ext * A_frt * (Ts - Tamb) - em * σ * A_frt * (Ts^4 - Tamb^4) - hf * A_exchange * (Ts - Tf)),
 	D(Tf) ~ (1/(ε * ρf2 * Cpf * Vf)) * (hf * A_exchange * (Ts - Tf) - mf * Cpf * (Tf - Tamb))
     ]
 
 	u0 = [Ts => Tamb, Tf => Tamb]
 
-	state_param = [qlpm => 15.27, Io => 456. *1e3, Tins=>(40. + 273.15)]
-	fit_param = [aCp => 1., aIo => 1., A => 80., B => 0.7, C => 6.]
+	state_param = [qlpm => 15.27, Io => 442. *1e3, Tins=>(40. + 273.15)]
+	fit_param = [aCp => 1., aIo => 1., A => 80., B => 0.5, C => 22.]
 	p = vcat(state_param, fit_param)
 	tspan = (0, 3600.)
 end
@@ -614,7 +604,7 @@ plot(sol)
 
 # ╔═╡ 1180068b-287b-4038-ac87-b689d42c8c98
 # rmp = ModelingToolkit.varmap_to_vars([aCp => slaCp, aIo => slaIo , hfa => slha, hfb => 0., hfn => 0., Io => 456000, Tins => 313., qlpm => 16.47], parameters(odes))
-rmp = ModelingToolkit.varmap_to_vars([aCp => slaCp, aIo => slaIo, A => 80., B => 0.2, C => 10., Io => 456000, Tins => 313., qlpm => 16.47], parameters(odes))
+rmp = ModelingToolkit.varmap_to_vars([aCp => slaCp, aIo => slaIo, A => 250., B => 1.6, C => 18., Io => 456000, Tins => 313., qlpm => 16.47], parameters(odes))
 
 # ╔═╡ aa2059e5-fcde-4cca-b9d7-f78120bd1b33
 
@@ -630,7 +620,7 @@ end
 
 # ╔═╡ 634082dc-6050-42fc-a208-1a68802fe5da
 begin
-	_g1_aIo = PEtabParameter(:g1_aIo, lb=1., ub=1., scale=:lin)
+	_g1_aIo = PEtabParameter(:g1_aIo, lb=1., ub=1.03, scale=:lin)
 	_g2_aIo = PEtabParameter(:g2_aIo, lb=1., ub=1., scale=:lin)
 	_g3_aIo = PEtabParameter(:g3_aIo, lb=1., ub=1., scale=:lin)
 	#_g1_al = PEtabParameter(:g1_al, lb=0.221, ub=3., scale=:lin)
@@ -639,14 +629,14 @@ begin
 	#_hfa = PEtabParameter(hfa, lb=0.001, ub=5., scale=:lin)
 	# _hfb = PEtabParameter(hfb, lb=0.1, ub=10., scale=:lin)
 	#_hfn = PEtabParameter(hfn, lb=0.001, ub=10., scale=:lin)
-	_A = PEtabParameter(A, lb=70., ub=500., scale=:lin)
-	_B = PEtabParameter(B, lb=0.3, ub=0.9, scale=:lin)
+	_A = PEtabParameter(A, lb=200., ub=1300., scale=:lin)
+	_B = PEtabParameter(B, lb=0.1, ub=3., scale=:lin)
 	#_n = PEtabParameter(n, lb=0.01, ub=0.9, scale=:lin)
-	_C = PEtabParameter(C, lb=5., ub=17., scale=:lin)
+	_C = PEtabParameter(C, lb=3., ub=70., scale=:lin)
 	#_al = PEtabParameter(al, lb=0.01, ub=3., scale=:lin)
-	_aCp = PEtabParameter(aCp, lb=0.5, ub=4.4, scale=:lin)
+	_aCp = PEtabParameter(aCp, lb=0.5, ub=3., scale=:lin)
 	params = [_g1_aIo, _g2_aIo, _g3_aIo, _A, _B, _C, _aCp]
-	obs_Ts = PEtabObservable(Ts, 0.5)
+	#obs_Ts = PEtabObservable(Ts, 0.5)
 	obs_Tf = PEtabObservable(Tf, 0.5)
 	#observables = Dict("obs_Tf" => obs_Tf, "obs_Ts" => obs_Ts)
 	observables = Dict("obs_Tf" => obs_Tf)
@@ -705,7 +695,7 @@ h_f = (10.02^0.995134)*0.784718
 hf
 
 # ╔═╡ 24b350f4-92df-4652-aa7a-264a8165eb74
-2.9574*((81.836*12.5)^1.44171)*((0.40721)^14.082)*54.389
+2.9474*((81.836*12.5)^1.594)*((0.40721)^17.3506)*236.74
 
 # ╔═╡ 737f33e9-74e6-4e87-82f1-ef7451643c1f
 2.9474*0.110197*(1+(((4.6216*15.27)^0.66)*2.85619*exp(-26.153/(4.6216*15.27))))
@@ -731,7 +721,7 @@ end
 pnew = get_ps(res, petab_problem, condition_id = casesim)
 
 # ╔═╡ e2613b68-6e5c-44dd-a631-65a367726753
-plot(res, petab_problem; observable_ids=["obs_Tf"], condition_id=casesim, ylim=(300, 900), ylabel = "Temperature (K)", xlabel = "Time (s)")
+plot(res, petab_problem; observable_ids=["obs_Tf"], condition_id=casesim, ylim=(300, 850), ylabel = "Temperature (K)", xlabel = "Time (s)")
 
 # ╔═╡ fef4139f-caad-4cc8-ab05-dcbad38f49f0
 #plot(res, petab_problem; observable_ids=["obs_Ts"], condition_id=casesim, ylim=(300, 1100), ylabel = "Temperature (K)", xlabel = "Time (s)")
@@ -782,7 +772,7 @@ labels = ["E67", "E68", "E69","E70", "E71", "E72", "E73", "E74", "E75", "E76", "
 
 
 # Plot the grouped bar chart
-groupedbar([Tend_e Tend_m], bar_position = :dodge, bar_width=0.5, xticks=(1:15, labels), label=["Experimental T" "Model T"], xlabel="Experimental Runs", ylabel="Temperature (K)", title="Air Outlet Temperature", ylimit = (0, 1000))
+groupedbar([Tend_e Tend_m], bar_position = :dodge, bar_width=0.5, xticks=(1:15, labels), label=["Experimental T" "Model T"], xlabel="Experimental Runs", ylabel="Temperature (K)", title="TI-3 Steady State Temperature", ylimit = (0, 900))
 end
 
 # ╔═╡ 4fd3723a-531f-4f09-8806-458e5b33f629
@@ -812,10 +802,21 @@ rel_error = (Tend_model[15] - Tend_exp[15]) / Tend_exp[15]
 # ╔═╡ 0eb4b057-48c2-4f77-9be9-adace62a9544
 Tend_e
 
+# ╔═╡ 8ad40098-80a4-4a44-811d-d94b68c6980e
+# ╠═╡ disabled = true
+#=╠═╡
+begin
+	using StatsPlots
+	bar(cond, [Tend_m, Tend_e])
+	groupedbar(cond, [Tend_m, Tend_e], bar_position = :dodge, bar_width=0.7)
+
+end
+  ╠═╡ =#
+
 # ╔═╡ 8fdb601b-55f4-477c-8160-0faa678e9ed1
 begin
-	scatter(Tend_e, Tend_m, label = "Experimental and Model Temperatures ", legend = :bottomright, xlabel = "Experimental Temperature (K)", ylabel = "Model Temperature (K)", title = "Air Outlet Temperature")
-	plot!([500, 850], [500, 850], label = "Best Fit")
+	scatter(Tend_e, Tend_m, label = "Temperature data points", legend = :bottomright, xlabel = "Experimental Temperature (K)", ylabel = "Model Temperature (K)", title = "TI-3 Steady State Temperature")
+	plot!([500, 850], [500, 850], label = "Ideal case (y=x)")
 end
 
 # ╔═╡ dbf6e835-239d-4c71-9a0a-fbb36f0a3f48
@@ -846,28 +847,6 @@ begin
 	Gzx = 10.:50.
 	plot(1 ./Gzx, fNu.(Gzx))
 end
-
-# ╔═╡ 86c7df59-4f03-4730-9cbf-72d8fc7c34bd
-#=╠═╡
-begin
-	using ModelingToolkit, DifferentialEquations, Plots
-	#using ModelingToolkit: t_nounits as t, D_nounits as D
-	using PEtab, XLSX, Statistics, DataFrames
-	using PlutoUI, StatsPlots
-	using Optimization, Optim, Ipopt, OptimizationNLopt
-end
-  ╠═╡ =#
-
-# ╔═╡ 8ad40098-80a4-4a44-811d-d94b68c6980e
-# ╠═╡ disabled = true
-#=╠═╡
-begin
-	using StatsPlots
-	bar(cond, [Tend_m, Tend_e])
-	groupedbar(cond, [Tend_m, Tend_e], bar_position = :dodge, bar_width=0.7)
-
-end
-  ╠═╡ =#
 
 # ╔═╡ Cell order:
 # ╠═8c28c8d1-dd57-4a04-9121-cbfed404d824
@@ -916,7 +895,7 @@ end
 # ╠═3cb41c98-5494-4276-8147-f3b2e361debd
 # ╠═f62e04d1-5d34-4e91-9fce-cc371d205414
 # ╠═3f090dba-5a3d-483e-b40b-e51d5002e9a0
-# ╠═2320e9e2-9192-413f-9462-687703a49bd8
+# ╟─2320e9e2-9192-413f-9462-687703a49bd8
 # ╠═24b350f4-92df-4652-aa7a-264a8165eb74
 # ╠═737f33e9-74e6-4e87-82f1-ef7451643c1f
 # ╠═44bb862e-e6fa-4f13-992a-5d24761536b9

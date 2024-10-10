@@ -94,12 +94,16 @@ end;
         @parameters A B C #ks h_average A n
         @parameters Io qlpm
         @variables Ts(..) Tf(..)
+        Cps(Ts(t,x)) = (0.27 + 0.135E-4 * Ts(t,x) -9720.0 * Ts(t,x)^-2 + 0.204E-7 * Ts(t,x)^2)  * 4187
+	    # Cp_sf(T) = (0.27+(0.135e-4)*(T)-9720*((T)^-2)+(0.204e-7)*(T)^2) * 4169
+	    @register_symbolic Cps(Ts(t,x))  #kg/m3 * J/kg.K 
+	    
         Dt = Differential(t)
         Dx = Differential(x)
         Dxx = Differential(x)^2
         ks = (48.78) * 1.97 * ((1 - e)^1.5) #W/m.K
         ρs = 3200  #kg/m3
-        Cps = 1290 * 6.6 #J/kg*K
+        #Cps = 1290 * 6.6 #J/kg*K
         #Nu = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
         #Nu = A*(Re^B)*(Pr^C)
         #Cps(Ts) = (0.27+0.135e-4*(Ts(t,x))-9720*((Ts(t,x))^-2)+0.204e-7*((Ts(t,x))^2))/1000 #kJ/kg*K from manufacturer data
@@ -138,7 +142,7 @@ end;
         #     e * ρf * Cpf * Vf * Dt(Tf(t, x)) ~ Af * kf * e * Dxx(Tf(t, x)) -  m * Cpf * Dx(Tf(t, x)) + (h_avg_f(qlpm) * A_exchange * ((Ts(t, x)) - Tf(t, x)))
         # ]
         eq1 = [
-        (1-e) * (aCp * ρs * Cps) * Vs * Dt(Ts(t, x)) ~  A_frt * ks * Dxx(Ts(t, x)) - (h_avg_f(qlpm) * A_exchange * (Ts(t, x) - Tf(t, x))) - al * (kins * (r_ins / r0) * (Ts(t, x) .- Tins_f(t)) * A_s_p / (r_ins - r0)),
+        (1-e) * (aCp * ρs * Cps(Ts)) * Vs * Dt(Ts(t, x)) ~  A_frt * ks * Dxx(Ts(t, x)) - (h_avg_f(qlpm) * A_exchange * (Ts(t, x) - Tf(t, x))) - al * (kins * (r_ins / r0) * (Ts(t, x) .- Tins_f(t)) * A_s_p / (r_ins - r0)),
         e * ρf * Cpf * Vf * Dt(Tf(t, x)) ~ Af * kf * e * Dxx(Tf(t, x)) - m * Cpf * Dx(Tf(t, x)) + (h_avg_f(qlpm) * A_exchange * (Ts(t, x) - Tf(t, x)))
     ]
         bcs1 = [
@@ -169,7 +173,7 @@ end;
     end
    
             
-    sol1 = solve(prob, FBDF(), saveat=2, maxiters = 100)
+    3sol1 = solve(prob, FBDF(), saveat=2, maxiters = 100)
         begin
             Ts_front_t = sol1.u[(Ts(t,x))][:,1]
             Tf_front_t = sol1.u[(Tf(t,x))][:,2]
