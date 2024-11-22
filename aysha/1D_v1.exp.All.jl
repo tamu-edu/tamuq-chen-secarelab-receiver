@@ -43,11 +43,11 @@ begin #FIXED Parameters
     w_chnl = 1.5e-3  # Width of a single channel (m)
     A_chnl_frt = w_chnl * w_chnl  # Frontal area of a single channel (m^2)
     A_chnl_p = w_chnl * L * 4  # Periphery area of a single channel (m^2)
-    Lc = 4 * (w_t * w_t) / (4 * w_t) #hydraulic receiver diameter
 
     # Channel array
     n_chnl = 10 * 10  # Number of channels (10x10 array)
     A_chnl_frt_all = A_chnl_frt * n_chnl  # Total frontal area of all channels (m^2)
+    Lc = 4 * (w_t * w_t) / (4 * w_t) #hydraulic receiver diameter
 
     # Solid geometrical calculations
     A_frt_solid = A_frt - A_chnl_frt_all  # Frontal area of solid (m^2)
@@ -72,17 +72,16 @@ begin #FIXED Parameters
     
     #Constants
     σ = 5.17e-8 #W/m2.K^4 Stefan-Boltzmann constant
-    hext = 0 #10 #W/m2.K convective heat transfer coefficient for the front --> with forced flow assume that there is no such loss
-
+    hext = 10 #W/m2.K convective heat transfer coefficient for the front 
     
     #SiC Properties
-    ϵ = 0.9 #absroptivity/emissivity
-    e = 0.425 #porosity
+    ϵ = 0.825 #absroptivity/emissivity
+    #e = 0.425 #porosity
     
     #parameters for the insulation
     r0 = 23 / 1000 #m
     r_ins = 42 / 1000 #m
-    kins = 0. #0.078/10 #W/m*K -->assume very few losses through the insulation
+    kins = 0.078 #W/m*K -->assume very few losses through the insulation
 end; 
 # #for interpolations 
 # #1. extract T2 data
@@ -111,7 +110,7 @@ end
 begin
     # Parameters, variables, and derivatives for system 1
     @independent_variables t x
-    @parameters A B C aloss#ks h_average A n
+    @parameters A B aloss#ks h_average A n
     @parameters Io qlpm
     @variables Ts(..) Tf(..)
     Dt = Differential(t)
@@ -122,7 +121,7 @@ begin
     ρf_f(x) = 352.716 * x^-1 #COMSOL
     @register_symbolic ρf_f(x)
     ρf = ρf_f(1000.) #kg/m3
-    m(qlpm) = ρf * (qlpm / 60 / 1000) #mass at the flowmeter conditions
+    m(qlpm) = ρf * (qlpm / 60. / 1000.) #mass at the flowmeter conditions
 
     mu = 2.0921e-5 #Pa.s
     kf = 0.056 #W/m.K
@@ -147,11 +146,14 @@ begin
     #Nu = A*(Re^B)*(Pr^C)
     #Cps(Ts) = (0.27+0.135e-4*(Ts)-9720*((Ts)^-2)+0.204e-7*((Ts)^2))/1000 #kJ/kg*K from manufacturer data
 
-    Re_f(qlpm) = (ρf * (qlpm / 60 / 1000 / A_chnl_frt_all) * Lc) / mu #density at ambient conditions ???
-    Pr = (Cpf * mu) / kf
-    Nu_f(qlpm) = A * (Re_f(qlpm)^B) * (Pr^C)
-    #Nu_f(qlpm) = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
-    h_avg_f(qlpm) = (Nu_f(qlpm) * kf) / Lc
+    Re_f(qlpm) = (m(qlpm) / A_chnl_frt_all) * Lc / mu #density at ambient conditions ???
+    Pr(x) = (cpf_f(x) * mu) / kf_f(x)
+    Nu_f(qlpm, x) = A * (Re_f(qlpm)^B) * (Pr(x)^C)
+    h_avg_f(qlpm,x) = (Nu_f(qlpm, x) * kf_f(x)) / Lc
+
+    h_avg_f_q(qlpm) = A * Re_f(qlpm)^B
+    h_avg_f_T(x) = (((cpf_f(x) * mu) / kf_f(x))^(9.0)) * kf_f(x) / Lc #9. instead of C because library error
+    @register_symbolic h_avg_f_T(x) 
 
     # MOL Discretization parameters for system 1
     x_max1 = L
@@ -166,7 +168,8 @@ begin
     ## SETUP Parameters
 
     #p_opt = [A => 2., B => 0.5, n=> 0.5, C=> 20.]
-    p_opt = [A => 1000.0, B => 0.6, C => 7.0, aloss => 1.0]
+    #p_opt = [A => 1000.0, B => 0.6, C => 7.0, aloss => 1.0]
+    p_opt = [A => 1000.0, B => 0.6, aloss => 1.0] 
     p_cond = [Io => 456000.0, qlpm => 15.27]
     p_math = Dict(vcat(p_opt, p_cond))
     #extract the parameters names from p_math
@@ -179,14 +182,14 @@ begin
     #     Vf * ρf * Cpf * Dt(Tf(t, x)) ~ Vf * kf * Dxx(Tf(t, x)) - Vf * ρf * Cpf * V * Dx(Tf(t, x)) + (h_average) * Av * Vi * ((Ts(t, x) - Tf(t, x)))
     # ]
     eq1 = [
-        Vs * Dt(Ts(t, x)) ~ (A_frt * ks_f(Ts(t,x)) * Dxx(Ts(t, x)) - (h_avg_f(qlpm) * A_exchange * ((Ts(t, x)) - Tf(t, x))) .- (kins * (r_ins / r0) .* (Ts(t, x) .- Tins_f(t)) * A_s_p / (r_ins - r0)))/(aloss * ρs * Cps(Ts(t,x))),
-        Vf * Dt(Tf(t, x)) ~ (A_chnl_frt_all * e * kf_f(Tf(t,x)) * Dxx(Tf(t, x)) - m(qlpm) * cpf_f(Tf(t,x)) * Dx(Tf(t, x)) + (h_avg_f(qlpm) * A_exchange * ((Ts(t, x)) - Tf(t, x))))/(ρf_f(Tf(t,x)) * cpf_f(Tf(t,x)))
+        Vs * Dt(Ts(t, x)) ~ (A_frt_solid * ks_f(Ts(t,x)) * Dxx(Ts(t, x)) - (h_avg_f_q(qlpm) * h_avg_f_T(Tf(t, x)) * A_exchange * ((Ts(t, x)) - Tf(t, x))) .- (kins * (r_ins / r0) .* (Ts(t, x) .- Tins_f(t)) * A_s_p / (r_ins - r0)))/(aloss * ρs * Cps(Ts(t,x))),
+        Vf * Dt(Tf(t, x)) ~ (A_chnl_frt_all * e * kf_f(Tf(t,x)) * Dxx(Tf(t, x)) - m(qlpm) * cpf_f(Tf(t,x)) * Dx(Tf(t, x)) + (h_avg_f_q(qlpm) * h_avg_f_T(Tf(t, x)) * A_exchange * ((Ts(t, x)) - Tf(t, x))))/(ρf_f(Tf(t,x)) * cpf_f(Tf(t,x)))
     ]
     bcs1 = [
         Ts(0.0, x) ~ Tamb, # initial
         Tf(0.0, x) ~ Tamb, # initial
         -A_frt_solid * ks_f(Ts(t,x)) * Dx(Ts(t, x_max1)) ~ 0.0, # far right
-        -A_frt_solid * ks_f(Ts(t,x)) * Dx(Ts(t, x_min1)) ~ ϵ * Io * A_frt - ϵ * σ * A_chnl_frt_all * (Ts(t, x_min1)^4 - Tamb^4) - hext * A_chnl_frt_all * (Ts(t, x_min1) - Tamb),  # far left
+        -A_frt_solid * ks_f(Ts(t,x)) * Dx(Ts(t, x_min1)) ~ ϵ * Io * A_frt_solid - ϵ * σ * A_chnl_frt_all * (Ts(t, x_min1)^4 - Tamb^4) - hext * A_chnl_frt_all * (Ts(t, x_min1) - Tamb),  # far left
         -A_chnl_frt_all * kf_f(Tf(t,x)) * Dx(Tf(t, x_max1)) ~ 0.0, #-ρf * Cpf * V * A_ft * (Tf(t, x_max1) - Tamb), # exiting fluid
         -A_chnl_frt_all * kf_f(Tf(t,x)) * Dx(Tf(t, x_min1)) ~ m(qlpm) * cpf_f(Tf(t,x)) * (Tf(t, x_min1) - Tamb) # entering fluid (upstream temperature)
     ]
@@ -208,6 +211,7 @@ begin
 end
 
 sol1 = solve(prob, FBDF(), saveat=2, reltol = 1e-7)
+
 begin
     Ts_front_t = sol1.u[(Ts(t, x))][:, 1]
     Tf_front_t = sol1.u[(Tf(t, x))][:, 2]
@@ -247,10 +251,9 @@ begin
 end
 
 #### SETUP OPTIMIZATION ####
-include("import_exp.jl") #import the experimental data
 
 #Optimization using NLOpt
-rmp = ModelingToolkit.varmap_to_vars([Io => 442320.0, A => 700.0, B => 0.4, C => 30.0, aloss => 1.0, qlpm => 7.12], parameters(pdesys))
+#rmp = ModelingToolkit.varmap_to_vars([Io => 442320.0, A => 700.0, B => 0.4, C => 30.0, aloss => 1.0, qlpm => 7.12], parameters(pdesys))
 function NLmodeloptim(tvalues, rmp, tolr)
 
     #p = [hlocal => p_vary[1]]
@@ -324,12 +327,16 @@ function lossAll(pguess_l, _)
     return sum(lossr) #MSE
 end
 
-p_opt = [A => 636.0, B => 0.44, C => 8.488, aloss => 10.]  
+include("import_exp.jl") #import the experimental data
+
+#p_opt = [A => 636.0, B => 0.44, C => 8.488, aloss => 10.]
+p_opt = [A => 1395.0, B => 0.11, aloss => 4.4]  
+
 p0 = [x[2] for x in p_opt]
 optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
 #p_opt = [aCp => 1., hfa => 8., hfn =>0.66, aIo => 1.] 
-lb = [200.0, 0.1, 3.0, 1.]
-ub = [1700.0, 0.9, 12.0, 10.5]
+lb = [200.0, 0.1, 1.]
+ub = [1700.0, 0.9, 10.5]
 
 #pguess_opt = ModelingToolkit.varmap_to_vars([Io => 456000, h_average => 14., qlpm => 7.12], parameters(pdesys))
 initialerror = (lossAll(p0, []))
@@ -390,14 +397,14 @@ begin #TI-8
         bar_position=:dodge, color=[color_model color_exp], ylimit=(0, 1250))
 
     plot1 = qqplot(T_mod_values, T_exp_values, label="",
-        xlabel="T_mod", ylabel="T_exp",ylims=(500, 800),xlims=(500, 800), aspect_ratio = :equal)
+        xlabel="T_mod", ylabel="T_exp",ylims=(300, 1000),xlims=(300, 1000), aspect_ratio = :equal)
 end
 
 
 #Plotting the temperature profiles for the gas domanin and a few solid domain profiles across all experimental conditions
 
 begin
-    it = 11:15
+    it = 1:5
     plot2 = plot(
         T_steady[it, :time],
         T_steady[it, :T_mod], 

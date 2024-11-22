@@ -527,13 +527,13 @@ end
 #Defining simulation conditions
 begin
 
-    # IoA = 456000.0
-    # IoB = 304000.0
-    # IoC = 256000.0
+    IoA = 456000.0 * 1.3
+    IoB = 304000.0 * 0.8
+    IoC = 256000.0 * 0.5
 
-    IoA = 530000.0
-    IoB = 388000.0
-    IoC = 230000.0
+    # IoA = 530000.0
+    # IoB = 388000.0
+    # IoC = 230000.0
 
     # condition_E67 = Dict(Io => 442320.0, qlpm => 15.27) #1
     # condition_E68 = Dict(Io => 442320.0, qlpm => 12.50) #2
