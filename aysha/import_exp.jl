@@ -1,112 +1,66 @@
 using Plots, XLSX, DataFrames, CSV, Statistics, Dates, LinearAlgebra, DelimitedFiles
 
-dec = 100
+dec = 50
 function decimate!(x, step)
     x = [x[i] for i in 1:step:length(x)]
 end
+function getT(df, col, dec)
+    temp = df[:, col]
+    temp = decimate!(temp, dec)
+    return temp
+end
+path = "./SolarSimulator/RAW/"
 begin
     #Exp. data to extract temp.
     begin
         #Exp 67 - T3, T8
-        Z = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0067_231125_161757.xlsx")["Sheet 1 - Data_FPT0067_231125_1"]["A3:C3932"]
-        E67t = float.(Z[:, 1]) #xz_data
-        E67Tf = Z[:, 2] .+ 273.15 #y1z_data
-        E67T8 = Z[:, 3] .+ 273.15
-        #decimate experimental data E67 for T3
-        E67t = decimate!(E67t, dec)
-        E67Tf = decimate!(E67Tf, dec)
+        #Z = XLSX.readxlsx("./SolarSimulator/RAW/Data_FPT0067_231125_161757.xlsx")["Sheet 1 - Data_FPT0067_231125_1"]["A3:C3932"]
+        Z = CSV.File(path * "Data_FPT0067_231125_161757.csv"; skipto=2, delim=",", header=false) |> DataFrame
+        E67t = getT(Z, 2, dec) #float.(Z[:, 2]) #xz_data
+        E67Tf = getT(Z, 37, dec) .+ 273.15 #y1z_data
+        E67T8 = getT(Z, 42, dec) .+ 273.15
+        E67T9 = getT(Z, 43, dec) .+ 273.15
+        E67T10 = getT(Z, 44, dec) .+ 273.15
+        E67T11 = getT(Z, 45, dec) .+ 273.15
+        E67T12 = getT(Z, 46, dec) .+ 273.15
+  
         scatter(E67t, E67Tf)
 
-        #Exp 67 - T9, T10, T11, T12
-        Z1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0067_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0067_T9"]["A3:E3932"]
-        E67T9 = Z1[:, 2] .+ 273.15
-        E67T10 = Z1[:, 3] .+ 273.15
-        E67T11 = Z1[:, 4] .+ 273.15
-        E67T12 = Z1[:, 5] .+ 273.15
-        #decimate experimental data E67 for T8
-        E67T8 = decimate!(E67T8, dec)
-        scatter(E67t, E67T8)
-        #decimate experimental data E67 for T9
-        E67T9 = decimate!(E67T9, dec)
-        scatter(E67t, E67T9)
-        #decimate experimental data E67 for T10
-        E67T10 = decimate!(E67T10, dec)
-        scatter(E67t, E67T10)
-        #decimate experimental data E67 for T11
-        E67T11 = decimate!(E67T11, dec)
-        scatter(E67t, E67T11)
-        #decimate experimental data E67 for T12
-        E67T12 = decimate!(E67T12, dec)
-        scatter(E67t, E67T12)
     end
 
     begin
         #Exp 68 - T3, T8
-        A1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0068_231126_115725.xlsx")["Sheet 1 - Data_FPT0068_231126_1"]["A3:C5365"]
-        E68t = float.(A1[:, 1]) #xa1_data
-        E68Tf = A1[:, 2] .+ 273.15 #y1a1_data
-        E68T8 = A1[:, 3] .+ 273.15
-        #decimate experimental data E68 for T3
-        E68t = decimate!(E68t, dec)
-        E68Tf = decimate!(E68Tf, dec)
+        #A1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0068_231126_115725.xlsx")["Sheet 1 - Data_FPT0068_231126_1"]["A3:C5365"]
+        Z = CSV.File(path * "Data_FPT0068_231126_115725.csv"; skipto=2, delim=",", header=false) |> DataFrame
+        E68t = getT(Z, 2, dec) #float.(Z[:, 2]) #xz_data
+        E68Tf = getT(Z, 37, dec) .+ 273.15 #y1z_data
+        E68T5 = getT(Z, 39, dec) .+ 273.15 #y1z_data
+        E68T8 = getT(Z, 42, dec) .+ 273.15
+        E68T9 = getT(Z, 43, dec) .+ 273.15
+        E68T10 = getT(Z, 44, dec) .+ 273.15
+        E68T11 = getT(Z, 45, dec) .+ 273.15
+        E68T12 = getT(Z, 46, dec) .+ 273.15
+        
         scatter(E68t, E68Tf)
-        #decimate experimental data E68 for T8
-        E68T8 = decimate!(E68T8, dec)
-        scatter(E68t, E68T8)
+        scatter(E68t, E68T5)
 
-
-        #Exp 68 - T9, T10, T11, T12
-        A11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0068_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0068_231126_1"]["A3:E5365"]
-        E68T9 = A11[:, 2] .+ 273.15
-        E68T10 = A11[:, 3] .+ 273.15
-        E68T11 = A11[:, 4] .+ 273.15
-        E68T12 = A11[:, 5] .+ 273.15
-        #decimate experimental data E68 for T9
-        E68T9 = decimate!(E68T9, dec)
-        scatter(E68t, E68T9)
-        #decimate experimental data E68 for T10
-        E68T10 = decimate!(E68T10, dec)
-        scatter(E68t, E68T10)
-        #decimate experimental data E68 for T11
-        E68T11 = decimate!(E68T11, dec)
-        scatter(E68t, E68T11)
-        #decimate experimental data E68 for T12
-        E68T12 = decimate!(E68T12, dec)
-        scatter(E68t, E68T12)
     end
 
     begin
         #Exp 69 - T3, T8
-        B1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0069_231126_140153.xlsx")["Sheet 1 - Data_FPT0069_231126_1"]["A3:C5366"]
-        E69t = float.(B1[:, 1])
-        E69Tf = B1[:, 2] .+ 273.15
-        E69T8 = B1[:, 3] .+ 273.15
-        #decimate experimental data E69 for T3
-        E69t = decimate!(E69t, dec)
-        E69Tf = decimate!(E69Tf, dec)
+        #B1 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0069_231126_140153.xlsx")["Sheet 1 - Data_FPT0069_231126_1"]["A3:C5366"]
+        Z = CSV.File(path * "Data_FPT0069_231126_140153.csv"; skipto=2, delim=",", header=false) |> DataFrame
+        E69t = getT(Z, 2, dec) #float.(Z[:, 2]) #xz_data
+        E69Tf = getT(Z, 37, dec) .+ 273.15 #y1z_data
+        E69T5 = getT(Z, 39, dec) .+ 273.15 #y1z_data
+        E69T8 = getT(Z, 42, dec) .+ 273.15
+        E69T9 = getT(Z, 43, dec) .+ 273.15
+        E69T10 = getT(Z, 44, dec) .+ 273.15
+        E69T11 = getT(Z, 45, dec) .+ 273.15
+        E69T12 = getT(Z, 46, dec) .+ 273.15
+  
         scatter(E69t, E69Tf)
-        #decimate experimental data E69 for T8
-        E69T8 = decimate!(E69T8, dec)
-        scatter(E69t, E69T8)
-
-        #Exp 69 - T9, T10, T11, T12
-        B11 = XLSX.readxlsx("./SolarSimulator/EXCEL/Data_FPT0069_T9,10,11,12.xlsx")["Sheet 1 - Data_FPT0069_231126_1"]["A3:E5366"]
-        E69T9 = B11[:, 2] .+ 273.15
-        E69T10 = B11[:, 3] .+ 273.15
-        E69T11 = B11[:, 4] .+ 273.15
-        E69T12 = B11[:, 5] .+ 273.15
-        #decimate experimental data E69 for T9
-        E69T9 = decimate!(E69T9, dec)
-        scatter(E69t, E69T9)
-        #decimate experimental data E69 for T10
-        E69T10 = decimate!(E69T10, dec)
-        scatter(E69t, E69T10)
-        #decimate experimental data E69 for T11
-        E69T11 = decimate!(E69T11, dec)
-        scatter(E69t, E69T11)
-        #decimate experimental data E69 for T12
-        E69T12 = decimate!(E69T12, dec)
-        scatter(E69t, E69T12)
+        scatter!(E69t, E69T5)
     end
 
 
@@ -527,9 +481,9 @@ end
 #Defining simulation conditions
 begin
 
-    IoA = 456000.0 * 1.3
-    IoB = 304000.0 * 0.8
-    IoC = 256000.0 * 0.5
+    IoA = 456000.0 * 1.
+    IoB = 304000.0 * 1.
+    IoC = 256000.0 * 1.
 
     # IoA = 530000.0
     # IoB = 388000.0
@@ -567,21 +521,21 @@ begin
     # condition_E80 = Dict(Io => 313088.0, qlpm => 6.62)
     # condition_E81 = Dict(Io => 313088.0, qlpm => 4.53)
 
-    condition_E67 = Dict(Io => IoA, qlpm => 15.27)
-    condition_E68 = Dict(Io => IoA, qlpm => 12.50)
-    condition_E69 = Dict(Io => IoA, qlpm => 10.50)
-    condition_E70 = Dict(Io => IoA, qlpm => 9.10)
-    condition_E71 = Dict(Io => IoA, qlpm => 7.12)
-    condition_E72 = Dict(Io => IoB, qlpm => 18.34)
-    condition_E73 = Dict(Io => IoB, qlpm => 13.16)
-    condition_E74 = Dict(Io => IoB, qlpm => 9.03)
-    condition_E75 = Dict(Io => IoB, qlpm => 6.95)
-    condition_E76 = Dict(Io => IoB, qlpm => 4.53)
-    condition_E77 = Dict(Io => IoC, qlpm => 13.85)
-    condition_E78 = Dict(Io => IoC, qlpm => 10.02)
-    condition_E79 = Dict(Io => IoC, qlpm => 8.04)
-    condition_E80 = Dict(Io => IoC, qlpm => 6.62)
-    condition_E81 = Dict(Io => IoC, qlpm => 4.53)
+    condition_E67 = Dict(Io => IoA, qlpm => 15.27, Tinit => E67Tf[1])
+    condition_E68 = Dict(Io => IoA, qlpm => 12.50, Tinit => E68Tf[1])
+    condition_E69 = Dict(Io => IoA, qlpm => 10.50, Tinit => E69Tf[1])
+    condition_E70 = Dict(Io => IoA, qlpm => 9.10, Tinit => E70Tf[1])
+    condition_E71 = Dict(Io => IoA, qlpm => 7.12, Tinit => E71Tf[1])
+    condition_E72 = Dict(Io => IoB, qlpm => 18.34, Tinit => E72Tf[1])
+    condition_E73 = Dict(Io => IoB, qlpm => 13.16, Tinit => E73Tf[1])
+    condition_E74 = Dict(Io => IoB, qlpm => 9.03, Tinit => E74Tf[1])
+    condition_E75 = Dict(Io => IoB, qlpm => 6.95, Tinit => E75Tf[1])
+    condition_E76 = Dict(Io => IoB, qlpm => 4.53, Tinit => E76Tf[1])
+    condition_E77 = Dict(Io => IoC, qlpm => 13.85, Tinit => E77Tf[1])
+    condition_E78 = Dict(Io => IoC, qlpm => 10.02, Tinit => E78Tf[1])
+    condition_E79 = Dict(Io => IoC, qlpm => 8.04, Tinit => E79Tf[1])
+    condition_E80 = Dict(Io => IoC, qlpm => 6.62, Tinit => E80Tf[1])
+    condition_E81 = Dict(Io => IoC, qlpm => 4.53, Tinit => E81Tf[1])
 
 
     simulation_conditions = Dict("E67" => condition_E67, "E68" => condition_E68,
