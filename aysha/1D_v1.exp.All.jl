@@ -323,7 +323,7 @@ function lossAll(pguess_l, sim_key)
         #sm = sim_key[it]
         #println(sm)
         local cond_k = simulation_conditions[sm]
-        local expdata = reduce(vcat, measurements[measurements.simulation_id.==sm, :temperatures])
+        local expdata = reduce(vcat, measurements[(measurements.simulation_id.==sm) .& (measurements.obs_id.=="_Tf"), :temperatures])
         local time_opt = measurements[measurements.simulation_id.==sm, :time][1]
 
         # Ensure time_opt are vectors of floats
@@ -338,7 +338,7 @@ function lossAll(pguess_l, sim_key)
     return lossr/length(sim_key) #MSE
 end
 
-include("import_exp.jl") #import the experimental data
+include("import_exp2.jl") #import the experimental data
 
 begin
     #p_opt = [A => 636.0, B => 0.44, C => 8.488, aloss => 10.]
@@ -374,8 +374,9 @@ begin #ONLY T3 gas temperature (as in the measurements dataframe)
         # Retrieve from measurements the experimental data for the current simulation condition
         #println(sm)
         cond_k = simulation_conditions[sm]
-        expdata = measurements[measurements.simulation_id.==sm, :temperatures]
-        time_opt = measurements[measurements.simulation_id.==sm, :time][1]
+        sel_meas = measurements[(measurements.simulation_id.==sm) .& (measurements.obs_id.=="_Tf"), :]
+        expdata = sel_meas[:, :temperatures]
+        time_opt =sel_meas[:, :time][1]
 
         #run selected simulation and get the steady temperature values
         temp_T = remakeAysha(pnew, cond_k, time_opt; tolr = 1e-7)

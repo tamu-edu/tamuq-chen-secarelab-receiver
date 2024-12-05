@@ -74,6 +74,6 @@ path = "./SolarSimulator/RAW/"
     
 #Defining simulation conditions
     simulation_conditions = Dict(
-        IDs[i] => Dict(Io => ArIo[i], qlpm => Arqplm[i]) 
+        IDs[i] => Dict(Io => ArIo[i], qlpm => Arqplm[i], Tinit => measurements[(measurements.simulation_id .== IDs[i]) .& (measurements.obs_id .== "_Tf"), :temperatures][1][1]) 
         for i=1:length(IDs)
     )
