@@ -174,8 +174,8 @@ begin
 
     #p_opt = [A => 2., B => 0.5, n=> 0.5, C=> 20.]
     #p_opt = [A => 1000.0, B => 0.6, C => 7.0, aloss => 1.0]
-    p_opt = [A => 1000.0, B => 0.6, C => 10.0, aloss => 1.0] 
-    p_cond = [Io => 456000.0, qlpm => 15.27, Tinit => Tamb]
+    p_opt = [A => 1263.0, B => 0.03, C => 8.2, aloss => 14.0] 
+    p_cond = [Io => 456000.0, qlpm => 12.5, Tinit => 380.]
     p_math = Dict(vcat(p_opt, p_cond))
     #extract the parameters names from p_math
     p_names = [i for i in keys(p_math)]
@@ -322,9 +322,9 @@ function lossAll(pguess_l, sim_key)
         # Retrieve from measurements the experimental data for the current simulation condition
         #sm = sim_key[it]
         #println(sm)
-        cond_k = simulation_conditions[sm]
-        expdata = reduce(vcat, measurements[measurements.simulation_id.==sm, :temperatures])
-        time_opt = measurements[measurements.simulation_id.==sm, :time][1]
+        local cond_k = simulation_conditions[sm]
+        local expdata = reduce(vcat, measurements[measurements.simulation_id.==sm, :temperatures])
+        local time_opt = measurements[measurements.simulation_id.==sm, :time][1]
 
         # Ensure time_opt are vectors of floats
 
@@ -370,9 +370,8 @@ begin #ONLY T3 gas temperature (as in the measurements dataframe)
     T_steady = DataFrame(sim_id=[], time=[], T_mod=[], T_exp=[])
     sim_key = collect(keys(simulation_conditions))
     #Threads.@threads 
-    for it in 1:length(sim_key)
+    for sm in sim_key
         # Retrieve from measurements the experimental data for the current simulation condition
-        sm = sim_key[it]
         #println(sm)
         cond_k = simulation_conditions[sm]
         expdata = measurements[measurements.simulation_id.==sm, :temperatures]
