@@ -60,15 +60,15 @@ path = "./SolarSimulator/RAW/"
         T12 = getT(f, 46, dec) .+ 273.15 #58mm (in)
   
         Tf = T3
-        Ts2 = T9#(T9 .+ T11) ./ 2
-        Ts3 = T10#(T12 .+ T10) ./ 2
+        T2 = (T9 .+ T11) ./ 2
+        T3 = (T12 .+ T10) ./ 2
         scatter(t, Tf, ylim=(200, 1200))
         plot!(t, T8)
-        plot!(t, Ts2)
-        plot!(t, Ts3)
+        plot!(t, T2)
+        plot!(t, T3)
         push!(df, (IDs[iID], "_T8", t, T8))
-        push!(df, (IDs[iID], "_Ts2", t, Ts2))
-        push!(df, (IDs[iID], "_Ts3", t, Ts3))
+        push!(df, (IDs[iID], "_T2", t, T2))
+        push!(df, (IDs[iID], "_T3", t, T3))
         push!(df, (IDs[iID], "_Tf", t, Tf))
 
     end

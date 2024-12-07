@@ -6,7 +6,7 @@ begin #libraries
     using XLSX, Statistics, Symbolics, Interpolations
     using StatsPlots, ColorSchemes #, Plots
     using LsqFit, LossFunctions
-    using Optimization, OptimizationNLopt, Symbolics, ForwardDiff
+    using Optimization, OptimizationNLopt, Symbolics, ForwardDiff, OptimizationMetaheuristics
     using SciMLStructures: replace!, Tunable
     using SymbolicIndexingInterface: parameter_values, state_values
     using Latexify
@@ -41,7 +41,7 @@ begin #FIXED Parameters
     A_s_p = w_t * L * 4 #total area solid periphery m2
 
     # Channel dimensions
-    w_chnl = 1.5e-3  # Width of a single channel (m)
+    w_chnl = 1.3e-3  # Width of a single channel (m)
     A_chnl_frt = w_chnl * w_chnl  # Frontal area of a single channel (m^2)
     A_chnl_p = w_chnl * L * 4  # Periphery area of a single channel (m^2)
 
@@ -70,20 +70,21 @@ begin #FIXED Parameters
     # w = 1.5e-3 #width of channel (m)
     # Vi = w * w * n_chnl * L #m3
     # Av = 4 * (w * L) / (w^2 * L) #specific area (m-1)
-    
+
     #Constants
     σ = 5.17e-8 #W/m2.K^4 Stefan-Boltzmann constant
-    hext = 0. #W/m2.K convective heat transfer coefficient for the front 
-    
+    hext = 1.0 #W/m2.K convective heat transfer coefficient for the front 
+
     #SiC Properties
-    ϵ = 0.825 #absroptivity/emissivity
+    ϵ = 0.75 #emissivity
+    α = 0.825 #absroptivity
     #e = 0.425 #porosity
-    
+
     #parameters for the insulation
     r0 = 23 / 1000 #m
     r_ins = 42 / 1000 #m
-    kins = 1*0.078 #W/m*K -->assume very few losses through the insulation
-end; 
+    kins = 1. * 0.078 #W/m*K -->assume very few losses through the insulation
+end;
 # #for interpolations 
 # #1. extract T2 data
 
@@ -111,30 +112,31 @@ end
 begin
     # Parameters, variables, and derivatives for system 1
     @independent_variables t x
-    @parameters havg cps_c kfs_c A B C n #ks h_average A n
+    @parameters havg cps_c kfs_c hext_c A B C n #ks h_average A n
     @parameters Io qlpm Tinith
     @variables Ts(..) Tf(..)
     Dt = Differential(t)
     Dx = Differential(x)
     Dxx = Differential(x)^2
-   
+
     ### Fluid Properties
-    ρf_f(T) = 352.716 * T^-1 #COMSOL
+    RH = 0.4 #relative humidity
+
+    ρf_f(T) = 352.716 * T^-1 #* (1+RH) /(1+ 1.609 * RH) #COMSOL + https://www.engineeringtoolbox.com/density-air-d_680.html with some error for w vs RH
     @register_symbolic ρf_f(x)
-    ρf = ρf_f(1000.) #kg/m3
-    m(qlpm) = ρf * (qlpm / 60. / 1000.) #mass at the flowmeter conditions kg/s
+    ρf = ρf_f(1000.0) #kg/m3
+    m(qlpm) = ρf * (qlpm / 60.0 / 1000.0) #mass at the flowmeter conditions kg/s
 
     mu = 2.0921e-5 #Pa.s
     kf = 0.056 #W/m.K
     kf_f(T) = -0.00227583562 + 1.15480022e-4 * T^1 - 7.90252856e-8 * T^2 + 4.11702505e-11 * T^3 - 7.43864331e-15 * T^4 #COMSOL
-    @register_symbolic kf_f(x)  
+    @register_symbolic kf_f(x)
     Cpf = 1090 #J/kg.K
     Cpw_f(T) = 1745.96354 + 0.185114553 * T^1 + 6.19448731e-4 * T^2 - 3.0267851e-7 * T^3 + 4.19053122e-11 * T^4 #COMSOL
-    RH = 0.4 #relative humidity
     cpf_f(T) = (1.93e-10 * T^4 - 8.0e-7 * T^3 + 1.14e-3 * T^2 - 4.49e-1 * T + 1.06e3) + RH * Cpw_f(T)
-    μf_f(T) = -8.38278E-7+8.35717342e-8 * T^1 - 7.69429583e-11 * T^2 + 4.6437266e-14 * T^3 - 1.06585607e-17 * T^4
+    μf_f(T) = -8.38278E-7 + 8.35717342e-8 * T^1 - 7.69429583e-11 * T^2 + 4.6437266e-14 * T^3 - 1.06585607e-17 * T^4
     @register_symbolic cpf_f(x)
-      
+
     #Solid Properties
     #ks = (500.0) * 1.97 * ((1 - e)^1.5)/10. #W/m.K
     ρs = 3200  #kg/m3
@@ -143,7 +145,7 @@ begin
     #Cps = 1290  #J/kg*K
     Cps(T) = (8.5e-5 * T^2 + 5.63e-2 * T - 4.05e7 * T^-2 + 1125.8) #J/kg*K
     @register_symbolic Cps(x)
-    aCp = 1. #correction factor
+    aCp = 1.0 #correction factor
 
     #Nu = A*(1+(B*((Gz_f(x))^n)*exp(-C/Gz_f(x))))
     #Nu = A*(Re^B)*(Pr^C)
@@ -154,7 +156,7 @@ begin
     Nu_f6(qlpm, T) = A * (Re_f(qlpm, T)^B) * (Pr(T)^C)
 
     Gz(qlpm, x, T) = (1 / x) * Re_f(qlpm, T) * Pr(T) * Lc
-    Nu_f5(qlpm, x, T) = A * (1 - B * Gz(qlpm, x, T)^n) * exp(- C / Gz(qlpm, x, T))
+    Nu_f5(qlpm, x, T) = A * (1 - B * Gz(qlpm, x, T)^n) * exp(-C / Gz(qlpm, x, T))
 
     #Gz_f(qlpm, x, T) = (1/x) * Re_f(qlpm) * Pr(T) * Lc
     #Nu_f5(qlpm, T) = A * [1 - B*Gz_f(qlpm, x, T)^Re_f(qlpm)^B) * (Pr(T)^C)
@@ -180,8 +182,8 @@ begin
 
     #p_opt = [A => 2., B => 0.5, n=> 0.5, C=> 20.]
     #p_opt = [A => 1000.0, B => 0.6, C => 7.0, aloss => 1.0]
-    p_opt = [havg =>8.6 , kfs_c => 1., cps_c => 2.] #[A => 4., B => 0.06, C => 51., n => 0.5] 
-    p_cond = [Io => 456000.0, qlpm => 9.1, Tinit => 300.]
+    p_opt = [havg => 8.99, cps_c => 8.68, hext_c => 11.4] #[A => 4., B => 0.06, C => 51., n => 0.5] 
+    p_cond = [Io => 456000.0, qlpm => 9.1, Tinit => 293.0]
     p_math = Dict(vcat(p_opt, p_cond))
     #extract the parameters names from p_math
     p_names = [i for i in keys(p_math)]
@@ -194,25 +196,27 @@ begin
     # ]
     eq1 = [
         Vs * Dt(Ts(t, x)) ~ (
-            A_frt_solid * kfs_c * ks_f(Ts(t,x)) * Dxx(Ts(t, x)) 
+            A_frt_solid * ks_f(Ts(t, x)) * Dxx(Ts(t, x))
             - (havg * A_exchange * ((Ts(t, x)) - Tf(t, x))) #h_avg_f(qlpm, x, Tf(t, x)) 
             - (kins * (r_ins / r0) * (Ts(t, x) - Tins_f(t)) * A_s_p / (r_ins - r0))
-            )/( ρs * cps_c* Cps(Ts(t,x))),
+        ) / (ρs * cps_c * Cps(Ts(t, x))),
         Vf * Dt(Tf(t, x)) ~ (
-            A_chnl_frt_all * kf_f(Tf(t,x)) * Dxx(Tf(t, x)) 
-            - m(qlpm) * cpf_f(Tf(t,x)) * Dx(Tf(t, x)) 
-            + (havg  * A_exchange * ((Ts(t, x)) - Tf(t, x))) # h_avg_f(qlpm, x, Tf(t, x))
-            )/(ρf_f(Tf(t,x)) * cpf_f(Tf(t,x)))
+            A_chnl_frt_all * kf_f(Tf(t, x)) * Dxx(Tf(t, x))
+            -
+            m(qlpm) * cpf_f(Tf(t, x)) * Dx(Tf(t, x))
+            +
+            (havg * A_exchange * ((Ts(t, x)) - Tf(t, x))) # h_avg_f(qlpm, x, Tf(t, x))
+        ) / (ρf_f(Tf(t, x)) * cpf_f(Tf(t, x)))
     ]
     bcs1 = [
         Ts(0.0, x) ~ Tinit, # initial
         Tf(0.0, x) ~ Tinit, # initial
-        -A_frt_solid * kfs_c* ks_f(Ts(t,x)) * Dx(Ts(t, x_max1)) ~ 0.0, # far right
-        -A_frt_solid * kfs_c * ks_f(Ts(t,x)) * Dx(Ts(t, x_min1)) ~ ϵ * Io * A_frt_solid 
-                                                            - ϵ * σ * A_chnl_frt_all * (Ts(t, x_min1)^4 - Tamb^4) 
-                                                            - hext * A_chnl_frt_all * (Ts(t, x_min1) - Tamb),  # far left
-        -A_chnl_frt_all * kf_f(Tf(t,x)) * Dx(Tf(t, x_max1)) ~ 0.0, #-ρf * Cpf * V * A_ft * (Tf(t, x_max1) - Tamb), # exiting fluid
-        -A_chnl_frt_all * kf_f(Tf(t,x)) * Dx(Tf(t, x_min1)) ~ m(qlpm) * cpf_f(Tf(t,x)) * (Tf(t, x_min1) - Tamb) # entering fluid (upstream temperature)
+        -A_frt_solid *  ks_f(Ts(t, x)) * Dx(Ts(t, x_max1)) ~ 0.0, # far right
+        -A_frt_solid *  ks_f(Ts(t, x)) * Dx(Ts(t, x_min1)) ~ α * Io * A_frt
+                                                                    - ϵ * σ * A_frt * (Ts(t, x_min1)^4 - Tamb^4)
+                                                                    - hext * A_frt * (Ts(t, x_min1) - Tamb),  # far left
+        -A_chnl_frt_all * kf_f(Tf(t, x)) * Dx(Tf(t, x_max1)) ~ 0.0, #-ρf * Cpf * V * A_ft * (Tf(t, x_max1) - Tamb), # exiting fluid
+        -A_chnl_frt_all * kf_f(Tf(t, x)) * Dx(Tf(t, x_min1)) ~ m(qlpm) * cpf_f(Tf(t, x)) * (Tf(t, x_min1) - Tamb) # entering fluid (upstream temperature)
     ]
     # Space and time domain for system 1
     domains1 = [t ∈ Interval(t_min, t_max),
@@ -232,7 +236,7 @@ begin
 end
 
 begin
-    sol1 = solve(prob, FBDF(), saveat=2, reltol = 1e-7)
+    sol1 = solve(prob, FBDF(), saveat=2, reltol=1e-7)
 
 
     # Ts_front_t = sol1.u[(Ts(t, x))][:, 1]
@@ -248,26 +252,28 @@ begin
     # display(plot0)
     x__domain = collect(sol1.ivdomain[2])
     colors = ColorSchemes.tab10[1:4]
-    temp_id="E70"
+    temp_id = "E70"
     sel_meas = measurements[(measurements.simulation_id.==temp_id), :]
 
-    scatter(sel_meas[:, :time], sel_meas[:, :temperatures], label=permutedims(sel_meas.obs_id), 
+    scatter(sel_meas[:, :time], sel_meas[:, :temperatures], label=permutedims(sel_meas.obs_id),
         color_palette=colors)
+    T2 = (sol1.u[Ts(t, x)][:, 43] .+ sol1.u[Tf(t, x)][:, 43]) ./2
+    T3 = (sol1.u[Ts(t, x)][:, 78] .+ sol1.u[Tf(t, x)][:, 78]) ./2
 
-    plot!(title="Temperature Profiles $temp_id", xlabel="Time (s)", ylabel="Temperature (K)", ylim=(300, 1300), 
+    plot!(title="Temperature Profiles $temp_id", xlabel="Time (s)", ylabel="Temperature (K)", ylim=(300, 1300),
         legend=:outerright, color_palette=colors)
     plot0 = plot!(sol1.t,
         sol1.u[Ts(t, x)][:, 4], # around 5 mm in T8
         label="Ts T8", lw=3)
     plot!(sol1.t,
-        sol1.u[Ts(t, x)][:, 43], # T9
-        label="Ts T9", lw=3)
+        T2, # T9+T10
+        label="T2", lw=3)
     # plot!(sol1.t,
     #     sol1.u[Tf(t, x)][:, 40], # T11
     #     label="Tf T11")
     plot!(sol1.t,
-        sol1.u[Ts(t, x)][:, 78], # T10
-        label="Ts T10", lw=3)
+        T3, # T11+T12
+        label="T3", lw=3)
     # plot!(sol1.t,
     #     sol1.u[Tf(t, x)][:, 77], # T12
     #     label="Tf T12")
@@ -277,7 +283,7 @@ begin
     display(plot0)
 
 
-        # model results for different thermocouples  CHECK DISTANCES WITH FIGURE
+    # model results for different thermocouples  CHECK DISTANCES WITH FIGURE
     # sol1.u[Ts(t, x)][:, 40] #T9 model 58mm (external)
     # sol1.u[Ts(t, x)][:, 77] #T10 model 107mm (external)
     # sol1.u[Tf(t, x)][:, 77] #T11 model 107mm (internal-gas)
@@ -287,99 +293,88 @@ begin
 end
 
 #### SETUP OPTIMIZATION ####
+begin # define functions
+    #Optimization using NLOpt
+    #rmp = ModelingToolkit.varmap_to_vars([Io => 442320.0, A => 700.0, B => 0.4, C => 30.0, aloss => 1.0, qlpm => 7.12], parameters(pdesys))
+    function NLmodeloptim(tvalues, rmp, tolr)
+        #p = [hlocal => p_vary[1]]
+        modeloptim = remake(prob, u0=ones(length(prob.u0)) * rmp[Tinit], tspan=(0.0, tvalues[end]))
+        #equations(modeloptim.f.initialization_data.initializeprob.f.sys)
+        replace!(Tunable(), modeloptim.p, collect(values(rmp)))
+        modeloptim_sol = solve(modeloptim, FBDF(), saveat=tvalues, reltol=tolr)#, reltol=1e-12, abstol=1e-12)
+        #time = modelfit_sol.t
+        tempT8_op = float.(modeloptim_sol.u[Ts(t, x)][:, 4])
+        tempT9_op = float.(modeloptim_sol.u[Ts(t, x)][:, 43])
+        tempT10_op = float.(modeloptim_sol.u[Ts(t, x)][:, 78])
+        tempT3_op = float.(modeloptim_sol.u[Tf(t, x)][:, end-1])
+        # T12_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 20] .+ modeloptim_sol.u[Ts(t, x)][end, 20]) ./ 2
+        # T11_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 59] .+ modeloptim_sol.u[Ts(t, x)][end, 59]) ./ 2
+        tempT11_op = float.(modeloptim_sol.u[Tf(t, x)][:, 43])
+        tempT12_op = float.(modeloptim_sol.u[Tf(t, x)][:, 78])
 
-#Optimization using NLOpt
-#rmp = ModelingToolkit.varmap_to_vars([Io => 442320.0, A => 700.0, B => 0.4, C => 30.0, aloss => 1.0, qlpm => 7.12], parameters(pdesys))
-function NLmodeloptim(tvalues, rmp, tolr)
-    #p = [hlocal => p_vary[1]]
-    modeloptim = remake(prob, u0 = ones(length(prob.u0))*rmp[Tinit], tspan=(0.0, tvalues[end]))
-    #equations(modeloptim.f.initialization_data.initializeprob.f.sys)
-    replace!(Tunable(), modeloptim.p, collect(values(rmp)))
-    modeloptim_sol = solve(modeloptim, FBDF(), saveat=tvalues, reltol = tolr)#, reltol=1e-12, abstol=1e-12)
-    #time = modelfit_sol.t
-    tempT8_op = float.(modeloptim_sol.u[Ts(t, x)][:, 4])
-    tempT9_op = float.(modeloptim_sol.u[Ts(t, x)][:, 43])
-    tempT10_op = float.(modeloptim_sol.u[Ts(t, x)][:, 78])
-    tempT3_op = float.(modeloptim_sol.u[Tf(t, x)][:, end-1])
-    # T12_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 20] .+ modeloptim_sol.u[Ts(t, x)][end, 20]) ./ 2
-    # T11_modelmean = (modeloptim_sol.u[Tf(t, x)][end, 59] .+ modeloptim_sol.u[Ts(t, x)][end, 59]) ./ 2
-    tempT11_op = float.(modeloptim_sol.u[Ts(t, x)][:, 78])
-    tempT12_op = float.(modeloptim_sol.u[Ts(t, x)][:, 43])
-    #return append!(tempT8_op, tempT9_op, tempT10_op, tempT3_op, tempT12_op, tempT11_op)
-    return ([tempT3_op])
-end
-
-function remakeAysha(pguess_l, cond_k, time_opt; tolr=1e-7)
-    #p_math_vec = copy(cond)
-    # Initialize a new p_math vector
-    #rmp = Vector{Pair{Symbol,Float64}}(undef, length(pguess_l) + length(cond))
-    
-    #convert the pguess_l to a Dict with the keys from p_math
-    #keys_array = collect(keys(p_math))
-    #pguess_l_temp = Dict(keys_array[i] => pguess_l[i] for i in 1:length(pguess_l))
-    
-    # combine the pguess_l and cond into a single Dict
-    pguess_temp = Dict(k => pguess_l[i] for (i, (k, v)) in enumerate(p_opt))
-    rmp = Dict(pguess_temp..., cond_k...)
-
-    # # Fill the new_p_math with values from pguess_l
-    # for i in 1:length(pguess_l)
-    #     rmp[i] = Symbol(p_math.keys[i]) => pguess_l[i]
-    # end
-    # # Fill the new_p_math with values from cond
-    # for (i, (key, value)) in enumerate(cond)
-    #     rmp[length(pguess_l)+i] = Symbol(key) => value
-    # end
-    # pguess is the initial guess for the optimization
-    #println(rmp)
-    temp_T = NLmodeloptim(time_opt, rmp, tolr)
-    return temp_T
-end
-function lossAll(pguess_l, sim_key)
-
-    #to place the conditions loop
-
-    lossr = 0 #zeros(length(sim_key))
-    #Threads.@threads 
-    for sm in sim_key
-        # Retrieve from measurements the experimental data for the current simulation condition
-        #sm = sim_key[it]
-        #println(sm)
-        local cond_k = simulation_conditions[sm]
-        local expdata = reduce(vcat, measurements[(measurements.simulation_id.==sm) .& (measurements.obs_id.=="_Tf"), :temperatures])
-        local time_opt = measurements[measurements.simulation_id.==sm, :time][1]
-
-        # Ensure time_opt are vectors of floats
-
-        #run selected simulation and get the steady temperature values
-        #print(sm)
-        temp_T = remakeAysha(pguess_l, cond_k, time_opt)[1]
-
-        temp_error = sqrt(sum((temp_T .- expdata) .^ 2)) / length(expdata)
-        lossr += temp_error
+        T2 = (tempT9_op .+ tempT11_op) ./2
+        T3 = (tempT12_op .+ tempT10_op) ./2
+        #return append!(tempT8_op, tempT9_op, tempT10_op, tempT3_op, tempT12_op, tempT11_op)
+        return ([tempT8_op T2 T3 tempT3_op])
     end
-    return lossr/length(sim_key) #MSE
-end
 
+    function remakeAysha(pguess_l, cond_k, time_opt; tolr=1e-7)
+        # combine the pguess_l and cond into a single Dict
+        pguess_temp = Dict(k => pguess_l[i] for (i, (k, v)) in enumerate(p_opt))
+        rmp = Dict(pguess_temp..., cond_k...)
+        #display(rmp)
+        local temp_T = NLmodeloptim(time_opt, rmp, tolr)
+        return temp_T
+    end
+    function lossAll(pguess_l, sim_key)
+
+        #to place the conditions loop
+
+        lossr = 0 #zeros(length(sim_key))
+        #Threads.@threads 
+        for sm in sim_key
+            # Retrieve from measurements the experimental data for the current simulation condition
+            #sm = sim_key[it]
+            #println(sm)
+            local cond_k = simulation_conditions[sm]
+            local expdata = reduce(hcat, measurements[(measurements.simulation_id.==sm), :temperatures])[:, 2:4] #ignore T8
+            #local expdata = measurements[(measurements.simulation_id.==sm), :temperatures]
+            local time_opt = measurements[measurements.simulation_id.==sm, :time][1]
+
+            # Ensure time_opt are vectors of floats
+
+            #run selected simulation and get the steady temperature values
+            #print(sm)
+            temp_T = remakeAysha(pguess_l, cond_k, time_opt)[:, 2:4] #ignore T8
+
+            temp_error = sqrt(sum((temp_T .- expdata) .^ 2)) / length(expdata)
+            lossr += temp_error
+        end
+        return lossr / length(sim_key) #MSE
+    end
+end
 include("import_exp2.jl") #import the experimental data
 
 begin
     #p_opt = [A => 636.0, B => 0.44, C => 8.488, aloss => 10.]
-    p_opt = [havg => 4., cps_c => 1. ] #[A => 3.6, B => 0.06, C => 51., n => 0.5]
+    p_opt = [havg => 4.0, cps_c => 1.0, hext_c =>2.] #[A => 3.6, B => 0.06, C => 51., n => 0.5]
 
     p0 = [x[2] for x in p_opt]
     optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
     #p_opt = [aCp => 1., hfa => 8., hfn =>0.66, aIo => 1.] 
-    lb = [0.1, 0.5]#[1.0, 0.05, 10., 0.2]
-    ub = [20., 15.] #[4.0, 0.5, 100., 0.7]
+    lb = [0.1, 0.5, 0.]#[1.0, 0.05, 10., 0.2]
+    ub = [20.0, 15.0, 15.] #[4.0, 0.5, 100., 0.7]
 
     #pguess_opt = ModelingToolkit.varmap_to_vars([Io => 456000, h_average => 14., qlpm => 7.12], parameters(pdesys))
     #sim_key = collect(keys(simulation_conditions))
-    sim_key = ["E70", "E74"]#["E67"]#, "E78", "E79", "E80", "E81"]
+    #sim_key = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
+    sim_key = ["E70"]#, "E74"]#["E67"]#, "E78", "E79", "E80", "E81"]
     initialerror = (lossAll(p0, sim_key))
     println("Initial Error $initialerror")
     optprob = Optimization.OptimizationProblem(optf, p0, sim_key, lb=lb, ub=ub)
     optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method=NLopt.LN_NELDERMEAD(), maxtime=20, local_maxiters=100000)
+    #optsol = solve(optprob, ECA(), maxtime=20, maxiters=100000)
+    
     println(optsol.retcode)
     pnew = optsol.u
     println(pnew)
@@ -399,63 +394,80 @@ begin #ONLY T3 gas temperature (as in the measurements dataframe)
     for sm in ordered_sim_conditions
         # Retrieve from measurements the experimental data for the current simulation condition
         #println(sm)
-        cond_k = simulation_conditions[sm]
-        sel_meas = measurements[(measurements.simulation_id.==sm) .& (measurements.obs_id.=="_Tf"), :]
-        expdata = sel_meas[:, :temperatures]
-        time_opt =sel_meas[:, :time][1]
+        local cond_k = simulation_conditions[sm]
+        local sel_meas = measurements[(measurements.simulation_id.==sm).&(measurements.obs_id.=="_Tf"), :]
+        local expdata = sel_meas[:, :temperatures]
+        local time_opt = sel_meas[:, :time][1]
 
         #run selected simulation and get the steady temperature values
-        temp_T = remakeAysha(pnew, cond_k, time_opt; tolr = 1e-7)
+        local temp_T = remakeAysha(pnew, cond_k, time_opt; tolr=1e-7)
         #temp_T = reshape(temp_T, length(expdata[1]), length(expdata))
-        temp_T = reshape(temp_T, length(expdata), length(expdata))
-        temp_T = [temp_T[:, i] for i in 1:length(expdata)]
-        push!(T_steady, (sm, time_opt, temp_T[1][1], expdata[1]))
+        #temp_T = reshape(temp_T, length(expdata), length(expdata))
+        #temp_T = [temp_T[:, i] for i in 1:length(expdata)]
+        push!(T_steady, (sm, time_opt, temp_T[:,4], expdata[1]))
     end
 
 
- 
-#TI-8
+
+    #TI-8
     color_model = :blue
     color_exp = :orange
-    
+
     # Extract T_mod and T_exp values
     T_mod_values = [T_steady[i, :T_mod][end] for i in 1:length(ordered_sim_conditions)]
     T_exp_values = [T_steady[i, :T_exp][end] for i in 1:length(ordered_sim_conditions)]
 
     # Create the bar plot
     bar_data = hcat(T_mod_values, T_exp_values)
-    plot0 = groupedbar(bar_data, label=["T_mod" "T_exp"], legend=:topright, title="T_steady Comparison", 
-        xlabel="Experimental Runs", ylabel="Temperature (K)", 
-        bar_width=0.4, xticks=(1:length(ordered_sim_conditions), ordered_sim_conditions), 
+    plot0 = groupedbar(bar_data, label=["T_mod" "T_exp"], legend=:topright, title="T_steady Comparison",
+        xlabel="Experimental Runs", ylabel="Temperature (K)",
+        bar_width=0.4, xticks=(1:length(ordered_sim_conditions), ordered_sim_conditions),
         bar_position=:dodge, color=[color_model color_exp], ylimit=(0, 1250))
 
     #plot1 = qqplot(T_mod_values, T_exp_values, label="",
-        #xlabel="T_mod", ylabel="T_exp",ylims=(500, 900),xlims=(500, 900), aspect_ratio = :equal)
+    #xlabel="T_mod", ylabel="T_exp",ylims=(500, 900),xlims=(500, 900), aspect_ratio = :equal)
     lims = (500, 900)
     plot1 = scatter(T_mod_values, T_exp_values, label="",
-        xlabel="T_mod", ylabel="T_exp",ylims=lims, xlims=lims, aspect_ratio = :equal)
+        xlabel="T_mod", ylabel="T_exp", ylims=lims, xlims=lims, aspect_ratio=:equal)
     plot1 = plot!(collect(lims), collect(lims))
 
     plot(plot0, plot1)
-#Plotting the temperature profiles for the gas domanin and a few solid domain profiles across all experimental conditions
+    #Plotting the temperature profiles for the gas domanin and a few solid domain profiles across all experimental conditions
 
     function plt(it)
         plot2 = plot(
             T_steady[it, :time],
-            T_steady[it, :T_mod], 
+            T_steady[it, :T_mod],
             title="Gas Temperature Profile T3",
             label=permutedims(ordered_sim_conditions[it]),
             xlabel="Time (s)",
             ylabel="Temperature (K)", xlimit=(0, 4050),
-            legend=:bottomright)
+            legend=:bottomright, color_palette=colors)
         scatter!(T_steady[it, :time],
-            T_steady[it, :T_exp], label=permutedims(ordered_sim_conditions[it])
-            )
-      
+            T_steady[it, :T_exp], label=permutedims(ordered_sim_conditions[it]),
+            color_palette=colors
+        )
+
         return plot2
     end
+    function plt_case(sm, params)
+        local cond_k = simulation_conditions[sm]
+        local expdata = reduce(hcat, measurements[(measurements.simulation_id.==sm), :temperatures])[:, 1:4] #ignore T8
+        local time_opt = measurements[measurements.simulation_id.==sm, :time][1]
+        local temp_T = remakeAysha(params, cond_k, time_opt)[:, 1:4] #ignore T8
+
+        labels = measurements[(measurements.simulation_id.==sm), :obs_id]
+        plt = plot(title="Temperature Profiles $sm", xlabel="Time (s)", ylabel="Temperature (K)", ylim=(300, 1600),
+            legend=:outerright, color_palette=colors)
+        scatter!(time_opt, expdata, label=permutedims(labels),
+            color_palette=colors)
+        plot!(time_opt, temp_T, label=permutedims(labels), lw=3)
+        return plt
+    end
     #display(plot(plot1, plt(1:5), plt(6:10), plt(11:15), layout = (4, 1), size=(900, 1800)))    
-    display(plot(plot1, plt(1:length(sim_key)), layout = (2, 1), size=(900, 600)))
+    display(plot(plot1, plt(1:length(sim_key)), layout=(2, 1), size=(900, 600)))
+    map(x -> display(plt_case(x , pnew)), sim_key)
+
 end
 
 
