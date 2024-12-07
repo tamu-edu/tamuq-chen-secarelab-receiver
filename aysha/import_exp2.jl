@@ -33,7 +33,9 @@ path = "./SolarSimulator/RAW/"
         "Data_FPT0079_231204_172244",
         "Data_FPT0080_231205_095122",
         "Data_FPT0081_231205_135354"]
-    IDs=["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
+    IDs=["E67", "E68", "E69", "E70", "E71", 
+        "E72", "E73", "E74", "E75", "E76", 
+        "E77", "E78", "E79", "E80", "E81"]
     
     IoA = 456000.0 * 1.
     IoB = 304000.0 * 1.
@@ -50,23 +52,25 @@ path = "./SolarSimulator/RAW/"
     function rd_data(df, iID)
         f = CSV.File(path * filenames[iID] * ".csv"; skipto=2, delim=",", header=false) |> DataFrame
         t = getT(f, 2, dec) #float.(Z[:, 2]) #xz_data
-        T3 = getT(f, 37, dec) .+ 273.15 #y1z_data
-        T8 = getT(f, 42, dec) .+ 273.15
-        T9 = getT(f, 43, dec) .+ 273.15
-        T10 = getT(f, 44, dec) .+ 273.15
-        T11 = getT(f, 45, dec) .+ 273.15
-        T12 = getT(f, 46, dec) .+ 273.15
+        T3 = getT(f, 37, dec) .+ 273.15 #y1z_data around 136 mm in
+        T8 = getT(f, 42, dec) .+ 273.15 #around 5 mm in
+        T9 = getT(f, 43, dec) .+ 273.15 #58mm (wall)
+        T10 = getT(f, 44, dec) .+ 273.15 #107mm (wall)
+        T11 = getT(f, 45, dec) .+ 273.15 #107mm (in)
+        T12 = getT(f, 46, dec) .+ 273.15 #58mm (in)
   
         Tf = T3
-        Ts2 = (T9 .+ T11) ./ 2
-        Ts3 = (T12 .+ T10) ./ 2
+        Ts2 = T9#(T9 .+ T11) ./ 2
+        Ts3 = T10#(T12 .+ T10) ./ 2
         scatter(t, Tf, ylim=(200, 1200))
         plot!(t, T8)
         plot!(t, Ts2)
         plot!(t, Ts3)
-        push!(df, (IDs[iID], "_Tf", t, Tf))
+        push!(df, (IDs[iID], "_T8", t, T8))
         push!(df, (IDs[iID], "_Ts2", t, Ts2))
         push!(df, (IDs[iID], "_Ts3", t, Ts3))
+        push!(df, (IDs[iID], "_Tf", t, Tf))
+
     end
 
     #rd_data(measurements, i) for i=1:length(filenames)
