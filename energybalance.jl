@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.42
+# v0.19.47
 
 using Markdown
 using InteractiveUtils
@@ -18,15 +18,6 @@ end
 begin
 	import Pkg
 	Pkg.activate("energy")
-end
-
-# ╔═╡ 86c7df59-4f03-4730-9cbf-72d8fc7c34bd
-begin
-	using ModelingToolkit, DifferentialEquations, Plots
-	#using ModelingToolkit: t_nounits as t, D_nounits as D
-	using PEtab, XLSX, Statistics, DataFrames
-	using PlutoUI, StatsPlots
-	using Optimization, Optim, Ipopt, OptimizationNLopt
 end
 
 # ╔═╡ 8c28c8d1-dd57-4a04-9121-cbfed404d824
@@ -560,6 +551,7 @@ begin
 	#hf = A * (qlpm^B)
 	hf = Nu * kf/ w_chnl
 	eq1 = [D(Ts) ~ (1/((1-ε) * aCp * (3200. * (0.27 + 0.135E-4 * Ts -9720.0 * Ts^-2 + 0.204E-7 * Ts^2)  * 4187) * Vs)) * (aIo*Io * A_frt - (kins * (r_ins2/r_ins1) * (Ts - Tins) * A_s_p / (r_ins2 - r_ins1)) - h_ext * A_frt * (Ts - Tamb) - em * σ * A_frt * (Ts^4 - Tamb^4) - hf * A_exchange * (Ts - Tf)),
+	
 	D(Tf) ~ (1/(ε * ρf2 * Cpf * Vf)) * (hf * A_exchange * (Ts - Tf) - mf * Cpf * (Tf - Tamb))
     ]
 
@@ -802,17 +794,6 @@ rel_error = (Tend_model[15] - Tend_exp[15]) / Tend_exp[15]
 # ╔═╡ 0eb4b057-48c2-4f77-9be9-adace62a9544
 Tend_e
 
-# ╔═╡ 8ad40098-80a4-4a44-811d-d94b68c6980e
-# ╠═╡ disabled = true
-#=╠═╡
-begin
-	using StatsPlots
-	bar(cond, [Tend_m, Tend_e])
-	groupedbar(cond, [Tend_m, Tend_e], bar_position = :dodge, bar_width=0.7)
-
-end
-  ╠═╡ =#
-
 # ╔═╡ 8fdb601b-55f4-477c-8160-0faa678e9ed1
 begin
 	scatter(Tend_e, Tend_m, label = "Temperature data points", legend = :bottomright, xlabel = "Experimental Temperature (K)", ylabel = "Model Temperature (K)", title = "TI-3 Steady State Temperature")
@@ -847,6 +828,28 @@ begin
 	Gzx = 10.:50.
 	plot(1 ./Gzx, fNu.(Gzx))
 end
+
+# ╔═╡ 86c7df59-4f03-4730-9cbf-72d8fc7c34bd
+#=╠═╡
+begin
+	using ModelingToolkit, DifferentialEquations, Plots
+	#using ModelingToolkit: t_nounits as t, D_nounits as D
+	using PEtab, XLSX, Statistics, DataFrames
+	using PlutoUI, StatsPlots
+	using Optimization, Optim, Ipopt, OptimizationNLopt
+end
+  ╠═╡ =#
+
+# ╔═╡ 8ad40098-80a4-4a44-811d-d94b68c6980e
+# ╠═╡ disabled = true
+#=╠═╡
+begin
+	using StatsPlots
+	bar(cond, [Tend_m, Tend_e])
+	groupedbar(cond, [Tend_m, Tend_e], bar_position = :dodge, bar_width=0.7)
+
+end
+  ╠═╡ =#
 
 # ╔═╡ Cell order:
 # ╠═8c28c8d1-dd57-4a04-9121-cbfed404d824

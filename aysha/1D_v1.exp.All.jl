@@ -410,8 +410,6 @@ begin #ONLY T3 gas temperature (as in the measurements dataframe)
         push!(T_steady, (sm, time_opt, temp_T[:,4], expdata[1]))
     end
 
-
-
     #TI-8
     color_model = :blue
     color_exp = :orange
