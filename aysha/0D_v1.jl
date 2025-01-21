@@ -173,8 +173,8 @@ begin # define functions
         replace!(Tunable(), modeloptim.p, collect(values(rmp)))
         modeloptim_sol = solve(modeloptim, FBDF(), saveat=tvalues, reltol=tolr)#, reltol=1e-12, abstol=1e-12)
         #time = modelfit_sol.t
-        tempT8_op = float.(modeloptim_sol[:, 1])  # Index 1 corresponds to Ts
-        tempT3_op = float.(modeloptim_sol[:, 2])  # Index 2 corresponds to Tf
+        tempT8_op = float.(modeloptim_sol'[:, 1])  # Index 1 corresponds to Ts
+        tempT3_op = float.(modeloptim_sol'[:, 2])  # Index 2 corresponds to Tf
         return ([tempT8_op tempT3_op])
     end
     function remakeAysha(pguess_l, cond_k, time_opt; tolr=1e-7)
@@ -210,8 +210,8 @@ begin #Optimization
     lb = [0.1, 0.0, 0.5]
     ub = [20.0, 10., 15.0] 
 
-    #sim_key = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
-    sim_key = ["E70"]#, "E74"]#["E67"]#, "E78", "E79", "E80", "E81"]
+    sim_key = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
+    #sim_key = ["E70"]#, "E74"]#["E67"]#, "E78", "E79", "E80", "E81"]
     initialerror = (lossAll(p0, sim_key))
     println("Initial Error $initialerror")
     optprob = Optimization.OptimizationProblem(optf, p0, sim_key, lb=lb, ub=ub)
@@ -223,6 +223,84 @@ begin #Optimization
     #res_error = lossAll(pnew, [])
     println("Final Error $(optsol.objective)")
 end
+
+
+begin 
+    T_steady = DataFrame(sim_id=[], time=[], T_mod=[], T_exp=[])
+    #plotting the scatter plots for the different thermocouples for the steady state temperatures
+    ordered_sim_conditions = sim_key#["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
+    
+    for sm in ordered_sim_conditions
+        # Retrieve from measurements the experimental data for the current simulation condition
+        #println(sm)
+        local cond_k = simulation_conditions[sm]
+        local sel_meas = measurements[(measurements.simulation_id.==sm).&(measurements.obs_id.=="_Tf"), :]
+        local expdata = sel_meas[:, :temperatures]
+        local time_opt = sel_meas[:, :time][1]
+
+        #run selected simulation and get the steady temperature values
+        local temp_T = remakeAysha(pnew, cond_k, time_opt; tolr=1e-7)
+        push!(T_steady, (sm, time_opt, temp_T[:,2], expdata[1]))
+    end
+    color_model = :blue
+    color_exp = :orange
+
+    # Extract T_mod and T_exp values
+    T_mod_values = [T_steady[i, :T_mod][end] for i in 1:length(ordered_sim_conditions)]
+    T_exp_values = [T_steady[i, :T_exp][end] for i in 1:length(ordered_sim_conditions)]
+
+    # Create the bar plot
+    bar_data = hcat(T_mod_values, T_exp_values)
+    plot0 = groupedbar(bar_data, label=["T_mod" "T_exp"], legend=:topright, title="T_steady Comparison",
+        xlabel="Experimental Runs", ylabel="Temperature (K)",
+        bar_width=0.4, xticks=(1:length(ordered_sim_conditions), ordered_sim_conditions),
+        bar_position=:dodge, color=[color_model color_exp], ylimit=(0, 1250))
+
+    lims = (500, 900)
+    plot1 = scatter(T_mod_values, T_exp_values, label="",
+        xlabel="T_mod", ylabel="T_exp", ylims=lims, xlims=lims, aspect_ratio=:equal)
+    plot1 = plot!(collect(lims), collect(lims))
+
+    plot(plot0, plot1)
+    #Plotting the temperature profiles for the gas domanin and a few solid domain profiles across all experimental conditions
+
+    function plt(it)
+        plot2 = plot(
+            T_steady[it, :time],
+            T_steady[it, :T_mod],
+            title="Gas Temperature Profile T3",
+            label=permutedims(ordered_sim_conditions[it]),
+            xlabel="Time (s)",
+            ylabel="Temperature (K)", xlimit=(0, 4050),
+            legend=:bottomright, color_palette=colors)
+        scatter!(T_steady[it, :time],
+            T_steady[it, :T_exp], label=permutedims(ordered_sim_conditions[it]),
+            color_palette=colors
+        )
+
+        return plot2
+    end
+    function plt_case(sm, params)
+        local cond_k = simulation_conditions[sm]
+        local expdata = reduce(hcat, measurements[(measurements.simulation_id.==sm), :temperatures])[:, 1:2] 
+        local time_opt = measurements[measurements.simulation_id.==sm, :time][1]
+        local temp_T = remakeAysha(params, cond_k, time_opt)[:, 1:2] 
+
+        labels = measurements[(measurements.simulation_id.==sm), :obs_id]
+        plt = plot(title="Temperature Profiles $sm", xlabel="Time (s)", ylabel="Temperature (K)", ylim=(300, 1600),
+            legend=:outerright, color_palette=colors)
+        scatter!(time_opt, expdata, label=permutedims(labels),
+            color_palette=colors)
+        plot!(time_opt, temp_T, label=permutedims(labels), lw=3)
+        return plt
+    end
+    display(plot(plot1, plt(1:length(sim_key)), layout=(2, 1), size=(900, 600)))
+    map(x -> display(plt_case(x , pnew)), sim_key)
+
+end
+
+
+
 
 
  
