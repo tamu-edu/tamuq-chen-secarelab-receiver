@@ -48,7 +48,7 @@ begin #FIXED Parameters
     #SiC Properties
     ϵ = 0.75 #emissivity
     α = 0.625 #absroptivity
-    #e = 0.425 #porosity
+    e = 0.425 #porosity
 
     #parameters for the insulation
     r0 = 23 / 1000 #m
@@ -70,7 +70,7 @@ end
 begin
     # Parameters, variables, and derivatives for system 1
     #@independent_variables t 
-    @parameters ha hb cps_c kfs_c A B C n #ks h_average A n
+    @parameters cps_c kfs_c A B C n #ks h_average A n
     @parameters Io qlpm Tinit
     @variables t Ts(t) Tf(t)
     Dt = Differential(t)
@@ -116,7 +116,7 @@ begin
 
     h_avg_f5(qlpm, T) = (Nu_f5(qlpm, T) * kf_f(T)) / Lc
     h_avg_f6(qlpm, T) = (Nu_f6(qlpm, T) * kf_f(T)) / Lc
-    h_f = ha + hb / (w_chnl) #W/m2.K
+    #h_f = ha + hb / (w_chnl) #W/m2.K
 
     # h_avg_f_q(qlpm) = A * Re_f(qlpm)^B
     # h_avg_f_T(T) = (((cpf_f(T) * mu) / kf_f(T))^(C)) * kf_f(T) / Lc #9. instead of C because library error
@@ -128,26 +128,25 @@ begin
 
     ## SETUP Parameters
 
-    p_opt = [ha => 8.99, hb => 1.0, cps_c => 8.68] #[A => 4., B => 0.06, C => 51., n => 0.5] 
+    p_opt = [A => 100., B => 0.5, C => 10.]#, cps_c => 6.0]  #[A => 4., B => 0.06, C => 51., n => 0.5] 
     p_cond = [Io => 456000.0, qlpm => 9.1, Tinit => 293.0]
     p_math = Dict(vcat(p_opt, p_cond))
     #extract the parameters names from p_math
     p_names = [i for i in keys(p_math)]
 
     # PDE equation for system 1
-
-    # eq1 = [
-    #     Vs * (ρs*Cps) * Dt(Ts(t, x)) ~ - ((h_average) * Av * Vi * ((Ts(t, x)) - Tf(t, x))) .- (kins * (r / r0) .* (Ts(t, x) .- Tins_f(t)) * A_t / (r - r0)),
-    #     Vf * ρf * Cpf * Dt(Tf(t, x)) ~ + (h_average) * Av * Vi * ((Ts(t, x) - Tf(t, x)))
-    # ]
     eq1 = [
-        Vs * Dt(Ts) ~ (
-            - (h_f * A_exchange * (Ts - Tf)) 
+        (1-e) * Vs * Dt(Ts) ~ (
+            α * Io * A_frt
+            - hext * A_frt * (Ts - Tamb)
+            - ϵ * σ * A_frt * (Ts^4 - Tamb^4)
+            - (h_avg_f6(qlpm, Tf) * A_exchange * (Ts - Tf)) 
             - (kins * (r_ins / r0) * (Ts - Tins_f(t)) * A_s_p / (r_ins - r0))
-        ) / (ρs * cps_c * Cps(Ts)),
-        Vf * Dt(Tf) ~
-            - (h_f * A_exchange * (Ts - Tf)) 
-         / (ρf_f(Tf) * (1.93e-10 * Tf^4 - 8.0e-7 * Tf^3 + 1.14e-3 * Tf^2 - 4.49e-1 * Tf + 1.06e3) + RH * (1745.96354 + 0.185114553 * Tf^1 + 6.19448731e-4 * Tf^2 - 3.0267851e-7 * Tf^3 + 4.19053122e-11 * Tf^4))
+        ) / (ρs * Cps(Ts)),
+        e * Vf * Dt(Tf) ~ (
+             - m(qlpm) * cpf_f(Tf) * (Tf - Tamb)
+             + (h_avg_f6(qlpm, Tf)* A_exchange * (Ts - Tf))
+        ) / (ρf_f(Tf) * cpf_f(Tf))
     ]
   
 
@@ -203,14 +202,16 @@ begin # define functions
     end    
 end
 begin #Optimization
-    p_opt = [ha => 8.99, hb => 1.0, cps_c => 6.0] 
+    #p_opt = [ha => 8.99, hb => 1.0, cps_c => 6.0] 
+    p_opt = [A => 100., B => 0.5, C => 10.] 
 
     p0 = [x[2] for x in p_opt]
     optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
-    lb = [0.1, 0.0, 0.5]
-    ub = [20.0, 10., 15.0] 
+    lb = [0., 0.0, 0.5]
+    ub = [2000., 0.8, 17.0] 
 
-    sim_key = ["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
+    sim_key = ["E67","E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
+    #E69, E75, E77
     #sim_key = ["E70"]#, "E74"]#["E67"]#, "E78", "E79", "E80", "E81"]
     initialerror = (lossAll(p0, sim_key))
     println("Initial Error $initialerror")
