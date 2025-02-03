@@ -24,7 +24,7 @@ begin #FIXED Parameters
     A_s_p = w_t * L * 4 #total area solid periphery m2
 
     # Channel dimensions
-    w_chnl = 1.2e-3  # Width of a single channel (m)
+    w_chnl = 1.5e-3  # Width of a single channel (m)
     A_chnl_frt = w_chnl * w_chnl  # Frontal area of a single channel (m^2)
     A_chnl_p = w_chnl * L * 4  # Periphery area of a single channel (m^2)
 
@@ -128,7 +128,7 @@ begin
 
     ## SETUP Parameters
 
-    p_opt = [A => 100., B => 0.5, C => 10.]#, cps_c => 6.0]  #[A => 4., B => 0.06, C => 51., n => 0.5] 
+    p_opt = [A => 100., B => 0.5, C => 10., cps_c => 6.0]  #[A => 4., B => 0.06, C => 51., n => 0.5] 
     p_cond = [Io => 456000.0, qlpm => 9.1, Tinit => 293.0]
     p_math = Dict(vcat(p_opt, p_cond))
     #extract the parameters names from p_math
@@ -136,14 +136,14 @@ begin
 
     # PDE equation for system 1
     eq1 = [
-        (1-e) * Vs * Dt(Ts) ~ (
+        Vs * Dt(Ts) ~ (
             α * Io * A_frt
             - hext * A_frt * (Ts - Tamb)
             - ϵ * σ * A_frt * (Ts^4 - Tamb^4)
             - (h_avg_f6(qlpm, Tf) * A_exchange * (Ts - Tf)) 
             - (kins * (r_ins / r0) * (Ts - Tins_f(t)) * A_s_p / (r_ins - r0))
-        ) / (ρs * Cps(Ts)),
-        e * Vf * Dt(Tf) ~ (
+        ) / (ρs * cps_c * Cps(Ts)),
+        Vf * Dt(Tf) ~ (
              - m(qlpm) * cpf_f(Tf) * (Tf - Tamb)
              + (h_avg_f6(qlpm, Tf)* A_exchange * (Ts - Tf))
         ) / (ρf_f(Tf) * cpf_f(Tf))
@@ -203,15 +203,14 @@ begin # define functions
 end
 begin #Optimization
     #p_opt = [ha => 8.99, hb => 1.0, cps_c => 6.0] 
-    p_opt = [A => 100., B => 0.5, C => 10.] 
+    p_opt = [A => 100., B => 0.5, C => 10., cps_c => 6.0]  #[A => 4., B => 0.06, C => 51., n => 0.5]
 
     p0 = [x[2] for x in p_opt]
     optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
-    lb = [0., 0.0, 0.5]
-    ub = [2000., 0.8, 17.0] 
+    lb = [0., 0., 0., 1.]
+    ub = [1500., 0.5, 60.0, 6.] 
 
     sim_key = ["E67","E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
-    #E69, E75, E77
     #sim_key = ["E70"]#, "E74"]#["E67"]#, "E78", "E79", "E80", "E81"]
     initialerror = (lossAll(p0, sim_key))
     println("Initial Error $initialerror")
@@ -299,11 +298,3 @@ begin
     map(x -> display(plt_case(x , pnew)), sim_key)
 
 end
-
-
-
-
-
- 
-
-

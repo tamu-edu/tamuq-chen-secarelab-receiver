@@ -41,7 +41,7 @@ begin #FIXED Parameters
     A_s_p = w_t * L * 4 #total area solid periphery m2
 
     # Channel dimensions
-    w_chnl = 1.2e-3  # Width of a single channel (m)
+    w_chnl = 1.5e-3  # Width of a single channel (m)
     A_chnl_frt = w_chnl * w_chnl  # Frontal area of a single channel (m^2)
     A_chnl_p = w_chnl * L * 4  # Periphery area of a single channel (m^2)
 
