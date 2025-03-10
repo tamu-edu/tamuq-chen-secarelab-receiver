@@ -45,9 +45,13 @@ path = "./SolarSimulator/RAW/"
         IoB, IoB, IoB, IoB, IoB,
         IoC, IoC, IoC, IoC, IoC]
 
-    Arqplm=[15.27, 12.50, 10.50, 9.10, 7.12,
-        18.34, 13.16, 9.03, 6.95, 4.53,
-        13.85, 10.02, 8.04, 6.62, 4.53]
+    # Arqplm=[15.27, 12.50, 10.50, 9.10, 7.12,
+    #     18.34, 13.16, 9.03, 6.95, 4.53,
+    #     13.85, 10.02, 8.04, 6.62, 4.53]
+
+    Arqplm=[1.429, 1.249, 1.171, 1.083, 0.920,
+         1.80, 1.287, 1.082, 0.895, 0.0,
+         1.326, 1.105, 1.047, 0.873, 0.0]
 
     function rd_data(df, iID)
         f = CSV.File(path * filenames[iID] * ".csv"; skipto=2, delim=",", header=false) |> DataFrame

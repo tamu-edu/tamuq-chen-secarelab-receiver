@@ -128,7 +128,7 @@ begin
 
     ## SETUP Parameters
 
-    p_opt = [A => 100., B => 0.5, C => 10., cps_c => 6.0]  #[A => 4., B => 0.06, C => 51., n => 0.5] 
+    p_opt = [A => 100., B => 0.2, C => 10., cps_c => 6.0]  #[A => 4., B => 0.06, C => 51., n => 0.5] 
     p_cond = [Io => 456000.0, qlpm => 9.1, Tinit => 293.0]
     p_math = Dict(vcat(p_opt, p_cond))
     #extract the parameters names from p_math
@@ -203,12 +203,12 @@ begin # define functions
 end
 begin #Optimization
     #p_opt = [ha => 8.99, hb => 1.0, cps_c => 6.0] 
-    p_opt = [A => 100., B => 0.5, C => 10., cps_c => 6.0]  #[A => 4., B => 0.06, C => 51., n => 0.5]
+    p_opt = [A => 10., B => 0.4, C => 7., cps_c => 1.0]  #[A => 4., B => 0.06, C => 51., n => 0.5]
 
     p0 = [x[2] for x in p_opt]
     optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
-    lb = [0., 0., 0., 1.]
-    ub = [1500., 0.5, 60.0, 6.] 
+    lb = [0.005, 0.001, 0.0005, 1.]
+    ub = [1359., 0.59, 10., 8.] 
 
     sim_key = ["E67","E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
     #sim_key = ["E70"]#, "E74"]#["E67"]#, "E78", "E79", "E80", "E81"]
@@ -226,6 +226,7 @@ end
 
 
 begin 
+    #gas 
     T_steady = DataFrame(sim_id=[], time=[], T_mod=[], T_exp=[])
     #plotting the scatter plots for the different thermocouples for the steady state temperatures
     ordered_sim_conditions = sim_key#["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
@@ -262,6 +263,7 @@ begin
     plot1 = plot!(collect(lims), collect(lims))
 
     plot(plot0, plot1)
+    
     #Plotting the temperature profiles for the gas domanin and a few solid domain profiles across all experimental conditions
 
     function plt(it)
@@ -296,5 +298,42 @@ begin
     end
     display(plot(plot1, plt(1:length(sim_key)), layout=(2, 1), size=(900, 600)))
     map(x -> display(plt_case(x , pnew)), sim_key)
+end
 
+begin 
+    #solid
+    T_steady_solid = DataFrame(sim_id=[], time=[], T_mod=[], T_exp=[])
+    #plotting the scatter plots for the different thermocouples for the steady state temperatures
+    ordered_sim_conditions = sim_key#["E67", "E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
+    
+    for sm in ordered_sim_conditions
+        # Retrieve from measurements the experimental data for the current simulation condition
+        #println(sm)
+        local cond_k = simulation_conditions[sm]
+        local sel_meas = measurements[(measurements.simulation_id.==sm).&(measurements.obs_id.=="_Tavg"), :]
+        local expdata = sel_meas[:, :temperatures]
+        local time_opt = sel_meas[:, :time][1]
+
+        #run selected simulation and get the steady temperature values
+        local temp_T = remakeAysha(pnew, cond_k, time_opt; tolr=1e-7)
+        push!(T_steady_solid, (sm, time_opt, temp_T[:,1], expdata[1]))
+    end
+    color_model = :blue
+    color_exp = :orange
+
+    # Extract T_mod and T_exp values
+    T_mod_values_solid = [T_steady_solid[i, :T_mod][end] for i in 1:length(ordered_sim_conditions)]
+    T_exp_values_solid = [T_steady_solid[i, :T_exp][end] for i in 1:length(ordered_sim_conditions)]
+
+    # Create the bar plot
+    bar_data = hcat(T_mod_values_solid, T_exp_values_solid)
+    plot0 = groupedbar(bar_data, label=["T_mod" "T_exp"], legend=:topright, title="T_steady Comparison",
+        xlabel="Experimental Runs", ylabel="Temperature (K)",
+        bar_width=0.4, xticks=(1:length(ordered_sim_conditions), ordered_sim_conditions),
+        bar_position=:dodge, color=[color_model color_exp], ylimit=(0, 1250))
+
+    lims = (500, 1250)
+    plot1 = scatter(title="Solid Steady State Temperature",T_mod_values_solid, T_exp_values_solid,
+    xlabel="T_mod", ylabel="T_exp", ylims=lims, xlims=lims, aspect_ratio=:equal)
+    plot1 = plot!(collect(lims), collect(lims)) 
 end
