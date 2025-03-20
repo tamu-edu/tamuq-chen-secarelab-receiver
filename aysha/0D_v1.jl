@@ -203,12 +203,12 @@ begin # define functions
 end
 begin #Optimization
     #p_opt = [ha => 8.99, hb => 1.0, cps_c => 6.0] 
-    p_opt = [A => 10., B => 0.4, C => 7., cps_c => 1.0]  #[A => 4., B => 0.06, C => 51., n => 0.5]
+    p_opt = [A => 10., B => 0.2, C => 7., cps_c => 1.0]  #[A => 4., B => 0.06, C => 51., n => 0.5]
 
     p0 = [x[2] for x in p_opt]
     optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
-    lb = [0.005, 0.001, 0.0005, 1.]
-    ub = [1359., 0.59, 10., 8.] 
+    lb = [0.0005, 0.001, 0.00005, 1.]
+    ub = [13., 0.3, 50., 8.] 
 
     sim_key = ["E67","E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
     #sim_key = ["E70"]#, "E74"]#["E67"]#, "E78", "E79", "E80", "E81"]

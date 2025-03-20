@@ -261,7 +261,6 @@ begin # define functions
 
         # T2 = (tempT9_op .+ tempT11_op) ./2
         # T3 = (tempT12_op .+ tempT10_op) ./2
-        #return append!(tempT8_op, tempT9_op, tempT10_op, tempT3_op, tempT12_op, tempT11_op)
         return ([tempT9_op tempT10_op tempT3_op tempT11_op tempT12_op])
     end
 
@@ -302,13 +301,12 @@ begin # define functions
 end
 
 begin
-    #p_opt = [A => 636.0, B => 0.44, C => 8.488, aloss => 10.]
     p_opt = [A => 10., B => 0.2, C => 10., cps_c => 6.0, hext_c => 1.] 
 
     p0 = [x[2] for x in p_opt]
     optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
-    lb = [0.1, 0.0, 0.5, 0., 0.]
-    ub = [20.0, 10., 15.0, 15., 15.]
+    lb = [0.005, 0.0008, 0.005, 0., 0.]
+    ub = [100.0, 5., 15.0, 8., 8.]
 
     #pguess_opt = ModelingToolkit.varmap_to_vars([Io => 456000, h_average => 14., qlpm => 7.12], parameters(pdesys))
     #sim_key = collect(keys(simulation_conditions))
@@ -405,8 +403,7 @@ begin #ONLY T3 gas temperature (as in the measurements dataframe)
             color_palette=colors)
         plot!(time_opt, temp_T, label=permutedims(labels), lw=3)
         return plt
-    end
-    #display(plot(plot1, plt(1:5), plt(6:10), plt(11:15), layout = (4, 1), size=(900, 1800)))    
+    end 
     display(plot(plot1, plt(1:length(sim_key)), layout=(2, 1), size=(900, 600)))
     map(x -> display(plt_case(x , pnew)), sim_key)
 
