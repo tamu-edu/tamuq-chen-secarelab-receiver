@@ -67,8 +67,8 @@ path = "./SolarSimulator/RAW/"
         #T2 = (T9 .+ T11) ./ 2
         #T3 = (T12 .+ T10) ./ 2
         # Average of T8, T9, and T10
-        #T_avg = (T9 .+ T10 .+ T11 .+ T12) ./ 4
-        T_avg = (T8 .+ T9 .+ T10) ./ 3
+        T_avg = (T9 .+ T10 .+ T11 .+ T12) ./ 4
+        #T_avg = (T8 .+ T9 .+ T10) ./ 3
         #T_avg = (T8 .+ T9 .+ T10 .+ T11 .+ T12 ./ 5)
         scatter(t, Tf, ylim=(200, 1200))
         plot!(t, T_avg, label="T_avg")
@@ -89,7 +89,8 @@ path = "./SolarSimulator/RAW/"
     map(x -> rd_data(measurements, x), 1:length(filenames))   
     
 #Defining simulation conditions
-    simulation_conditions = Dict(
-        IDs[i] => Dict(Io => ArIo[i], qlpm => Arqplm[i], Tinit => measurements[(measurements.simulation_id .== IDs[i]) .& (measurements.obs_id .== "_Tf"), :temperatures][1][1]) 
-        for i=1:length(IDs)
-    )
+#Defining simulation conditions
+simulation_conditions = Dict(
+    IDs[i] => Dict(Io => ArIo[i], qlpm => Arqplm[i], Tinit => measurements[(measurements.simulation_id .== IDs[i]) .& (measurements.obs_id .== "_Tf"), :temperatures][1][1]) 
+    for i=1:length(IDs)
+)

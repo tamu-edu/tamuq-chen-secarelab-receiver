@@ -70,7 +70,7 @@ end
 begin
     # Parameters, variables, and derivatives for system 1
     #@independent_variables t 
-    @parameters cps_c kfs_c A B C n #ks h_average A n
+    @parameters kfs_c cps_c I_loss A B C n #ks h_average A n
     @parameters Io qlpm Tinit
     @variables t Ts(t) Tf(t)
     Dt = Differential(t)
@@ -106,7 +106,7 @@ begin
 
     Re_f(qlpm, T) = (m(qlpm) / A_chnl_frt_all) * Lc / μf_f(T) #use of flux instead of u*ρf
     Pr(T) = (cpf_f(T) * μf_f(T)) / kf_f(T)
-    Nu_f6(qlpm, T) = A * (Re_f(qlpm, T)^B) * (Pr(T)^C)
+    Nu_f6(qlpm, T) = A * (Re_f(qlpm, T)^B) #* (Pr(T)^C)
 
     Gz(qlpm, T) = (1 / w_chnl) * Re_f(qlpm, T) * Pr(T) * Lc
     Nu_f5(qlpm, T) = A * (1 - B * Gz(qlpm, T)^n) * exp(-C / Gz(qlpm, T))
@@ -128,7 +128,7 @@ begin
 
     ## SETUP Parameters
 
-    p_opt = [A => 100., B => 0.2, C => 10., cps_c => 6.0]  #[A => 4., B => 0.06, C => 51., n => 0.5] 
+    p_opt = [A => 100., B => 0.2, cps_c=> 2.]  #[A => 4., B => 0.06, C => 51., n => 0.5] 
     p_cond = [Io => 456000.0, qlpm => 9.1, Tinit => 293.0]
     p_math = Dict(vcat(p_opt, p_cond))
     #extract the parameters names from p_math
@@ -172,7 +172,7 @@ begin # define functions
         replace!(Tunable(), modeloptim.p, collect(values(rmp)))
         modeloptim_sol = solve(modeloptim, FBDF(), saveat=tvalues, reltol=tolr)#, reltol=1e-12, abstol=1e-12)
         #time = modelfit_sol.t
-        tempT8_op = float.(modeloptim_sol'[:, 1])  # Index 1 corresponds to Ts
+        tempT8_op = float.(modeloptim_sol'[:, 1])  # Index 1 corresponds to Ts 
         tempT3_op = float.(modeloptim_sol'[:, 2])  # Index 2 corresponds to Tf
         return ([tempT8_op tempT3_op])
     end
@@ -193,9 +193,11 @@ begin # define functions
             local time_exp = measurements[measurements.simulation_id .== sm, :time][1]
             # Run model and get temperatures
             temp_T = remakeAysha(pguess_l, cond_k, time_exp)[:, 1:2]
-    
+            #expdata_last = expdata[end, :]   # Last row of experimental data
+            #temp_T_last = temp_T[end, :]     # Last row of simulated temperature data
             # Compute error
             temp_error = sqrt(sum((temp_T .- expdata) .^ 2)) / length(expdata)
+            #temp_error = sqrt(sum((temp_T_last .- expdata_last) .^ 2))
             lossr += temp_error
         end
         return lossr / length(sim_key)
@@ -203,12 +205,12 @@ begin # define functions
 end
 begin #Optimization
     #p_opt = [ha => 8.99, hb => 1.0, cps_c => 6.0] 
-    p_opt = [A => 10., B => 0.2, C => 7., cps_c => 1.0]  #[A => 4., B => 0.06, C => 51., n => 0.5]
+    p_opt = [A => 10., B => 0.2, cps_c => 2.]  #[A => 4., B => 0.06, C => 51., n => 0.5]
 
     p0 = [x[2] for x in p_opt]
     optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
-    lb = [0.0005, 0.001, 0.00005, 1.]
-    ub = [13., 0.3, 50., 8.] 
+    lb = [0.0005, 0.001, 1.]
+    ub = [13., 10., 8.] 
 
     sim_key = ["E67","E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
     #sim_key = ["E70"]#, "E74"]#["E67"]#, "E78", "E79", "E80", "E81"]

@@ -107,7 +107,7 @@ end
 #     Gz_ = LinearInterpolation(x11, Gz)
 #     Gz_f(x) = Gz_(x)
 #     @register_symbolic Gz_f(x)
-# end
+#end
 
 begin
     # Parameters, variables, and derivatives for system 1
@@ -153,7 +153,7 @@ begin
 
     Re_f(qlpm, T) = (m(qlpm) / A_chnl_frt_all) * Lc / μf_f(T) #use of flux instead of u*ρf
     Pr(T) = (cpf_f(T) * μf_f(T)) / kf_f(T)
-    Nu_f6(qlpm, T) = A * (Re_f(qlpm, T)^B) * (Pr(T)^C)
+    Nu_f6(qlpm, T) = A * (Re_f(qlpm, T)^B) #* (Pr(T)^C)
 
     Gz(qlpm, x, T) = (1 / x) * Re_f(qlpm, T) * Pr(T) * Lc
     Nu_f5(qlpm, x, T) = A * (1 - B * Gz(qlpm, x, T)^n) * exp(-C / Gz(qlpm, x, T))
@@ -183,7 +183,7 @@ begin
 
     #p_opt = [A => 2., B => 0.5, n=> 0.5, C=> 20.]
     #p_opt = [A => 1000.0, B => 0.6, C => 7.0, aloss => 1.0]
-    p_opt = [A => 10., B => 0.2, C => 10., cps_c => 6.0, hext_c => 1.] 
+    p_opt = [A => 10., B => 0.2, cps_c => 6.0] #, hext_c => 1.] 
     p_cond = [Io => 456000.0, qlpm => 9.1, Tinit => 293.0]
     p_math = Dict(vcat(p_opt, p_cond))
     #extract the parameters names from p_math
@@ -301,12 +301,12 @@ begin # define functions
 end
 
 begin
-    p_opt = [A => 10., B => 0.2, C => 10., cps_c => 6.0, hext_c => 1.] 
+    p_opt = [A => 10., B => 0.2, cps_c => 6.0] 
 
     p0 = [x[2] for x in p_opt]
     optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
-    lb = [0.005, 0.0008, 0.005, 0., 0.]
-    ub = [100.0, 5., 15.0, 8., 8.]
+    lb = [0.005, 0.0008, 0.]
+    ub = [30.0, 3., 8.]
 
     #pguess_opt = ModelingToolkit.varmap_to_vars([Io => 456000, h_average => 14., qlpm => 7.12], parameters(pdesys))
     #sim_key = collect(keys(simulation_conditions))
