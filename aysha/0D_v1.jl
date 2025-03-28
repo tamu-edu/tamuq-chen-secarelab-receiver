@@ -80,8 +80,8 @@ begin
     @register_symbolic ρf_f(Tf)
     ρf_f(T) = 352.716 * T^-1 * (1+RH) /(1+ 1.609 * RH) #COMSOL + https://www.engineeringtoolbox.com/density-air-d_680.html with some error for w vs RH
   
-    ρf = ρf_f(1000.0) #kg/m3
-    m(qlpm) = ρf * (qlpm / 60.0 / 1000.0) #mass at the flowmeter conditions kg/s
+    ρf = ρf_f(293.0) #kg/m3
+    m(qlpm, T) = ρf_f(T) * (qlpm / 60.0 / 1000.0) #kg/s mass at the flowmeter conditions T=25oC
 
     mu = 2.0921e-5 #Pa.s
     kf = 0.056 #W/m.K
@@ -104,7 +104,7 @@ begin
     aCp = 1.0 #correction factor
 
 
-    Re_f(qlpm, T) = (m(qlpm) / A_chnl_frt_all) * Lc / μf_f(T) #use of flux instead of u*ρf
+    Re_f(qlpm, T) = (m(qlpm, T) / A_chnl_frt_all) * Lc / μf_f(T) #use of flux instead of u*ρf
     Pr(T) = (cpf_f(T) * μf_f(T)) / kf_f(T)
     Nu_f6(qlpm, T) = A * (Re_f(qlpm, T)^B) * (Pr(T)^C)
 
@@ -144,7 +144,7 @@ begin
             - (kins * (r_ins / r0) * (Ts - Tins_f(t)) * A_s_p / (r_ins - r0))
         ) / (ρs * 1. * Cps(Ts)),
         Vf * Dt(Tf) ~ (
-             - m(qlpm) * cpf_f(Tf) * (Tf - Tamb)
+             - m(qlpm, Tf) * cpf_f(Tf) * (Tf - Tamb)
              + (h_avg_f6(qlpm, Tf)* A_exchange * (Ts - Tf))
         ) / (ρf_f(Tf) * cpf_f(Tf))
     ]
@@ -209,7 +209,7 @@ begin #Optimization
 
     p0 = [x[2] for x in p_opt]
     optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
-    lb = [0.001, 0.001, 0.0001]
+    lb = [0.001, 0.0001, 0.0001]
     ub = [10., 10., 20.] 
 
     sim_key = ["E67","E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
