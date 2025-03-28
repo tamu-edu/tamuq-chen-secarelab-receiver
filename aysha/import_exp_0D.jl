@@ -38,12 +38,12 @@ path = "./SolarSimulator/RAW/"
         "E77", "E78", "E79", "E80", "E81"]
     
     IoA = 456000.0 * 1.1
-    IoB = 304000.0 * 1.1
+    IoB = 304000.0 * 1.2
     IoC = 256000.0 * 0.8 # arbitrary fix KK
 
     ArIo=[IoA, IoA, IoA, IoA, IoA,
         IoB, IoB, IoB, IoB, IoB,
-        IoC, IoC, IoC, IoC, IoC] .* 0.62
+        IoC, IoC, IoC, IoC, IoC] .* 0.64
     # Arqplm=[15.27, 12.50, 10.50, 9.10, 7.12,
     #     18.34, 13.16, 9.03, 6.95, 4.53,
     #     13.85, 10.02, 8.04, 6.62, 4.53]

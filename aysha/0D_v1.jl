@@ -196,7 +196,7 @@ begin # define functions
             #expdata_last = expdata[end, :]   # Last row of experimental data
             #temp_T_last = temp_T[end, :]     # Last row of simulated temperature data
             # Compute error
-            temp_error = sqrt(sum((temp_T .- expdata) .^ 2)) / length(expdata)
+            temp_error = sqrt(sum((temp_T .- expdata) .^ 2)) #/ length(expdata)
             #temp_error = sqrt(sum((temp_T_last .- expdata_last) .^ 2))
             lossr += temp_error
         end
@@ -209,7 +209,7 @@ begin #Optimization
 
     p0 = [x[2] for x in p_opt]
     optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
-    lb = [0.001, 0.0001, 0.0001]
+    lb = [0.0001, 0.0001, 0.0001]
     ub = [10., 10., 20.] 
 
     sim_key = ["E67","E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
@@ -217,7 +217,7 @@ begin #Optimization
     initialerror = (lossAll(p0, sim_key))
     println("Initial Error $initialerror")
     optprob = Optimization.OptimizationProblem(optf, p0, sim_key, lb=lb, ub=ub)
-    optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method=NLopt.LN_NELDERMEAD(), maxtime=60, local_maxiters=100000)
+    optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method=NLopt.LN_NELDERMEAD(), maxtime=600, local_maxiters=100000)
     
     println(optsol.retcode)
     pnew = optsol.u
@@ -259,7 +259,7 @@ begin
         bar_width=0.4, xticks=(1:length(ordered_sim_conditions), ordered_sim_conditions),
         bar_position=:dodge, color=[color_model color_exp], ylimit=(0, 1250))
 
-    lims = (500, 900)
+    lims = (300, 800)
     plot1 = scatter(T_mod_values, T_exp_values, label="",
         xlabel="T_mod", ylabel="T_exp", ylims=lims, xlims=lims, aspect_ratio=:equal)
     plot1 = plot!(collect(lims), collect(lims))
@@ -334,7 +334,7 @@ begin
         bar_width=0.4, xticks=(1:length(ordered_sim_conditions), ordered_sim_conditions),
         bar_position=:dodge, color=[color_model color_exp], ylimit=(0, 1250))
 
-    lims = (500, 1250)
+    lims = (300, 1150)
     plot4 = scatter(title="Solid Steady State Temperature",T_mod_values_solid, T_exp_values_solid,
     xlabel="T_mod", ylabel="T_exp", ylims=lims, xlims=lims, aspect_ratio=:equal)
     plot4 = plot!(collect(lims), collect(lims)) 
