@@ -37,14 +37,13 @@ path = "./SolarSimulator/RAW/"
         "E72", "E73", "E74", "E75", "E76", 
         "E77", "E78", "E79", "E80", "E81"]
     
-    IoA = 456000.0 * 1.
-    IoB = 304000.0 * 1.
-    IoC = 256000.0 * 1.
+    IoA = 456000.0 * 1.1
+    IoB = 304000.0 * 1.1
+    IoC = 256000.0 * 0.8 # arbitrary fix KK
 
     ArIo=[IoA, IoA, IoA, IoA, IoA,
         IoB, IoB, IoB, IoB, IoB,
-        IoC, IoC, IoC, IoC, IoC]
-
+        IoC, IoC, IoC, IoC, IoC] .* 0.62
     # Arqplm=[15.27, 12.50, 10.50, 9.10, 7.12,
     #     18.34, 13.16, 9.03, 6.95, 4.53,
     #     13.85, 10.02, 8.04, 6.62, 4.53]
@@ -70,6 +69,8 @@ path = "./SolarSimulator/RAW/"
         T_avg = (T9 .+ T10 .+ T11 .+ T12) ./ 4
         #T_avg = (T8 .+ T9 .+ T10) ./ 3
         #T_avg = (T8 .+ T9 .+ T10 .+ T11 .+ T12 ./ 5)
+        #T_avg = (T9 .+ T10) ./ 2
+
         scatter(t, Tf, ylim=(200, 1200))
         plot!(t, T_avg, label="T_avg")
         #plot!(t, T2)

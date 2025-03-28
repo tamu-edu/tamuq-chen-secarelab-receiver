@@ -99,14 +99,14 @@ begin
     ks_f(T) = (191.9216 - 0.3261784 * T^1 + 2.739462e-4 * T^2 - 7.70926e-8 * T^3) #COMSOL SiC Alpha Polycrystaline
     @register_symbolic ks_f(Tf)
     #Cps = 1290  #J/kg*K
-    Cps(T) = (8.5e-5 * T^2 + 5.63e-2 * T - 4.05e7 * T^-2 + 1125.8) #J/kg*K
+    Cps(T) = (8.5e-5 * T^2 + 5.63e-2 * T - 4.05e7 * T^-2 + 1125.8) #.* 4. #J/kg*K
     @register_symbolic Cps(Ts)
     aCp = 1.0 #correction factor
 
 
     Re_f(qlpm, T) = (m(qlpm) / A_chnl_frt_all) * Lc / μf_f(T) #use of flux instead of u*ρf
     Pr(T) = (cpf_f(T) * μf_f(T)) / kf_f(T)
-    Nu_f6(qlpm, T) = A * (Re_f(qlpm, T)^B) #* (Pr(T)^C)
+    Nu_f6(qlpm, T) = A * (Re_f(qlpm, T)^B) * (Pr(T)^C)
 
     Gz(qlpm, T) = (1 / w_chnl) * Re_f(qlpm, T) * Pr(T) * Lc
     Nu_f5(qlpm, T) = A * (1 - B * Gz(qlpm, T)^n) * exp(-C / Gz(qlpm, T))
@@ -128,7 +128,7 @@ begin
 
     ## SETUP Parameters
 
-    p_opt = [A => 100., B => 0.2, cps_c=> 2.]  #[A => 4., B => 0.06, C => 51., n => 0.5] 
+    p_opt = [A => 100., B => 0.2, C => 0.6]  #[A => 4., B => 0.06, C => 51., n => 0.5] 
     p_cond = [Io => 456000.0, qlpm => 9.1, Tinit => 293.0]
     p_math = Dict(vcat(p_opt, p_cond))
     #extract the parameters names from p_math
@@ -142,7 +142,7 @@ begin
             - ϵ * σ * A_frt * (Ts^4 - Tamb^4)
             - (h_avg_f6(qlpm, Tf) * A_exchange * (Ts - Tf)) 
             - (kins * (r_ins / r0) * (Ts - Tins_f(t)) * A_s_p / (r_ins - r0))
-        ) / (ρs * cps_c * Cps(Ts)),
+        ) / (ρs * 1. * Cps(Ts)),
         Vf * Dt(Tf) ~ (
              - m(qlpm) * cpf_f(Tf) * (Tf - Tamb)
              + (h_avg_f6(qlpm, Tf)* A_exchange * (Ts - Tf))
@@ -205,12 +205,12 @@ begin # define functions
 end
 begin #Optimization
     #p_opt = [ha => 8.99, hb => 1.0, cps_c => 6.0] 
-    p_opt = [A => 10., B => 0.2, cps_c => 2.]  #[A => 4., B => 0.06, C => 51., n => 0.5]
+    p_opt = [A => 9., B => 0.4, C => 10.]  #[A => 4., B => 0.06, C => 51., n => 0.5]
 
     p0 = [x[2] for x in p_opt]
     optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
-    lb = [0.0005, 0.001, 1.]
-    ub = [13., 10., 8.] 
+    lb = [0.001, 0.001, 0.0001]
+    ub = [10., 10., 20.] 
 
     sim_key = ["E67","E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
     #sim_key = ["E70"]#, "E74"]#["E67"]#, "E78", "E79", "E80", "E81"]
@@ -264,7 +264,7 @@ begin
         xlabel="T_mod", ylabel="T_exp", ylims=lims, xlims=lims, aspect_ratio=:equal)
     plot1 = plot!(collect(lims), collect(lims))
 
-    plot(plot0, plot1)
+    #plot(plot0, plot1)
     
     #Plotting the temperature profiles for the gas domanin and a few solid domain profiles across all experimental conditions
 
@@ -329,13 +329,16 @@ begin
 
     # Create the bar plot
     bar_data = hcat(T_mod_values_solid, T_exp_values_solid)
-    plot0 = groupedbar(bar_data, label=["T_mod" "T_exp"], legend=:topright, title="T_steady Comparison",
+    plot3 = groupedbar(bar_data, label=["T_mod" "T_exp"], legend=:topright, title="T_steady Comparison",
         xlabel="Experimental Runs", ylabel="Temperature (K)",
         bar_width=0.4, xticks=(1:length(ordered_sim_conditions), ordered_sim_conditions),
         bar_position=:dodge, color=[color_model color_exp], ylimit=(0, 1250))
 
     lims = (500, 1250)
-    plot1 = scatter(title="Solid Steady State Temperature",T_mod_values_solid, T_exp_values_solid,
+    plot4 = scatter(title="Solid Steady State Temperature",T_mod_values_solid, T_exp_values_solid,
     xlabel="T_mod", ylabel="T_exp", ylims=lims, xlims=lims, aspect_ratio=:equal)
-    plot1 = plot!(collect(lims), collect(lims)) 
+    plot4 = plot!(collect(lims), collect(lims)) 
 end
+
+plot(plot1, plot4)
+
