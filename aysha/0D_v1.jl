@@ -209,7 +209,7 @@ begin #Optimization
 
     p0 = [x[2] for x in p_opt]
     optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
-    lb = [0.0001, 0.0001, 0.0001]
+    lb = [0.00001, 0.0001, 0.0001]
     ub = [10., 10., 20.] 
 
     sim_key = ["E67","E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
@@ -260,7 +260,7 @@ begin
         bar_position=:dodge, color=[color_model color_exp], ylimit=(0, 1250))
 
     lims = (300, 800)
-    plot1 = scatter(T_mod_values, T_exp_values, label="",
+    plot1 = scatter(T_mod_values, T_exp_values, label="", title="Gas SS Temp",
         xlabel="T_mod", ylabel="T_exp", ylims=lims, xlims=lims, aspect_ratio=:equal)
     plot1 = plot!(collect(lims), collect(lims))
 
@@ -298,7 +298,8 @@ begin
         plot!(time_opt, temp_T, label=permutedims(labels), lw=3)
         return plt
     end
-    display(plot(plot1, plt(1:length(sim_key)), layout=(2, 1), size=(900, 600)))
+    #display(plot(plot1, plt(1:length(sim_key)), layout=(2, 1), size=(900, 600)))
+    display(plt(1:length(sim_key)))
     map(x -> display(plt_case(x , pnew)), sim_key)
 end
 
@@ -335,10 +336,11 @@ begin
         bar_position=:dodge, color=[color_model color_exp], ylimit=(0, 1250))
 
     lims = (300, 1150)
-    plot4 = scatter(title="Solid Steady State Temperature",T_mod_values_solid, T_exp_values_solid,
+    plot4 = scatter(title="Solid SS Temp",T_mod_values_solid, T_exp_values_solid,
     xlabel="T_mod", ylabel="T_exp", ylims=lims, xlims=lims, aspect_ratio=:equal)
     plot4 = plot!(collect(lims), collect(lims)) 
 end
 
-plot(plot1, plot4)
-
+#plot(plot1, plot4)
+display(plot(plot1, plot4, layout=(2, 1), size=(300, 600)))
+    

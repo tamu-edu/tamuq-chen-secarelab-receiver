@@ -37,7 +37,7 @@ path = "./SolarSimulator/RAW/"
         "E72", "E73", "E74", "E75", "E76", 
         "E77", "E78", "E79", "E80", "E81"]
     
-    IoA = 456000.0 * 1.1
+    IoA = 456000.0 * 1.0
     IoB = 304000.0 * 1.2
     IoC = 256000.0 * 0.8 # arbitrary fix KK
 
