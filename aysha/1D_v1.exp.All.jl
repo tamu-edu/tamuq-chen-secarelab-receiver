@@ -153,7 +153,7 @@ begin
 
     Re_f(qlpm, T) = (m(qlpm) / A_chnl_frt_all) * Lc / μf_f(T) #use of flux instead of u*ρf
     Pr(T) = (cpf_f(T) * μf_f(T)) / kf_f(T)
-    Nu_f6(qlpm, T) = A * (Re_f(qlpm, T)^B) #* (Pr(T)^C)
+    Nu_f6(qlpm, T) = A * (Re_f(qlpm, T)^B) * (Pr(T)^C)
 
     Gz(qlpm, x, T) = (1 / x) * Re_f(qlpm, T) * Pr(T) * Lc
     Nu_f5(qlpm, x, T) = A * (1 - B * Gz(qlpm, x, T)^n) * exp(-C / Gz(qlpm, x, T))
@@ -183,7 +183,7 @@ begin
 
     #p_opt = [A => 2., B => 0.5, n=> 0.5, C=> 20.]
     #p_opt = [A => 1000.0, B => 0.6, C => 7.0, aloss => 1.0]
-    p_opt = [A => 10., B => 0.2, cps_c => 6.0] #, hext_c => 1.] 
+    p_opt = [A => 9., B => 0.4, C => 10.] #, hext_c => 1.] 
     p_cond = [Io => 456000.0, qlpm => 9.1, Tinit => 293.0]
     p_math = Dict(vcat(p_opt, p_cond))
     #extract the parameters names from p_math
@@ -200,7 +200,7 @@ begin
             A_frt_solid * ks_f(Ts(t, x)) * Dxx(Ts(t, x))
             - (h_avg_f6(qlpm, (Tf(t, x))) * A_exchange * ((Ts(t, x)) - Tf(t, x))) #h_avg_f(qlpm, x, Tf(t, x)) 
             - (kins * (r_ins / r0) * (Ts(t, x) - Tins_f(t)) * A_s_p / (r_ins - r0))
-        ) / (ρs * cps_c * Cps(Ts(t, x))),
+        ) / (ρs * Cps(Ts(t, x))),
         Vf * Dt(Tf(t, x)) ~ (
             A_chnl_frt_all * kf_f(Tf(t, x)) * Dxx(Tf(t, x))
             -
@@ -274,7 +274,7 @@ begin # define functions
     end
     function lossAll(pguess_l, sim_key)
 
-        #to place the conditions loop
+    #to place the conditions loop
 
         lossr = 0 #zeros(length(sim_key))
         #Threads.@threads 
@@ -292,8 +292,8 @@ begin # define functions
             #run selected simulation and get the steady temperature values
             #print(sm)
             temp_T = remakeAysha(pguess_l, cond_k, time_opt)[:, 1:4] #ignore T8
-
-            temp_error = sqrt(sum((temp_T .- expdata) .^ 2)) / length(expdata)
+            #temp_T = reshape(temp_T, length(expdata[1]), length(expdata))
+            temp_error = sqrt(sum((temp_T .- expdata) .^ 2)) ./ length(expdata)
             lossr += temp_error
         end
         return lossr / length(sim_key) #MSE
@@ -301,12 +301,12 @@ begin # define functions
 end
 
 begin
-    p_opt = [A => 10., B => 0.2, cps_c => 6.0] 
+    p_opt = [A => 0.5, B => 0.04, C => 15.]
 
     p0 = [x[2] for x in p_opt]
     optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
-    lb = [0.005, 0.0008, 0.]
-    ub = [30.0, 3., 8.]
+    lb = [0.001, 0.0001, 0.0001]
+    ub = [10., 10., 20.] 
 
     #pguess_opt = ModelingToolkit.varmap_to_vars([Io => 456000, h_average => 14., qlpm => 7.12], parameters(pdesys))
     #sim_key = collect(keys(simulation_conditions))
