@@ -76,12 +76,14 @@ begin
     Dt = Differential(t)
     
     ### Fluid Properties
-    RH = 0.4 #relative humidity
+    RH = 0.0 #relative humidity
     @register_symbolic ρf_f(Tf)
     ρf_f(T) = 352.716 * T^-1 * (1+RH) /(1+ 1.609 * RH) #COMSOL + https://www.engineeringtoolbox.com/density-air-d_680.html with some error for w vs RH
   
     ρf = ρf_f(293.0) #kg/m3
-    m(qlpm, T) = ρf_f(T) * (qlpm / 60.0 / 1000.0) #kg/s mass at the flowmeter conditions T=25oC
+    m(qlpm) = ρf_f(Tamb) * (qlpm / 60.0 / 1000.0) #kg/s mass at the flowmeter conditions T=25oC
+    G(qlpm) = m(qlpm) / A_chnl_frt_all #kg/2/m2 mass at the flowmeter conditions T=25oC
+
 
     mu = 2.0921e-5 #Pa.s
     kf = 0.056 #W/m.K
@@ -99,14 +101,14 @@ begin
     ks_f(T) = (191.9216 - 0.3261784 * T^1 + 2.739462e-4 * T^2 - 7.70926e-8 * T^3) #COMSOL SiC Alpha Polycrystaline
     @register_symbolic ks_f(Tf)
     #Cps = 1290  #J/kg*K
-    Cps(T) = (8.5e-5 * T^2 + 5.63e-2 * T - 4.05e7 * T^-2 + 1125.8) #.* 4. #J/kg*K
+    Cps(T) = (8.5e-5 * T^2 + 5.63e-2 * T - 4.05e7 * T^-2 + 1125.8)# * 4.4 #J/kg*K
     @register_symbolic Cps(Ts)
     aCp = 1.0 #correction factor
 
 
-    Re_f(qlpm, T) = (m(qlpm, T) / A_chnl_frt_all) * Lc / μf_f(T) #use of flux instead of u*ρf
+    Re_f(qlpm, T) = G(qlpm) * Lc / μf_f(T) #use of flux instead of u*ρf
     Pr(T) = (cpf_f(T) * μf_f(T)) / kf_f(T)
-    Nu_f6(qlpm, T) = A * (Re_f(qlpm, T)^B) * (Pr(T)^C)
+    Nu_f6(qlpm, T) = A * (Re_f(qlpm, T)^B) * (Pr(Tamb)^C)
 
     Gz(qlpm, T) = (1 / w_chnl) * Re_f(qlpm, T) * Pr(T) * Lc
     Nu_f5(qlpm, T) = A * (1 - B * Gz(qlpm, T)^n) * exp(-C / Gz(qlpm, T))
@@ -144,7 +146,7 @@ begin
             - (kins * (r_ins / r0) * (Ts - Tins_f(t)) * A_s_p / (r_ins - r0))
         ) / (ρs * 1. * Cps(Ts)),
         Vf * Dt(Tf) ~ (
-             - m(qlpm, Tf) * cpf_f(Tf) * (Tf - Tamb)
+             - m(qlpm) * cpf_f(Tf) * (Tf - Tamb)
              + (h_avg_f6(qlpm, Tf)* A_exchange * (Ts - Tf))
         ) / (ρf_f(Tf) * cpf_f(Tf))
     ]
@@ -205,19 +207,19 @@ begin # define functions
 end
 begin #Optimization
     #p_opt = [ha => 8.99, hb => 1.0, cps_c => 6.0] 
-    p_opt = [A => 9., B => 0.4, C => 10.]  #[A => 4., B => 0.06, C => 51., n => 0.5]
+    p_opt = [A => 0.0005, B => 1.61, C => 0.0001]  #[A => 4., B => 0.06, C => 51., n => 0.5]
 
     p0 = [x[2] for x in p_opt]
     optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
-    lb = [0.00001, 0.0001, 0.0001]
-    ub = [10., 10., 20.] 
+    lb = [0.00001, 0.1, 0.000001]
+    ub = [10., 10., 0.01] 
 
     sim_key = ["E67","E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
     #sim_key = ["E70"]#, "E74"]#["E67"]#, "E78", "E79", "E80", "E81"]
     initialerror = (lossAll(p0, sim_key))
     println("Initial Error $initialerror")
     optprob = Optimization.OptimizationProblem(optf, p0, sim_key, lb=lb, ub=ub)
-    optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method=NLopt.LN_NELDERMEAD(), maxtime=600, local_maxiters=100000)
+    optsol = solve(optprob, NLopt.GN_MLSL_LDS(), local_method=NLopt.LN_NELDERMEAD(), maxtime=60, local_maxiters=10000)
     
     println(optsol.retcode)
     pnew = optsol.u
@@ -291,7 +293,7 @@ begin
         local temp_T = remakeAysha(params, cond_k, time_opt)[:, 1:2] 
 
         labels = measurements[(measurements.simulation_id.==sm), :obs_id]
-        plt = plot(title="Temperature Profiles $sm", xlabel="Time (s)", ylabel="Temperature (K)", ylim=(300, 1600),
+        plt = plot(title="Temperature Profiles $sm", xlabel="Time (s)", ylabel="Temperature (K)", ylim=(300, 1000),
             legend=:outerright, color_palette=colors)
         scatter!(time_opt, expdata, label=permutedims(labels),
             color_palette=colors)
@@ -343,4 +345,27 @@ end
 
 #plot(plot1, plot4)
 display(plot(plot1, plot4, layout=(2, 1), size=(300, 600)))
+
+A, B, C = pnew
+
+T_test=range(300, 1000,100)
+plot(T_test, h_avg_f6.(0.5, T_test), label="0.5 Lpm", xlabel="T (K)", 
+    ylabel="h_avg (W/m2.K)", title="h vs T", legend=:topright, color_palette=colors)
+plot!(T_test, h_avg_f6.(1.0, T_test), label="1.0 Lpm")
+plot!(T_test, h_avg_f6.(1.5, T_test), label="1.5 Lpm")
+plot!(T_test, h_avg_f6.(2.0, T_test), label="2.0 Lpm")
+plot!(T_test, h_avg_f6.(2.5, T_test), label="2.5 Lpm")
+plot!(T_test, h_avg_f6.(3.0, T_test), label="3.0 Lpm")
+
+
     
+fl_test=range(0.4, 3.5,20)
+plot(fl_test, h_avg_f6.(fl_test, 300), label="T=300 K", xlabel="qlpm (Lpm)", 
+    ylabel="h_avg (W/m2.K)", title="h vs qlpm", legend=:bottomright, color_palette=colors)
+plot!(fl_test, h_avg_f6.(fl_test, 400), label="T=400 K")
+plot!(fl_test, h_avg_f6.(fl_test, 500), label="T=500 K")
+plot!(fl_test, h_avg_f6.(fl_test, 600), label="T=600 K")
+plot!(fl_test, h_avg_f6.(fl_test, 700), label="T=700 K")
+plot!(fl_test, h_avg_f6.(fl_test, 800), label="T=800 K")
+plot!(fl_test, h_avg_f6.(fl_test, 900), label="T=900 K")
+plot!(fl_test, h_avg_f6.(fl_test, 1000), label="T=1000 K")
