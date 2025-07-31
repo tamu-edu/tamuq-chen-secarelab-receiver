@@ -18,13 +18,13 @@ begin #FIXED Parameters
     Tamb = (22.448 + 273.15) #K (same for all exp) 
 
     # Receiver dimensions
-    w_t = 19.e-3  # Width of the receiver in meters
+    w_t = 20.e-3  # Width of the receiver in meters
     A_frt = w_t * w_t  # Total frontal area of the receiver (m^2)
     L = 137e-3 #m Length
     A_s_p = w_t * L * 4 #total area solid periphery m2
 
     # Channel dimensions
-    w_chnl = 1.5e-3  # Width of a single channel (m)
+    w_chnl = 1.7e-3  # Width of a single channel (m)
     A_chnl_frt = w_chnl * w_chnl  # Frontal area of a single channel (m^2)
     A_chnl_p = w_chnl * L * 4  # Periphery area of a single channel (m^2)
 
@@ -34,26 +34,51 @@ begin #FIXED Parameters
     Lc = 4 * (w_t * w_t) / (4 * w_t) #hydraulic receiver diameter
 
     # Solid geometrical calculations
-    A_frt_solid = A_frt - A_chnl_frt_all  # Frontal area of solid (m^2)
+    A_frt_solid = A_frt - A_chnl_frt_all  # Frontal area of just solid (m^2)
     A_exchange = A_chnl_p * n_chnl  # Total contact area between fluid and solid (m^2)
 
     # Volume calculations
     Vs = A_frt_solid * L  # Corrected solid volume (m^3)
     Vf = n_chnl * A_chnl_frt * L  # Fluid volume in the channels (m^3)
 
-    #Constants
+    # Alumina Adaptor dimensions
+    rs2 = 38.8E-3/2 # radius of the second solid
+    Ls2 = 59.E-3 # length of the second solid
+    Vs2 = π * rs2^2 * Ls2 # full volume of the second solid (m^3)
+        - A_frt * Ls2 # minus the volume of the first solid in contact with the solid (omitted the tube)
+    A_s1s2 = A_frt * Ls2 # area of the second solid in contact with the first solid (m^2)
+    A_s_p2 = 2 * π * rs2 * Ls2 #periphery area of the second solid (m^2)
+
+       #Constants
     σ = 5.17e-8 #W/m2.K^4 Stefan-Boltzmann constant
-    hext = 1.0 #W/m2.K convective heat transfer coefficient for the front 
+    hext = 10.0 #W/m2.K convective heat transfer coefficient for the front 
 
     #SiC Properties
-    ϵ = 0.75 #emissivity
-    α = 0.625 #absroptivity
+    ϵ = 0.85 #emissivity
+    α = 0.85 #absroptivity
     e = 0.425 #porosity
 
-    #parameters for the insulation
-    r0 = 23 / 1000 #m
-    r_ins = 42 / 1000 #m
-    kins = 1. * 0.078 #W/m*K -->assume very few losses through the insulation
+    #parameters for the insulation + metal (3rd solid)
+    r0 = 23 /2 / 1000 #m
+    r_ins = 150/2 / 1000 #m alumina felt
+    r_metal = 180/2/1000 #m aluminum
+    Vs3 = π * r_metal^2 * L # full volume of the third solid (m^3)
+        + 2 * π * r_metal * (r_metal - r_ins) / 2  # plus the back volume of the metal
+    Vs_ins = π * (r_ins^2 - r0^2) * L # full volume of the insulation (m^3)
+
+    A_s1s3 = A_frt * (L- 0.029) # area of the third solid in contact with the first solid (m^2)
+    A_s2s3 = A_s_p2 # area of the third solid in contact with the second solid (m^2)
+    A_s_p3 = 2 * π * r_metal * L #periphery area of the third solid (m^2)
+    A_s_b3 = π * r_metal^2 #back area of the third solid (m^2)
+    
+
+    kins = 0.078 #W/m*K -->assume very few losses through the insulation
+    kmet = 201 #W/m*K 
+
+    R1 = log(r_ins / r0) / (2 * π * kins * L) #thermal resistance of the insulation
+    R2 = log(r_metal / r_ins) / (2 * π * kmet * L) #thermal resistance of the metal
+    k_eff = log(r_metal / r0) / (2* π * L *(R1 + R2)) #effective thermal conductivity of the insulation
+
 end;
 
 #Exp 71 One typical Insulation Temperature Profile
@@ -72,7 +97,7 @@ begin
     #@independent_variables t 
     @parameters kfs_c cps_c I_loss A B C n #ks h_average A n
     @parameters Io qlpm Tinit
-    @variables t Ts(t) Tf(t)
+    @variables t Ts(t) Tf(t) Ts2(t) Ts3(t)
     Dt = Differential(t)
     
     ### Fluid Properties
@@ -99,18 +124,35 @@ begin
     #ks = (500.0) * 1.97 * ((1 - e)^1.5)/10. #W/m.K
     ρs = 3200  #kg/m3
     ks_f(T) = (191.9216 - 0.3261784 * T^1 + 2.739462e-4 * T^2 - 7.70926e-8 * T^3) #COMSOL SiC Alpha Polycrystaline
+    #ks_f(T) = 52000*exp(-1.24*10^(-5)*(T-273)) / ((T-273)+437) # Munro 1997
     @register_symbolic ks_f(Tf)
+
     #Cps = 1290  #J/kg*K
-    Cps(T) = (8.5e-5 * T^2 + 5.63e-2 * T - 4.05e7 * T^-2 + 1125.8)# * 4.4 #J/kg*K
+    #Cps(T) = (8.5e-5 * T^2 + 5.63e-2 * T - 4.05e7 * T^-2 + 1125.8) *2# * 4.4 #J/kg*K COMSOL
+    Cps(T) = (1110 + 0.15 * T - 425 * exp(-0.003 * T)) *3 # Munro 1997
     @register_symbolic Cps(Ts)
     aCp = 1.0 #correction factor
 
+    #alumina adaptor Properties
+    ρs2 = 3900  #kg/m3
+    ks2_f(T) = 5.5+34.5*exp(-0.0033*(T-273)) # k by Morrell 1987 (Auerkari 1996)
+    @register_symbolic ks2_f(Tf)
+    Cps2(T) = (1.00446+1.742e-4 *T - 2.796e4 * T^-2)*1000 #J/kg*K Cp by Touloukian 1970 (Auerkari 1996)
+    @register_symbolic Cps2(Ts2)
+    h_s1s2 = 100.0 #W/m2.K conduction/convective exchange with first solid
 
+    #Insulation + metal Properties
+    ρs3 = (160 * Vs_ins + 2700 * (Vs3 - Vs_ins)) / Vs3  #kg/m3
+    Cps3 = (1360 * Vs_ins + 900 * (Vs3 - Vs_ins)) / Vs3 #J/kg*K
+    h_s1s3 = h_s1s2 #W/m2.K conduction/convective exchange with first solid
+    h_s2s3 = h_s1s2 #W/m2.K conduction/convective exchange with second solid
+    h_nat = 10.0 #W/m2.K natural convection heat transfer coefficient
+    
     Re_f(qlpm, T) = G(qlpm) * Lc / μf_f(T) #use of flux instead of u*ρf
-    Pr(T) = (cpf_f(T) * μf_f(T)) / kf_f(T)
-    Nu_f6(qlpm, T) = A * (Re_f(qlpm, T)^B) * (Pr(Tamb)^C)
+    Pr_f(T) = (cpf_f(T) * μf_f(T)) / kf_f(T)
+    Nu_f6(qlpm, T) = 10^A * (Re_f(qlpm, T)^B) * (Pr_f(T)^(10^C))
 
-    Gz(qlpm, T) = (1 / w_chnl) * Re_f(qlpm, T) * Pr(T) * Lc
+    Gz(qlpm, T) = (1 / w_chnl) * Re_f(qlpm, T) * Pr_f(T) * Lc
     Nu_f5(qlpm, T) = A * (1 - B * Gz(qlpm, T)^n) * exp(-C / Gz(qlpm, T))
 
     #Gz_f(qlpm, x, T) = (1/x) * Re_f(qlpm) * Pr(T) * Lc
@@ -130,39 +172,53 @@ begin
 
     ## SETUP Parameters
 
-    p_opt = [A => 100., B => 0.2, C => 0.6]  #[A => 4., B => 0.06, C => 51., n => 0.5] 
-    p_cond = [Io => 456000.0, qlpm => 9.1, Tinit => 293.0]
+    p_opt = [A => -1., B => 0.4, C => -5.]  #[A => 4., B => 0.06, C => 51., n => 0.5] 
+    p_cond = [Io => 456000.0, qlpm => 12.5, Tinit => 293.0]
     p_math = Dict(vcat(p_opt, p_cond))
     #extract the parameters names from p_math
     p_names = [i for i in keys(p_math)]
 
     # PDE equation for system 1
     eq1 = [
-        Vs * Dt(Ts) ~ (
+        Vs * Dt(Ts) ~ ( # receiver
             α * Io * A_frt
             - hext * A_frt * (Ts - Tamb)
             - ϵ * σ * A_frt * (Ts^4 - Tamb^4)
-            - (h_avg_f6(qlpm, Tf) * A_exchange * (Ts - Tf)) 
-            - (kins * (r_ins / r0) * (Ts - Tins_f(t)) * A_s_p / (r_ins - r0))
-        ) / (ρs * 1. * Cps(Ts)),
-        Vf * Dt(Tf) ~ (
+            - (h_avg_f6(qlpm, Tf) * A_exchange * (Ts - Tf))
+            - (h_s1s2 * A_s1s2 * (Ts - Ts2)) # conduction/convective exchange with second solid
+            - (h_s1s3 * A_s1s3 * (Ts - Ts3)) # conduction/convective exchange with third solid 
+            ) / (ρs * 1. * Cps(Ts)),
+        Vf * Dt(Tf) ~ ( # fluid
              - m(qlpm) * cpf_f(Tf) * (Tf - Tamb)
              + (h_avg_f6(qlpm, Tf)* A_exchange * (Ts - Tf))
-        ) / (ρf_f(Tf) * cpf_f(Tf))
+            ) / (ρf_f(Tf) * cpf_f(Tf)),
+        Vs2 * Dt(Ts2) ~ ( # adaptor
+            - h_s1s2 * A_s1s2 * (Ts2 - Ts)                     # conduction/convective exchange with first solid
+            - h_s2s3 * A_s2s3 * (Ts2 - Ts3)                 # conduction/convective exchange with third solid
+            #- h_avg_f6(qlpm, Tf) * A_s2f * (Ts2 - Tf)          # heat exchange with fluid (if applicable)
+            ) / (ρs2 * Cps2(Ts2)),
+        Vs3 * Dt(Ts3) ~ ( # insulation + metal
+            - h_s1s3 * A_s1s3 * (Ts3 - Ts)                     # conduction/convective exchange with first solid
+            - h_s2s3 * A_s2s3 * (Ts3 - Ts2)                 # conduction/convective exchange with second solid
+            - h_nat * (A_s_p3 + 2 * A_s_b3) * (Ts3 - (Tamb+50))
+            - ϵ * σ * (A_s_p3 + 2 * A_s_b3)* (Ts3^4 - Tamb^4)  # insulation losses periphery, back and front areas
+            ) / (ρs3 * Cps3)
     ]
   
 
     # Initial values for Ts and Tf
-    u0 = [Ts => Tinit, Tf => Tinit]
+    u0 = [Ts => Tinit, Tf => Tinit + 1., Ts2 => Tinit + 2., Ts3 => Tinit + 3.]
 
     # Time span for the solution
     tspan = (t_min, t_max)
     
     # ODE system for system 1
-    @named odesys = ODESystem(eq1, t, [Ts, Tf], p_names; defaults=p_math)
+    @named odesys = ODESystem(eq1, t, [Ts, Tf, Ts2, Ts3], p_names; defaults=p_math)
     simplified_odesys = structural_simplify(odesys)
     prob = ODEProblem(simplified_odesys, u0, tspan)
 end
+
+sol_temp = solve(prob, FBDF(), reltol=1e-12, abstol=1e-12)
 
 include("import_exp_0D.jl") #import the experimental data
 colors = ColorSchemes.tab10[1:4]
@@ -174,8 +230,8 @@ begin # define functions
         replace!(Tunable(), modeloptim.p, collect(values(rmp)))
         modeloptim_sol = solve(modeloptim, FBDF(), saveat=tvalues, reltol=tolr)#, reltol=1e-12, abstol=1e-12)
         #time = modelfit_sol.t
-        tempT8_op = float.(modeloptim_sol'[:, 1])  # Index 1 corresponds to Ts 
-        tempT3_op = float.(modeloptim_sol'[:, 2])  # Index 2 corresponds to Tf
+        tempT8_op = float.(modeloptim_sol'[:, 4])  # corresponds to Ts 
+        tempT3_op = float.(modeloptim_sol'[:, 3])  # corresponds to Tf
         return ([tempT8_op tempT3_op])
     end
     function remakeAysha(pguess_l, cond_k, time_opt; tolr=1e-7)
@@ -198,6 +254,9 @@ begin # define functions
             #expdata_last = expdata[end, :]   # Last row of experimental data
             #temp_T_last = temp_T[end, :]     # Last row of simulated temperature data
             # Compute error
+            if length(expdata) != length(temp_T)
+                return temp_error = Inf
+            end
             temp_error = sqrt(sum((temp_T .- expdata) .^ 2)) #/ length(expdata)
             #temp_error = sqrt(sum((temp_T_last .- expdata_last) .^ 2))
             lossr += temp_error
@@ -207,12 +266,12 @@ begin # define functions
 end
 begin #Optimization
     #p_opt = [ha => 8.99, hb => 1.0, cps_c => 6.0] 
-    p_opt = [A => 0.0005, B => 1.61, C => 0.0001]  #[A => 4., B => 0.06, C => 51., n => 0.5]
+    p_opt = [A => -2., B => 1.61, C => -2.]  #[A => 4., B => 0.06, C => 51., n => 0.5]
 
     p0 = [x[2] for x in p_opt]
     optf = OptimizationFunction(lossAll, Optimization.AutoForwardDiff())
-    lb = [0.00001, 0.1, 0.000001]
-    ub = [10., 10., 0.01] 
+    lb = [-9., 0.01, -5.]
+    ub = [4., 10., 2.] 
 
     sim_key = ["E67","E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
     #sim_key = ["E70"]#, "E74"]#["E67"]#, "E78", "E79", "E80", "E81"]
@@ -223,7 +282,7 @@ begin #Optimization
     
     println(optsol.retcode)
     pnew = optsol.u
-    println(pnew)
+    display(pnew)
     #res_error = lossAll(pnew, [])
     println("Final Error $(optsol.objective)")
 end
@@ -270,7 +329,7 @@ begin
     
     #Plotting the temperature profiles for the gas domanin and a few solid domain profiles across all experimental conditions
 
-    function plt(it)
+    function plt_own(it)
         plot2 = plot(
             T_steady[it, :time],
             T_steady[it, :T_mod],
@@ -293,15 +352,15 @@ begin
         local temp_T = remakeAysha(params, cond_k, time_opt)[:, 1:2] 
 
         labels = measurements[(measurements.simulation_id.==sm), :obs_id]
-        plt = plot(title="Temperature Profiles $sm", xlabel="Time (s)", ylabel="Temperature (K)", ylim=(300, 1000),
+        plt_t = plot(title="Temperature Profiles $sm", xlabel="Time (s)", ylabel="Temperature (K)", ylim=(300, 1000),
             legend=:outerright, color_palette=colors)
         scatter!(time_opt, expdata, label=permutedims(labels),
             color_palette=colors)
         plot!(time_opt, temp_T, label=permutedims(labels), lw=3)
-        return plt
+        return plt_t
     end
     #display(plot(plot1, plt(1:length(sim_key)), layout=(2, 1), size=(900, 600)))
-    display(plt(1:length(sim_key)))
+    display(plt_own(1:length(sim_key)))
     map(x -> display(plt_case(x , pnew)), sim_key)
 end
 
@@ -344,24 +403,23 @@ begin
 end
 
 #plot(plot1, plot4)
-display(plot(plot1, plot4, layout=(2, 1), size=(300, 600)))
+display(plot(plot1, plot4, layout=(2, 1), size=(600, 900)))
 
 A, B, C = pnew
 
 T_test=range(300, 1000,100)
-plot(T_test, h_avg_f6.(0.5, T_test), label="0.5 Lpm", xlabel="T (K)", 
-    ylabel="h_avg (W/m2.K)", title="h vs T", legend=:topright, color_palette=colors)
-plot!(T_test, h_avg_f6.(1.0, T_test), label="1.0 Lpm")
-plot!(T_test, h_avg_f6.(1.5, T_test), label="1.5 Lpm")
-plot!(T_test, h_avg_f6.(2.0, T_test), label="2.0 Lpm")
-plot!(T_test, h_avg_f6.(2.5, T_test), label="2.5 Lpm")
-plot!(T_test, h_avg_f6.(3.0, T_test), label="3.0 Lpm")
-
+plot_flow = plot(xlabel="T (K)", ylabel="h_avg (W/m2.K)", title="h vs T", legend=:topright, color_palette=colors)
+flow_rates= [1.0, 2.0, 5.0, 10.0, 15.0, 20.0, 30.0]
+for fl in flow_rates
+    plot!(T_test, h_avg_f6.(fl, T_test), label="$(fl) Lpm")
+end
+display(plot_flow)
 
     
-fl_test=range(0.4, 3.5,20)
+fl_test=range(1, 30, 30)
 plot(fl_test, h_avg_f6.(fl_test, 300), label="T=300 K", xlabel="qlpm (Lpm)", 
-    ylabel="h_avg (W/m2.K)", title="h vs qlpm", legend=:bottomright, color_palette=colors)
+    ylabel="h_avg (W/m2.K)", title="h vs qlpm", legend=:bottomright, color_palette=colors,
+    xlims=(0, 30))
 plot!(fl_test, h_avg_f6.(fl_test, 400), label="T=400 K")
 plot!(fl_test, h_avg_f6.(fl_test, 500), label="T=500 K")
 plot!(fl_test, h_avg_f6.(fl_test, 600), label="T=600 K")
