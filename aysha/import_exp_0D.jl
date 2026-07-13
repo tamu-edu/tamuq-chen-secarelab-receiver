@@ -43,7 +43,7 @@ path = "./SolarSimulator/RAW/"
 
     ArIo=[IoA, IoA, IoA, IoA, IoA,
         IoB, IoB, IoB, IoB, IoB,
-        IoC, IoC, IoC, IoC, IoC] * 0.8
+        IoC, IoC, IoC, IoC, IoC] * 1.0
     Arqplm=[15.27, 12.50, 10.50, 9.10, 7.12,
         18.34, 13.16, 9.03, 6.95, 4.53,
         13.85, 10.02, 8.04, 6.62, 4.53]
