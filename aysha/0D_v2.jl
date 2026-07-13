@@ -17,21 +17,21 @@ begin #FIXED Parameters
 
     Tamb = (22.448 + 273.15) #K (same for all exp) 
 
-    # Receiver dimensions
+    # Receiver dimensions (COMSOL D_tot = 20mm, L_channel = 137mm)
     w_t = 20.e-3  # Width of the receiver in meters
     A_frt = w_t * w_t  # Total frontal area of the receiver (m^2)
     L = 137e-3 #m Length
     A_s_p = w_t * L * 4 #total area solid periphery m2
 
-    # Channel dimensions
-    w_chnl = 1.7e-3  # Width of a single channel (m)
+    # Channel dimensions (COMSOL R_channel = 1.65mm, t_channel = 0.35mm)
+    w_chnl = 1.65e-3  # Width of a single channel (m)
     A_chnl_frt = w_chnl * w_chnl  # Frontal area of a single channel (m^2)
     A_chnl_p = w_chnl * L * 4  # Periphery area of a single channel (m^2)
 
     # Channel array
     n_chnl = 10 * 10  # Number of channels (10x10 array)
     A_chnl_frt_all = A_chnl_frt * n_chnl  # Total frontal area of all channels (m^2)
-    Lc = 4 * (w_t * w_t) / (4 * w_t) #hydraulic receiver diameter
+    Lc = 4 * (w_t * w_t) / (4 * w_t) #hydraulic receiver diameter (20mm)
 
     # Solid geometrical calculations
     A_frt_solid = A_frt - A_chnl_frt_all  # Frontal area of just solid (m^2)
@@ -41,43 +41,63 @@ begin #FIXED Parameters
     Vs = A_frt_solid * L  # Corrected solid volume (m^3)
     Vf = n_chnl * A_chnl_frt * L  # Fluid volume in the channels (m^3)
 
-    # Alumina Adaptor dimensions
-    rs2 = 38.8E-3/2 # radius of the second solid
-    Ls2 = 59.E-3 # length of the second solid
-    Vs2 = π * rs2^2 * Ls2 # full volume of the second solid (m^3)
-        - A_frt * Ls2 # minus the volume of the first solid in contact with the solid (omitted the tube)
-    A_s1s2 = A_frt * Ls2 # area of the second solid in contact with the first solid (m^2)
-    A_s_p2 = 2 * π * rs2 * Ls2 #periphery area of the second solid (m^2)
-
-       #Constants
-    σ = 5.17e-8 #W/m2.K^4 Stefan-Boltzmann constant
-    hext = 10.0 #W/m2.K convective heat transfer coefficient for the front 
-
-    #SiC Properties
-    ϵ = 0.85 #emissivity
-    α = 0.85 #absroptivity
-    e = 0.425 #porosity
-
-    #parameters for the insulation + metal (3rd solid)
-    r0 = 23 /2 / 1000 #m
-    r_ins = 150/2 / 1000 #m alumina felt
-    r_metal = 180/2/1000 #m aluminum
-    Vs3 = π * r_metal^2 * L # full volume of the third solid (m^3)
-        + 2 * π * r_metal * (r_metal - r_ins) / 2  # plus the back volume of the metal
-    Vs_ins = π * (r_ins^2 - r0^2) * L # full volume of the insulation (m^3)
-
-    A_s1s3 = A_frt * (L- 0.029) # area of the third solid in contact with the first solid (m^2)
-    A_s2s3 = A_s_p2 # area of the third solid in contact with the second solid (m^2)
-    A_s_p3 = 2 * π * r_metal * L #periphery area of the third solid (m^2)
-    A_s_b3 = π * r_metal^2 #back area of the third solid (m^2)
+    # Alumina Adaptor dimensions (COMSOL Al_radius = 19.4mm, Al_L1 = 29mm, Al_L2 = 28mm, Al_tube = 13mm)
+    rs2 = 19.4e-3 # radius of the second solid (m)
+    Ls2 = 57.e-3 # total length of the adaptor (m)
+    r_tube = 6.5e-3 # radius of the central gas exit tube (m)
+    L_overlap = 29.e-3 # length of overlap with receiver (m)
+    L_free = 28.e-3 # length of exit section (m)
     
+    # Adaptor Volume: (cyl2 - receiver) in overlap + (cyl2 - tube) in free section
+    Vs2 = (π * rs2^2 * L_overlap - A_frt * L_overlap) + π * (rs2^2 - r_tube^2) * L_free
+    
+    A_s1s2 = 4 * w_t * L_overlap # lateral contact area between receiver and adaptor (m^2)
+    A_s_p2 = 2 * π * rs2 * Ls2 # periphery area of the second solid (m^2)
 
-    kins = 0.078 #W/m*K -->assume very few losses through the insulation
-    kmet = 201 #W/m*K 
+    # Constants
+    σ = 5.670374419e-8 # W/m2.K^4 Stefan-Boltzmann constant (COMSOL value)
+    hext = 10.0 # W/m2.K convective heat transfer coefficient for the front 
 
-    R1 = log(r_ins / r0) / (2 * π * kins * L) #thermal resistance of the insulation
-    R2 = log(r_metal / r_ins) / (2 * π * kmet * L) #thermal resistance of the metal
-    k_eff = log(r_metal / r0) / (2* π * L *(R1 + R2)) #effective thermal conductivity of the insulation
+    # SiC Properties
+    ϵ = 0.85 # emissivity
+    α = 0.85 # absorptivity
+    e = 0.425 # porosity
+
+    # Insulation (3rd solid: felt) & Casing (4th solid: metal) parameters
+    r_ins = 75.e-3 # outer radius of insulation felt (m, COMSOL R_ins = 75mm)
+    t_metal = 18.e-3 # thickness of metal shell (m, COMSOL M_Length = 18mm)
+    r_metal = r_ins + t_metal # outer radius of metal casing (m, 93mm)
+    L_metal = L + L_free # total length of metal casing (m, 165mm)
+    L_backplate = t_metal # backplate thickness (m, 18mm)
+
+    # Volumes of insulation & metal
+    # Insulation Volume: surrounds receiver (length 108mm) and adaptor (length 57mm)
+    L_overlap_ins = 108.e-3 # monolith-only insulation length (m)
+    L_adaptor_ins = 57.e-3 # adaptor insulation length (m)
+    Vs_ins = (π * r_ins^2 - A_frt) * L_overlap_ins + π * (r_ins^2 - rs2^2) * L_adaptor_ins # m^3
+    
+    # Metal Volume: outer sleeve + backplate with tube hole
+    Vs_metal = π * (r_metal^2 - r_ins^2) * L_metal + π * (r_metal^2 - r_tube^2) * L_backplate # m^3
+
+    # Surface areas for loss calculations
+    A_s_p3 = 2 * π * r_metal * L_metal # periphery area of metal casing (m^2)
+    A_s_b3 = π * r_metal^2 # back area of metal casing (m^2)
+    A_outer_casing = A_s_p3 + A_s_b3 # total outer area exposed to environment (m^2)
+
+    # Material properties
+    kins = 0.08 # W/m*K (COMSOL ins_k = 0.08)
+    kmet = 201.0 # W/m*K (COMSOL M_k = 201)
+
+    # Thermal resistance network for radial conduction through insulation
+    r0_eq = sqrt(A_frt / π) # equivalent inner radius of square receiver (m)
+    R_ins_total = log(r_ins / r0_eq) / (2 * π * kins * L) # radial resistance monolith section
+    R_out_monolith = R_ins_total / 2 # inner-midpoint resistance
+    
+    R_ins_adpt = log(r_ins / rs2) / (2 * π * kins * Ls2) # radial resistance adaptor section
+    R_out_adpt = R_ins_adpt / 2 # inner-midpoint resistance
+    
+    # Parallel resistance for insulation midpoint (Ts3) to metal casing (Ts4)
+    R_s3s4 = 1.0 / (1.0 / R_out_monolith + 1.0 / R_out_adpt)
 
 end;
 
@@ -94,10 +114,10 @@ end
 
 begin
     # Parameters, variables, and derivatives for system 1
-    @independent_variables t 
+    #@independent_variables t 
     @parameters kfs_c cps_c I_loss A B C n #ks h_average A n
     @parameters Io qlpm Tinit
-    @variables Ts(t) Tf(t) Ts2(t) Ts3(t)
+    @variables t Ts(t) Tf(t) Ts2(t) Ts3(t) Ts4(t)
     Dt = Differential(t)
     
     ### Fluid Properties
@@ -141,12 +161,16 @@ begin
     @register_symbolic Cps2(Ts2)
     h_s1s2 = 100.0 #W/m2.K conduction/convective exchange with first solid
 
-    #Insulation + metal Properties
-    ρs3 = (160 * Vs_ins + 2700 * (Vs3 - Vs_ins)) / Vs3  #kg/m3
-    Cps3 = (1360 * Vs_ins + 900 * (Vs3 - Vs_ins)) / Vs3 #J/kg*K
-    h_s1s3 = h_s1s2 #W/m2.K conduction/convective exchange with first solid
-    h_s2s3 = h_s1s2 #W/m2.K conduction/convective exchange with second solid
-    h_nat = 10.0 #W/m2.K natural convection heat transfer coefficient
+    #Insulation (felt) Properties
+    ρs_ins = 140.0 # kg/m3 (COMSOL ins_rho = 0.140 g/cm3)
+    Cps_ins = 3500.0 # J/kg*K (COMSOL ins_cp = 3500)
+    
+    #Metal Casing Properties
+    ρs_metal = 2700.0 # kg/m3 (COMSOL M_rho = 2700)
+    Cps_metal = 900.0 # J/kg*K (COMSOL M_Cp = 900)
+    ϵ_metal = 0.2 # metal outer emissivity (COMSOL M_emis = 0.2)
+
+    h_nat = 10.0 #W/m2.K natural convection heat transfer coefficient (COMSOL h_nat = 10)
     
     Re_f(qlpm, T) = G(qlpm) * Lc / μf_f(T) #use of flux instead of u*ρf
     Pr_f(T) = (cpf_f(T) * μf_f(T)) / kf_f(T)
@@ -178,36 +202,43 @@ begin
     #extract the parameters names from p_math
     p_names = [i for i in keys(p_math)]
 
-    # PDE equation for system 1
+    # ODE equations for 5-node system
     eq1 = [
-        Vs * Dt(Ts) ~ ( # receiver
+        Vs * Dt(Ts) ~ ( # receiver monolith
             α * Io * A_frt
             - hext * A_frt * (Ts - Tamb)
             - ϵ * σ * A_frt * (Ts^4 - Tamb^4)
             - (h_avg_f6(qlpm, Tf) * A_exchange * (Ts - Tf))
-            - (h_s1s2 * A_s1s2 * (Ts - Ts2)) # conduction/convective exchange with second solid
-            - (h_s1s3 * A_s1s3 * (Ts - Ts3)) # conduction/convective exchange with third solid 
-            ) / (ρs * 1. * Cps(Ts)),
-        Vf * Dt(Tf) ~ ( # fluid
+            - (h_s1s2 * A_s1s2 * (Ts - Ts2)) # contact conduction to alumina adaptor
+            - ((Ts - Ts3) / (R_ins_total / 2)) # conduction loss to insulation felt
+            ) / (ρs * Cps(Ts)),
+            
+        Vf * Dt(Tf) ~ ( # channel fluid
              - m(qlpm) * cpf_f(Tf) * (Tf - Tamb)
-             + (h_avg_f6(qlpm, Tf)* A_exchange * (Ts - Tf))
+             + (h_avg_f6(qlpm, Tf) * A_exchange * (Ts - Tf))
             ) / (ρf_f(Tf) * cpf_f(Tf)),
-        Vs2 * Dt(Ts2) ~ ( # adaptor
-            - h_s1s2 * A_s1s2 * (Ts2 - Ts)                     # conduction/convective exchange with first solid
-            - h_s2s3 * A_s2s3 * (Ts2 - Ts3)                 # conduction/convective exchange with third solid
-            #- h_avg_f6(qlpm, Tf) * A_s2f * (Ts2 - Tf)          # heat exchange with fluid (if applicable)
+            
+        Vs2 * Dt(Ts2) ~ ( # alumina adaptor
+            - h_s1s2 * A_s1s2 * (Ts2 - Ts) # conduction from receiver monolith
+            - ((Ts2 - Ts3) / (R_ins_adpt / 2)) # conduction loss to insulation felt
             ) / (ρs2 * Cps2(Ts2)),
-        Vs3 * Dt(Ts3) ~ ( # insulation + metal
-            - h_s1s3 * A_s1s3 * (Ts3 - Ts)                     # conduction/convective exchange with first solid
-            - h_s2s3 * A_s2s3 * (Ts3 - Ts2)                 # conduction/convective exchange with second solid
-            - h_nat * (A_s_p3 + 2 * A_s_b3) * (Ts3 - (Tamb+50))
-            - ϵ * σ * (A_s_p3 + 2 * A_s_b3)* (Ts3^4 - Tamb^4)  # insulation losses periphery, back and front areas
-            ) / (ρs3 * Cps3)
+            
+        Vs_ins * Dt(Ts3) ~ ( # insulation felt midpoint
+            ((Ts - Ts3) / (R_ins_total / 2)) # heat from receiver monolith
+            + ((Ts2 - Ts3) / (R_ins_adpt / 2)) # heat from adaptor
+            - ((Ts3 - Ts4) / R_s3s4) # heat to metal casing
+            ) / (ρs_ins * Cps_ins),
+            
+        Vs_metal * Dt(Ts4) ~ ( # aluminum casing outer shell
+            ((Ts3 - Ts4) / R_s3s4) # heat from insulation felt
+            - h_nat * A_outer_casing * (Ts4 - Tamb) # natural convection to environment
+            - ϵ_metal * σ * A_outer_casing * (Ts4^4 - Tamb^4) # radiation to environment
+            ) / (ρs_metal * Cps_metal)
     ]
   
 
-    # Initial values for Ts and Tf
-    u0 = [Ts => 293.0, Tf => 294.0, Ts2 => 295.0, Ts3 => 296.0]
+    # Initial values for Ts, Tf, Ts2, Ts3, Ts4
+    u0 = [Ts => 293.0, Tf => 294.0, Ts2 => 295.0, Ts3 => 296.0, Ts4 => 297.0]
 
     # Time span for the solution
     tspan = (t_min, t_max)
@@ -226,7 +257,7 @@ colors = ColorSchemes.tab10[1:4]
 begin # define functions
     #Optimization using NLOpt
     function NLmodeloptim(tvalues, rmp, tolr)
-        u0_map = Dict(Ts => rmp[Tinit], Tf => rmp[Tinit] + 1.0, Ts2 => rmp[Tinit] + 2.0, Ts3 => rmp[Tinit] + 3.0)
+        u0_map = Dict(Ts => rmp[Tinit], Tf => rmp[Tinit] + 1.0, Ts2 => rmp[Tinit] + 2.0, Ts3 => rmp[Tinit] + 3.0, Ts4 => rmp[Tinit] + 4.0)
         rmp_clean = filter(pair -> !isequal(pair.first, Tinit), rmp)
         modeloptim = remake(prob, u0 = u0_map, p = rmp_clean, tspan = (0.0, tvalues[end]))
         modeloptim_sol = solve(modeloptim, FBDF(), saveat=tvalues, reltol=tolr)
