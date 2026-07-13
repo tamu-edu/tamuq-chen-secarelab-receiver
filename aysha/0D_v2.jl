@@ -90,7 +90,7 @@ begin #FIXED Parameters
 
     # Thermal resistance network for radial conduction through insulation
     r0_eq = sqrt(A_frt / π) # equivalent inner radius of square receiver (m)
-    R_ins_total = log(r_ins / r0_eq) / (2 * π * kins * L) # radial resistance monolith section
+    R_ins_total = log(r_ins / r0_eq) / (2 * π * kins * L_overlap_ins) # radial resistance monolith section
     R_out_monolith = R_ins_total / 2 # inner-midpoint resistance
     
     R_ins_adpt = log(r_ins / rs2) / (2 * π * kins * Ls2) # radial resistance adaptor section
@@ -163,7 +163,7 @@ begin
 
     #Insulation (felt) Properties
     ρs_ins = 140.0 # kg/m3 (COMSOL ins_rho = 0.140 g/cm3)
-    Cps_ins = 3500.0 # J/kg*K (COMSOL ins_cp = 3500)
+    Cps_ins = 1360.0 # J/kg*K (COMSOL ins_cp = 3500)
     
     #Metal Casing Properties
     ρs_metal = 2700.0 # kg/m3 (COMSOL M_rho = 2700)
@@ -351,7 +351,7 @@ begin
         bar_width=0.4, xticks=(1:length(ordered_sim_conditions), ordered_sim_conditions),
         bar_position=:dodge, color=[color_model color_exp], ylimit=(0, 1250))
 
-    lims = (300, 800)
+    lims = (300, 850)
     plot1 = scatter(T_mod_values, T_exp_values, label="", title="Gas SS Temp",
         xlabel="T_mod", ylabel="T_exp", ylims=lims, xlims=lims, aspect_ratio=:equal)
     plot1 = plot!(collect(lims), collect(lims))
