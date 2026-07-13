@@ -10,6 +10,7 @@ begin #libraries
     using SciMLStructures: replace!, Tunable
     using SymbolicIndexingInterface: parameter_values, state_values
     using Latexify
+    using CSV
 
 end
 
@@ -50,7 +51,7 @@ begin #FIXED Parameters
     A_s_p2 = 2 * π * rs2 * Ls2 #periphery area of the second solid (m^2)
 
        #Constants
-    σ = 5.17e-8 #W/m2.K^4 Stefan-Boltzmann constant
+    σ = 5.670374419e-8 # W/m2.K^4 Stefan-Boltzmann constant (COMSOL value)
     hext = 10.0 #W/m2.K convective heat transfer coefficient for the front 
 
     #SiC Properties
@@ -129,7 +130,7 @@ begin
 
     #Cps = 1290  #J/kg*K
     #Cps(T) = (8.5e-5 * T^2 + 5.63e-2 * T - 4.05e7 * T^-2 + 1125.8) *2# * 4.4 #J/kg*K COMSOL
-    Cps(T) = (1110 + 0.15 * T - 425 * exp(-0.003 * T)) *3 # Munro 1997
+    Cps(T) = (1110 + 0.15 * T - 425 * exp(-0.003 * T)) *1 # Munro 1997
     @register_symbolic Cps(Ts)
     aCp = 1.0 #correction factor
 
@@ -427,3 +428,143 @@ plot!(fl_test, h_avg_f6.(fl_test, 700), label="T=700 K")
 plot!(fl_test, h_avg_f6.(fl_test, 800), label="T=800 K")
 plot!(fl_test, h_avg_f6.(fl_test, 900), label="T=900 K")
 plot!(fl_test, h_avg_f6.(fl_test, 1000), label="T=1000 K")
+
+# ==========================================
+# ADDITIONAL METRICS COMPUTATION AND EXPORT
+# ==========================================
+begin
+    println("\n=== Computing Additional Metrics (0D v1) ===")
+    
+    # Helper function for t90
+    function get_t90(time, temp)
+        t_init = temp[1]
+        t_ss = temp[end]
+        target = t_init + 0.9 * (t_ss - t_init)
+        idx = findfirst(t -> t >= target, temp)
+        if idx !== nothing
+            return time[idx]
+        else
+            return time[end]
+        end
+    end
+
+    # Define the 0D analysis function to extract all nodes
+    function run_analysis_0D_v1(pguess_l, cond_k, time_opt; tolr=1e-7)
+        pguess_temp = Dict(k => pguess_l[i] for (i, (k, v)) in enumerate(p_opt))
+        rmp = Dict(pguess_temp..., cond_k...)
+        u0_map = Dict(Ts => rmp[Tinit], Tf => rmp[Tinit] + 1.0, Ts2 => rmp[Tinit] + 2.0, Ts3 => rmp[Tinit] + 3.0)
+        rmp_clean = filter(pair -> !isequal(pair.first, Tinit), rmp)
+        modeloptim = remake(prob, u0 = u0_map, p = rmp_clean, tspan = (0.0, time_opt[end]))
+        sol = solve(modeloptim, FBDF(), saveat=time_opt, reltol=tolr)
+        
+        Ts_sol = float.(sol[Ts])
+        Tf_sol = float.(sol[Tf])
+        Ts3_sol = float.(sol[Ts3])
+        
+        return Ts_sol, Tf_sol, Ts3_sol
+    end
+
+    # Determine the next RunID
+    csv_path = "D:/kkakosim/sim_comsol/analysis_results_0D_v1.csv"
+    global next_run_id = 1.0
+    file_exists = isfile(csv_path)
+    
+    if file_exists
+        try
+            existing_df = CSV.read(csv_path, DataFrame)
+            if !isempty(existing_df) && "RunID" in names(existing_df)
+                global next_run_id = maximum(existing_df.RunID) + 1.0
+            end
+        catch err
+            println("Warning: could not read existing CSV file, starting RunID at 1.0. Error: ", err)
+        end
+    end
+
+    results_df = DataFrame(
+        RunID = Float64[],
+        Case = String[],
+        T9_SS_sim = Float64[],
+        T9_SS_exp = Float64[],
+        dT_T09 = Float64[],
+        T3_SS_sim = Float64[],
+        T3_SS_exp = Float64[],
+        dT_T03 = Float64[],
+        T2_SS_sim = Float64[],
+        T2_SS_exp = Float64[],
+        dT_T02 = Float64[],
+        R_leak_sim = Float64[],
+        R_leak_exp = Float64[],
+        t90_sim_T09_s = Float64[],
+        t90_exp_T09_s = Float64[],
+        dt90_T09_s = Float64[],
+        t90_sim_T03_s = Float64[],
+        t90_exp_T03_s = Float64[],
+        dt90_T03_s = Float64[],
+        Gap_ss_sim = Float64[],
+        Gap_ss_exp = Float64[],
+        dGap_ss = Float64[]
+    )
+
+    for sm in sim_key
+        local cond_k = simulation_conditions[sm]
+        
+        # Extract experimental profiles
+        local time_exp = measurements[(measurements.simulation_id .== sm) .& (measurements.obs_id .== "_Tavg"), :time][1]
+        local T9_exp = measurements[(measurements.simulation_id .== sm) .& (measurements.obs_id .== "_T9"), :temperatures][1]
+        local T3_exp = measurements[(measurements.simulation_id .== sm) .& (measurements.obs_id .== "_Tf"), :temperatures][1] # Tf is T3
+        local T2_exp = measurements[(measurements.simulation_id .== sm) .& (measurements.obs_id .== "_T2"), :temperatures][1]
+        
+        # Run simulation
+        Ts_sim, Tf_sim, Ts3_sim = run_analysis_0D_v1(pnew, cond_k, time_exp)
+        
+        # Steady-state values (last element)
+        Ts_ss = Ts_sim[end]
+        Tf_ss = Tf_sim[end]
+        Ts3_ss = Ts3_sim[end]
+        
+        T9_exp_ss = T9_exp[end]
+        T3_exp_ss = T3_exp[end]
+        T2_exp_ss = T2_exp[end]
+        
+        # Temperature differences
+        dT_T09 = Ts_ss - T9_exp_ss
+        dT_T03 = Tf_ss - T3_exp_ss
+        dT_T02 = Ts3_ss - T2_exp_ss
+        
+        # Energy partitioning ratio (R_leak)
+        R_leak_sim = (Tf_ss - Tamb) / (Ts_ss - Tamb)
+        R_leak_exp = (T3_exp_ss - Tamb) / (T9_exp_ss - Tamb)
+        
+        # t90 times
+        t90_sim_T09 = get_t90(time_exp, Ts_sim)
+        t90_exp_T09 = get_t90(time_exp, T9_exp)
+        dt90_T09 = t90_sim_T09 - t90_exp_T09
+        
+        t90_sim_T03 = get_t90(time_exp, Tf_sim)
+        t90_exp_T03 = get_t90(time_exp, T3_exp)
+        dt90_T03 = t90_sim_T03 - t90_exp_T03
+        
+        # Gas-to-solid gap
+        gap_sim = Tf_ss - Ts_ss
+        gap_exp = T3_exp_ss - T9_exp_ss
+        dgap = gap_sim - gap_exp
+        
+        push!(results_df, (
+            next_run_id, sm, Ts_ss, T9_exp_ss, dT_T09, Tf_ss, T3_exp_ss, dT_T03, Ts3_ss, T2_exp_ss, dT_T02,
+            R_leak_sim, R_leak_exp, t90_sim_T09, t90_exp_T09, dt90_T09,
+            t90_sim_T03, t90_exp_T03, dt90_T03, gap_sim, gap_exp, dgap
+        ))
+    end
+    
+    # Print the table to console
+    println(results_df)
+    
+    # Save the dataframe to a CSV file (appending if file exists)
+    if file_exists
+        CSV.write(csv_path, results_df, append=true)
+        println("Appended additional metrics to $csv_path with RunID = $next_run_id")
+    else
+        CSV.write(csv_path, results_df)
+        println("Created new CSV file $csv_path and saved metrics with RunID = $next_run_id")
+    end
+end

@@ -149,7 +149,7 @@ begin
 
     #Cps = 1290  #J/kg*K
     #Cps(T) = (8.5e-5 * T^2 + 5.63e-2 * T - 4.05e7 * T^-2 + 1125.8) *2# * 4.4 #J/kg*K COMSOL
-    Cps(T) = (1110 + 0.15 * T - 425 * exp(-0.003 * T)) *3 # Munro 1997
+    Cps(T) = (1110 + 0.15 * T - 425 * exp(-0.003 * T)) *1 # Munro 1997
     @register_symbolic Cps(Ts)
     aCp = 1.0 #correction factor
 
