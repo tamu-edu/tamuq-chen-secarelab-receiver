@@ -54,7 +54,7 @@ const D_h = 0.0017   # m  (edit if necessary)
     A_s_p = w_t * L * 4 #total area solid periphery m2
 
     # Channel dimensions
-    w_chnl = 1.5e-3  # Width of a single channel (m)
+    w_chnl = 1.7e-3  # Width of a single channel (m)
     A_chnl_frt = w_chnl * w_chnl  # Frontal area of a single channel (m^2)
     A_chnl_p = w_chnl * L * 4  # Periphery area of a single channel (m^2)
 
@@ -92,7 +92,7 @@ function λ1(Bi)
     fλ(λ) = λ * tan(λ)+Bi
     # Bracket: λ→0  => f≈Bi>0 ; λ→π/2 => f→∞ ; root lives in (0,π/2)
     #return find_zero(f, (1e-6, 1.5607963267948966); atol=λ_tol)
-    return find_zero(fλ, 1.5607963267948966; atol=λ_tol)
+    return find_zero(fλ, (0, 1.5607963267948966); atol=λ_tol)
 end
 
 # ---------------------- τ model for given h, k_SiC -----------------------
@@ -125,7 +125,7 @@ function τ_model(h, k)
 end
 
 # ---------------------- fit τ from one trace -----------------------------
-function fit_tau(t::Vector{Float64}, Temp::Vector{Float64}; tail_frac = 0.3)
+function fit_tau(t::Vector{Float64}, Temp::Vector{Float64}; tail_frac = 0.4)
     N   = length(t)
     T_inf, Nt = findmax(Temp)
     Nt  = Int(round(tail_frac*Nt))

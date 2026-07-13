@@ -89,8 +89,26 @@ path = "./SolarSimulator/RAW/"
     end
 
     #rd_data(measurements, i) for i=1:length(filenames)
-    map(x -> rd_data(measurements, x), 1:length(filenames))   
-    
+    map(x -> rd_data(measurements, x), 1:length(filenames))
+
+# create a dataframe with the last temperature (steady state) reported for each thermocouple [Tx] and simulation ID [EXX]
+# each row is a simulation ID and each column is a thermocouple
+    # Create a DataFrame with the last temperature for each thermocouple
+    last_temps = DataFrame(simulation_id=String[], T2=Float64[], T3=Float64[], T8=Float64[], T9=Float64[], T10=Float64[], T11=Float64[], T12=Float64[])
+    for id in unique(measurements.simulation_id)
+        row = (simulation_id=id,
+               T2=measurements[(measurements.simulation_id .== id) .& (measurements.obs_id .== "_T2"), :temperatures][1][end],
+               T3=measurements[(measurements.simulation_id .== id) .& (measurements.obs_id .== "_T3"), :temperatures][1][end],
+               T8=measurements[(measurements.simulation_id .== id) .& (measurements.obs_id .== "_T8"), :temperatures][1][end],
+               T9=measurements[(measurements.simulation_id .== id) .& (measurements.obs_id .== "_T9"), :temperatures][1][end],
+               T10=measurements[(measurements.simulation_id .== id) .& (measurements.obs_id .== "_T10"), :temperatures][1][end],
+               T11=measurements[(measurements.simulation_id .== id) .& (measurements.obs_id .== "_T11"), :temperatures][1][end],
+               T12=measurements[(measurements.simulation_id .== id) .& (measurements.obs_id .== "_T12"), :temperatures][1][end])
+        push!(last_temps, row)
+    end
+    # Save the measurements DataFrame to a CSV file
+    CSV.write("measurements.csv", last_temps)
+           
 #Defining simulation conditions
 simulation_conditions = Dict(
    IDs[i] => Dict(Io => ArIo[i], qlpm => Arqplm[i], Tinit => measurements[(measurements.simulation_id .== IDs[i]) .& (measurements.obs_id .== "_Tf"), :temperatures][1][1]) 

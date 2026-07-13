@@ -75,8 +75,7 @@ function simulate_probe(temp_time, k0, a1, a2, ρc, x_probe, L;
     idx_p  = round(Int, x_probe/dx) + 1
 
     # Tin(t)  — linear interpolation on provided knots
-    Tin_itp = LinearInterpolation(tvec, Tinvec,
-                                  extrapolation_bc = Flat())
+    Tin_itp = LinearInterpolation(tvec, Tinvec,extrapolation_bc = Interpolations.Flat())
 
     function heat_ode!(dT, T, p, t)
         # Update boundary node to prescribed Dirichlet value
@@ -104,7 +103,7 @@ function simulate_probe(temp_time, k0, a1, a2, ρc, x_probe, L;
     # ODE solve
     T0_vec = fill(Tinvec[1], nx)           # init with first Tin
     prob   = ODEProblem(heat_ode!, T0_vec, (tvec[1], tvec[end]))
-    sol    = solve(prob, Rodas4(); saveat = tvec, reltol = 1e-6, abstol = 1e-6)
+    sol    = solve(prob, Tsit5(); saveat = tvec, reltol = 1e-6, abstol = 1e-6)
     return sol[idx_p, :]
 end
 
@@ -126,22 +125,22 @@ end
 # 5.  MAIN SCRIPT
 # -------------------------------------------------------------
 #if abspath(PROGRAM_FILE) == @__FILE__
+
+    # ---------------- data ----------------------------------
+    include("import_exp_0D.jl") #import the experimental data
+
+    dataset = load_data(measurements)   
+
 begin
 
     # ---------------- user inputs ---------------------------
     csv_path    = "transient_Tin_Tp.csv"   # edit accordingly
-    L_felt      = 0.015    # m, thickness of insulation
-    x_probe     = 0.0040 - 0.0018    # m, depth of thermocouple
+    L_felt      = 0.15    # m, thickness of insulation
+    x_probe     = 0.040 - 0.018    # m, depth of thermocouple
     Tf_ref      = 450.0    # K, centre of fitted k(T) window
     Tamb        = 298.15   # K, lab air
     h_nat       = 10.0     # W m⁻² K⁻¹, est. natural conv.
     eps_shell   = 0.15     # emissivity of brushed Al shell
-
-    # ---------------- data ----------------------------------
-    #include("import_exp_0D.jl") #import the experimental data
-
-    dataset = load_data(measurements)
-    
 
     # ---------------- optimisation --------------------------
     p0   = [0.10,   1.0e-3, 0.0, 9.6e4]   # k0, a1, a2, ρc
@@ -151,8 +150,9 @@ begin
     println("\nFitting k(T) and ρc …\n")
     cost(p) = objective(p, dataset, x_probe, L_felt,
                         Tf_ref, Tamb, h_nat, eps_shell)
-    res = optimize(cost, p0, low, high, Fminbox(LBFGS());
-                   rel_tol = 1e-6, abs_tol = 1e-6)
+    #res = optimize(cost, low, high, p0, Fminbox(LBFGS()); f_reltol = 1e-6, f_calls_limit=1000)
+    #res = optimize(cost, p0, LBFGS(), Optim.Options(f_reltol = 1e-6, iterations = 1000))
+    
     p̂ = Optim.minimizer(res)
 
     println("\n=========== BEST‑FIT PARAMETERS ===========")
