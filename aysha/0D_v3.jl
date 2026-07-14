@@ -204,21 +204,18 @@ begin
     #extract the parameters names from p_math
     p_names = [i for i in keys(p_math)]
 
-    # ODE equations for 5-node system
+    # ODE equations for 5-node system with algebraic NTU fluid node
     eq1 = [
         Vs * Dt(Ts) ~ ( # receiver monolith
             α * Io * A_frt # irradiance absorbed by the receiver
             - hext * A_frt_solid * (Ts - Tamb) # front convection losses
             - ϵ * σ * A_frt * (Ts^4 - Tamb^4) # radiation losses
-            - (h_avg_f6(qlpm, Tf) * A_exchange * (Ts - Tf)) # convective heat transfer to channel fluid
+            - (m(qlpm) * cpf_f(Ts) * (Tf - Tamb)) # enthalpy rise of gas (NTU model)
             - (h_s1s2 * A_s1s2 * (Ts - Ts2)) # contact conduction to alumina adaptor
             - ((Ts - Ts3) / (R_ins_total / 2)) # conduction loss to insulation felt
             ) / (ρs * Cps(Ts)),
             
-        Vf * Dt(Tf) ~ ( # channel fluid
-             - m(qlpm) * cpf_f(Tf) * (Tf - Tamb)
-             + (h_avg_f6(qlpm, Tf) * A_exchange * (Ts - Tf))
-            ) / (ρf_f(Tf) * cpf_f(Tf)),
+        Tf ~ Ts - (Ts - Tamb) * exp(-(h_avg_f6(qlpm, Ts) * A_exchange) / (m(qlpm) * cpf_f(Ts))), # algebraic NTU relation
             
         Vs2 * Dt(Ts2) ~ ( # alumina adaptor
             - h_s1s2 * A_s1s2 * (Ts2 - Ts) # conduction from receiver monolith
@@ -239,8 +236,8 @@ begin
     ]
   
 
-    # Initial values for Ts, Tf, Ts2, Ts3, Ts4
-    u0 = [Ts => 293.0, Tf => 294.0, Ts2 => 295.0, Ts3 => 296.0, Ts4 => 297.0]
+    # Initial values for Ts, Ts2, Ts3, Ts4
+    u0 = [Ts => 293.0, Ts2 => 295.0, Ts3 => 296.0, Ts4 => 297.0]
 
     # Time span for the solution
     tspan = (t_min, t_max)
@@ -259,7 +256,7 @@ colors = ColorSchemes.tab10[1:4]
 begin # define functions
     #Optimization using NLOpt
     function NLmodeloptim(tvalues, rmp, tolr)
-        u0_map = Dict(Ts => rmp[Tinit], Tf => rmp[Tinit] + 1.0, Ts2 => rmp[Tinit] + 2.0, Ts3 => rmp[Tinit] + 3.0, Ts4 => rmp[Tinit] + 4.0)
+        u0_map = Dict(Ts => rmp[Tinit], Ts2 => rmp[Tinit] + 2.0, Ts3 => rmp[Tinit] + 3.0, Ts4 => rmp[Tinit] + 4.0)
         rmp_clean = filter(pair -> !isequal(pair.first, Tinit), rmp)
         modeloptim = remake(prob, u0 = u0_map, p = rmp_clean, tspan = (0.0, tvalues[end]))
         modeloptim_sol = solve(modeloptim, FBDF(), saveat=tvalues, reltol=tolr)
@@ -277,21 +274,34 @@ begin # define functions
     end
 
     function lossAll(pguess_l, sim_key)
-        lossr = 0
+        lossr = 0.0
         for sm in sim_key
             local cond_k = simulation_conditions[sm]
             local expdata = reduce(hcat, measurements[(measurements.simulation_id .== sm), :temperatures])[:, 1:2]
             local time_exp = measurements[measurements.simulation_id .== sm, :time][1]
             # Run model and get temperatures
             temp_T = remakeAysha(pguess_l, cond_k, time_exp)[:, 1:2]
-            #expdata_last = expdata[end, :]   # Last row of experimental data
-            #temp_T_last = temp_T[end, :]     # Last row of simulated temperature data
-            # Compute error
-            if length(expdata) != length(temp_T)
-                return temp_error = Inf
+            
+            if length(expdata[:, 1]) != length(temp_T[:, 1])
+                return Inf
             end
-            temp_error = sqrt(sum((temp_T .- expdata) .^ 2)) #/ length(expdata)
-            #temp_error = sqrt(sum((temp_T_last .- expdata_last) .^ 2))
+            
+            N_samples = length(expdata[:, 1])
+            
+            # Calculate total experimental temperature rise for normalization
+            delta_Ts_exp = expdata[end, 1] - expdata[1, 1]
+            delta_Tf_exp = expdata[end, 2] - expdata[1, 2]
+            
+            # Prevent division by zero
+            delta_Ts_exp = abs(delta_Ts_exp) > 1e-3 ? delta_Ts_exp : 1.0
+            delta_Tf_exp = abs(delta_Tf_exp) > 1e-3 ? delta_Tf_exp : 1.0
+            
+            # Normalized sum of squared errors
+            error_s = sum(((temp_T[:, 1] .- expdata[:, 1]) .^ 2)) / (delta_Ts_exp^2)
+            error_f = sum(((temp_T[:, 2] .- expdata[:, 2]) .^ 2)) / (delta_Tf_exp^2)
+            
+            # Average normalized error for this experiment
+            temp_error = (error_s + error_f) / N_samples
             lossr += temp_error
         end
         return lossr / length(sim_key)
@@ -465,7 +475,7 @@ plot!(fl_test, h_avg_f6.(fl_test, 1000), label="T=1000 K")
 # ADDITIONAL METRICS COMPUTATION AND EXPORT
 # ==========================================
 begin
-    println("\n=== Computing Additional Metrics (0D v2) ===")
+    println("\n=== Computing Additional Metrics (0D v3 NTU) ===")
     
     # Helper function for t90
     function get_t90(time, temp)
@@ -484,7 +494,7 @@ begin
     function run_analysis_0D(pguess_l, cond_k, time_opt; tolr=1e-7)
         pguess_temp = Dict(k => pguess_l[i] for (i, (k, v)) in enumerate(p_opt))
         rmp = Dict(pguess_temp..., cond_k...)
-        u0_map = Dict(Ts => rmp[Tinit], Tf => rmp[Tinit] + 1.0, Ts2 => rmp[Tinit] + 2.0, Ts3 => rmp[Tinit] + 3.0, Ts4 => rmp[Tinit] + 4.0)
+        u0_map = Dict(Ts => rmp[Tinit], Ts2 => rmp[Tinit] + 2.0, Ts3 => rmp[Tinit] + 3.0, Ts4 => rmp[Tinit] + 4.0)
         rmp_clean = filter(pair -> !isequal(pair.first, Tinit), rmp)
         modeloptim = remake(prob, u0 = u0_map, p = rmp_clean, tspan = (0.0, time_opt[end]))
         sol = solve(modeloptim, FBDF(), saveat=time_opt, reltol=tolr)
@@ -499,7 +509,7 @@ begin
     end
 
     # Determine the next RunID
-    csv_path = "D:/kkakosim/sim_comsol/analysis_results_0D_v2.csv"
+    csv_path = "D:/kkakosim/sim_comsol/analysis_results_0D_v3.csv"
     global next_run_id = 1.0
     file_exists = isfile(csv_path)
     
