@@ -713,15 +713,18 @@ begin # result helpers
         @eval using StatsPlots
         data = transient_case_v3(simulation_id, params;
                                  is_cooling=is_cooling, nodes=nodes)
+        sensors = (:T8, :T9, :T10, :T3)
+        colors = (:blue, :red, :green, :purple)
         plot_object = plot(title="1D_v3 transient: $simulation_id",
                            xlabel="Time (s)", ylabel="Temperature (K)",
                            legend=:outerright)
-        for sensor in (:T8, :T9, :T10, :T3)
+        for (sensor, color) in zip(sensors, colors)
             plot!(plot_object, data.time, getproperty(data, Symbol(sensor, "_model")),
-                  label="$(sensor) model", lw=2)
+                  label="$(sensor) model", lw=2, color=color)
             scatter!(plot_object, data.time,
                      getproperty(data, Symbol(sensor, "_experiment")),
-                     label="$(sensor) experiment", ms=2, markerstrokewidth=0)
+                     label="$(sensor) experiment", ms=2, markerstrokewidth=0,
+                     color=color)
         end
         return plot_object
     end

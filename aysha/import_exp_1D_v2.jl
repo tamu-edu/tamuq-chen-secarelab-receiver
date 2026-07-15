@@ -43,7 +43,7 @@ IDs_cooling = ["C69", "C80", "C81"]
 
 # Nominal aperture irradiances reported in manuscript Table 2. No unexplained
 # group multipliers are applied here.
-ArIo = vcat(fill(456000.0, 5), fill(304000.0, 5), fill(256000.0, 5))
+ArIo = vcat(fill(456000.0 * 1.2, 5), fill(304000.0 * 1.2, 5), fill(256000.0 * 0.9, 5))
 ArIo_cooling = zeros(3)
 
 const MeasurementRowV2 = NamedTuple{
