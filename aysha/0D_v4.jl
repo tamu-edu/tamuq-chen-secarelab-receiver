@@ -314,6 +314,7 @@ begin # define solver and loss functions
         n_valid = 0
         for sm in sim_key_cool
             cond_k = simulation_conditions_cooling[sm]
+            Io_val = cond_k[Io]
             qlpm_val = cond_k[qlpm]
             Tinit_val = cond_k[Tinit]
 
@@ -325,8 +326,8 @@ begin # define solver and loss functions
             # Use initial T_s,avg from weighted data as the solid state IC
             Tinit_solid = Ts_exp[1]
 
-            # Run model with Io = 0 (no solar input during cooling)
-            Ts_mod, Tf_mod = solve_model(pguess, 0.0, qlpm_val, Tinit_solid, time_exp)
+            # Run model
+            Ts_mod, Tf_mod = solve_model(pguess, Io_val, qlpm_val, Tinit_solid, time_exp)
 
             if any(isnan, Ts_mod) || length(Ts_exp) != length(Ts_mod)
                 return Inf
@@ -729,6 +730,7 @@ begin
     # Process cooling experiments
     for sm in sim_key_cool
         cond_k = simulation_conditions_cooling[sm]
+        Io_val = cond_k[Io]
         qlpm_val = cond_k[qlpm]
         Tinit_val = cond_k[Tinit]
 
@@ -737,7 +739,7 @@ begin
         Tf_exp = measurements_cooling[(measurements_cooling.simulation_id .== sm) .& (measurements_cooling.obs_id .== "_Tf"), :temperatures][1]
         Tinit_solid = Ts_exp[1]  # Use initial T_s,avg as IC
 
-        Ts_mod, Tf_mod = solve_model(pnew, 0.0, qlpm_val, Tinit_solid, time_exp)
+        Ts_mod, Tf_mod = solve_model(pnew, Io_val, qlpm_val, Tinit_solid, time_exp)
 
         Ts_ss_sim = Ts_mod[end]
         Tf_ss_sim = Tf_mod[end]

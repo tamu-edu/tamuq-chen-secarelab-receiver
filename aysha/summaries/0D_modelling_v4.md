@@ -2754,7 +2754,7 @@ It is generally better to weight each experiment or phase according to measureme
 
 ---
 
-## Main change to the study
+# D. Hysteresis
 
 Previously, the heating ramps mainly supported a model based on correlated effective parameters.
 
@@ -2768,6 +2768,592 @@ With cooling data, the analysis can now:
 6. provide a much stronger basis for comparing the 0D and later 1D models.
 
 Three cooling experiments can be very informative, especially if they cover different flow rates or different initial temperature levels.
+
+
+Yes. The most physically defensible way is to add **one hidden thermal-distribution state** to the 0D model.
+
+The hysteresis in gas temperature is usually not caused by a heat-transfer coefficient having two values. It occurs because the same measured average ceramic temperature can correspond to different internal axial temperature profiles:
+
+* During heating, the irradiated and middle regions may be much hotter than the rear.
+* During cooling, stored energy continues redistributing through the ceramic.
+* The gas therefore encounters a different wall-temperature profile even when $T_{s,\mathrm{avg}}$ is the same.
+
+A single-state model loses this information.
+
+## 1. Why the original 0D model produces no hysteresis
+
+The original outlet relation is
+
+$$
+T_{g,\mathrm{out}}
+=
+
+T_{g,\mathrm{in}}
++
+\varepsilon_{\mathrm{eff}}
+\left(
+T_{s,\mathrm{avg}}-T_{g,\mathrm{in}}
+\right).
+$$
+
+For fixed flow rate, this is a unique algebraic relationship between $T_{g,\mathrm{out}}$ and $T_{s,\mathrm{avg}}$. Therefore, heating and cooling must follow the same curve.
+
+To generate a loop, the outlet temperature must depend on at least one additional state containing information about the previous thermal history.
+
+## 2. Introduce an effective gas-weighted wall temperature
+
+The gas does not respond directly to the volume-averaged solid temperature. It responds to a weighted average of the internal wall temperature:
+
+$$
+T_{w,\mathrm{eff}}
+=
+
+\frac{
+\displaystyle
+\int_0^L
+W_g(z),T_w(z),dz
+}{
+\displaystyle
+\int_0^L W_g(z),dz
+}.
+$$
+
+The weighting function $W_g(z)$ depends on local gas-side heat transfer and on how much of the downstream gas temperature is influenced by each axial location.
+
+The gas outlet equation should therefore be written as
+
+$$
+\boxed{
+T_{g,\mathrm{out}}
+=
+
+T_{g,\mathrm{in}}
++
+\varepsilon_g
+\left(
+T_{w,\mathrm{eff}}-T_{g,\mathrm{in}}
+\right).
+}
+$$
+
+The required hysteresis appears when $T_{w,\mathrm{eff}}$ is treated as a dynamic variable rather than being set equal to $T_{s,\mathrm{avg}}$.
+
+## 3. Minimum two-state 0D model
+
+Retain the average solid-temperature state:
+
+$$
+T_s=T_{s,\mathrm{avg}}.
+$$
+
+Add a profile or wall state (a(t)), representing the difference between the gas-weighted wall temperature and the average ceramic temperature:
+
+$$
+\boxed{
+T_{w,\mathrm{eff}}
+=
+
+T_s+\chi_a a.
+}
+$$
+
+The variable $a$ has units of temperature. It represents the strength and sign of the internal axial temperature nonuniformity.
+
+The average solid balance remains
+
+$$
+\boxed{
+C_{\mathrm{eff}}
+\frac{dT_s}{dt}
+=
+
+\dot Q_{\mathrm{abs}}
+-
+
+\dot Q_g
+-
+
+\dot Q_{\mathrm{loss}}.
+}
+$$
+
+The gas heat-removal rate is
+
+$$
+\dot Q_g
+=
+
+\dot m c_{p,g}
+\left(
+T_{g,\mathrm{out}}-T_{g,\mathrm{in}}
+\right).
+$$
+
+The gas outlet temperature is
+
+$$
+\boxed{
+T_{g,\mathrm{out}}
+=
+
+T_{g,\mathrm{in}}
++
+\varepsilon_g(\dot m)
+\left[
+T_s+\chi_a a-T_{g,\mathrm{in}}
+\right].
+}
+$$
+
+A simple dynamic equation for the profile state is
+
+$$
+\boxed{
+\tau_a\frac{da}{dt}
++
+a
+=
+
+R_q\dot Q_{\mathrm{abs}}
+-
+
+R_g\dot Q_g.
+}
+$$
+
+Here:
+
+* $R_q\dot Q_{\mathrm{abs}}$ represents development of the hot axial profile caused by solar heating.
+* $R_g\dot Q_g$ represents flattening or alteration of that profile caused by gas heat removal.
+* $\tau_a$ is the characteristic time required for axial conduction to redistribute heat.
+* $\chi_a$ converts the profile state into the gas-weighted wall-temperature correction.
+
+This is still a 0D model: it contains two ordinary differential equations and no spatial derivative.
+
+## 4. How the hysteresis is produced
+
+During heating,
+
+$$
+\dot Q_{\mathrm{abs}}>0,
+$$
+
+and the profile state generally becomes positive:
+
+$$
+a>0.
+$$
+
+Therefore,
+
+$$
+T_{w,\mathrm{eff}}>T_s.
+$$
+
+The gas sees hot internal surfaces, especially around the observed $58\ \mathrm{mm}$ hot region, and the gas outlet temperature is relatively high.
+
+When irradiance is removed,
+
+$$
+\dot Q_{\mathrm{abs}}=0,
+$$
+
+but the profile state cannot disappear instantaneously. It decays according to
+
+$$
+\tau_a\frac{da}{dt}+a=-R_g\dot Q_g.
+$$
+
+Thus, during early cooling, two cases are possible:
+
+* $a$ remains positive because the middle region is still hotter than the receiver average.
+* $a$ may change sign later if the wall regions affecting the gas cool faster than the bulk ceramic.
+
+Consequently, at the same value of $T_s$,
+
+$$
+a_{\mathrm{heating}}\neq a_{\mathrm{cooling}},
+$$
+
+and therefore
+
+$$
+T_{g,\mathrm{out,heating}}
+\neq
+T_{g,\mathrm{out,cooling}}.
+$$
+
+This generates the observed loop without introducing an artificial heating/cooling switch.
+
+## 5. Basis from an axial heat-transfer model
+
+The additional state can be derived from a first-mode approximation of the solid-temperature field:
+
+$$
+T_s(z,t)
+\approx
+T_{s,\mathrm{avg}}(t)
++
+a(t)\phi_1(z),
+$$
+
+where $\phi_1(z)$ is an axial shape function satisfying
+
+$$
+\int_0^L \phi_1(z),dz=0.
+$$
+
+The zero-average condition ensures that $a\phi_1$ modifies the temperature distribution without changing the average stored-energy temperature.
+
+For example, $\phi_1(z)$ could be selected to represent the measured hot region around $58\ \mathrm{mm}$. It might be constructed from:
+
+* a first axial conduction eigenfunction;
+* a polynomial fitted to the thermocouple positions;
+* a shape obtained from the later 1D model;
+* principal-component analysis of the measured temperature profiles.
+
+The gas-weighted wall temperature then becomes
+
+$$
+T_{w,\mathrm{eff}}
+=
+
+T_{s,\mathrm{avg}}
++
+a
+\frac{
+\displaystyle
+\int_0^L W_g(z)\phi_1(z),dz
+}{
+\displaystyle
+\int_0^L W_g(z),dz
+}.
+$$
+
+Thus,
+
+$$
+\boxed{
+\chi_a
+=
+
+\frac{
+\displaystyle
+\int_0^L W_g(z)\phi_1(z),dz
+}{
+\displaystyle
+\int_0^L W_g(z),dz
+}.
+}
+$$
+
+This gives a physical interpretation to the coefficient $\chi_a$.
+
+## 6. Estimate of the profile time constant from geometry
+
+An initial estimate for the axial redistribution time is based on ceramic thermal diffusion:
+
+$$
+t_{\mathrm{diff}}
+\sim
+\frac{L^2}{\alpha_s},
+$$
+
+where
+
+$$
+\alpha_s
+=
+
+\frac{k_s}{\rho_sc_{p,s}}.
+$$
+
+For a first axial mode, a more useful estimate is
+
+$$
+\boxed{
+\tau_a
+\approx
+\frac{L^2}{\lambda_1^2\alpha_s},
+}
+$$
+
+where $\lambda_1$ depends on the axial boundary conditions.
+
+For an idealized mode with $\lambda_1\approx\pi$,
+
+$$
+\tau_a
+\approx
+\frac{L^2}{\pi^2\alpha_s}.
+$$
+
+Because the receiver is end-heated and has mixed heat-loss conditions, this should be treated as an initial estimate. The final value should be obtained from the heating and cooling data.
+
+## 7. A simpler empirical version
+
+If a physical forcing equation for $a$ is difficult to identify, use a first-order dynamic correction:
+
+$$
+\boxed{
+\tau_a\frac{da}{dt}
++
+a
+=
+
+K_q q''_{\mathrm{sol}}
++
+K_T\frac{dT_s}{dt}.
+}
+$$
+
+The outlet equation remains
+
+$$
+T_{g,\mathrm{out}}
+=
+
+T_{g,\mathrm{in}}
++
+\varepsilon_g
+\left(
+T_s+\chi_a a-T_{g,\mathrm{in}}
+\right).
+$$
+
+The term
+
+$$
+K_T\frac{dT_s}{dt}
+$$
+
+causes the wall correction to have different signs or magnitudes during heating and cooling.
+
+This form is useful for control, but it is less directly tied to energy conservation than the absorbed-power and gas-removal formulation.
+
+## 8. Sensor-induced hysteresis must also be checked
+
+Before assigning the entire hysteresis to receiver heat transfer, the dynamics of the gas thermocouple should be modeled.
+
+A simple sensor-lag equation is
+
+$$
+\boxed{
+\tau_{\mathrm{TC}}
+\frac{dT_{g,\mathrm{meas}}}{dt}
++
+T_{g,\mathrm{meas}}
+=
+
+T_{g,\mathrm{out,true}}.
+}
+$$
+
+This alone creates a loop when measured gas temperature is plotted against solid temperature.
+
+A gas thermocouple inside a hot ceramic receiver may also be affected by radiation:
+
+$$
+\begin{aligned}
+C_{\mathrm{TC}}
+\frac{dT_{\mathrm{TC}}}{dt}
+={}&
+h_{\mathrm{TC}}A_{\mathrm{TC}}
+(T_g-T_{\mathrm{TC}})
+\\
+&+
+\epsilon_{\mathrm{TC}}\sigma A_{\mathrm{TC}}
+(T_{w,\mathrm{rad}}^4-T_{\mathrm{TC}}^4)
+\\
+&+
+G_{\mathrm{wire}}
+(T_{\mathrm{support}}-T_{\mathrm{TC}}).
+\end{aligned}
+$$
+
+Because the wall-temperature distribution differs during heating and cooling, radiation bias can itself be path dependent.
+
+The recommended observation model is therefore
+
+$$
+\boxed{
+\tau_{\mathrm{TC}}
+\frac{dT_{g,\mathrm{meas}}}{dt}
++
+T_{g,\mathrm{meas}}
+=
+
+T_{g,\mathrm{in}}
++
+\varepsilon_g
+\left(
+T_s+\chi_a a-T_{g,\mathrm{in}}
+\right).
+}
+$$
+
+This separates receiver memory from thermocouple memory.
+
+## 9. Recommended identification procedure
+
+Use all heating and cooling data simultaneously.
+
+First estimate the average-temperature state from the solid thermocouples:
+
+$$
+T_s
+=
+
+\sum_iw_iT_i.
+$$
+
+Then fit the base energy model to identify
+
+$$
+C_{\mathrm{eff}},
+\qquad
+K_{\mathrm{loss}},
+\qquad
+\eta_{\mathrm{eff}}.
+$$
+
+Next fit the gas-temperature loop using
+
+$$
+\tau_a,
+\qquad
+R_q,
+\qquad
+R_g,
+\qquad
+\chi_a,
+\qquad
+\varepsilon_g(\dot m),
+\qquad
+\tau_{\mathrm{TC}}.
+$$
+
+The objective should include both heating and cooling:
+
+$$
+\begin{aligned}
+J
+={}&
+\sum_k
+\left[
+T_{s,\mathrm{meas}}(t_k)
+-
+
+T_{s,\mathrm{model}}(t_k)
+\right]^2
+\\
+&+
+w_g
+\sum_k
+\left[
+T_{g,\mathrm{meas}}(t_k)
+-
+
+T_{g,\mathrm{model}}(t_k)
+\right]^2.
+\end{aligned}
+$$
+
+The parameters should be shared across experiments, while measured irradiance, mass flow, inlet gas temperature and initial conditions vary by experiment.
+
+## 10. Recommended control-oriented model
+
+The minimum model likely to reproduce the observed hysteresis is
+
+$$
+\boxed{
+C_{\mathrm{eff}}
+\frac{dT_s}{dt}
+=
+
+\eta_{\mathrm{eff}}A_{\mathrm{irr}}q''_{\mathrm{sol}}
+-
+
+\dot m c_{p,g}
+(T_{g,\mathrm{out}}-T_{g,\mathrm{in}})
+-
+
+K_{\mathrm{loss}}(T_s-T_\infty),
+}
+$$
+
+$$
+\boxed{
+\tau_a\frac{da}{dt}
++
+a
+=
+
+R_q\eta_{\mathrm{eff}}A_{\mathrm{irr}}q''_{\mathrm{sol}}
+-
+
+R_g\dot m c_{p,g}
+(T_{g,\mathrm{out}}-T_{g,\mathrm{in}}),
+}
+$$
+
+and
+
+$$
+\boxed{
+T_{g,\mathrm{out}}
+=
+
+T_{g,\mathrm{in}}
++
+\varepsilon_g(\dot m)
+\left[
+T_s+\chi_a a-T_{g,\mathrm{in}}
+\right].
+}
+$$
+
+Optionally, add the thermocouple equation
+
+$$
+\boxed{
+\tau_{\mathrm{TC}}
+\frac{dT_{g,\mathrm{meas}}}{dt}
++
+T_{g,\mathrm{meas}}
+=
+
+T_{g,\mathrm{out}}.
+}
+$$
+
+This produces hysteresis through real thermal memory while retaining a very small state dimension:
+
+$$
+\mathbf{x}
+=
+
+\begin{bmatrix}
+T_s\\
+a
+\end{bmatrix},
+$$
+
+or, including sensor dynamics,
+
+$$
+\mathbf{x}
+=
+
+\begin{bmatrix}
+T_s\\
+a\\
+T_{g,\mathrm{meas}}
+\end{bmatrix}.
+$$
+
+The best interpretation is therefore not to add an empirical hysteresis curve directly. It is to add the **first unresolved axial thermal mode** to the 0D model. This remains computationally simple enough for control while linking the loop to ceramic conductivity, receiver length, irradiance, gas flow and sensor dynamics.
+
 
 
 

@@ -55,6 +55,8 @@ path = "./SolarSimulator/RAW/"
     ArIo=[IoA, IoA, IoA, IoA, IoA,
         IoB, IoB, IoB, IoB, IoB,
         IoC, IoC, IoC, IoC, IoC] * 1.0
+    ArIo_cooling=[0, 0, 0]
+
     Arqplm=[15.27, 12.50, 10.50, 9.10, 7.12,
         18.34, 13.16, 9.03, 6.95, 4.53,
         13.85, 10.02, 8.04, 6.62, 4.53]
@@ -141,7 +143,7 @@ CSV.write("measurements_cooling.csv", last_temps)
 
 # Defining cooling simulation conditions
 simulation_conditions_cooling = Dict(
-   IDs_cooling[i] => Dict(qlpm => Arqplm_cooling[i], Tinit => measurements_cooling[(measurements_cooling.simulation_id .== IDs_cooling[i]) .& (measurements_cooling.obs_id .== "_Tf"), :temperatures][1][1]) 
+   IDs_cooling[i] => Dict(Io => ArIo_cooling[i], qlpm => Arqplm_cooling[i], Tinit => measurements_cooling[(measurements_cooling.simulation_id .== IDs_cooling[i]) .& (measurements_cooling.obs_id .== "_Tf"), :temperatures][1][1]) 
    for i=1:length(IDs_cooling)
 )
 
