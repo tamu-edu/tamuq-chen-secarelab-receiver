@@ -295,8 +295,9 @@ begin # data and calibration
     open(parameter_path_v3, "w") do io
         println(io, "index,name,value")
         names = (
-            "gamma_C", "k_scale", "U_side", "U_rear", "h_ref", "n_exp",
-            "tau_T3", "eta_abs", "beta_opt", "h_front", "eps_front",
+            "gamma_C", "k_scale", "U_side", "U_rear",
+            "A_Nu", "B_Re", "C_Pr", "tau_T3",
+            "eta_abs", "beta_opt", "h_front", "eps_front",
         )
         for i in eachindex(calibrated_parameters_v3)
             println(io, join((i, names[i], calibrated_parameters_v3[i]), ','))

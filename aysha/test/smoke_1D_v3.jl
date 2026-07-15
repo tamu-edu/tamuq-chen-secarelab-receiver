@@ -3,7 +3,7 @@ using Test
 include(joinpath(@__DIR__, "..", "1D_v3.jl"))
 
 @testset "1D_v3 finite-volume smoke test" begin
-    @test length(pnew) == 11
+    @test length(pnew) == 12
     @test length(sim_key_heat) == 15
     @test length(sim_key_cool) == 3
 

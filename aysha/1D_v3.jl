@@ -54,8 +54,6 @@ begin # fixed parameters
     rho_s = 3200.0
 
     sensor_positions = Dict(:T8 => 0.011, :T9 => 0.058, :T10 => 0.107)
-    reference_flow_lpm = 10.0
-    reference_temperature = 600.0
     default_nodes = 25
 
     # Keys used by the external importer and legacy-style condition dictionaries.
@@ -82,18 +80,19 @@ end;
 #   p[2]  k_scale     effective axial-conductivity multiplier
 #   p[3]  U_side      side-loss conductance per receiver length [W/m/K]
 #   p[4]  U_rear      rear/adaptor conductance [W/K]
-#   p[5]  h_ref       effective h at 10 standard L/min and 600 K [W/m2/K]
-#   p[6]  n_exp       flow exponent in h = h_ref*(flow/10)^n_exp
-#   p[7]  tau_T3      outlet sensor/downstream lag [s]
+#   p[5]  A_Nu        Nusselt multiplier exponent in 10^A_Nu
+#   p[6]  B_Re        Reynolds exponent in Re^B_Re
+#   p[7]  C_Pr        Prandtl double-exponent in Pr^(10^C_Pr)
+#   p[8]  tau_T3      outlet sensor/downstream lag [s]
 # Heating parameters:
-#   p[8]  eta_abs     absorbed solar fraction
-#   p[9]  beta_opt    Beer-Lambert extinction coefficient [1/m]
-#   p[10] h_front     front convection coefficient [W/m2/K]
-#   p[11] eps_front   effective front emissivity
+#   p[9]  eta_abs     absorbed solar fraction
+#   p[10] beta_opt    Beer-Lambert extinction coefficient [1/m]
+#   p[11] h_front     front convection coefficient [W/m2/K]
+#   p[12] eps_front   effective front emissivity
 begin # parameter values and bounds
-    p_cool_init = [1.0, 1.0, 0.35, 0.10, 4.0, 1.0, 20.0]
-    lb_cool = [0.10, 0.10, 0.01, 0.001, 0.10, 0.10, 0.50]
-    ub_cool = [5.00, 5.00, 5.00, 5.000, 100.0, 2.00, 500.0]
+    p_cool_init = [1.0, 1.0, 0.35, 0.10, -1.0, 1.0, 0.5, 20.0]
+    lb_cool = [0.10, 0.10, 0.01, 0.001, -3.0, 0.50, -1.0, 0.50]
+    ub_cool = [5.00, 5.00, 5.00, 5.000, 1.00, 2.00, 2.00, 500.0]
 
     p_heat_init = [0.85, 50.0, 10.0, 0.85]
     lb_heat = [0.10, 1.0, 0.10, 0.10]
@@ -217,8 +216,12 @@ function gas_profile_v3!(Tg, Qgas, hcell, Ts, time, p, operating, z, dx)
     for i in eachindex(Ts)
         Tfilm = 0.5 * (Ts[i] + Tg[i])
         cp = cpf_f(Tfilm)
-        temperature_factor = kf_f(Tfilm) / kf_f(reference_temperature)
-        hcell[i] = p[5] * (flow / reference_flow_lpm)^p[6] * temperature_factor
+        mu = mu_f_f(Tfilm)
+        kf = kf_f(Tfilm)
+        reynolds = mdot * Dh / (A_flow * mu)
+        prandtl = cp * mu / kf
+        nusselt = 10.0^p[5] * reynolds^p[6] * prandtl^(10.0^p[7])
+        hcell[i] = nusselt * kf / Dh
         UA = hcell[i] * P_exchange * dx
         effectiveness = -expm1(-UA / (mdot * cp))
         Tg[i + 1] = Tg[i] + effectiveness * (Ts[i] - Tg[i])
@@ -245,14 +248,14 @@ function receiver_rhs_v3!(dTs, Ts, time, p, operating, z, dx, solar_weights,
         dTs[i + 1] += Qcond
     end
 
-    Qsolar = p[8] * max(0.0, operating.irradiance(time)) * A_frt
+    Qsolar = p[9] * max(0.0, operating.irradiance(time)) * A_frt
     for i in 1:nodes
         Qside = p[3] * dx * (Ts[i] - ambient)
         dTs[i] += Qsolar * solar_weights[i] - Qgas[i] - Qside
     end
 
-    Qfront = p[10] * A_frt * (Ts[1] - ambient) +
-             p[11] * sigma_sb * A_frt * (Ts[1]^4 - ambient^4)
+    Qfront = p[11] * A_frt * (Ts[1] - ambient) +
+             p[12] * sigma_sb * A_frt * (Ts[1]^4 - ambient^4)
     Qrear = p[4] * (Ts[end] - ambient)
     dTs[1] -= Qfront
     dTs[end] -= Qrear
@@ -278,10 +281,10 @@ function simulate_v3(p, operating, save_times;
                      initial_temperature=Tamb, nodes=default_nodes,
                      solver=Rodas5P(autodiff=AutoFiniteDiff()),
                      reltol=1e-6, abstol=1e-7, dtmax=30.0)
-    length(p) == 11 || throw(ArgumentError("1D_v3 expects 11 parameters"))
+    length(p) == 12 || throw(ArgumentError("1D_v3 expects 12 parameters"))
     all(isfinite, p) || throw(ArgumentError("all model parameters must be finite"))
-    p[1] > 0.0 && p[2] > 0.0 && p[5] > 0.0 ||
-        throw(ArgumentError("capacity, conductivity, and h parameters must be positive"))
+    p[1] > 0.0 && p[2] > 0.0 ||
+        throw(ArgumentError("capacity and conductivity parameters must be positive"))
     nodes >= 3 || throw(ArgumentError("at least three axial nodes are required"))
 
     time = Float64.(save_times)
@@ -292,7 +295,7 @@ function simulate_v3(p, operating, save_times;
     dx = L / nodes
     z = collect(range(dx / 2, step=dx, length=nodes))
     zg = collect(range(0.0, L, length=nodes + 1))
-    weights = solar_weights_v3(p[9], nodes)
+    weights = solar_weights_v3(p[10], nodes)
     Ts_initial = initial_profile_v3(initial_temperature, z)
     Tg_history = Matrix{Float64}(undef, nodes + 1, length(time))
     h_history = Matrix{Float64}(undef, nodes, length(time))
@@ -371,7 +374,7 @@ function energy_rates_v3(Ts, time, p, operating)
     nodes = length(Ts)
     dx = L / nodes
     z = collect(range(dx / 2, step=dx, length=nodes))
-    weights = solar_weights_v3(p[9], nodes)
+    weights = solar_weights_v3(p[10], nodes)
     Tg = zeros(nodes + 1)
     Qgas_cell = zeros(nodes)
     hcell = zeros(nodes)
@@ -380,11 +383,11 @@ function energy_rates_v3(Ts, time, p, operating)
                      Tg, Qgas_cell, hcell)
 
     ambient = operating.ambient_temperature(time)
-    absorbed = p[8] * max(0.0, operating.irradiance(time)) * A_frt
+    absorbed = p[9] * max(0.0, operating.irradiance(time)) * A_frt
     gas = sum(Qgas_cell)
     side = p[3] * dx * sum(Ts .- ambient)
-    front = p[10] * A_frt * (Ts[1] - ambient) +
-            p[11] * sigma_sb * A_frt * (Ts[1]^4 - ambient^4)
+    front = p[11] * A_frt * (Ts[1] - ambient) +
+            p[12] * sigma_sb * A_frt * (Ts[1]^4 - ambient^4)
     rear = p[4] * (Ts[end] - ambient)
     volume = A_solid * dx
     storage = sum(rho_s * p[1] * Cps_f(Ts[i]) * volume * dTs[i] for i in 1:nodes)
@@ -445,7 +448,7 @@ begin # experimental profiles
         T9 = solid_at_v3(result, sensor_positions[:T9])
         T10 = solid_at_v3(result, sensor_positions[:T10])
         Tf_true = vec(result.gas_temperature[end, :])
-        Tf = apply_T3_lag_v3(Tf_true, T3_initial, result.time, p[7])
+        Tf = apply_T3_lag_v3(Tf_true, T3_initial, result.time, p[8])
         h_mean = vec(mean(result.heat_transfer_coefficient, dims=1))
         return hcat(T8, T9, T10, Tf, h_mean)
     end
