@@ -1973,4 +1973,801 @@ $$
 
 This preserves a genuinely simple control model while using the thermocouple array to incorporate the otherwise missing axial information.
 
+# C. Incorporate Cooling Data
+Cooling data substantially strengthens the analysis. During cooling, the solar-input term disappears, so the model is no longer trying to distinguish heat storage, heat loss, and uncertain absorbed solar power at the same time.
+
+## 1. Cooling form of the 0D model
+
+The general one-state model is
+
+$$
+C_{\mathrm{eff}}
+\frac{dT_{s,\mathrm{avg}}}{dt}
+=
+
+\eta_{\mathrm{eff}}A_{\mathrm{irr}}q''_{\mathrm{sol}}
+-
+
+K_g
+\left(
+T_{s,\mathrm{avg}}-T_{g,\mathrm{in}}
+\right)
+-
+
+\dot Q_{\mathrm{loss}}.
+$$
+
+During cooling, after the solar flux is removed,
+
+$$
+q''_{\mathrm{sol}}\simeq0.
+$$
+
+The model becomes
+
+$$
+\boxed{
+C_{\mathrm{eff}}
+\frac{dT_{s,\mathrm{avg}}}{dt}
+=
+
+*
+
+K_g
+\left(
+T_{s,\mathrm{avg}}-T_{g,\mathrm{in}}
+\right)
+-
+
+\dot Q_{\mathrm{loss}}.
+}
+$$
+
+For a linear loss model,
+
+$$
+\dot Q_{\mathrm{loss}}
+=
+
+K_{\mathrm{loss}}
+\left(
+T_{s,\mathrm{avg}}-T_\infty
+\right),
+$$
+
+so
+
+$$
+\boxed{
+C_{\mathrm{eff}}
+\frac{dT_{s,\mathrm{avg}}}{dt}
+=
+
+*
+
+K_g
+\left(
+T_{s,\mathrm{avg}}-T_{g,\mathrm{in}}
+\right)
+-
+
+K_{\mathrm{loss}}
+\left(
+T_{s,\mathrm{avg}}-T_\infty
+\right).
+}
+$$
+
+The important point is that the effective absorptivity,
+
+$$
+\eta_{\mathrm{eff}},
+$$
+
+does not appear in this cooling equation.
+
+---
+
+## 2. Analytical cooling solution
+
+If the mass flow, inlet gas temperature, ambient temperature, and heat-transfer coefficients remain approximately constant during cooling, define
+
+$$
+K_{\mathrm{tot}}
+=
+
+K_g+K_{\mathrm{loss}}.
+$$
+
+The zero-solar equilibrium temperature is
+
+$$
+\boxed{
+T_{\mathrm{off}}
+=
+
+\frac{
+K_gT_{g,\mathrm{in}}
++
+K_{\mathrm{loss}}T_\infty
+}{
+K_g+K_{\mathrm{loss}}
+}.
+}
+$$
+
+If cooling begins at time $t=t_c$, then
+
+$$
+\boxed{
+T_{s,\mathrm{avg}}(t)
+=
+
+T_{\mathrm{off}}
++
+\left[
+T_{s,\mathrm{avg}}(t_c)-T_{\mathrm{off}}
+\right]
+\exp
+\left(
+-\frac{t-t_c}{\tau_{\mathrm{cool}}}
+\right),
+}
+$$
+
+where
+
+$$
+\boxed{
+\tau_{\mathrm{cool}}
+=
+
+\frac{
+C_{\mathrm{eff}}
+}{
+K_g+K_{\mathrm{loss}}
+}.
+}
+$$
+
+The outlet gas temperature remains
+
+$$
+\boxed{
+T_{g,\mathrm{out}}
+=
+
+T_{g,\mathrm{in}}
++
+\varepsilon_{\mathrm{eff}}
+\left(
+T_{s,\mathrm{avg}}-T_{g,\mathrm{in}}
+\right).
+}
+$$
+
+Therefore, under the simple 0D assumptions, the gas outlet temperature should cool with the same dominant time constant as the average ceramic temperature.
+
+---
+
+## 3. If gas flow continues during cooling
+
+If the gas continues flowing, then both gas heat removal and environmental loss contribute:
+
+$$
+\frac{1}{\tau_{\mathrm{cool}}(\dot m)}
+=
+
+\frac{
+K_g(\dot m)+K_{\mathrm{loss}}
+}{
+C_{\mathrm{eff}}}.
+$$
+
+Cooling experiments at several flow rates are particularly useful because
+
+$$
+K_{\mathrm{loss}}
+$$
+
+should not depend directly on mass flow, while
+
+$$
+K_g(\dot m)
+$$
+
+does.
+
+If the effective gas conductance is represented as
+
+$$
+K_g(\dot m)
+=
+
+\dot m c_{p,g}
+\chi_L
+\left[
+1-\exp\left(
+-\frac{UA_{\mathrm{eff}}(\dot m)}
+{\dot m c_{p,g}}
+\right)
+\right],
+$$
+
+then the cooling time constants can be fitted simultaneously to identify the flow dependence of $K_g$.
+
+For example, if
+
+$$
+UA_{\mathrm{eff}}
+=
+
+a_{UA}\dot m^{,n},
+$$
+
+then
+
+$$
+\boxed{
+\frac{1}{\tau_{\mathrm{cool}}(\dot m)}
+=
+
+\frac{1}{C_{\mathrm{eff}}}
+\left{
+K_{\mathrm{loss}}
++
+\dot m c_{p,g}\chi_L
+\left[
+1-
+\exp\left(
+-\frac{
+a_{UA}\dot m^{,n}
+}{
+\dot m c_{p,g}
+}
+\right)
+\right]
+\right}.
+}
+$$
+
+The different cooling rates can therefore help identify
+
+$$
+C_{\mathrm{eff}},
+\qquad
+K_{\mathrm{loss}},
+\qquad
+a_{UA},
+\qquad
+n,
+\qquad
+\chi_L.
+$$
+
+---
+
+## 4. If gas flow is stopped during cooling
+
+If the gas flow is switched off,
+
+$$
+\dot m=0,
+$$
+
+and therefore approximately
+
+$$
+K_g=0.
+$$
+
+The cooling equation becomes
+
+$$
+C_{\mathrm{eff}}
+\frac{dT_{s,\mathrm{avg}}}{dt}
+=
+
+*
+
+K_{\mathrm{loss}}
+\left(
+T_{s,\mathrm{avg}}-T_\infty
+\right).
+$$
+
+The time constant is then
+
+$$
+\boxed{
+\tau_{\mathrm{no,flow}}
+=
+
+\frac{
+C_{\mathrm{eff}}
+}{
+K_{\mathrm{loss}}
+}.
+}
+$$
+
+This is especially valuable because it isolates environmental loss from gas heat transfer.
+
+If both no-flow and flowing cooling tests exist, then
+
+$$
+\frac{1}{\tau_{\mathrm{flow}}}
+-
+
+\frac{1}{\tau_{\mathrm{no,flow}}}
+-
+
+\frac{K_g}{C_{\mathrm{eff}}}.
+$$
+
+Thus,
+
+$$
+\boxed{
+K_g
+=
+
+C_{\mathrm{eff}}
+\left(
+\frac{1}{\tau_{\mathrm{flow}}}
+-
+
+\frac{1}{\tau_{\mathrm{no,flow}}}
+\right).
+}
+$$
+
+---
+
+## 5. Better separation of model parameters
+
+With heating-only data, the early temperature slope primarily identifies the combination
+
+$$
+\frac{\eta_{\mathrm{eff}}}{C_{\mathrm{eff}}},
+$$
+
+while the curvature identifies approximately
+
+$$
+\frac{K_g+K_{\mathrm{loss}}}{C_{\mathrm{eff}}}.
+$$
+
+This creates strong parameter correlations.
+
+Cooling data changes this because it identifies
+
+$$
+\frac{K_g+K_{\mathrm{loss}}}{C_{\mathrm{eff}}}
+$$
+
+without involving
+
+$$
+\eta_{\mathrm{eff}}.
+$$
+
+Once the cooling parameters are established, the heating data can be used primarily to estimate the absorbed-power coefficient:
+
+$$
+\boxed{
+\eta_{\mathrm{eff}}
+=
+
+\frac{
+C_{\mathrm{eff}}\dot T_{s,\mathrm{avg}}
++
+K_g(T_{s,\mathrm{avg}}-T_{g,\mathrm{in}})
++
+\dot Q_{\mathrm{loss}}
+}{
+A_{\mathrm{irr}}q''_{\mathrm{sol}}
+}.
+}
+$$
+
+This calculation can be evaluated throughout the heating period. If the model is appropriate, the inferred $\eta_{\mathrm{eff}}$ should remain approximately constant for a given optical configuration.
+
+---
+
+## 6. Use of the gas outlet measurement
+
+The measured gas outlet temperature gives an independent estimate of the gas effectiveness:
+
+$$
+\boxed{
+\varepsilon_{\mathrm{eff}}
+=
+
+\frac{
+T_{g,\mathrm{out}}-T_{g,\mathrm{in}}
+}{
+T_{s,\mathrm{avg}}-T_{g,\mathrm{in}}
+}.
+}
+$$
+
+The corresponding gas conductance is
+
+$$
+\boxed{
+K_g
+=
+
+\dot m c_{p,g}
+\frac{
+T_{g,\mathrm{out}}-T_{g,\mathrm{in}}
+}{
+T_{s,\mathrm{avg}}-T_{g,\mathrm{in}}
+}.
+}
+$$
+
+This is useful because it provides information about $K_g$ independently of the cooling time constant.
+
+Then the cooling equation can be used to estimate $C_{\mathrm{eff}}$ and $K_{\mathrm{loss}}$ more directly.
+
+Care is needed if the outlet thermocouple has substantial lag or downstream heat loss. In that case, the measured outlet relation should include the outlet correction previously discussed.
+
+---
+
+## 7. Radiation becomes more identifiable
+
+Cooling data is particularly useful for separating linear losses from radiation.
+
+The nonlinear cooling balance is
+
+$$
+\begin{aligned}
+C_{\mathrm{eff}}
+\frac{dT_{s,\mathrm{avg}}}{dt}
+={}&
+-
+
+K_g
+\left(
+T_{s,\mathrm{avg}}-T_{g,\mathrm{in}}
+\right)
+\\
+&-
+K_{\mathrm{lin}}
+\left(
+T_{s,\mathrm{avg}}-T_\infty
+\right)
+\\
+&-
+K_{\mathrm{rad}}
+\left(
+T_{s,\mathrm{avg}}^4-T_{\mathrm{sur}}^4
+\right),
+\end{aligned}
+$$
+
+where
+
+$$
+K_{\mathrm{rad}}
+=
+
+\chi_{\mathrm{rad}}
+\epsilon_{\mathrm{rad}}
+\sigma A_{\mathrm{rad}}.
+$$
+
+Rearranging,
+
+$$
+\boxed{
+-C_{\mathrm{eff}}
+\frac{dT_{s,\mathrm{avg}}}{dt}
+-
+
+K_g
+\left(
+T_{s,\mathrm{avg}}-T_{g,\mathrm{in}}
+\right)
+=
+
+K_{\mathrm{lin}}
+\left(
+T_{s,\mathrm{avg}}-T_\infty
+\right)
++
+K_{\mathrm{rad}}
+\left(
+T_{s,\mathrm{avg}}^4-T_{\mathrm{sur}}^4
+\right).
+}
+$$
+
+The temperature dependence of the cooling rate helps distinguish:
+
+* linear conductive or convective loss;
+* fourth-power radiative loss;
+* temperature-dependent heat capacity.
+
+At high temperatures, radiation produces faster initial cooling than a simple exponential model predicts.
+
+---
+
+## 8. Cooling data is a direct test of the single-state assumption
+
+This may be the most important benefit.
+
+For a valid single-state 0D model, all solid thermocouples should respond according to the same dominant thermal state. Their absolute temperatures may differ, but their normalized cooling curves should be similar.
+
+For thermocouple $i$, define
+
+$$
+\Theta_i(t)
+=
+
+\frac{
+T_i(t)-T_{i,\mathrm{off}}
+}{
+T_i(t_c)-T_{i,\mathrm{off}}
+}.
+$$
+
+For an ideal one-state model,
+
+$$
+\boxed{
+\Theta_i(t)
+\approx
+\exp
+\left(
+-\frac{t-t_c}{\tau}
+\right)
+}
+$$
+
+for all solid thermocouples.
+
+Therefore, plot the normalized cooling traces for
+
+$$
+T_8,\quad T_9,\quad T_{10},\quad T_{11},\quad T_{12}.
+$$
+
+### Evidence supporting the 0D model
+
+The 0D model is supported if:
+
+* the normalized curves nearly collapse;
+* they have similar fitted time constants;
+* their differences can be described by fixed offsets or gains;
+* no local temperature increases after the solar flux is removed.
+
+### Evidence against the 0D model
+
+The single-state model is questionable if:
+
+* the $58\ \mathrm{mm}$ position cools much more slowly than the others;
+* the front or rear thermocouples temporarily continue heating after solar shutdown;
+* the ordering of the temperatures changes substantially during cooling;
+* the normalized traces have clearly different time constants;
+* the axial shape coefficients vary strongly during cooling.
+
+For example, if the $58\ \mathrm{mm}$ region contains stored heat, the temperatures near 10 or 110 mm may briefly increase after solar shutdown because heat is redistributing internally. A one-state 0D model cannot reproduce that behaviour.
+
+Such observations would provide strong justification for the later 1D model.
+
+---
+
+## 9. Improved use of all thermocouples
+
+Previously, the thermocouples were used to estimate
+
+$$
+T_{s,\mathrm{avg}}
+=
+
+\sum_i w_iT_i.
+$$
+
+Cooling data allows the weights to be tested rather than accepted only from geometry.
+
+For a candidate set of weights,
+
+$$
+\widehat T_{s,\mathrm{avg}}
+=
+
+\sum_i w_iT_i,
+$$
+
+with
+
+$$
+\sum_iw_i=1,
+$$
+
+the reconstructed average temperature should satisfy the cooling energy balance:
+
+$$
+\boxed{
+C_{\mathrm{eff}}
+\frac{d\widehat T_{s,\mathrm{avg}}}{dt}
++
+K_g
+\left(
+\widehat T_{s,\mathrm{avg}}-T_{g,\mathrm{in}}
+\right)
++
+\dot Q_{\mathrm{loss}}
+\approx0.
+}
+$$
+
+The weights can therefore be refined by minimizing the cooling energy-balance residual:
+
+$$
+\boxed{
+J_w
+=
+
+\sum_{e,k}
+\left[
+C_{\mathrm{eff}}
+\frac{d\widehat T_{s,\mathrm{avg}}}{dt}
++
+K_g
+\left(
+\widehat T_{s,\mathrm{avg}}-T_{g,\mathrm{in}}
+\right)
++
+\dot Q_{\mathrm{loss}}
+\right]^2.
+}
+$$
+
+The weights should remain constrained by
+
+$$
+w_i\geq0,
+$$
+
+and
+
+$$
+\sum_iw_i=1.
+$$
+
+This gives weights with both geometric and thermodynamic justification.
+
+---
+
+## 10. Revised identification sequence
+
+The analysis should now be reordered.
+
+### Stage 1: classify the cooling experiments
+
+For each cooling section, record:
+
+* whether solar flux truly falls to zero;
+* whether gas flow continues;
+* the mass-flow history;
+* inlet gas temperature;
+* ambient temperature;
+* starting receiver temperature;
+* cooling duration;
+* whether the outlet gas temperature is available.
+
+### Stage 2: compare normalized thermocouple cooling curves
+
+Use the local measurements to determine whether one dominant time constant is reasonable.
+
+Fit each trace initially with
+
+$$
+T_i(t)
+=
+
+T_{i,\mathrm{off}}
++
+A_i
+\exp
+\left(
+-\frac{t-t_c}{\tau_i}
+\right).
+$$
+
+Compare the fitted values
+
+$$
+\tau_8,\quad
+\tau_9,\quad
+\tau_{10},\quad
+\tau_{11},\quad
+\tau_{12}.
+$$
+
+### Stage 3: fit cooling before heating
+
+Use the cooling data to estimate:
+
+$$
+C_{\mathrm{eff}},
+\qquad
+K_{\mathrm{loss}},
+\qquad
+K_g(\dot m),
+$$
+
+and, if supported,
+
+$$
+K_{\mathrm{rad}}.
+$$
+
+### Stage 4: fit absorbed solar power
+
+Hold the cooling-related parameters fixed or tightly constrained and fit the heating data for
+
+$$
+\eta_{\mathrm{eff}}.
+$$
+
+### Stage 5: global simultaneous fit
+
+Finally, fit the complete heating and cooling histories together with shared physical parameters.
+
+The transition from heating to cooling should remain continuous:
+
+$$
+T_{s,\mathrm{avg}}(t_c^-)
+=
+
+T_{s,\mathrm{avg}}(t_c^+).
+$$
+
+The cooling phase should not be assigned an independently fitted initial temperature.
+
+---
+
+## 11. Revised fitting objective
+
+The complete objective can be written as
+
+$$
+J
+=
+
+J_{\mathrm{heating}}
++
+\lambda_{\mathrm{cool}}
+J_{\mathrm{cool}}
++
+J_{\mathrm{prior}}.
+$$
+
+The cooling weight $\lambda_{\mathrm{cool}}$ may be used to prevent the more numerous heating samples from dominating the parameter estimation.
+
+It is generally better to weight each experiment or phase according to measurement uncertainty rather than simply according to the number of samples.
+
+---
+
+## Main change to the study
+
+Previously, the heating ramps mainly supported a model based on correlated effective parameters.
+
+With cooling data, the analysis can now:
+
+1. test whether a single-state 0D representation is dynamically valid;
+2. estimate heat-loss and gas-removal parameters without solar absorptivity;
+3. identify radiation more reliably;
+4. improve the thermocouple weighting used for $T_{s,\mathrm{avg}}$;
+5. reduce the correlation between $C_{\mathrm{eff}}$ and $\eta_{\mathrm{eff}}$;
+6. provide a much stronger basis for comparing the 0D and later 1D models.
+
+Three cooling experiments can be very informative, especially if they cover different flow rates or different initial temperature levels.
+
+
 

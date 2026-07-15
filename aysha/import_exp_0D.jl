@@ -64,8 +64,8 @@ path = "./SolarSimulator/RAW/"
     #      1.58, 1.22, 1.06, 0.92, 0.61,
     #      1.24, 1.11, 1.00, 0.88, 0.61]
 
-    function rd_data(df, iID, IDs)
-        f = CSV.File(path * filenames[iID] * ".csv"; skipto=2, delim=",", header=false) |> DataFrame
+    function rd_data(df, iID, IDs, fnames)
+        f = CSV.File(path * fnames[iID] * ".csv"; skipto=2, delim=",", header=false) |> DataFrame
         t = getT(f, 2, dec) #float.(Z[:, 2]) #xz_data
         T2 = getT(f, 36, dec) .+ 273.15 #insulation
         T3 = getT(f, 37, dec) .+ 273.15 #y1z_data around 136 mm in
@@ -76,19 +76,14 @@ path = "./SolarSimulator/RAW/"
         T12 = getT(f, 46, dec) .+ 273.15 #58mm (in)
   
         Tf = T3
-        #T2 = (T9 .+ T11) ./ 2
-        #T3 = (T12 .+ T10) ./ 2
-        # Average of T8, T9, and T10
-        #T_avg = (T9 .+ T10 .+ T11 .+ T12) ./ 4
+        # Arithmetic average of T8, T9, and T10 (legacy v3)
         T_avg = (T8 .+ T9 .+ T10) ./ 3
-        #T_avg = (T8 .+ T9 .+ T10 .+ T11 .+ T12 ./ 5)
-        #T_avg = (T9 .+ T10) ./ 2
+        # Trapezoidal weighted average using TC positions (10, 58, 110 mm along 137 mm)
+        # Weights: 0.248 (T8), 0.365 (T9), 0.387 (T10)
+        T_avg_v4 = 0.248 .* T8 .+ 0.365 .* T9 .+ 0.387 .* T10
 
-        scatter(t, Tf, ylim=(200, 1200))
-        plot!(t, T_avg, label="T_avg")
-        #plot!(t, T2)
-        #plot!(t, T3)
-        push!(df, (IDs[iID], "_Tavg", t, T_avg)) #first and second position for the 0D model
+        push!(df, (IDs[iID], "_Tavg", t, T_avg)) #arithmetic mean (v3 compat)
+        push!(df, (IDs[iID], "_Tavg_v4", t, T_avg_v4)) #trapezoidal weighted (v4)
         push!(df, (IDs[iID], "_Tf", t, Tf))
         push!(df, (IDs[iID], "_T2", t, T2))
         push!(df, (IDs[iID], "_T3", t, T3))
@@ -101,7 +96,7 @@ path = "./SolarSimulator/RAW/"
     end
 
     #rd_data(measurements, i) for i=1:length(filenames)
-    map(x -> rd_data(measurements, x, IDs), 1:length(filenames))
+    map(x -> rd_data(measurements, x, IDs, filenames), 1:length(filenames))
 
 # create a dataframe with the last temperature (steady state) reported for each thermocouple [Tx] and simulation ID [EXX]
 # each row is a simulation ID and each column is a thermocouple
@@ -128,7 +123,7 @@ simulation_conditions = Dict(
 )
 
 # process the cooling measurements
-map(x -> rd_data(measurements_cooling, x, IDs_cooling), 1:length(filenames_cooling))
+map(x -> rd_data(measurements_cooling, x, IDs_cooling, filenames_cooling), 1:length(filenames_cooling))
 last_temps = DataFrame(simulation_id=String[], T2=Float64[], T3=Float64[], T8=Float64[], T9=Float64[], T10=Float64[], T11=Float64[], T12=Float64[])
     for id in unique(measurements_cooling.simulation_id)
         row = (simulation_id=id,
