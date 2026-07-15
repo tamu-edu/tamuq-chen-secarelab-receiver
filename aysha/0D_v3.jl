@@ -210,12 +210,12 @@ begin
             α * Io * A_frt # irradiance absorbed by the receiver
             - hext * A_frt_solid * (Ts - Tamb) # front convection losses
             - ϵ * σ * A_frt * (Ts^4 - Tamb^4) # radiation losses
-            - (m(qlpm) * cpf_f(Ts) * (Tf - Tamb)) # enthalpy rise of gas (NTU model)
+            - (m(qlpm) * cpf_f((Ts + Tamb)/2) * (Tf - Tamb)) # enthalpy rise of gas (NTU model)
             - (h_s1s2 * A_s1s2 * (Ts - Ts2)) # contact conduction to alumina adaptor
             - ((Ts - Ts3) / (R_ins_total / 2)) # conduction loss to insulation felt
             ) / (ρs * Cps(Ts)),
             
-        Tf ~ Ts - (Ts - Tamb) * exp(-(h_avg_f6(qlpm, Ts) * A_exchange) / (m(qlpm) * cpf_f(Ts))), # algebraic NTU relation
+        Tf ~ Ts - (Ts - Tamb) * exp(-(h_avg_f6(qlpm, (Ts + Tamb)/2) * A_exchange) / (m(qlpm) * cpf_f((Ts + Tamb)/2))), # algebraic NTU relation
             
         Vs2 * Dt(Ts2) ~ ( # alumina adaptor
             - h_s1s2 * A_s1s2 * (Ts2 - Ts) # conduction from receiver monolith
@@ -264,10 +264,11 @@ begin # define functions
         tempT3_op = float.(modeloptim_sol[Tf])  # corresponds to Tf
         return ([tempT8_op tempT3_op])
     end
-    function remakeAysha(pguess_l, cond_k, time_opt; tolr=1e-7)
+    function remakeAysha(pguess_l, cond_k, time_opt, Tinit_val; tolr=1e-7)
         # combine the pguess_l and cond into a single Dict
         pguess_temp = Dict(k => pguess_l[i] for (i, (k, v)) in enumerate(p_opt))
         rmp = Dict(pguess_temp..., cond_k...)
+        rmp[Tinit] = Tinit_val
         #display(rmp)
         local temp_T = NLmodeloptim(time_opt, rmp, tolr)
         return temp_T
@@ -277,10 +278,11 @@ begin # define functions
         lossr = 0.0
         for sm in sim_key
             local cond_k = simulation_conditions[sm]
-            local expdata = reduce(hcat, measurements[(measurements.simulation_id .== sm), :temperatures])[:, 1:2]
+            local expdata = reduce(hcat, measurements[(measurements.simulation_id .== sm), :temperatures])[:, 2:3]
             local time_exp = measurements[measurements.simulation_id .== sm, :time][1]
+            local Tinit_val = expdata[1, 1]
             # Run model and get temperatures
-            temp_T = remakeAysha(pguess_l, cond_k, time_exp)[:, 1:2]
+            temp_T = remakeAysha(pguess_l, cond_k, time_exp, Tinit_val)[:, 1:2]
             
             if length(expdata[:, 1]) != length(temp_T[:, 1])
                 return Inf
@@ -491,9 +493,10 @@ begin
     end
 
     # Define the 0D analysis function to extract all nodes
-    function run_analysis_0D(pguess_l, cond_k, time_opt; tolr=1e-7)
+    function run_analysis_0D(pguess_l, cond_k, time_opt, Tinit_val; tolr=1e-7)
         pguess_temp = Dict(k => pguess_l[i] for (i, (k, v)) in enumerate(p_opt))
         rmp = Dict(pguess_temp..., cond_k...)
+        rmp[Tinit] = Tinit_val
         u0_map = Dict(Ts => rmp[Tinit], Ts2 => rmp[Tinit] + 2.0, Ts3 => rmp[Tinit] + 3.0, Ts4 => rmp[Tinit] + 4.0)
         rmp_clean = filter(pair -> !isequal(pair.first, Tinit), rmp)
         modeloptim = remake(prob, u0 = u0_map, p = rmp_clean, tspan = (0.0, time_opt[end]))
@@ -553,13 +556,15 @@ begin
         local cond_k = simulation_conditions[sm]
         
         # Extract experimental profiles
-        local time_exp = measurements[(measurements.simulation_id .== sm) .& (measurements.obs_id .== "_Tavg"), :time][1]
+        local time_exp = measurements[(measurements.simulation_id .== sm) .& (measurements.obs_id .== "_Tavg_v4"), :time][1]
+        local Tavg_v4_exp = measurements[(measurements.simulation_id .== sm) .& (measurements.obs_id .== "_Tavg_v4"), :temperatures][1]
         local T9_exp = measurements[(measurements.simulation_id .== sm) .& (measurements.obs_id .== "_T9"), :temperatures][1]
         local T3_exp = measurements[(measurements.simulation_id .== sm) .& (measurements.obs_id .== "_Tf"), :temperatures][1] # Tf is T3
         local T2_exp = measurements[(measurements.simulation_id .== sm) .& (measurements.obs_id .== "_T2"), :temperatures][1]
         
+        local Tinit_val = Tavg_v4_exp[1]
         # Run simulation
-        Ts_sim, Tf_sim, Ts2_sim, Ts3_sim, Ts4_sim = run_analysis_0D(pnew, cond_k, time_exp)
+        Ts_sim, Tf_sim, Ts2_sim, Ts3_sim, Ts4_sim = run_analysis_0D(pnew, cond_k, time_exp, Tinit_val)
         
         # Steady-state values (last element)
         Ts_ss = Ts_sim[end]
