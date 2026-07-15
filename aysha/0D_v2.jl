@@ -178,18 +178,18 @@ begin
     Pr_f(T) = (cpf_f(T) * μf_f(T)) / kf_f(T)
     Nu_f6(qlpm, T) = 10^A * (Re_f(qlpm, T)^B) * (Pr_f(T)^(10^C))
 
-    Gz(qlpm, T) = (1 / w_chnl) * Re_f(qlpm, T) * Pr_f(T) * Lc
+    Gz(qlpm, T) = (1 / w_chnl) * Re_f(qlpm, T) * Pr_f(T) * Dh
     Nu_f5(qlpm, T) = A * (1 - B * Gz(qlpm, T)^n) * exp(-C / Gz(qlpm, T))
 
-    #Gz_f(qlpm, x, T) = (1/x) * Re_f(qlpm) * Pr(T) * Lc
+    #Gz_f(qlpm, x, T) = (1/x) * Re_f(qlpm) * Pr(T) * Dh
     #Nu_f5(qlpm, T) = A * [1 - B*Gz_f(qlpm, x, T)^Re_f(qlpm)^B) * (Pr(T)^C)
 
-    h_avg_f5(qlpm, T) = (Nu_f5(qlpm, T) * kf_f(T)) / Lc
-    h_avg_f6(qlpm, T) = (Nu_f6(qlpm, T) * kf_f(T)) / Lc
+    h_avg_f5(qlpm, T) = (Nu_f5(qlpm, T) * kf_f(T)) / Dh
+    h_avg_f6(qlpm, T) = (Nu_f6(qlpm, T) * kf_f(T)) / Dh
     #h_f = ha + hb / (w_chnl) #W/m2.K
 
     # h_avg_f_q(qlpm) = A * Re_f(qlpm)^B
-    # h_avg_f_T(T) = (((cpf_f(T) * mu) / kf_f(T))^(C)) * kf_f(T) / Lc #9. instead of C because library error
+    # h_avg_f_T(T) = (((cpf_f(T) * mu) / kf_f(T))^(C)) * kf_f(T) / Dh #9. instead of C because library error
     #@register_symbolic h_avg_f_T(x) #does not work if symbolic
 
     # MOL Discretization parameters for system 1

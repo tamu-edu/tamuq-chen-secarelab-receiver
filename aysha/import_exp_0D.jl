@@ -18,6 +18,12 @@ path = "./SolarSimulator/RAW/"
         time=Array[],
         temperatures=Array[]
     )
+    measurements_cooling = DataFrame(
+        simulation_id=String[],
+        obs_id=String[],
+        time=Array[],
+        temperatures=Array[]
+    )
     filenames=["Data_FPT0067_231125_161757",
         "Data_FPT0068_231126_115725",
         "Data_FPT0069_231126_140153",
@@ -36,7 +42,12 @@ path = "./SolarSimulator/RAW/"
     IDs=["E67", "E68", "E69", "E70", "E71", 
         "E72", "E73", "E74", "E75", "E76", 
         "E77", "E78", "E79", "E80", "E81"]
-    
+
+    filenames_cooling=["Data_FPT0069-Cooling_231126_153148",
+        "Data_FPT0080-cooling_231205_112837",
+        "Data_FPT0081-cooling_231205_153409"]
+    IDs_cooling=["C69", "C80", "C81"]
+
     IoA = 456000.0 * 1.
     IoB = 304000.0 * 1.15
     IoC = 256000.0 * 0.7 # arbitrary fix KK
@@ -47,12 +58,13 @@ path = "./SolarSimulator/RAW/"
     Arqplm=[15.27, 12.50, 10.50, 9.10, 7.12,
         18.34, 13.16, 9.03, 6.95, 4.53,
         13.85, 10.02, 8.04, 6.62, 4.53]
+    Arqplm_cooling=[10.50, 6.62, 4.53]
 
     # Arqplm=[1.31, 1.19, 1.12, 1.064, 0.93,
     #      1.58, 1.22, 1.06, 0.92, 0.61,
     #      1.24, 1.11, 1.00, 0.88, 0.61]
 
-    function rd_data(df, iID)
+    function rd_data(df, iID, IDs)
         f = CSV.File(path * filenames[iID] * ".csv"; skipto=2, delim=",", header=false) |> DataFrame
         t = getT(f, 2, dec) #float.(Z[:, 2]) #xz_data
         T2 = getT(f, 36, dec) .+ 273.15 #insulation
@@ -89,7 +101,7 @@ path = "./SolarSimulator/RAW/"
     end
 
     #rd_data(measurements, i) for i=1:length(filenames)
-    map(x -> rd_data(measurements, x), 1:length(filenames))
+    map(x -> rd_data(measurements, x, IDs), 1:length(filenames))
 
 # create a dataframe with the last temperature (steady state) reported for each thermocouple [Tx] and simulation ID [EXX]
 # each row is a simulation ID and each column is a thermocouple
@@ -114,3 +126,27 @@ simulation_conditions = Dict(
    IDs[i] => Dict(Io => ArIo[i], qlpm => Arqplm[i], Tinit => measurements[(measurements.simulation_id .== IDs[i]) .& (measurements.obs_id .== "_Tf"), :temperatures][1][1]) 
    for i=1:length(IDs)
 )
+
+# process the cooling measurements
+map(x -> rd_data(measurements_cooling, x, IDs_cooling), 1:length(filenames_cooling))
+last_temps = DataFrame(simulation_id=String[], T2=Float64[], T3=Float64[], T8=Float64[], T9=Float64[], T10=Float64[], T11=Float64[], T12=Float64[])
+    for id in unique(measurements_cooling.simulation_id)
+        row = (simulation_id=id,
+               T2=measurements_cooling[(measurements_cooling.simulation_id .== id) .& (measurements_cooling.obs_id .== "_T2"), :temperatures][1][end],
+               T3=measurements_cooling[(measurements_cooling.simulation_id .== id) .& (measurements_cooling.obs_id .== "_T3"), :temperatures][1][end],
+               T8=measurements_cooling[(measurements_cooling.simulation_id .== id) .& (measurements_cooling.obs_id .== "_T8"), :temperatures][1][end],
+               T9=measurements_cooling[(measurements_cooling.simulation_id .== id) .& (measurements_cooling.obs_id .== "_T9"), :temperatures][1][end],
+               T10=measurements_cooling[(measurements_cooling.simulation_id .== id) .& (measurements_cooling.obs_id .== "_T10"), :temperatures][1][end],
+               T11=measurements_cooling[(measurements_cooling.simulation_id .== id) .& (measurements_cooling.obs_id .== "_T11"), :temperatures][1][end],
+               T12=measurements_cooling[(measurements_cooling.simulation_id .== id) .& (measurements_cooling.obs_id .== "_T12"), :temperatures][1][end])
+        push!(last_temps, row)
+    end
+# Save the measurements DataFrame to a CSV file
+CSV.write("measurements_cooling.csv", last_temps)
+
+# Defining cooling simulation conditions
+simulation_conditions_cooling = Dict(
+   IDs_cooling[i] => Dict(qlpm => Arqplm_cooling[i], Tinit => measurements_cooling[(measurements_cooling.simulation_id .== IDs_cooling[i]) .& (measurements_cooling.obs_id .== "_Tf"), :temperatures][1][1]) 
+   for i=1:length(IDs_cooling)
+)
+
