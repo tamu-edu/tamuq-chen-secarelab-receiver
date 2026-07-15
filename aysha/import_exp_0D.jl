@@ -48,7 +48,7 @@ path = "./SolarSimulator/RAW/"
         "Data_FPT0081-cooling_231205_153409"]
     IDs_cooling=["C69", "C80", "C81"]
 
-    IoA = 456000.0 * 1.
+    IoA = 456000.0 * 1.1
     IoB = 304000.0 * 1.15
     IoC = 256000.0 * 0.7 # arbitrary fix KK
 
