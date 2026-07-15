@@ -3,6 +3,11 @@ using Test
 include(joinpath(@__DIR__, "..", "1D_v2.jl"))
 
 @testset "1D_v2 legacy-style research flow" begin
+    source_v2 = read(joinpath(@__DIR__, "..", "1D_v2.jl"), String)
+    @test !occursin("include(\"1D_v1.jl\")", source_v2)
+    @test isdefined(Main, :Receiver1DV2)
+    @test !isdefined(Main, :Receiver1D)
+
     @test length(sim_key_heat) == 15
     @test length(sim_key_cool) == 3
     @test length(measurements) == 15 * 13
@@ -30,6 +35,16 @@ include(joinpath(@__DIR__, "..", "1D_v2.jl"))
         @test result.gas_temperature[end, end] > result.gas_temperature[1, end]
 
         cond = simulation_conditions[case]
+        operating = Receiver1DV2.OperatingCondition(
+            irradiance=cond[Io], flow_lpm=cond[qlpm],
+            inlet_temperature=cond[T_in], ambient_temperature=cond[T_amb],
+        )
+        balance = Receiver1DV2.energy_rates(
+            result.solid_temperature[:, end], result.time[end],
+            build_model_v2(pnew; nodes=11), operating,
+        )
+        @test abs(balance.residual) < 1e-10
+
         time = observation_time(measurements, case)
         remade = remakeAysha(pnew, cond, time, cond[Tinit]; nodes=11)
         @test size(remade) == size(outputs)

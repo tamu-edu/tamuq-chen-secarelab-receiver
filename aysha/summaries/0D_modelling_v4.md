@@ -3357,3 +3357,49 @@ The best interpretation is therefore not to add an empirical hysteresis curve di
 
 
 
+
+## 11. Effective Heat Transfer Coefficient
+
+The effective gas-side heat transfer coefficient $h_{\mathrm{eff}}$ can be directly reconstructed from the fitted parameter vector.
+
+The Number of Transfer Units ($NTU_{\mathrm{eff}}$) is defined physically as:
+
+$$
+NTU_{\mathrm{eff}} = \frac{h_{\mathrm{eff}} A_{\mathrm{exchange}}}{\dot{m} c_{p,g}} = \frac{h_{\mathrm{eff}} \Pi L}{\dot{m} c_{p,g}}
+$$
+
+where $\Pi$ is the total perimeter of the internal gas channels, and $L$ is the length.
+
+In the 0D model, $NTU_{\mathrm{eff}}$ is parameterized empirically using the fitted variables $a_h$ and $n_{\mathrm{exp}}$:
+
+$$
+NTU_{\mathrm{eff}} = \frac{a_h \Pi L}{c_{p,g}} \dot{m}^{n_{\mathrm{exp}}-1}
+$$
+
+Equating the two expressions and solving for $h_{\mathrm{eff}}$ yields:
+
+$$
+\frac{h_{\mathrm{eff}} \Pi L}{\dot{m} c_{p,g}} = \frac{a_h \Pi L}{c_{p,g}} \dot{m}^{n_{\mathrm{exp}}-1}
+$$
+
+$$
+\boxed{h_{\mathrm{eff}} = a_h \dot{m}^{n_{\mathrm{exp}}}}
+$$
+
+This represents the effective average heat transfer coefficient across the entire receiver channel structure, capturing both forced convection scaling and geometry.
+
+## 12. Three-Stage Hysteresis Identification Strategy
+
+Because global optimization algorithms (e.g., `MLSL_LDS`) can struggle to disentangle correlated dynamic parameters if all experiments are lumped together, the 0D model utilizes a strict **3-Stage Sequential Optimization Pipeline** to isolate and identify the hysteresis physics:
+
+### Stage 1: Base Heating Fit
+The optimizer strictly uses the **heating experiments** to fit the 7 physical base parameters (`γ_C`, `K_lin`, `χε_rad`, `a_h`, `n_exp`, `χ_L`, `η_eff`). During this stage, the dynamic hysteresis state is explicitly bypassed ($R_q^* = 0$, $R_g^* = 0$). This securely estimates the core properties from a highly robust dataset.
+
+### Stage 2: Cooling Hysteresis Fit
+The 7 non-solar parameters from Stage 1 are locked. The optimizer then exclusively uses the **cooling experiments** (where $I_o = 0$) to identify the two hysteresis-specific variables:
+* $\tau_a$: The characteristic time for axial profile redistribution.
+* $R_g^*$: The gas heat-removal resistance altering the temperature profile.
+Because the base properties are locked, the optimizer is strictly constrained to use these parameters solely to explain the dynamic cooling lag.
+
+### Stage 3: Heating Hysteresis Refinement
+Using the locked $\tau_a$ and $R_g^*$ from Stage 2, the optimizer is unleashed across the **heating dataset** one last time. It identifies the final solar resistance parameter $R_q^*$ while allowing the 7 base parameters to shift tightly (within ±20% of their Stage 1 optima). This final refinement ensures the core properties adapt to perfectly accommodate the newly active hysteresis physics, providing the best possible fit to the full heating and cooling loops.

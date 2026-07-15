@@ -1,0 +1,49 @@
+using Test
+
+source_path = joinpath(@__DIR__, "..", "1D_v3.jl")
+source = read(source_path, String)
+
+@testset "1D_v3 source structure" begin
+    parsed = Meta.parseall(source; filename=source_path)
+    @test parsed isa Expr
+
+    @test occursin("using DifferentialEquations", source)
+    @test occursin("using Optimization", source)
+    @test occursin("using OptimizationNLopt", source)
+    @test occursin("using SciMLBase", source)
+    @test !occursin("using MethodOfLines", source)
+    @test !occursin("using ModelingToolkit", source)
+    @test occursin("include(\"import_exp_1D_v2.jl\")", source)
+    @test occursin("function receiver_rhs_v3!", source)
+    @test occursin("function receiver_ode_v3!", source)
+    @test occursin("function gas_profile_v3!", source)
+    @test occursin("function simulate_v3", source)
+    @test occursin("ODEProblem", source)
+    @test occursin("Rodas5P", source)
+    @test !occursin("stable_step_v3", source)
+    @test occursin("function NLmodeloptim", source)
+    @test occursin("function remakeAysha", source)
+    @test occursin("function loss_cooling_v3", source)
+    @test occursin("function loss_heating_v3", source)
+    @test occursin("function optimize_with_nlopt_v3", source)
+    @test occursin("OptimizationFunction", source)
+    @test occursin("Optimization.OptimizationProblem", source)
+    @test occursin("SciMLBase.NoAD()", source)
+    @test occursin("NLopt.LN_NELDERMEAD", source)
+    @test occursin("nlopt_evaluation_budget_v3", source)
+    @test occursin("function calibrate_v3", source)
+    @test occursin("RECEIVER1D_V3_RUN_CALIBRATION", source)
+    @test occursin("RECEIVER1D_V3_EXPORT_METRICS", source)
+    @test occursin("function build_steady_results_v3", source)
+    @test occursin("function plot_case_v3", source)
+    @test occursin("write_metrics_v3(output_path", source)
+
+    # Regression checks for the physical corrections.
+    @test occursin("P_exchange", source)
+    @test occursin("m_dot(flow_lpm, Tin=Tamb)", source)
+    @test occursin("Qcond", source)
+    @test occursin("solar_weights_v3", source)
+    @test occursin("measured_initial_profile_v3", source)
+    @test !occursin("include(\"1D_v1.jl\")", source)
+    @test !occursin("include(\"1D_v2.jl\")", source)
+end

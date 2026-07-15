@@ -64,9 +64,9 @@ end;
 #   p[1] = γ_C     : effective capacitance correction factor
 #   p[2] = K_lin   : linear loss conductance (W/K)
 #   p[3] = χε_rad  : χ_rad * ε_rad product for radiation loss
-#   p[4] = a_h     : gas HTC coefficient in h_eff = a_h * ṁ^n
-#   p[5] = n_exp   : gas HTC flow-rate exponent
-#   p[6] = χ_L     : length shape correction factor
+#   p[4] = A       : Nusselt multiplier exponent (10^A)
+#   p[5] = B       : Nusselt Reynolds exponent (Re^B)
+#   p[6] = C       : Nusselt Prandtl double-exponent (Pr^(10^C))
 #   p[7] = τ_a     : characteristic time for axial profile redistribution
 #   p[8] = R_g_star: profile decay resistance due to gas heat removal
 #   p[9] = η_eff   : effective absorbed solar fraction
@@ -74,16 +74,25 @@ end;
 # ============================================================================
 
 function compute_Tg_out(Ts_avg, a_star, qlpm, p, Tg_in)
-    a_h = p[4]
-    n_exp = p[5]
-    χ_L = p[6]
+    A = p[4]
+    B = p[5]
+    C = p[6]
 
     mdot = m_dot(qlpm)
     T_film = (Ts_avg + Tg_in) / 2.0
+    
     cp_g = cpf_f(T_film)
+    mu_g = μf_f(T_film)
+    k_g = kf_f(T_film)
 
-    NTU_eff = (a_h * Pi * L / cp_g) * mdot^(n_exp - 1.0)
-    ε_eff = χ_L * (1.0 - exp(-NTU_eff))
+    Re_f = mdot * Dh / (A_chnl_frt_all * mu_g)
+    Pr_f = cp_g * mu_g / k_g
+    
+    Nu_f = 10^A * (Re_f^B) * (Pr_f^(10^C))
+    h_eff = Nu_f * k_g / Dh
+
+    NTU_eff = h_eff * A_exchange / (mdot * cp_g)
+    ε_eff = 1.0 - exp(-NTU_eff)
 
     # Hysteresis adjustment: gas weighted wall temp = Ts_avg + a_star
     Tg_out = Tg_in + ε_eff * (Ts_avg + a_star - Tg_in)
@@ -124,6 +133,11 @@ end
 # SECTION D: EXPERIMENTAL DATA IMPORT
 # ============================================================================
 begin
+    # Define backward-compatible dictionary keys for the import script
+    const Io = :Io
+    const qlpm = :qlpm
+    const Tinit = :Tinit
+
     include("import_exp_0D.jl")
     colors = theme_palette(:auto)
 end
@@ -163,6 +177,9 @@ begin
     sim_key_heat = ["E67","E68", "E69", "E70", "E71", "E72", "E73", "E74", "E75", "E76", "E77", "E78", "E79", "E80", "E81"]
     sim_key_cool = ["C69", "C80", "C81"]
 
+    # Trigger to use both temperatures (false) or only gas temperature (true) for fitting
+    fit_gas_only = true
+
     # ==========================================================
     # STAGE 1: BASE HEATING OPTIMIZATION (NO HYSTERESIS)
     # ==========================================================
@@ -184,15 +201,15 @@ begin
             
             error_s = sum((temp_T[:, 1] .- Ts_exp) .^ 2) / (maximum(Ts_exp) - minimum(Ts_exp))^2
             error_f = sum((temp_T[:, 2] .- Tf_exp) .^ 2) / (maximum(Tf_exp) - minimum(Tf_exp))^2
-            lossr += (error_s + error_f) / N_samples
+            lossr += fit_gas_only ? (error_f / N_samples) : ((error_s + error_f) / N_samples)
         end
         return lossr / length(keys)
     end
 
     println("\n--- STAGE 1: Heating Base Optimization (No Hysteresis) ---")
-    p_s1_init = [1.0, 0.5, 1.0, 10.0, 0.8, 1.0, 0.8]
-    lb_s1 = [0.1, 0.0, 0.0, 1.0, 0.5, 0.1, 0.1]
-    ub_s1 = [5.0, 5.0, 5.0, 50.0, 1.0, 5.0, 1.0]
+    p_s1_init = [1.0, 0.5, 1.0, -1.0, 1.0, 0.5, 0.8]
+    lb_s1 = [0.1, 0.0, 0.0, -3.0, 0.5, -1.0, 0.1]
+    ub_s1 = [5.0, 5.0, 5.0, 1.0, 2.0, 2.0, 1.0]
 
     optf_s1 = OptimizationFunction(loss_stage1, Optimization.AutoForwardDiff())
     optprob_s1 = Optimization.OptimizationProblem(optf_s1, p_s1_init, sim_key_heat, lb=lb_s1, ub=ub_s1)
@@ -219,7 +236,7 @@ begin
             
             error_s = sum((temp_T[:, 1] .- Ts_exp) .^ 2) / (maximum(Ts_exp) - minimum(Ts_exp))^2
             error_f = sum((temp_T[:, 2] .- Tf_exp) .^ 2) / (maximum(Tf_exp) - minimum(Tf_exp))^2
-            lossr += (error_s + error_f) / N_samples
+            lossr += fit_gas_only ? (error_f / N_samples) : ((error_s + error_f) / N_samples)
         end
         return lossr / length(keys)
     end
@@ -240,7 +257,7 @@ begin
     # ==========================================================
     function loss_stage3(p_heat, keys)
         lossr = 0.0
-        # p_heat = [γ_C, K_lin, χε_rad, a_h, n_exp, χ_L, η_eff, R_q_star]
+        # p_heat = [γ_C, K_lin, χε_rad, A, B, C, η_eff, R_q_star]
         p_full = [p_heat[1], p_heat[2], p_heat[3], p_heat[4], p_heat[5], p_heat[6], p_cool_opt[1], p_cool_opt[2], p_heat[7], p_heat[8]]
         for sm in keys
             cond_k = simulation_conditions[sm]
@@ -254,7 +271,7 @@ begin
             
             error_s = sum((temp_T[:, 1] .- Ts_exp) .^ 2) / (maximum(Ts_exp) - minimum(Ts_exp))^2
             error_f = sum((temp_T[:, 2] .- Tf_exp) .^ 2) / (maximum(Tf_exp) - minimum(Tf_exp))^2
-            lossr += (error_s + error_f) / N_samples
+            lossr += fit_gas_only ? (error_f / N_samples) : ((error_s + error_f) / N_samples)
         end
         return lossr / length(keys)
     end
@@ -262,8 +279,8 @@ begin
     println("\n--- STAGE 3: Heating Hysteresis Refinement ---")
     p_s3_init = [p_base_opt[1], p_base_opt[2], p_base_opt[3], p_base_opt[4], p_base_opt[5], p_base_opt[6], p_base_opt[7], 0.5]
     # Tighten bounds slightly around base to prevent drift: +/- 20%
-    lb_s3 = [max(0.1, p_base_opt[1]*0.8), max(0.0, p_base_opt[2]*0.8), max(0.0, p_base_opt[3]*0.8), max(1.0, p_base_opt[4]*0.8), max(0.5, p_base_opt[5]*0.8), max(0.1, p_base_opt[6]*0.8), max(0.1, p_base_opt[7]*0.8), 0.0]
-    ub_s3 = [min(5.0, p_base_opt[1]*1.2), min(5.0, p_base_opt[2]*1.2), min(5.0, p_base_opt[3]*1.2), min(50.0, p_base_opt[4]*1.2), min(1.0, p_base_opt[5]*1.2), min(5.0, p_base_opt[6]*1.2), min(1.0, p_base_opt[7]*1.2), 5.0]
+    lb_s3 = [max(0.1, p_base_opt[1]*0.8), max(0.0, p_base_opt[2]*0.8), max(0.0, p_base_opt[3]*0.8), max(-3.0, p_base_opt[4]-0.5), max(0.5, p_base_opt[5]*0.8), max(-1.0, p_base_opt[6]-0.5), max(0.1, p_base_opt[7]*0.8), 0.0]
+    ub_s3 = [min(5.0, p_base_opt[1]*1.2), min(5.0, p_base_opt[2]*1.2), min(5.0, p_base_opt[3]*1.2), min(1.0, p_base_opt[4]+0.5), min(2.0, p_base_opt[5]*1.2), min(2.0, p_base_opt[6]+0.5), min(1.0, p_base_opt[7]*1.2), 5.0]
 
     optf_s3 = OptimizationFunction(loss_stage3, Optimization.AutoForwardDiff())
     optprob_s3 = Optimization.OptimizationProblem(optf_s3, p_s3_init, sim_key_heat, lb=lb_s3, ub=ub_s3)
@@ -425,7 +442,7 @@ begin
         t90_sim_Ts_s = Float64[], t90_exp_Ts_s = Float64[], dt90_Ts_s = Float64[],
         t90_sim_T3_s = Float64[], t90_exp_T3_s = Float64[], dt90_T3_s = Float64[],
         Gap_ss_sim = Float64[], Gap_ss_exp = Float64[], dGap_ss = Float64[],
-        ε_eff = Float64[], NTU_eff = Float64[]
+        ε_eff = Float64[], NTU_eff = Float64[], h_eff_sim = Float64[]
     )
 
     function process_metrics(sm, is_cooling)
@@ -471,7 +488,17 @@ begin
 
         _, ε_ss, cp_ss, _ = compute_Tg_out(Ts_ss_sim, a_mod[end], qlpm_val, pnew, Tamb)
         mdot_val = m_dot(qlpm_val)
-        NTU_ss = (pnew[4] * Pi * L / cp_ss) * mdot_val^(pnew[5] - 1.0)
+        
+        T_film_ss = (Ts_ss_sim + Tamb) / 2.0
+        mu_g_ss = μf_f(T_film_ss)
+        k_g_ss = kf_f(T_film_ss)
+        
+        Re_f_ss = mdot_val * Dh / (A_chnl_frt_all * mu_g_ss)
+        Pr_f_ss = cp_ss * mu_g_ss / k_g_ss
+        
+        Nu_f_ss = 10^pnew[4] * (Re_f_ss^pnew[5]) * (Pr_f_ss^(10^pnew[6]))
+        h_eff_val = Nu_f_ss * k_g_ss / Dh
+        NTU_ss = h_eff_val * A_exchange / (mdot_val * cp_ss)
 
         push!(results_df, (
             next_run_id, sm, is_cooling ? "cooling" : "heating",
@@ -481,7 +508,7 @@ begin
             t90_sim_Ts, t90_exp_Ts, dt90_Ts,
             t90_sim_T3, t90_exp_T3, dt90_T3,
             gap_sim, gap_exp, dgap,
-            ε_ss, NTU_ss
+            ε_ss, NTU_ss, h_eff_val
         ))
     end
 
