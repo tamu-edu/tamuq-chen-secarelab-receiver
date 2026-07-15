@@ -346,9 +346,10 @@ begin
         local sel_meas = measurements[(measurements.simulation_id.==sm).&(measurements.obs_id.=="_Tf"), :]
         local expdata = sel_meas[:, :temperatures]
         local time_opt = sel_meas[:, :time][1]
+        local Tinit_val = measurements[(measurements.simulation_id.==sm).&(measurements.obs_id.=="_Tavg_v4"), :temperatures][1][1]
 
         #run selected simulation and get the steady temperature values
-        local temp_T = remakeAysha(pnew, cond_k, time_opt; tolr=1e-7)
+        local temp_T = remakeAysha(pnew, cond_k, time_opt, Tinit_val; tolr=1e-7)
         push!(T_steady, (sm, time_opt, temp_T[:,2], expdata[1]))
     end
     color_model = :blue
@@ -392,11 +393,12 @@ begin
     end
     function plt_case(sm, params)
         local cond_k = simulation_conditions[sm]
-        local expdata = reduce(hcat, measurements[(measurements.simulation_id.==sm), :temperatures])[:, 1:2] 
+        local expdata = reduce(hcat, measurements[(measurements.simulation_id.==sm), :temperatures])[:, 2:3] 
         local time_opt = measurements[measurements.simulation_id.==sm, :time][1]
-        local temp_T = remakeAysha(params, cond_k, time_opt)[:, 1:2] 
+        local Tinit_val = expdata[1, 1]
+        local temp_T = remakeAysha(params, cond_k, time_opt, Tinit_val)[:, 1:2] 
 
-        labels = measurements[(measurements.simulation_id.==sm), :obs_id]
+        labels = ["_Tavg_v4", "_Tf"]
         plt_t = plot(title="Temperature Profiles $sm", xlabel="Time (s)", ylabel="Temperature (K)", ylim=(300, 1000),
             legend=:outerright, color_palette=colors)
         scatter!(time_opt, expdata, label=permutedims(labels),
@@ -419,12 +421,13 @@ begin
         # Retrieve from measurements the experimental data for the current simulation condition
         #println(sm)
         local cond_k = simulation_conditions[sm]
-        local sel_meas = measurements[(measurements.simulation_id.==sm).&(measurements.obs_id.=="_Tavg"), :]
+        local sel_meas = measurements[(measurements.simulation_id.==sm).&(measurements.obs_id.=="_Tavg_v4"), :]
         local expdata = sel_meas[:, :temperatures]
         local time_opt = sel_meas[:, :time][1]
+        local Tinit_val = expdata[1][1]
 
         #run selected simulation and get the steady temperature values
-        local temp_T = remakeAysha(pnew, cond_k, time_opt; tolr=1e-7)
+        local temp_T = remakeAysha(pnew, cond_k, time_opt, Tinit_val; tolr=1e-7)
         push!(T_steady_solid, (sm, time_opt, temp_T[:,1], expdata[1]))
     end
     color_model = :blue
