@@ -1,0 +1,21 @@
+index,name,value
+1,gamma_C,2.1999999999999997
+2,k_scale,1.7875000000000003
+3,k_ins_scale,0.6484375
+4,A_Nu,0.8007139950807121
+5,h_floor,0.40763359005867994
+6,L_h,0.03320484152122682
+7,tau_T3,32.796875
+8,f_I_high,1.003738441306425
+9,f_I_mid,1.3573123026005922
+10,f_I_low,0.9915538854317489
+# fixed,B_Re,1.0
+# fixed,C_Pr,0.5
+# fixed,eta_abs,0.8
+# fixed,beta_opt,50.0
+# fixed,front_dep,0.5
+# fixed,h_front,10.0
+# fixed,eps_front,0.95
+# fixed,T2_boundary_radius_m,0.05071960208740737
+# fixed,G_receiver_to_T2_W_per_m_K,0.3234090827587482
+# fixed,G_rear_to_T2_W_per_K,0.02626065150325878

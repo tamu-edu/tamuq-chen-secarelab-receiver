@@ -1,0 +1,19 @@
+index,name,value
+1,gamma_C,2.3628085457681665
+2,k_scale,0.6184636966729132
+3,U_side,0.006186819457517811
+4,U_rear,0.13218933635609564
+5,A_Nu,1.8810997605731758
+6,h_floor,0.238789873686843
+7,L_h,0.06158830405884423
+8,tau_T3,4.90791840867962
+9,eta_abs,0.8
+10,beta_opt,150.0
+11,a_source,0.5
+12,h_front,0.10452255046396287
+# fixed,B_Re,1.0
+# fixed,C_Pr,0.5
+# fixed,eps_front,0.95
+# fixed_in_calibration,eta_abs,0.8
+# fixed_in_calibration,beta_opt,150.0
+# fixed_in_calibration,a_source,0.5
