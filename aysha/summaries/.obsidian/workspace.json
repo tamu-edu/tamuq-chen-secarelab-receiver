@@ -186,6 +186,8 @@
   },
   "active": "5c706a574f57aab2",
   "lastOpenFiles": [
+    "1D_v7_geminicomments.md",
+    "1D_v7_geminicomments.txt",
     "1D_v7/plots/transient_C81_1D_v7.png",
     "1D_v7/plots/transient_C80_1D_v7.png",
     "1D_v7/plots/transient_C69_1D_v7.png",
@@ -196,7 +198,6 @@
     "1D_v7/plots/transient_E77_1D_v7.png",
     "1D_v7/plots/transient_E76_1D_v7.png",
     "1D_v7/plots/transient_E75_1D_v7.png",
-    "1D_v7/plots/transient_E74_1D_v7.png",
     "1D_v7/analysis_results_1D_v7.csv",
     "1D_v7/parameters_1D_v7.csv",
     "1D_v7/plots",
@@ -211,7 +212,6 @@
     "1D_v1_theory_manual.md",
     "journal.1D.md",
     "1D_v5/analysis_results_1D_v5.csv",
-    "1D_v5/parameters_1D_v5.csv",
     "1D_modelling_v4_ideas.md",
     "0D_modelling_v4.md"
   ]

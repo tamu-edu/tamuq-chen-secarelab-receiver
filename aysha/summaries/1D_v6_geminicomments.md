@@ -48,3 +48,16 @@ global pnew_v6 = parameters
 - **Robust Effectiveness Limit:** Your handling of the `UA / (mdot * cp)` convection via `-expm1(...)` is excellent. It perfectly captures the low-flow asymptotic limit (where exit gas approaches solid temperature) without dividing by zero or risking explicit ODE instabilities.
 - **Energy Conservation:** The solid-to-gas energy exchange (`Qgas = mdot * cp * (Tg[i+1] - Tg[i])`) and the subtraction of exactly `Qgas[i]` from the solid states guarantees strict energy conservation. The structural rear thermal mass coupling is also mathematically robust and conservative.
 - **Heat Capacity Formulation:** Rewriting $C(T) \frac{dT}{dt} = Q$ into $\frac{dT}{dt} = \frac{Q}{C(T)}$ inside the derivative function is clean and avoids mass-matrix inversion overheads for an explicit representation.
+
+## Codex Review and Revision Disposition
+
+Implemented in both `1D_v6.jl` and `1D_v7.jl`:
+
+1. The heat-exchange-shape regularization is now applied in the heating objective, where `h_floor` and `L_h` are actually fitted. In v6, the constant cooling-stage penalty on `p[6]` and `p[7]` was removed. In v7, the heating objective now regularizes the corresponding `p[5]` and `p[6]`.
+2. The calibration loss loops now catch solver failures and return `Inf`, while still rethrowing `InterruptException`. This keeps bad simplex trial points from aborting the full calibration run.
+3. The zero-flow gas diagnostic now sets the internal outlet gas profile to the local solid temperatures while keeping `Qgas = 0`. This avoids forcing the outlet gas signal to the inlet temperature during stagnant-flow/cooling cases.
+
+Deferred:
+
+1. The boundary-face temperature correction is physically valid as a mesh-sensitivity concern, but it is not a small patch because it changes how front absorption, conduction, and radiative loss are coupled at the first finite-volume cell. It should be handled as a dedicated mesh/boundary-condition revision.
+2. The global mutation of `pnew_v6`/`pnew_v7` is retained for the current notebook/REPL workflow. Batch reproducibility can be improved later by adding a no-mutation calibration wrapper while preserving the interactive behavior.

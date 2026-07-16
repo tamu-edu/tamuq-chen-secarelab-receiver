@@ -342,3 +342,115 @@ Quick-run notes:
 - The smoke test passed with Julia 1.12.6.
 - The quick-fit cooling behavior no longer shows the v6 free rear-mass warm-up problem.
 - Heating remains imperfect in the quick run, especially front/depth steady-state bias, so the full v7 calibration is needed before judging the irradiance factors.
+
+Full-run assessment:
+
+- Latest saved v7 parameters:
+
+```text
+gamma_C = 2.72
+k_scale = 1.17
+k_ins_scale = 0.97
+A_Nu = 1.73
+h_floor = 0.257
+L_h = 0.050 m
+tau_T3 = 20.4 s
+f_I_high = 1.29
+f_I_mid = 1.37
+f_I_low = 0.945
+```
+
+- The insulation/T2 conductance scale stayed credible, close to unity. This supports using measured `T2(t)` as a boundary rather than a free hidden rear mass.
+- The fitted irradiance factors are large for the high and middle irradiance groups. Because the effective absorbed factor is `eta_abs * f_I`, the high and middle groups correspond to roughly `1.03` and `1.09` of nominal irradiance after `eta_abs = 0.80`. That is plausible only if the nominal aperture irradiance or projected area is low; it should not be interpreted as pure absorptivity.
+- Compared with v6, cooling no longer suffers from the artificial rear-mass warm-up. Cooling `T8` and `T9_pair` are reasonable, with mean RMSE near 22-25 K.
+- Cooling `T10_pair` and `T3` still show early model overshoot and then too-fast decay/tail underprediction. This suggests either excessive axial redistribution from the hot front during early cooling, an incompatible cooling initial profile, or missing outlet/adaptor thermal inertia.
+- Heating remains the main failure. Mean steady errors are about:
+
+```text
+T8       model - experiment = -114 K
+T9_pair  model - experiment = -110 K
+T10_pair model - experiment =   -1 K
+T3       model - experiment =  +54 K
+```
+
+- This sign pattern is important: the front/mid solid is too cold while the outlet gas/T3 can be too hot. A bulk irradiance correction alone cannot resolve that contradiction.
+- Worst heating deviations are concentrated in E67-E76. Later cases E77-E81 are substantially better, so the model error has a case/flow/irradiance dependence rather than a uniform offset.
+
+Interpretation:
+
+- v7 is a better structural model than v6 for cooling because it removes the unphysical free rear energy reservoir.
+- v7 does not yet solve the key heating physics. The remaining mismatch points toward the coupling between gas heat removal, axial exchange distribution, and what the T3 thermocouple actually measures.
+- The combination "solid too cold, gas too hot" is consistent with too much modeled gas-solid energy extraction from the hot solid path and/or too little bypass/mixing before the T3 measurement.
+
+## Revalidation of Gemini Comments Across v3-v7
+
+Accepted and implemented in v6/v7:
+
+- Heat-shape regularization now belongs in the heating objective when `h_floor` and `L_h` are fitted there. This was a real issue for v6. v7 also uses the corrected placement.
+- Calibration loss functions in v6/v7 now catch ODE solve failures and return `Inf` rather than crashing a full optimizer run.
+- Zero-flow gas diagnostics in v6/v7 now set the internal gas outlet profile to local solid temperatures while keeping `Qgas = 0`, avoiding an artificial instant drop to inlet temperature.
+
+Still present in older reference versions:
+
+- v3-v5 still hard-error on failed solves in the loss path. If those versions are used again for calibration, port the v6/v7 loss `try/catch` pattern back.
+- v3-v5 still set stagnant gas to inlet temperature at zero flow. If old cooling comparisons are revisited, remember that their T3 behavior is biased by this assumption.
+- v5 regularizes `h_floor` and `L_h` during cooling because v5 actually fits those parameters in the cooling set. That is not the same logical bug as v6, but the modeling premise is now superseded by the v6/v7 staged strategy.
+
+Deferred:
+
+- Boundary-face temperatures remain approximated by first/last cell-center temperatures in all finite-volume versions. This is a real mesh-sensitivity caveat, but a proper fix requires a boundary face energy balance and should be handled as a dedicated model revision.
+- Calibration functions still mutate global `pnew_v*` values for interactive REPL convenience. For batch reproducibility, add a no-mutation wrapper later rather than changing the current workflow abruptly.
+
+## Proposed v8 Strategy
+
+1. Regenerate v7 results after the latest robustness fixes.
+
+The saved full-run v7 plots were generated before the most recent regularization/zero-flow/loss-handling edits. The expected qualitative behavior should be similar, but the official comparison should be rerun before making publication-grade conclusions.
+
+2. Add a gas bypass / active-flow fraction model.
+
+The current v7 failure pattern suggests that all measured flow is being forced to exchange too strongly with the hot receiver path. Introduce a heating-stage parameter such as `f_active`:
+
+```text
+mdot_active = f_active mdot_total
+Qgas = mdot_active cp (Tg_active,out - Tin)
+T3_true = Tin + f_active (Tg_active,out - Tin)
+```
+
+This can raise solid temperatures by reducing total heat removal while also lowering the mixed outlet temperature seen by T3. That is the right direction for the observed `T8/T9_pair` underprediction and `T3` overprediction.
+
+3. Add a cooling overshoot/monotonicity penalty.
+
+The early cooling bump in `T10_pair` and `T3` is not acceptable if the experiment decays monotonically. Add a targeted cooling penalty:
+
+```text
+penalty += mean(max(model(t) - model(t0), 0)^2)
+```
+
+for cooling sensors that should not warm after shutdown. This should help the optimizer reject excessive early axial heat redistribution.
+
+4. Revisit axial conductivity after adding the cooling penalty.
+
+If the bump remains, reduce or restructure the axial conduction path. The fitted `k_scale` near 1.17 is not extreme, but the finite-volume model may still over-connect hot front material to deeper thermocouple locations because the real porous/channeled structure has weaker effective axial conduction than dense SiC.
+
+5. Replace the simple T3 lag with a physical outlet/sensor node.
+
+The fitted `tau_T3` is now small, yet T3 timing errors remain large. A single first-order lag is probably not representing the outlet tube, adaptor, and thermocouple environment. A small outlet gas/metal measurement node connected to `T2(t)` or ambient would be more physical than continuing to tune `tau_T3`.
+
+6. Keep optical shape as a controlled sensitivity, not a broad fit.
+
+Do not reopen unrestricted optical fitting yet. Instead, run a small manual/sensitivity grid over `front_dep` and `beta_opt` after the gas-bypass test. The question is whether front-weighted deposition can improve `T8/T9_pair` without worsening `T10_pair` and T3.
+
+7. Judge versions by signed residual structure, not objective alone.
+
+For v8 comparisons, always report:
+
+```text
+mean RMSE
+mean signed steady error
+t90 error
+cooling overshoot
+T8/T9_pair intersection behavior versus flow
+```
+
+The present objective can improve while preserving the wrong physical sign pattern.

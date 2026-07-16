@@ -116,9 +116,12 @@ function gas_profile_v7!(Tg, Qgas, hcell, Ts, time, p, operating, z, dx)
     Tg[1] = Tin
 
     if flow <= 1e-12
-        fill!(Tg, Tin)
         fill!(Qgas, 0.0)
         fill!(hcell, 0.0)
+        Tg[1] = Tin
+        for i in eachindex(Ts)
+            Tg[i + 1] = Ts[i]
+        end
         return nothing
     end
 
@@ -332,6 +335,9 @@ begin # v7 calibration
     const TIMING_WEIGHT_V7 = 0.15
     const SLOPE_WEIGHT_V7 = 0.25
 
+    heat_shape_regularization_v7(p) =
+        0.001 * (log(p[5] / 0.25)^2 + log(p[6] / 0.050)^2)
+
     function normalized_slope_mse_v7(model, experiment)
         length(model) < 2 && return 0.0
         scale = max(maximum(experiment) - minimum(experiment), 1.0)
@@ -352,21 +358,27 @@ begin # v7 calibration
     function loss_cases_v7(p, keys; is_cooling=false, nodes=15)
         total = 0.0
         for simulation_id in keys
-            model, result, experiment = solve_case_v7(
-                p, simulation_id; is_cooling=is_cooling, nodes=nodes,
-                reltol=2e-5, abstol=2e-6, dtmax=60.0,
-            )
-            all(isfinite, model) || return Inf
-            total += mean(
-                signal_loss_v7(result.time, model[:, j], experiment[:, j])
-                for j in 1:4
-            )
+            try
+                model, result, experiment = solve_case_v7(
+                    p, simulation_id; is_cooling=is_cooling, nodes=nodes,
+                    reltol=2e-5, abstol=2e-6, dtmax=60.0,
+                )
+                all(isfinite, model) || return Inf
+                total += mean(
+                    signal_loss_v7(result.time, model[:, j], experiment[:, j])
+                    for j in 1:4
+                )
+            catch err
+                err isa InterruptException && rethrow()
+                return Inf
+            end
         end
         return total / length(keys)
     end
 
     function loss_heating_v7(p, keys=sim_key_heat; nodes=15)
-        regularization = 0.003 * sum(log(p[i])^2 for i in 8:10)
+        regularization = heat_shape_regularization_v7(p) +
+                         0.003 * sum(log(p[i])^2 for i in 8:10)
         return loss_cases_v7(p, keys; is_cooling=false, nodes=nodes) + regularization
     end
 

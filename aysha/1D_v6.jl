@@ -68,9 +68,12 @@ function gas_profile_v6!(Tg, Qgas, hcell, Ts, time, p, operating, z, dx)
     Tg[1] = Tin
 
     if flow <= 1e-12
-        fill!(Tg, Tin)
         fill!(Qgas, 0.0)
         fill!(hcell, 0.0)
+        Tg[1] = Tin
+        for i in eachindex(Ts)
+            Tg[i + 1] = Ts[i]
+        end
         return nothing
     end
 
@@ -289,27 +292,34 @@ begin # v6 experimental interface
 end
 
 begin # v6 calibration
+    heat_shape_regularization_v6(p) =
+        0.001 * (log(p[6] / 0.20)^2 + log(p[7] / 0.050)^2)
+
     function loss_cases_v6(p, keys; is_cooling=false, nodes=15)
         total = 0.0
         for simulation_id in keys
-            model, _, experiment = solve_case_v6(
-                p, simulation_id; is_cooling=is_cooling, nodes=nodes,
-                reltol=2e-5, abstol=2e-6, dtmax=60.0,
-            )
-            all(isfinite, model) || return Inf
-            total += mean(normalized_mse_v3(model[:, j], experiment[:, j]) for j in 1:4)
+            try
+                model, _, experiment = solve_case_v6(
+                    p, simulation_id; is_cooling=is_cooling, nodes=nodes,
+                    reltol=2e-5, abstol=2e-6, dtmax=60.0,
+                )
+                all(isfinite, model) || return Inf
+                total += mean(normalized_mse_v3(model[:, j], experiment[:, j]) for j in 1:4)
+            catch err
+                err isa InterruptException && rethrow()
+                return Inf
+            end
         end
         return total / length(keys)
     end
 
     loss_heating_v6(p, keys=sim_key_heat; nodes=15) =
-        loss_cases_v6(p, keys; is_cooling=false, nodes=nodes)
+        loss_cases_v6(p, keys; is_cooling=false, nodes=nodes) +
+        heat_shape_regularization_v6(p)
 
     function loss_cooling_v6(p, keys=sim_key_cool; nodes=15)
         regularization = 0.005 * (log(p[1])^2 + log(p[2])^2) +
-                         0.001 * (log(p[6] / 0.20)^2 +
-                                  log(p[7] / 0.050)^2 +
-                                  log(p[9] / 0.50)^2)
+                         0.001 * log(p[9] / 0.50)^2
         return loss_cases_v6(p, keys; is_cooling=true, nodes=nodes) + regularization
     end
 end
