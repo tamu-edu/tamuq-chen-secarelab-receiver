@@ -40,3 +40,7 @@ UndefVarError: `StaticData` not defined in `Base`
 & "C:\Users\kkakosim\.julia\juliaup\julia-1.12.6+0.x64.w64.mingw32\bin\julia.exe" --project=. test\smoke_1D_v6.jl
 & "C:\Users\kkakosim\.julia\juliaup\julia-1.12.6+0.x64.w64.mingw32\bin\julia.exe" --project=. test\smoke_1D_v7.jl
 ```
+
+## Documentation Notes
+
+- Periodically check `summaries/journal.1D.md` when making or evaluating 1D model changes. Update it with meaningful new model versions, calibration outcomes, validation notes, and interpretation changes so the journal remains aligned with the current code and results.

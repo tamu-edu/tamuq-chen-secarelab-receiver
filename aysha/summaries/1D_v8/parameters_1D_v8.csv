@@ -1,0 +1,26 @@
+index,name,value
+1,gamma_C,1.95859375
+2,k_scale,1.4634765625000006
+3,k_ins_scale,0.8121337890625
+4,A_Nu,1.8009259259259258
+5,h_floor,0.22164437585733887
+6,L_h,0.0444444444444444
+7,tau_T3,38.252685546875
+8,f_I_high,0.9370370370370373
+9,f_I_mid,1.5999999999999996
+10,f_I_low,1.1319615912208492
+# fixed,B_Re,1.0
+# fixed,C_Pr,0.5
+# fixed,eta_abs,0.8
+# fixed,beta_opt,50.0
+# fixed,front_dep,0.5
+# fixed,h_front,10.0
+# fixed,eps_front,0.95
+# fixed,T2_boundary_radius_m,0.05071960208740737
+# fixed,G_receiver_to_T2_W_per_m_K,0.3234090827587482
+# fixed,G_receiver_to_tube_W_per_K,0.2166
+# fixed,rear_tube_length_m,0.2
+# fixed,rear_tube_cavity_length_m,0.1
+# fixed,rear_tube_flange_length_m,0.1
+# fixed,rear_tube_wall_thickness_m,0.0015
+# fixed,water_flange_temperature_K,298.15

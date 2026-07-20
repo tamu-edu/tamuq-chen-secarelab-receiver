@@ -454,3 +454,207 @@ T8/T9_pair intersection behavior versus flow
 ```
 
 The present objective can improve while preserving the wrong physical sign pattern.
+
+## v8/v8b Result Assessment and Next Revision Plan
+
+Files:
+
+- `1D_v8.jl`
+- `run_1D_v8.jl`
+- `test/smoke_1D_v8.jl`
+- `1D_v8b.jl`
+- `run_1D_v8b.jl`
+- `test/smoke_1D_v8b.jl`
+- `summaries/1D_v8_theory_manual.md`
+
+Purpose:
+
+- v8a added an explicit rear alumina tube and water-cooled flange while keeping measured T2 as a boundary.
+- v8b kept the rear tube/flange domain but replaced measured T2 with one predicted lumped cavity state.
+- v8b compares T3 to the gas temperature at 140 mm and compares T2 directly to the predicted cavity temperature.
+
+Saved v8b parameters:
+
+```text
+gamma_C = 1.50
+k_scale = 1.28
+k_ins_scale = 0.856
+A_Nu = 1.956
+h_floor = 0.251
+L_h = 0.050 m
+tau_T3 = 20.0  # retained but unused in v8b
+f_I_high = 1.600
+f_I_mid = 1.600
+f_I_low = 1.185
+```
+
+Key result:
+
+- v8b is a substantial improvement over v7/v8a in heating solid temperatures and T2 prediction.
+- T2 is now predicted well with a single lumped cavity state:
+
+```text
+heating T2 mean RMSE = 4.3 K, mean steady error = -5.5 K
+cooling T2 mean RMSE = 2.3 K, mean steady error =  3.3 K
+```
+
+- Cooling remains reasonable:
+
+```text
+cooling T8       RMSE 14.9 K
+cooling T9_pair  RMSE 29.1 K
+cooling T10_pair RMSE 19.0 K
+cooling T3       RMSE 26.5 K
+```
+
+- Heating is improved but still structurally biased:
+
+```text
+heating T8       mean steady error = -62 K
+heating T9_pair  mean steady error = -83 K
+heating T10_pair mean steady error = -13 K
+heating T3       mean steady error = +11 K
+```
+
+Irradiance-band residuals show the remaining problem more clearly:
+
+```text
+high-Io: T8 -86 K, T9_pair -83 K, T10_pair +13 K, T3 +46 K
+mid-Io:  T8 -100 K, T9_pair -116 K, T10_pair -39 K, T3 -11 K
+low-Io:  T8  ~0 K, T9_pair -51 K, T10_pair -14 K, T3  -1 K
+```
+
+Interpretation:
+
+- The cavity/T2 problem is largely resolved by v8b. The single lumped cavity is good enough to proceed without a radial mesh.
+- The remaining heating error is not primarily a missing-cavity-mass problem.
+- High and mid irradiance factors hit the upper bound (`f_I_high ~= f_I_mid ~= 1.6`), while the front/mid receiver solid is still too cold. This points to an input-energy/source-distribution or gas-removal structure issue rather than insufficient optimizer effort.
+- The low-irradiance cases are much closer, so the next revision should target irradiance-dependent behavior, not a uniform offset.
+- Heat-flow diagnostics show the cooled flange is a strong sink and the rear tube exit wall stays near the water temperature, but T3 is sampled at 140 mm, so the main T3 comparison is upstream of most flange cooling.
+
+Recommended next revision:
+
+1. Freeze the v8b cavity structure.
+
+Do not add a radial mesh next. Keep the lumped cavity/T2 model and use it as the baseline because it predicts T2 well.
+
+2. Address the irradiance/source limit.
+
+The fitted `f_I_high` and `f_I_mid` are at the upper bound. Before adding more thermal states, test whether the fixed optical assumptions are too restrictive:
+
+```text
+eta_abs = 0.80
+beta_opt = 50 1/m
+front_dep = 0.50
+```
+
+The next revision should allow a controlled optical/source sensitivity, not a broad unconstrained fit. Candidate tests:
+
+```text
+front_dep sweep
+beta_opt sweep
+eta_abs or aperture-power scale by irradiance group
+```
+
+3. Add an active-flow or gas-bypass model after the source check.
+
+If increasing/reshaping energy input fixes solid temperatures but breaks T3, add a mixed outlet model:
+
+```text
+mdot_active = f_active mdot_total
+T3_mix = Tin + f_active (Tg_active(140 mm) - Tin)
+```
+
+This can decouple solid heat removal from the measured gas temperature.
+
+4. Keep T3 at 140 mm for now.
+
+The v8b T3 definition is more physical than a fitted lag. Do not reintroduce `tau_T3` until the source and active-flow questions have been tested.
+
+5. Add a source/flow diagnostic runner.
+
+Before creating a large new version, make a small diagnostic script that runs v8b over a grid:
+
+```text
+front_dep
+beta_opt
+f_active
+```
+
+and reports signed steady residuals by irradiance group. This is faster and more informative than immediately adding more fitted states.
+
+6. Judge the next revision by signed residuals.
+
+The target should be:
+
+```text
+T2 remains within ~5-10 K
+high/mid T8 and T9_pair underprediction is reduced
+T10_pair does not flip into large overprediction
+T3 at 140 mm remains within a plausible signed residual
+```
+
+### 2026-07-20 - v8b axial profile plots after widened irradiance bounds
+
+Added steady axial `T vs Length` plots to `run_1D_v8b.jl` for every heating and cooling experiment. Each profile overlays:
+
+- continuous receiver/tube wall temperature,
+- continuous gas temperature,
+- experimental solid points at T8/T9/T10 axial locations,
+- experimental T3 at 140 mm,
+- T2 experiment/model markers at the lumped cavity location for context.
+
+The plotting pass was run with `RECEIVER1D_V8B_RUNNER_REUSE_PARAMETERS=true`, so it reused the saved full-calibration parameters instead of refitting. The generated files are:
+
+```text
+summaries/1D_v8b/plots/axial_profile_*_1D_v8b.png
+```
+
+Saved parameters with the updated bounds:
+
+```text
+gamma_C     = 1.5021
+k_scale     = 1.2804
+k_ins_scale = 0.8562
+A_Nu        = 2.3628
+h_floor     = 0.2506
+L_h         = 0.0500 m
+f_I_high    = 1.6131
+f_I_mid     = 1.7809
+f_I_low     = 1.1849
+```
+
+Aggregate residuals from the regenerated metrics:
+
+```text
+heating: T8 RMSE 63 K, steady -44 K
+heating: T9_pair RMSE 72 K, steady -65 K
+heating: T10_pair RMSE 59 K, steady +2 K
+heating: T3 RMSE 65 K, steady +25 K
+heating: T2 RMSE 4 K, steady -5 K
+
+cooling: T8 RMSE 15 K, steady +9 K
+cooling: T9_pair RMSE 29 K, steady +8 K
+cooling: T10_pair RMSE 19 K, steady +13 K
+cooling: T3 RMSE 27 K, steady +21 K
+cooling: T2 RMSE 2 K, steady +3 K
+```
+
+Heating steady residuals by irradiance group:
+
+```text
+high-Io: T8 -81 K, T9_pair -78 K, T10_pair +18 K, T3 +50 K, T2 -10 K
+mid-Io:  T8 -50 K, T9_pair -67 K, T10_pair  +3 K, T3 +26 K, T2  -4 K
+low-Io:  T8  ~0 K, T9_pair -51 K, T10_pair -14 K, T3  -1 K, T2  ~0 K
+```
+
+Interpretation:
+
+- The widened high/mid irradiance factors improved the front/mid solid underprediction relative to the earlier 1.6-limited run.
+- The price is a warmer gas prediction, especially T3 in high and mid irradiance cases.
+- T2 remains well captured, so the lumped cavity thermal mass should stay frozen for the next revision.
+- The axial profiles make the remaining structural issue clearer: the model can lift the receiver profile, but it then tends to overheat the sampled gas in low-flow/mid-irradiance cases such as E76 and E71.
+
+Next revision recommendation:
+
+Keep the v8b cavity/rear-tube structure and test a source-shape or active-flow/mixing diagnostic before adding more thermal masses. The next useful diagnostic is a small grid over front deposition / beta_opt / active gas fraction, judged by signed residuals and the new axial profile plots.
