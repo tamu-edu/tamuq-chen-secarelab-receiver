@@ -211,15 +211,20 @@ begin # runner helpers
                                   simulation_conditions[simulation_id]
         phase = is_cooling ? "cooling" : "heating"
 
-        solid_x_mm = vcat(result.z_solid, L .+ result.z_rear_tube) .* 1000.0
+        solid_x_mm = vcat(result.z_solid, result.z_rear_tube) .* 1000.0
         solid_T = vcat(result.solid_temperature[:, end],
                        result.rear_tube_temperature[:, end])
         gas_x_mm = result.z_gas .* 1000.0
         gas_T = result.gas_temperature[:, end]
 
-        experimental_solid_x_mm =
-            [sensor_positions[:T8], sensor_positions[:T9], sensor_positions[:T10]] .* 1000.0
-        experimental_solid_T = vec(experiment[end, 1:3])
+        measurement_data = is_cooling ? measurements_cooling : measurements
+        solid_measurement_points = (
+            (:T8, sensor_positions[:T8], "_T8", :square, :blue),
+            (:T9, sensor_positions[:T9], "_T9", :circle, :blue),
+            (:T12, sensor_positions[:T9], "_T12", :utriangle, :cyan),
+            (:T10, sensor_positions[:T10], "_T10", :diamond, :blue),
+            (:T11, sensor_positions[:T10], "_T11", :dtriangle, :cyan),
+        )
         t3_x_mm = [T3_SAMPLE_POSITION_v8b * 1000.0]
         t3_experiment_T = [experiment[end, 4]]
 
@@ -238,9 +243,12 @@ begin # runner helpers
               label="solid/tube model", color=:blue, linestyle=:dash, lw=2)
         plot!(plot_object, gas_x_mm, gas_T;
               label="gas model", color=:green, lw=2)
-        scatter!(plot_object, experimental_solid_x_mm, experimental_solid_T;
-                 label="solid experiment", color=:blue, markershape=:square,
-                 markerstrokewidth=0, ms=5)
+        for (sensor, position, observation_id, marker, color) in solid_measurement_points
+            scatter!(plot_object, [position * 1000.0],
+                     [observation(measurement_data, simulation_id, observation_id)[end]];
+                     label=String(sensor), color=color, markershape=marker,
+                     markerstrokewidth=0, ms=5)
+        end
         scatter!(plot_object, t3_x_mm, t3_experiment_T;
                  label="T3 experiment", color=:red, markershape=:star5,
                  markerstrokewidth=0, ms=7)

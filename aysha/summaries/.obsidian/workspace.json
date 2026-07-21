@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "1D_v8_theory_manual.md",
+                "file": "journal.1D.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "1D_v8_theory_manual"
+              "title": "journal.1D"
             }
           }
         ]
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "1D_v8_theory_manual.md",
+                "file": "journal.1D.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of 1D_v8_theory_manual"
+              "title": "Outline of journal.1D"
             }
           }
         ],
@@ -186,19 +186,24 @@
   },
   "active": "5c706a574f57aab2",
   "lastOpenFiles": [
-    "1D_v8b/plots/axial_profile_C81_1D_v8b.png",
-    "1D_v8b/plots/axial_profile_C80_1D_v8b.png",
-    "1D_v8b/plots/axial_profile_C69_1D_v8b.png",
-    "1D_v8b/plots/axial_profile_E81_1D_v8b.png",
-    "1D_v8b/plots/axial_profile_E80_1D_v8b.png",
-    "1D_v8b/plots/axial_profile_E79_1D_v8b.png",
-    "1D_v8b/plots/axial_profile_E78_1D_v8b.png",
-    "1D_v8b/plots/axial_profile_E77_1D_v8b.png",
-    "1D_v8b/plots/axial_profile_E76_1D_v8b.png",
-    "1D_v8b/plots/axial_profile_E75_1D_v8b.png",
-    "1D_v8b/plots/axial_profile_E74_1D_v8b.png",
-    "1D_theory.md",
+    "1D_v8b_geminicomments.md",
+    "1D_v9a/plots/Thumbs.db",
+    "1D_v9a/plots/axial_profile_C81_1D_v9a.png",
+    "1D_v9a/plots/transient_C81_1D_v9a.png",
+    "1D_v9a/plots/axial_profile_C80_1D_v9a.png",
+    "1D_v9a/plots/transient_C80_1D_v9a.png",
+    "1D_v9a/plots/axial_profile_C69_1D_v9a.png",
+    "1D_v9a/plots/transient_C69_1D_v9a.png",
+    "1D_v9a/plots/axial_profile_E81_1D_v9a.png",
+    "1D_v9a/plots/transient_E81_1D_v9a.png",
+    "1D_v9a/plots/axial_profile_E80_1D_v9a.png",
+    "1D_v9a/plots/transient_E80_1D_v9a.png",
+    "1D_v9a/analysis_results_1D_v9a.csv",
+    "1D_v9a/parameters_1D_v9a.csv",
+    "1D_v9a/plots",
+    "1D_v9a",
     "1D_v8_theory_manual.md",
+    "1D_theory.md",
     "journal.1D.md",
     "1D_v8b_notes.md",
     "1D_v8b/analysis_results_1D_v8b.csv",
@@ -208,12 +213,7 @@
     "1D_v8a_notes.md",
     "1D_v7_geminicomments.md",
     "1D_v7_geminicomments.txt",
-    "1D_v7/analysis_results_1D_v7.csv",
-    "1D_v7/parameters_1D_v7.csv",
-    "1D_v7/plots",
-    "1D_v7",
     "1D_v6_geminicomments.md",
-    "1D_v6/analysis_results_1D_v6.csv",
     "1D_theory_manual_v3-v6.md",
     "1D_v1_theory_manual.md",
     "1D_modelling_v4_ideas.md",

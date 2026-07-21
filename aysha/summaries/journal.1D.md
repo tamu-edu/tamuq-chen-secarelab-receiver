@@ -658,3 +658,232 @@ Interpretation:
 Next revision recommendation:
 
 Keep the v8b cavity/rear-tube structure and test a source-shape or active-flow/mixing diagnostic before adding more thermal masses. The next useful diagnostic is a small grid over front deposition / beta_opt / active gas fraction, judged by signed residuals and the new axial profile plots.
+
+### 2026-07-20 - v9a heat-transfer-law revision
+
+Implemented `1D_v9a.jl`, `run_1D_v9a.jl`, and `test/smoke_1D_v9a.jl`.
+
+v9a keeps the v8b rear tube, water-cooled flange, and predicted lumped cavity/T2 state, but changes the receiver gas-solid heat-transfer model:
+
+```text
+Nu(z) = max(Nu_fd, 10^A_Nu Re^B_Re Pr^C_Pr (Dh / z)^1/3)
+Nu_fd = 3.61
+UA = h f_exchange P_exchange dx
+```
+
+Removed from the fitted vector:
+
+```text
+gamma_C
+tau_T3
+h_floor
+L_h
+```
+
+Fitted vector:
+
+```text
+k_scale
+k_ins_scale
+A_Nu
+B_Re
+C_Pr
+f_exchange
+f_I_high
+f_I_mid
+f_I_low
+```
+
+Full v9a runner completed and generated:
+
+```text
+summaries/1D_v9a/parameters_1D_v9a.csv
+summaries/1D_v9a/analysis_results_1D_v9a.csv
+summaries/1D_v9a/plots/
+```
+
+Full-run fitted parameters:
+
+```text
+k_scale     = 1.3716
+k_ins_scale = 0.7982
+A_Nu        = 0.2372
+B_Re        = 0.7109
+C_Pr        = 0.3920
+f_exchange  = 0.9908
+f_I_high    = 1.5735
+f_I_mid     = 1.7319
+f_I_low     = 1.1516
+```
+
+Aggregate residuals:
+
+```text
+heating: T8       RMSE 72.9 K, steady -54.7 K
+heating: T9_pair  RMSE 83.3 K, steady -74.8 K
+heating: T10_pair RMSE 68.7 K, steady  -2.2 K
+heating: T3       RMSE 74.9 K, steady +25.2 K
+heating: T2       RMSE  4.5 K, steady  -6.4 K
+
+cooling: T8       RMSE 28.1 K, steady  +8.4 K
+cooling: T9_pair  RMSE 49.0 K, steady  +7.3 K
+cooling: T10_pair RMSE 33.6 K, steady +11.2 K
+cooling: T3       RMSE 27.5 K, steady +17.7 K
+cooling: T2       RMSE  2.3 K, steady  +2.6 K
+```
+
+Heating steady residuals by irradiance group:
+
+```text
+high-Io: T8 -93 K, T9_pair -90 K, T10_pair +11 K, T3 +50 K, T2 -12 K
+mid-Io:  T8 -62 K, T9_pair -77 K, T10_pair  -1 K, T3 +27 K, T2  -6 K
+low-Io:  T8  -9 K, T9_pair -58 K, T10_pair -16 K, T3  -1 K, T2  -1 K
+```
+
+Interpretation:
+
+- v9a is a useful negative result. It did not improve the central signed residual pattern relative to the latest v8b run.
+- `f_exchange` calibrated near unity, so the optimizer did not use reduced exchange area to improve the fit in this formulation.
+- `B_Re = 0.71` and `C_Pr = 0.39` are physically more reasonable than the old fixed `B_Re = 1.0`, but the axial profiles remain similar to v8b.
+- Removing `gamma_C` did not break T2, but cooling T8/T9/T10 worsened relative to v8b, so the missing transient storage/coupling question may still matter for cooling even if it is not the main heating error.
+- The remaining heating problem is increasingly likely to involve source distribution and/or active flow/T3 mixing rather than only the receiver heat-transfer exponent.
+
+Recommended next move:
+
+Do not continue tuning v9a heat-transfer bounds alone. The next informative test should be one of:
+
+```text
+v9b-source: fit/sweep front_dep and beta_opt with v9a or v8b baseline
+v9b-flow: replace f_exchange with an active-flow/mixed-T3 model
+```
+
+Because v9a did not use `f_exchange < 1`, the source-distribution test should probably come first unless independent flow evidence supports bypass/mixing.
+
+### 2026-07-21 — Gemini assessment of v9a results
+
+#### What v9a tested and what it decided
+
+v9a implemented the heat-transfer-law revision from the combined Gemini+GPT plan in `1D_v8b_geminicomments.md`:
+
+- **Replaced** the empirical `Nu = 10^A_Nu × Re^1.0 × Pr^3.16 × s(z)` with a developing laminar flow form: `Nu(z) = max(3.61, 10^A_Nu × Re^B_Re × Pr^C_Pr × (Dh/z)^(1/3))`
+- **Freed** `B_Re` and `C_Pr` as fitted parameters (previously fixed at 1.0 and 0.5 via the `10^C_Pr` encoding)
+- **Added** `f_exchange` (exchange-area fraction) multiplying `P_exchange` in the UA term
+- **Removed** `gamma_C`, `tau_T3`, `h_floor`, `L_h`
+
+The code exactly followed the GPT plan rather than the Gemini counter-proposal on `gamma_C` (Gemini recommended keeping it; v9a removed it).
+
+#### Validation of predictions from the Gemini review
+
+**1. Effectiveness saturation — confirmed by `f_exchange ≈ 1.0`.**
+
+The Gemini review predicted that with v8b parameters (NTU ≈ 380 per cell), the gas-solid exchange was fully saturated and that changing the Re exponent alone would have zero effect. It also predicted that with classical laminar Nu ≈ 3.6, the per-cell NTU would drop to ~2.1 and ε to ~0.88.
+
+v9a results:
+- `A_Nu = 0.237`, so the Nusselt pre-factor is `10^0.237 ≈ 1.72`, and the developing-flow term at the inlet (where `(Dh/z)^(1/3)` is large) gives Nu ≈ 10–20 in the first few cells, decaying toward `Nu_fd = 3.61` downstream. This is consistent with the predicted ε ≈ 0.88 regime for most of the receiver.
+- `f_exchange = 0.991` — the optimizer did not reduce the exchange area. This means even at the lower NTU ≈ 2 regime, the gas-solid coupling is still too strong to explain the residual pattern. The remaining error is not about how much exchange happens per cell — it is about what the gas encounters (source distribution) or how much gas actually enters the channels (active flow).
+- `B_Re = 0.71` — physically plausible for a developing laminar/transitional regime, but the parameter had little leverage because the NTU is above the threshold where ε sensitivity saturates (for NTU > 2, ε changes slowly).
+
+**2. Removing `gamma_C` worsened cooling — as predicted.**
+
+| Sensor | v8b cooling RMSE | v9a cooling RMSE | Change |
+|---|---|---|---|
+| T8 | 15 K | 28 K | +87% |
+| T9_pair | 29 K | 49 K | +69% |
+| T10_pair | 19 K | 34 K | +77% |
+| T3 | 27 K | 28 K | ~same |
+| T2 | 2.3 K | 2.3 K | ~same |
+
+The Gemini review warned:
+
+> Removing gamma_C simultaneously with changing the Nusselt law makes it impossible to separate the effects. If the new Nusselt law changes the steady-state balance, gamma_C will need to re-adjust the transient response.
+
+This is exactly what happened. The receiver's thermal response became too fast without the capacity multiplier, producing larger cooling errors. The v8b `gamma_C = 1.50` was not just a fudge — it was absorbing real uncertainty in effective thermal mass (adaptor, channel geometry, contact interfaces).
+
+**3. Heating residuals did not improve — as predicted for a Nusselt-only change.**
+
+v9a heating signed residuals are essentially indistinguishable from v8b:
+
+| Group | v8b T8 | v9a T8 | v8b T9_pair | v9a T9_pair | v8b T3 | v9a T3 |
+|---|---|---|---|---|---|---|
+| high | -81 K | -93 K | -78 K | -90 K | +50 K | +50 K |
+| mid | -50 K | -62 K | -67 K | -77 K | +26 K | +27 K |
+| low | ~0 K | -9 K | -51 K | -58 K | -1 K | -1 K |
+
+v9a is actually slightly **worse** in every irradiance group for solid temperatures, while T3 is unchanged. The irradiance factors remain near bounds: `f_I_high = 1.57`, `f_I_mid = 1.73`.
+
+This confirms that the Nusselt-law revision was a necessary structural correction (the exponents are now physical), but it was not the cause of the steady-state bias.
+
+#### What this means for the model
+
+The v9a result narrows the diagnosis significantly:
+
+1. **The gas-solid exchange law is no longer the primary suspect.** Whether the Re exponent is 1.0 or 0.71, whether the Nusselt is 2566 or 5, the gas outlet temperature and solid temperatures barely change. The model is in a regime where gas-solid coupling is strong enough to equilibrate within a few cells, and the residual pattern is set by the overall energy balance, not the exchange rate.
+
+2. **The irradiance factors at bounds point to insufficient energy input.** The optimizer wants `f_I × eta_abs > 1.0` for high/mid irradiance, which means either:
+   - The nominal irradiance is underestimated
+   - `eta_abs = 0.80` is too low
+   - The actual absorbed power is higher than `0.80 × Io × A_frt`
+   - Or: the energy is correctly absorbed but distributed too far forward (front_dep = 0.50), causing excessive front radiative loss that reduces the *net* energy available to heat the deeper solid
+
+3. **The source distribution is the remaining structural lever.** With `front_dep = 0.50`, roughly half the absorbed solar power goes into the first 5.5 mm cell. At high irradiance, this front cell reaches ~1100–1200 K, producing a front radiative loss of `0.95 × 5.67e-8 × 361e-6 × (1200⁴ - 295⁴) ≈ 30 W`. With a total absorbed power of ~60–80 W, this is a 40–50% front loss fraction, which is enormous. Reducing `front_dep` to 0.15 and/or lowering `beta_opt` to 20 1/m would spread the absorption deeper, reduce the front peak temperature, reduce front radiative loss, and make more net energy available for heating the mid/rear receiver — without changing the gas exchange at all.
+
+#### Concrete recommendation for v9b
+
+```text
+v9b should be: v9a + gamma_C restored + front_dep/beta_opt freed
+
+Fitted vector (11 parameters):
+  p[1]  gamma_C        [0.50, 3.00]
+  p[2]  k_scale        [0.20, 3.00]
+  p[3]  k_ins_scale    [0.25, 4.00]
+  p[4]  A_Nu           [-2.00, 1.00]
+  p[5]  B_Re           [0.00, 1.00]
+  p[6]  C_Pr           [0.20, 0.50]
+  p[7]  f_exchange     [0.05, 1.00]
+  p[8]  front_dep      [0.05, 0.50]
+  p[9]  beta_opt       [10.0, 100.0]
+  p[10] f_I_high       [0.60, 2.00]
+  p[11] f_I_mid        [0.60, 2.00]
+  p[12] f_I_low        [0.60, 1.60]
+```
+
+Calibration stages:
+
+```text
+Stage 1 — Heating: fit A_Nu, B_Re, C_Pr, f_exchange, front_dep,
+          beta_opt, f_I_high, f_I_mid, f_I_low (9 parameters)
+Stage 2 — Cooling: fit gamma_C, k_scale, k_ins_scale (3 parameters)
+Stage 3 — Heating refit (same 9 parameters)
+```
+
+Success criteria:
+
+```text
+1. front_dep calibrates below 0.30 (evidence for deeper absorption)
+2. f_I factors move closer to 1.0 (less need for energy compensation)
+3. T8/T9_pair steady error decreases in high/mid groups
+4. Cooling RMSE returns to v8b levels with gamma_C restored
+5. f_exchange either stays near 1.0 or drops — either result is
+   informative for deciding whether v9c needs an active-flow model
+```
+
+Alternative if v9b-source doesn't close the gap: the next change should be an active-flow/mixed-T3 model (v9c-flow). But the source-distribution test should come first because it has independent physical motivation and doesn't add new conceptual complexity.
+
+### 2026-07-21 - axial profile thermocouple markers
+
+Updated the axial profile plot helpers in `run_1D_v8b.jl` and `run_1D_v9a.jl` so the experimental solid markers show the raw thermocouple channels:
+
+```text
+T8 at z = 11 mm
+T9 and T12 at z = 58 mm
+T10 and T11 at z = 107 mm
+```
+
+The model curves are unchanged. The previous profile plots used the 1D comparison channels `T8`, `T9_pair`, and `T10_pair`; the new plots make the radial spread at the T9/T12 and T10/T11 axial stations explicit.
+
+Regenerated both saved-parameter plot sets:
+
+```text
+summaries/1D_v8b/plots/axial_profile_*_1D_v8b.png
+summaries/1D_v9a/plots/axial_profile_*_1D_v9a.png
+```
