@@ -659,7 +659,7 @@ Next revision recommendation:
 
 Keep the v8b cavity/rear-tube structure and test a source-shape or active-flow/mixing diagnostic before adding more thermal masses. The next useful diagnostic is a small grid over front deposition / beta_opt / active gas fraction, judged by signed residuals and the new axial profile plots.
 
-### 2026-07-20 - v9a heat-transfer-law revision
+# 2026-07-20 - v9a heat-transfer-law revision
 
 Implemented `1D_v9a.jl`, `run_1D_v9a.jl`, and `test/smoke_1D_v9a.jl`.
 
@@ -759,7 +759,7 @@ v9b-flow: replace f_exchange with an active-flow/mixed-T3 model
 
 Because v9a did not use `f_exchange < 1`, the source-distribution test should probably come first unless independent flow evidence supports bypass/mixing.
 
-### 2026-07-21 — Gemini assessment of v9a results
+# 2026-07-21 — Gemini assessment of v9a results
 
 #### What v9a tested and what it decided
 
@@ -869,7 +869,7 @@ Success criteria:
 
 Alternative if v9b-source doesn't close the gap: the next change should be an active-flow/mixed-T3 model (v9c-flow). But the source-distribution test should come first because it has independent physical motivation and doesn't add new conceptual complexity.
 
-### 2026-07-21 - axial profile thermocouple markers
+### axial profile thermocouple markers
 
 Updated the axial profile plot helpers in `run_1D_v8b.jl` and `run_1D_v9a.jl` so the experimental solid markers show the raw thermocouple channels:
 
@@ -887,3 +887,99 @@ Regenerated both saved-parameter plot sets:
 summaries/1D_v8b/plots/axial_profile_*_1D_v8b.png
 summaries/1D_v9a/plots/axial_profile_*_1D_v9a.png
 ```
+
+### v10a comparison-first ECM baseline
+
+Implemented `1D_v10.jl`, `run_1D_v10.jl`, and `test/smoke_1D_v10.jl` as the
+first fundamental v10 revision. The model keeps the v8b rear tube/flange/cavity
+domain, but removes the broad fitted scalars:
+
+```text
+removed/replaced: gamma_C, k_scale, k_ins_scale, h_floor, L_h, f_exchange,
+                  tau_T3
+kept/fitted-ready at first: C_Nu_model, ell_rad_m, eta_opt, front_dep, beta_opt
+```
+
+The v10 runner is intentionally comparison-first rather than calibration-first.
+It reports:
+
+```text
+M1_no_rad:        fixed material/geometry properties, monolith Nu, no Rosseland
+M2_rad_beta1000:  M1 + Rosseland axial radiation with beta_tr = 1000 1/m
+M3_rad_beta300:   Rosseland sensitivity with beta_tr = 300 1/m
+M3_rad_beta2700:  Rosseland sensitivity with beta_tr = 2700 1/m
+```
+
+Smoke test:
+
+```text
+test/smoke_1D_v10.jl: 44/44 passed
+```
+
+The first full matrix shows that the fixed-property v10a baseline is much too
+cold during heating, especially in the receiver solid:
+
+| variant | phase | T8 steady | T9_pair steady | T10_pair steady | T3 steady | T2 steady |
+|---|---:|---:|---:|---:|---:|---:|
+| M1_no_rad | heating | -219 K | -241 K | -156 K | -118 K | -11 K |
+| M2_rad_beta1000 | heating | -219 K | -242 K | -156 K | -118 K | -11 K |
+| M3_rad_beta300 | heating | -219 K | -242 K | -157 K | -118 K | -11 K |
+| M3_rad_beta2700 | heating | -219 K | -241 K | -156 K | -118 K | -11 K |
+
+Cooling remains moderate, because those runs start near the measured hot state:
+
+| variant | phase | T8 steady | T9_pair steady | T10_pair steady | T3 steady | T2 steady |
+|---|---:|---:|---:|---:|---:|---:|
+| M1_no_rad | cooling | +3 K | +2 K | +7 K | +15 K | +3 K |
+| M2/M3 | cooling | nearly unchanged | nearly unchanged | nearly unchanged | nearly unchanged | nearly unchanged |
+
+Interpretation:
+
+1. Rosseland axial diffusion across `beta_tr = 300-2700 1/m` barely changes the
+   result. At this magnitude it is not the missing dominant mechanism.
+2. Removing `k_scale`, `k_ins_scale`, and `f_exchange` exposes a large heating
+   energy/source deficit. The model is not getting enough useful absorbed heat
+   into the receiver interior.
+3. Because T2 stays close while the receiver is cold, the next v10 step should
+   not be a hidden cavity/insulation scalar. The problem is upstream of cavity
+   heat loss: absorbed-power level, source distribution, or inlet/front thermal
+   boundary physics.
+
+Recommended v10b:
+
+```text
+keep eta_opt = 1.0 fixed
+keep front_dep = 1.0 fixed
+add Nu A/B/C coefficients
+add low-dimensional axial Rosseland parameters
+defer per-irradiance absorbed-power calibration to a later stage
+```
+
+Follow-up change after discussion:
+
+```text
+eta_opt   fixed to 1.0
+front_dep fixed to 1.0
+```
+
+This removes global absorbed-power compensation and forces all shortwave source
+into the front cell under the current `solar_weights_v5` convention. Since
+`front_dep = 1.0` makes `beta_opt` inactive, the current v10 fit-ready
+heat-transfer index list was reduced to `C_Nu_model` only; Rosseland remains a
+separate radiation index.
+
+Regenerated `summaries/1D_v10` after this change. The smoke test now passes
+`49/49` checks. Mean heating signed steady errors for `M1_no_rad` became:
+
+| sensor | steady error |
+|---|---:|
+| T8 | -192 K |
+| T9_pair | -248 K |
+| T10_pair | -164 K |
+| T3 | -125 K |
+| T2 | -11 K |
+
+Relative to the previous `front_dep = 0.50` v10a matrix, T8 becomes less cold
+but T9/T10/T3 become slightly colder. This is a useful source-location signal:
+front-only deposition preferentially helps the front thermocouple and does not
+solve the deeper receiver deficit.

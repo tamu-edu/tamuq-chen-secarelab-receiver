@@ -44,3 +44,7 @@ UndefVarError: `StaticData` not defined in `Base`
 ## Documentation Notes
 
 - Periodically check `summaries/journal.1D.md` when making or evaluating 1D model changes. Update it with meaningful new model versions, calibration outcomes, validation notes, and interpretation changes so the journal remains aligned with the current code and results.
+
+## Overall Study Objective
+
+The overarching goal of this study and the 1D model development is to **obtain and validate effective macroscopic heat transfer coefficients (convective, radiative, and conductive)** for a structured monolithic solar receiver with square channels. The model serves as a continuum representation (Entire Converter Model) where fundamental transport parameters (such as Nusselt number correlations and Rosseland radiation extinction coefficients) are extracted from experimental data, bridging the gap between detailed single-channel physics and full-reactor behavior.
