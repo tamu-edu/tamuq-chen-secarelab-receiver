@@ -1,0 +1,32 @@
+index,name,value
+1,A_Nu,1.099639225439012
+2,B_Re,1.0
+3,C_Pr,0.31833744247285517
+4,L_entry_m,0.03790557942990763
+5,beta_opt,184.67243519237965
+6,front_dep,0.0
+# fixed,Nu_fd_receiver,3.61
+# fixed,entry_shape_exponent,0.3333333333333333
+# fixed,eta_abs,0.8
+# fixed,eta_opt,1.0
+# fitted,beta_opt,184.67243519237965
+# fitted,front_dep,0.0
+# derived,front_cell_source_fraction,0.6365105278484928
+# derived,downstream_source_fraction,0.3634894721515072
+# fixed,h_front,10.0
+# fixed,eps_front,0.95
+# fixed,ell_rad_m,0.001
+# derived,beta_tr,1000.0
+# derived,tau_receiver,137.0
+# derived,tau_channel,1.5
+# fixed,cavity_outer_radius_m,0.075
+# fixed,insulation_outer_radius_m,0.056999999999999995
+# fixed,G_receiver_to_cavity_W_per_m_K,0.6016297709756657
+# fixed,G_receiver_to_tube_W_per_K,0.2128
+# fixed,adaptor_diameter_m,0.0776
+# fixed,rear_tube_length_m,0.15
+# fixed,rear_tube_cavity_length_m,0.046
+# fixed,rear_tube_flange_length_m,0.104
+# fixed,T3_sample_position_m,0.14
+# fixed,cavity_heat_capacity_J_per_K,4025.7299551151973
+# fixed,water_flange_temperature_K,298.15
