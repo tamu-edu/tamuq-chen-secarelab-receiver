@@ -31,6 +31,7 @@ begin # v8b fixed constants
     const BETA_OPT_FIXED_v8b = BETA_OPT_FIXED_V5
     const FRONT_DEPOSITION_FIXED_v8b = FRONT_DEPOSITION_FIXED_V5
     const H_FRONT_FIXED_v8b = 10.0
+    const TEMPERATURE_AXIS_LIMITS_v8b = (250.0, 1250.0)
 
     # Cavity geometry from the annotated v8b schematic.
     const CAVITY_OUTER_RADIUS_v8b = 75.0e-3
@@ -793,7 +794,8 @@ begin # v8b post-processing
         colors = (:blue, :red, :green, :purple, :black)
         plot_object = plot(title="1D_v8b transient: $simulation_id",
                            xlabel="Time (s)", ylabel="Temperature (K)",
-                           legend=:outerright)
+                           legend=:outerright,
+                           ylims=TEMPERATURE_AXIS_LIMITS_v8b)
         for (sensor, color) in zip(sensors, colors)
             plot!(plot_object, data.time, getproperty(data, Symbol(sensor, "_model"));
                   label="$(sensor) model", lw=2, color=color)

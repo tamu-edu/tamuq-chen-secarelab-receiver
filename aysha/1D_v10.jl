@@ -33,6 +33,7 @@ begin # v10 fixed constants
     const MONOLITH_GRAETZ_COEFF_v10 = 1.0
     const DEFAULT_ROSSELAND_MEAN_PATH_v10 = 1.0e-3
     const RADIATION_AREA_v10 = A_frt
+    const TEMPERATURE_AXIS_LIMITS_v10 = (250.0, 1250.0)
 
     # Cavity geometry from the annotated v10 schematic.
     const CAVITY_OUTER_RADIUS_v10 = 75.0e-3
@@ -736,10 +737,12 @@ end
 
 begin # v10 post-processing
     function transient_case_v10(simulation_id, p=pnew_v10; is_cooling=false,
-                               nodes=default_nodes, use_rosseland_radiation=false)
+                               nodes=default_nodes, use_rosseland_radiation=false,
+                               rosseland_profile=:uniform)
         model, result, experiment = solve_case_v10(
             p, simulation_id; is_cooling=is_cooling, nodes=nodes,
             use_rosseland_radiation=use_rosseland_radiation,
+            rosseland_profile=rosseland_profile,
         )
         return (
             time=result.time,
@@ -764,16 +767,19 @@ begin # v10 post-processing
     end
 
     function plot_case_v10(simulation_id, params=pnew_v10; is_cooling=false,
-                          nodes=default_nodes, use_rosseland_radiation=false)
+                          nodes=default_nodes, use_rosseland_radiation=false,
+                          rosseland_profile=:uniform)
         @eval using StatsPlots
         data = transient_case_v10(simulation_id, params;
                                  is_cooling=is_cooling, nodes=nodes,
-                                 use_rosseland_radiation=use_rosseland_radiation)
+                                 use_rosseland_radiation=use_rosseland_radiation,
+                                 rosseland_profile=rosseland_profile)
         sensors = (:T8, :T9_pair, :T10_pair, :T3, :T2)
         colors = (:blue, :red, :green, :purple, :black)
         plot_object = plot(title="1D_v10 transient: $simulation_id",
                            xlabel="Time (s)", ylabel="Temperature (K)",
-                           legend=:outerright)
+                           legend=:outerright,
+                           ylims=TEMPERATURE_AXIS_LIMITS_v10)
         for (sensor, color) in zip(sensors, colors)
             plot!(plot_object, data.time, getproperty(data, Symbol(sensor, "_model"));
                   label="$(sensor) model", lw=2, color=color)
@@ -789,13 +795,15 @@ begin # v10 post-processing
 
     function compute_metrics_v10(p=pnew_v10; heating_keys=sim_key_heat,
                                 cooling_keys=sim_key_cool, nodes=default_nodes,
-                                use_rosseland_radiation=false)
+                                use_rosseland_radiation=false,
+                                rosseland_profile=:uniform)
         metrics = NamedTuple[]
         for (keys, cooling) in ((heating_keys, false), (cooling_keys, true))
             for simulation_id in keys
                 model, result, experiment = solve_case_v10(
                     p, simulation_id; is_cooling=cooling, nodes=nodes,
                     use_rosseland_radiation=use_rosseland_radiation,
+                    rosseland_profile=rosseland_profile,
                 )
                 for (sensor, column) in ((:T8, 1), (:T9_pair, 2),
                                          (:T10_pair, 3), (:T3, 4), (:T2, 5))

@@ -190,8 +190,7 @@ begin # runner helpers
                      ms=4, markerstrokewidth=0)
         end
 
-        lower = 50.0 * floor(minimum(all_values) / 50.0)
-        upper = 50.0 * ceil(maximum(all_values) / 50.0)
+        lower, upper = TEMPERATURE_AXIS_LIMITS_v9a
         plot!(plot_object, [lower, upper], [lower, upper];
               label="1:1", color=:gray, linestyle=:dash)
         xlims!(plot_object, lower, upper)
@@ -236,6 +235,7 @@ begin # runner helpers
             legend=:outerright,
             grid=true,
             xlims=(0.0, 1000.0 * (L + REAR_TUBE_LENGTH_v9a)),
+            ylims=TEMPERATURE_AXIS_LIMITS_v9a,
         )
         plot!(plot_object, solid_x_mm, solid_T;
               label="solid/tube model", color=:blue, linestyle=:dash, lw=2)

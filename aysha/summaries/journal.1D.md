@@ -983,3 +983,163 @@ Relative to the previous `front_dep = 0.50` v10a matrix, T8 becomes less cold
 but T9/T10/T3 become slightly colder. This is a useful source-location signal:
 front-only deposition preferentially helps the front thermocouple and does not
 solve the deeper receiver deficit.
+
+### v10 energy-partition precheck
+
+Implemented `run_1D_v10_energy_precheck.jl` and added optional named Rosseland
+axial profiles to `1D_v10.jl`:
+
+```text
+:uniform
+:front_strong
+:rear_strong
+:weak_gradient
+```
+
+The default model behavior remains uniform Rosseland unless a profile is
+explicitly requested. The smoke test now passes `52/52` checks.
+
+Precheck outputs:
+
+```text
+summaries/1D_v10/precheck/energy_partition_summary_1D_v10.csv
+summaries/1D_v10/precheck/axial/axial_terms_*_1D_v10.csv
+summaries/1D_v10/precheck/plots/energy_partition_*_1D_v10.png
+summaries/1D_v10/precheck/plots/axial_heat_terms_*_1D_v10.png
+```
+
+Representative cases checked:
+
+```text
+E67, E76, E80, C80
+```
+
+Mean heating energy partition over E67/E76/E80:
+
+| variant | solar | front loss | gas gain receiver | receiver-cavity | receiver-tube | flange | receiver residual |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| no_rad | 97.8 W | 7.8 W | 44.3 W | 26.6 W | 18.6 W | 20.6 W | 0.5 W |
+| uniform_beta1000 | 97.8 W | 7.8 W | 44.4 W | 26.5 W | 18.6 W | 20.6 W | 0.5 W |
+| front_strong | 97.8 W | 7.8 W | 44.4 W | 26.5 W | 18.6 W | 20.6 W | 0.5 W |
+| rear_strong | 97.8 W | 7.8 W | 44.4 W | 26.5 W | 18.6 W | 20.6 W | 0.5 W |
+
+Mean heating steady errors remain essentially unchanged by spatial Rosseland:
+
+| variant | T8 | T9_pair | T10_pair | T3 | T2 |
+|---|---:|---:|---:|---:|---:|
+| no_rad | -181 K | -235 K | -150 K | -113 K | -10 K |
+| uniform_beta1000 | -181 K | -235 K | -150 K | -113 K | -10 K |
+| front_strong | -182 K | -235 K | -150 K | -112 K | -10 K |
+| rear_strong | -181 K | -235 K | -150 K | -112 K | -10 K |
+
+For E76, axial solid conduction is roughly 20 W through most of the receiver,
+while Rosseland face flux remains very small:
+
+| profile | max \|Qrad\| | mean \|Qrad\| | max \|Qcond\| | mean \|Qcond\| |
+|---|---:|---:|---:|---:|
+| uniform_beta1000 | 0.17 W | 0.08 W | 23.6 W | 20.3 W |
+| front_strong | 0.56 W | 0.19 W | 23.3 W | 20.2 W |
+| rear_strong | 0.15 W | 0.12 W | 23.7 W | 20.3 W |
+
+Interpretation:
+
+1. The energy balance is numerically consistent: the receiver residual is only
+   about 0.5 W at the final sample.
+2. Spatial Rosseland profiles in the current physically bounded range do not
+   materially change the energy partition or the deeper receiver/T3 residuals.
+3. With `front_dep = 1.0`, all shortwave source is assigned to the first cell.
+   The first cell passes a large amount to the gas; downstream cells then
+   mostly see hot-gas exchange, side loss to the cavity, and solid conduction.
+4. The next fit should not rely on Rosseland as the main missing mechanism.
+
+Recommended next revision:
+
+```text
+v10b-Nu:
+  keep eta_opt = 1.0
+  keep front_dep = 1.0
+  keep Rosseland off or fixed as a diagnostic
+  replace C_Nu_model with A_Nu, B_Re, C_Pr
+  report the same energy partition after fitting
+```
+
+If Nu A/B/C cannot reduce the deeper receiver and T3 residuals without
+unphysical coefficients, then the following stage should revisit absorbed-power
+level by irradiance group, including the fixed `ETA_ABS_FIXED_v10 = 0.8`
+assumption.
+
+### experimental T8 versus T9/T12 flow crossover
+
+Added `run_1D_sensor_pattern.jl` to summarize the raw steady thermocouple
+ordering and produce flow-trend plots:
+
+```text
+summaries/1D_sensor_pattern/steady_thermocouple_pattern.csv
+summaries/1D_sensor_pattern/plots/temperature_vs_flow_I*_1D.png
+summaries/1D_sensor_pattern/plots/internal_minus_front_I*_1D.png
+```
+
+The diagnostic confirms the user's observation and rules out a simple "T9 direct
+light" explanation, because side thermocouple T12 follows the same pattern.
+The diagnostic was then expanded to include raw T10/T11 and their pair average.
+
+At high flow, the internal station is hotter than T8:
+
+| irradiance | high-flow case | flow | T9_pair - T8 | T12 - T8 |
+|---:|---|---:|---:|---:|
+| 456 kW/m2 | E67 | 15.28 L/min | +47 K | +60 K |
+| 304 kW/m2 | E72 | 18.71 L/min | +47 K | +60 K |
+| 256 kW/m2 | E77 | 13.85 L/min | +47 K | +58 K |
+
+As flow is reduced, the sign reverses:
+
+| irradiance | low-flow case | flow | T9_pair - T8 | T12 - T8 |
+|---:|---|---:|---:|---:|
+| 456 kW/m2 | E71 | 7.13 L/min | -96 K | -83 K |
+| 304 kW/m2 | E76 | 4.53 L/min | -109 K | -97 K |
+| 256 kW/m2 | E81 | 4.53 L/min | -21 K | -10 K |
+
+The deeper T10/T11 station behaves differently: `T10_pair - T8` is negative in
+all heating cases and becomes more negative as flow is reduced:
+
+| irradiance | high-flow case | low-flow case |
+|---:|---:|---:|
+| 456 kW/m2 | -80 K | -338 K |
+| 304 kW/m2 | -29 K | -329 K |
+| 256 kW/m2 | -6 K | -152 K |
+
+Interpretation:
+
+1. The sign reversal is flow-coupled. A purely flow-independent ETC or
+   Rosseland correction would not naturally create the observed crossover by
+   itself.
+2. A more plausible primary mechanism is **front-region inlet cooling plus gas
+   preheating**. At high flow, the front section sees the coldest gas and a
+   high entry/developing-flow heat-transfer coefficient, so T8 can be depressed
+   while the downstream gas is already warmer and removes heat less aggressively
+   from the T9/T12 station. At low flow, the gas quickly heats and the total heat
+   removal capacity drops, so the front source dominates and T8 becomes the
+   hottest solid station.
+3. This does not eliminate ETC/Rosseland. It means ETC/Rosseland should be
+   secondary: it can smooth or redistribute the axial field, but the crossover
+   itself is a diagnostic for flow-dependent gas/solid exchange and inlet
+   thermal development.
+4. The current v10a Nu closure is too weakly structured to test this properly
+   because it is effectively near `Nu_fd = 3.61` over much of the receiver.
+
+Recommended next check:
+
+```text
+v10b-flow-shape:
+  keep eta_opt = 1.0
+  keep front_dep = 1.0
+  keep Rosseland off/fixed
+  replace C_Nu_model with A_Nu, B_Re, C_Pr
+  retain an axial entry/developing-flow dependence
+  add diagnostics for predicted T9_pair - T8, T12 - T8, and T10_pair - T8
+```
+
+If v10b-flow-shape cannot reproduce the high-flow internal-hot / low-flow
+front-hot crossover with credible Nu coefficients, then test an explicit axial
+ETC term as a diagnostic, but require it to be reported as an equivalent
+conductivity and compared against the physical solid/Rosseland scales.

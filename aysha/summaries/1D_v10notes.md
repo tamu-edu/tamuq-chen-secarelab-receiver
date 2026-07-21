@@ -908,3 +908,169 @@ T2         -11 K
 Compared with the previous `front_dep = 0.50` matrix, the front thermocouple is
 less cold but the deeper receiver and T3 are slightly colder. This confirms that
 front-only deposition does not solve the deeper receiver deficit by itself.
+
+## 12. Energy-Partition Precheck
+
+Added `run_1D_v10_energy_precheck.jl` to diagnose the fixed absorbed-power
+budget before v10b fitting. It writes:
+
+```text
+summaries/1D_v10/precheck/energy_partition_summary_1D_v10.csv
+summaries/1D_v10/precheck/axial/axial_terms_*_1D_v10.csv
+summaries/1D_v10/precheck/plots/*_1D_v10.png
+```
+
+The script checks E67, E76, E80, and C80 for:
+
+```text
+no_rad
+uniform_beta1000
+front_strong spatial Rosseland
+rear_strong spatial Rosseland
+```
+
+The code now supports named Rosseland axial profiles without changing the v10
+parameter vector:
+
+```text
+:uniform
+:front_strong
+:rear_strong
+:weak_gradient
+```
+
+The smoke test now passes `52/52` checks.
+
+### Main Finding
+
+For the heating cases, the mean energy partition is almost unchanged across all
+Rosseland variants:
+
+```text
+absorbed solar power     ~97.8 W
+front loss                ~7.8 W
+receiver gas gain        ~44.4 W
+receiver-to-cavity       ~26.5 W
+receiver-to-tube         ~18.6 W
+receiver residual         ~0.5 W
+```
+
+The corresponding mean heating residuals remain nearly unchanged:
+
+```text
+T8        ~ -181 K
+T9_pair   ~ -235 K
+T10_pair  ~ -150 K
+T3        ~ -113 K
+T2        ~  -10 K
+```
+
+For E76, the axial Rosseland flux is much smaller than solid conduction:
+
+```text
+uniform_beta1000:
+  max |Qrad|  ~0.17 W
+  mean |Qrad| ~0.08 W
+  mean |Qcond| ~20 W
+
+front_strong:
+  max |Qrad|  ~0.56 W
+  mean |Qrad| ~0.19 W
+  mean |Qcond| ~20 W
+```
+
+### Interpretation
+
+Rosseland radiation in the currently bounded ECM form is not the dominant
+missing transport pathway. It is too small relative to solid axial conduction
+and does not improve T9/T10/T3 materially.
+
+The next v10b should therefore use Rosseland as a diagnostic or fixed secondary
+term, not as the primary fitted explanation.
+
+Recommended v10b:
+
+```text
+keep eta_opt = 1.0
+keep front_dep = 1.0
+keep Rosseland off or fixed
+replace C_Nu_model with A_Nu, B_Re, C_Pr
+rerun energy partition after fitting
+```
+
+If Nu A/B/C cannot close the deeper receiver and T3 residuals with credible
+coefficients, the next stage should revisit absorbed-power calibration by
+irradiance group and the fixed `ETA_ABS_FIXED_v10 = 0.8` assumption.
+
+## 13. T8 versus T9/T12 Flow Crossover
+
+Added `run_1D_sensor_pattern.jl` to summarize the raw experimental
+thermocouple ordering:
+
+```text
+summaries/1D_sensor_pattern/steady_thermocouple_pattern.csv
+summaries/1D_sensor_pattern/plots/temperature_vs_flow_I*_1D.png
+summaries/1D_sensor_pattern/plots/internal_minus_front_I*_1D.png
+```
+
+The data show a repeatable crossover at all three irradiance levels:
+
+```text
+high flow: T9/T12 station hotter than T8
+low flow:  T8 hotter than T9/T12 station
+```
+
+Examples:
+
+```text
+456 kW/m2:
+  E67, 15.28 L/min: T9_pair - T8 = +47 K, T12 - T8 = +60 K
+  E71,  7.13 L/min: T9_pair - T8 = -96 K, T12 - T8 = -83 K
+
+304 kW/m2:
+  E72, 18.71 L/min: T9_pair - T8 = +47 K, T12 - T8 = +60 K
+  E76,  4.53 L/min: T9_pair - T8 = -109 K, T12 - T8 = -97 K
+
+256 kW/m2:
+  E77, 13.85 L/min: T9_pair - T8 = +47 K, T12 - T8 = +58 K
+  E81,  4.53 L/min: T9_pair - T8 = -21 K, T12 - T8 = -10 K
+```
+
+Because T12 follows T9, the pattern is not well explained by direct light on T9.
+The crossover is also not naturally explained by a purely flow-independent ETC
+or Rosseland term.
+
+The diagnostic now includes the deeper T10/T11 station. Unlike T9/T12, the
+T10/T11 pair stays cooler than T8 in all heating cases, and the deficit grows as
+flow is reduced:
+
+```text
+456 kW/m2: T10_pair - T8 shifts from -80 K to -338 K
+304 kW/m2: T10_pair - T8 shifts from -29 K to -329 K
+256 kW/m2: T10_pair - T8 shifts from  -6 K to -152 K
+```
+
+The most plausible primary mechanism is front-region inlet cooling plus gas
+thermal development:
+
+```text
+high flow:
+  cold inlet gas + stronger entry heat transfer cools T8 strongly;
+  gas is warmer by T9/T12, so the internal station can be hotter.
+
+low flow:
+  lower gas heat-removal capacity and rapid gas warming make the front source
+  dominate, so T8 becomes hottest.
+```
+
+This makes the next v10b target more specific:
+
+```text
+fit/test A_Nu, B_Re, C_Pr with axial entry dependence
+track T9_pair - T8 and T10_pair - T8 as signed diagnostics
+keep Rosseland/ETC secondary until Nu/entry-flow physics is tested
+```
+
+If a credible Nu/entry model cannot reproduce the crossover, then test an
+explicit ETC term next, but report its required equivalent conductivity and
+compare it against physical solid and Rosseland scales.

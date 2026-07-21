@@ -56,6 +56,14 @@ include(joinpath(@__DIR__, "..", "1D_v10.jl"))
     @test all(isfinite, model_rad)
     @test successful_retcode(result_rad.ode_solution)
 
+    model_profile, result_profile, _ = solve_case_v10(
+        pnew_v10, "E74"; nodes=11, use_rosseland_radiation=true,
+        rosseland_profile=:front_strong,
+    )
+    @test size(model_profile) == size(model)
+    @test all(isfinite, model_profile)
+    @test successful_retcode(result_profile.ode_solution)
+
     @test isfinite(loss_heating_v10(pnew_v10, ["E74"]; nodes=11))
     @test isfinite(loss_cooling_v10(pnew_v10, ["C69"]; nodes=11))
 

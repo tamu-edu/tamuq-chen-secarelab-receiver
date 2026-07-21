@@ -30,6 +30,7 @@ begin # v9a fixed constants
     const FRONT_DEPOSITION_FIXED_v9a = FRONT_DEPOSITION_FIXED_V5
     const H_FRONT_FIXED_v9a = 10.0
     const NU_FD_RECEIVER_v9a = 3.61
+    const TEMPERATURE_AXIS_LIMITS_v9a = (250.0, 1250.0)
 
     # Cavity geometry from the annotated v9a schematic.
     const CAVITY_OUTER_RADIUS_v9a = 75.0e-3
@@ -795,7 +796,8 @@ begin # v9a post-processing
         colors = (:blue, :red, :green, :purple, :black)
         plot_object = plot(title="1D_v9a transient: $simulation_id",
                            xlabel="Time (s)", ylabel="Temperature (K)",
-                           legend=:outerright)
+                           legend=:outerright,
+                           ylims=TEMPERATURE_AXIS_LIMITS_v9a)
         for (sensor, color) in zip(sensors, colors)
             plot!(plot_object, data.time, getproperty(data, Symbol(sensor, "_model"));
                   label="$(sensor) model", lw=2, color=color)
