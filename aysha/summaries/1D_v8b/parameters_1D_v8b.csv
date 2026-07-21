@@ -2,18 +2,18 @@ index,name,value
 1,gamma_C,1.5020607180516758
 2,k_scale,1.280359273899652
 3,k_ins_scale,0.856157862528226
-4,A_Nu,2.1477315086598816
-5,h_floor,0.26111682138855485
-6,L_h,0.049209716513998275
+4,A_Nu,2.152309517151295
+5,h_floor,0.24797301875297817
+6,L_h,0.04961266321024683
 7,tau_T3,20.0
-8,f_I_high,1.6153777014456017
-9,f_I_mid,1.782481461829527
-10,f_I_low,1.184545162197593
+8,f_I_high,1.6465042004171724
+9,f_I_mid,1.797625317718642
+10,f_I_low,1.1747361823215896
 # fixed,B_Re,1.0
 # fixed,C_Pr,0.5
 # fixed,eta_abs,0.8
 # fixed,beta_opt,50.0
-# fixed,front_dep,0.5
+# fixed,front_dep,1.0
 # fixed,h_front,10.0
 # fixed,eps_front,0.95
 # fixed,cavity_outer_radius_m,0.075

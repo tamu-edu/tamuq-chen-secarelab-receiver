@@ -1074,3 +1074,119 @@ keep Rosseland/ETC secondary until Nu/entry-flow physics is tested
 If a credible Nu/entry model cannot reproduce the crossover, then test an
 explicit ETC term next, but report its required equivalent conductivity and
 compare it against physical solid and Rosseland scales.
+
+## 14. Front-Only Deposition Reruns
+
+The fixed source convention was changed upstream:
+
+```text
+FRONT_DEPOSITION_FIXED_V5 = 1.0
+```
+
+Saved parameter files confirm that v8b, v9a, and v10 use `front_dep = 1.0`.
+The older plain v8 summary still records `front_dep = 0.5`, so v8b/v9a/v10 are
+the relevant front-only comparison set.
+
+Mean heating signed steady errors after the reruns:
+
+```text
+v8b:
+  T8        -7 K
+  T9_pair  -76 K
+  T10_pair -10 K
+  T3       +14 K
+  T2        -5 K
+
+v9a:
+  T8       -18 K
+  T9_pair -83 K
+  T10_pair -12 K
+  T3      +17 K
+  T2       -6 K
+
+v10 M1:
+  T8       -192 K
+  T9_pair  -248 K
+  T10_pair -164 K
+  T3       -125 K
+  T2        -11 K
+```
+
+Interpretation:
+
+```text
+front-only deposition fixes/improves T8 in v8b/v9a,
+but does not reproduce the internal T9/T12 hot ridge.
+```
+
+This is consistent with the experimental sensor-pattern diagnostic: the issue
+is not only where optical power is deposited. The model also needs to reproduce
+how flow redistributes heat removal along the receiver.
+
+## 15. Flow-Slope Constraint for v10b
+
+Linear slopes of the experimental steady thermocouple temperatures within each
+irradiance group are:
+
+```text
+456 kW/m2:
+  dT8/dflow        -34 K/(L/min)
+  dT9_pair/dflow   -17 K/(L/min)
+  dT10_pair/dflow   -3 K/(L/min)
+
+304 kW/m2:
+  dT8/dflow        -24 K/(L/min)
+  dT9_pair/dflow   -13 K/(L/min)
+  dT10_pair/dflow   -3 K/(L/min)
+
+256 kW/m2:
+  dT8/dflow        -21 K/(L/min)
+  dT9_pair/dflow   -14 K/(L/min)
+  dT10_pair/dflow   -6 K/(L/min)
+```
+
+The data do agree that the downstream response becomes flatter with flow,
+especially at T10/T11. They do **not** indicate that front heat transfer has
+less impact on temperature; T8 is the most flow-sensitive channel.
+
+Most plausible interpretation:
+
+```text
+T8:
+  cold inlet gas and entrance/developing-flow exchange create strong
+  flow-sensitive cooling.
+
+T9/T12:
+  the gas has been preheated, reducing local gas-solid driving force, so this
+  station can remain hotter than T8 at high flow.
+
+T10/T11:
+  available heat and gas-solid driving force are weaker, giving a flatter
+  flow response and temperatures below T8 in all current heating runs.
+```
+
+Recommended v10b correlation family:
+
+```text
+Nu(z) = Nu_fd + A * Re^B * Pr^C * F_entry(z, Re, Pr)
+
+F_entry(z, Re, Pr) = (Dh / max(z, z0))^m * exp(-z / L_entry)
+```
+
+or:
+
+```text
+Nu(z) = max(Nu_fd, A * Re^B * Pr^C * (1 + E * Gz(z)^m))
+Gz(z) = Re * Pr * Dh / max(z, z0)
+```
+
+The v10b fit should require `B > 0`, keep `eta_opt = 1.0` and
+`front_dep = 1.0` initially, and report:
+
+```text
+T9_pair - T8
+T12 - T8
+T10_pair - T8
+```
+
+as signed diagnostics, not only sensor-wise RMSE.

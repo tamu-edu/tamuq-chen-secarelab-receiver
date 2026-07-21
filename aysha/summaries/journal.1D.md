@@ -1143,3 +1143,136 @@ If v10b-flow-shape cannot reproduce the high-flow internal-hot / low-flow
 front-hot crossover with credible Nu coefficients, then test an explicit axial
 ETC term as a diagnostic, but require it to be reported as an equivalent
 conductivity and compared against the physical solid/Rosseland scales.
+
+### front-only deposition reruns and flow-slope interpretation
+
+The project constant was changed to:
+
+```text
+FRONT_DEPOSITION_FIXED_V5 = 1.0
+```
+
+Saved parameter files show that v8b, v9a, and v10 are now using
+`front_dep = 1.0`. The older plain `summaries/1D_v8/parameters_1D_v8.csv`
+still records `front_dep = 0.5`, so the directly comparable front-only reruns
+are v8b, v9a, and v10.
+
+Mean signed steady errors after the front-only reruns:
+
+| model | T8 | T9_pair | T10_pair | T3 | T2 |
+|---|---:|---:|---:|---:|---:|
+| v8b | -7 K | -76 K | -10 K | +14 K | -5 K |
+| v9a | -18 K | -83 K | -12 K | +17 K | -6 K |
+| v10 M1 | -192 K | -248 K | -164 K | -125 K | -11 K |
+
+Observations:
+
+1. Front-only deposition strongly helps the T8 level in v8b/v9a, but it leaves a
+   large T9/T12 cold bias. This is consistent with the experimental pattern:
+   the front source can correct the front thermocouple without reproducing the
+   internal hot ridge.
+2. v8b remains better than v9a after the change. The more physical v9a Nu law
+   still worsens T8/T9/T3 relative to the empirical v8b heat-transfer shape.
+3. v10 remains much too cold because it removed the irradiance-level
+   compensation and broad thermal scalars. This is not a Rosseland failure alone;
+   it is also a source/input/closure deficit under the fixed `eta_abs = 0.8`,
+   `eta_opt = 1.0` assumptions.
+
+The sensor-pattern slopes versus flow provide an important constraint. Linear
+slopes within each irradiance group are:
+
+| irradiance | dT8/dflow | dT9_pair/dflow | dT10_pair/dflow |
+|---:|---:|---:|---:|
+| 456 kW/m2 | -34 K/(L/min) | -17 K/(L/min) | -3 K/(L/min) |
+| 304 kW/m2 | -24 K/(L/min) | -13 K/(L/min) | -3 K/(L/min) |
+| 256 kW/m2 | -21 K/(L/min) | -14 K/(L/min) | -6 K/(L/min) |
+
+This agrees with the observation that the downstream temperatures become
+flatter with flow rate, especially at T10/T11. However, it does **not** support
+the statement that front heat transfer has less temperature impact. T8 is the
+most flow-sensitive channel. The more consistent interpretation is:
+
+```text
+T8:
+  cold inlet gas + entry/developing-flow exchange makes the front strongly
+  flow-sensitive.
+
+T9/T12:
+  gas has already been heated, so the local driving temperature difference and
+  flow sensitivity are reduced; this station forms the internal hot ridge at
+  high flow.
+
+T10/T11:
+  source/available heat and gas-solid driving force are both weaker, so the
+  temperature response to flow is much flatter and always below T8 in the
+  current data.
+```
+
+Recommended correlation form for v10b:
+
+```text
+Nu(z) = Nu_fd + A * Re^B * Pr^C * F_entry(z, Re, Pr)
+
+F_entry(z, Re, Pr) = (Dh / max(z, z0))^m
+                     * exp(-z / L_entry)
+
+or equivalently
+
+Nu(z) = max(Nu_fd, A * Re^B * Pr^C * (1 + E * Gz(z)^m))
+Gz(z) = Re * Pr * Dh / max(z, z0)
+```
+
+The fit should constrain `B > 0` so heat transfer increases with flow and should
+report signed diagnostics for:
+
+```text
+T9_pair - T8
+T12 - T8
+T10_pair - T8
+```
+
+If this entry/developing-flow Nu shape cannot reproduce the crossover and the
+flattening toward T10/T11, then add an explicit axial ETC diagnostic. But that
+ETC should be required to report an equivalent conductivity and should not be
+allowed to silently replace source/input calibration.
+
+Actionable v10b implementation suggestions:
+
+```text
+1. Keep fixed during the first v10b-flow-shape test:
+   eta_opt = 1.0
+   front_dep = 1.0
+   ETA_ABS_FIXED_v10 = 0.8
+
+2. Keep Rosseland off or fixed as a secondary diagnostic:
+   do not fit ell_rad/front-rear Rosseland in the first Nu test
+   still report Qrad and equivalent k_rad if enabled
+
+3. Replace the single C_Nu_model parameter with:
+   A_Nu
+   B_Re
+   C_Pr
+
+4. Add one explicit entry/development shape:
+   either F_entry(z) = (Dh / max(z, z0))^m * exp(-z / L_entry)
+   or     F_entry(z) = 1 + E * Gz(z)^m
+
+5. Use physically bounded coefficients:
+   B_Re > 0
+   0.2 <= C_Pr <= 0.5
+   Nu(z) should remain near credible square-channel/monolith ranges
+
+6. Optimize against the normal sensor residuals plus signed ordering metrics:
+   T9_pair - T8
+   T12 - T8
+   T10_pair - T8
+
+7. Require the fitted model to reproduce the qualitative flow pattern:
+   high flow: T9/T12 hotter than T8
+   low flow:  T8 hotter than T9/T12
+   all flows: T10/T11 generally below T8, with flatter flow response
+
+8. Only if this fails, add an axial ETC diagnostic:
+   report k_ETC, equivalent Q_ETC, and compare them with solid conduction and
+   Rosseland flux before accepting it as physics.
+```

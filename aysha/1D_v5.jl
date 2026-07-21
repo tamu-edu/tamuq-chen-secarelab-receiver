@@ -26,7 +26,7 @@ begin # v5 fixed modeling constants
     const EPS_FRONT_FIXED_V5 = 0.95
     const ETA_ABS_FIXED_V5 = 0.80
     const BETA_OPT_FIXED_V5 = 50.0
-    const FRONT_DEPOSITION_FIXED_V5 = 0.50
+    const FRONT_DEPOSITION_FIXED_V5 = 1.0
 end
 
 # Final v5 parameter vector p[1:12]
