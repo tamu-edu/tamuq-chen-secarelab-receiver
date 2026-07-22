@@ -1,0 +1,22 @@
+index,name,value
+1,A_Nu,1.0996
+2,B_Re,0.3333
+3,C_Pr_fixed,0.3333333333333333
+4,phi_0,0.65
+5,m_rec,0.5
+6,front_dep,1.0
+7,scale_456,1.669539299381132
+8,scale_304,1.7170694424514947
+9,scale_256,0.9827026344016692
+10,G_core_perim_W_m_K,15.0
+11,C_perim_eff_J_K,250.0
+12,k_perim_ref_W_m_K,2.0
+13,beta_opt,184.67243519237965
+# fitted,phi_0,0.65
+# fitted,m_rec,0.5
+# fitted,G_core_perim_W_m_K,15.0
+# fitted,C_perim_eff_J_K,250.0
+# fitted,k_perim_ref_W_m_K,2.0
+# derived,C_core_eff_J_K,72.52693256582086
+# derived,C_participating_eff_J_K,322.52693256582086
+# reference,measured_C_eff_J_K,301.0

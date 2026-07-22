@@ -131,9 +131,9 @@ begin # v19 parameter values and bounds
         0.20,
         0.0,
         pnew_v19[6],
-        pnew_v19[7],
-        pnew_v19[8],
-        pnew_v19[9],
+        0.50,
+        0.50,
+        0.50,
         0.5,
         50.0,
         0.0,
@@ -146,18 +146,18 @@ begin # v19 parameter values and bounds
         1.00,
         1.50,
         pnew_v19[6],
-        pnew_v19[7],
-        pnew_v19[8],
-        pnew_v19[9],
+        2.50,
+        2.50,
+        2.50,
         100.0,
         450.0,
         50.0,
         pnew_v19[13],
     ]
 
-    fit_heat_transfer_indices_v19 = [1, 2, 4, 5, 10, 11, 12]
+    fit_heat_transfer_indices_v19 = [1, 2, 4, 5, 7, 8, 9, 10, 11, 12]
     fit_source_indices_v19 = Int[]
-    fit_power_scale_indices_v19 = Int[]
+    fit_power_scale_indices_v19 = [7, 8, 9]
     fit_radiation_indices_v19 = Int[]
 end
 
@@ -523,6 +523,9 @@ function simulate_v19(p, operating, save_times;
     rear_temperature_history .= state_history[tube_start:tube_stop, :]
     cavity_temperature_history .= state_history[cavity_index, :]
 
+    nu_history = Matrix{Float64}(undef, nodes, length(time))
+    effectiveness_history = Matrix{Float64}(undef, nodes, length(time))
+
     for output_index in eachindex(time)
         t = time[output_index]
         Tcore_now = view(core_temperature_history, :, output_index)
@@ -532,6 +535,23 @@ function simulate_v19(p, operating, save_times;
         Tg_history[:, output_index] .= Tg
         h_history[:, output_index] .= hcell
         qgas_history[:, output_index] .= Qgas
+
+        flow = max(0.0, operating.flow_lpm(t))
+        mdot_total = m_dot_standard_v19(flow)
+        for i in 1:nodes
+            Tfilm = 0.5 * (Tcore_now[i] + Tg_history[i, output_index])
+            cp = cpf_f(Tfilm)
+            kf = kf_f(Tfilm)
+            nu_history[i, output_index] = h_history[i, output_index] * Dh / max(kf, eps(Float64))
+            if flow > 1e-12
+                phi_act = active_flow_fraction_v19(mdot_total * Dh / (A_flow * mu_f_f(Tfilm)), p)
+                mdot_active = phi_act * mdot_total
+                UA = h_history[i, output_index] * P_exchange * dx
+                effectiveness_history[i, output_index] = -expm1(-UA / (mdot_active * cp))
+            else
+                effectiveness_history[i, output_index] = 1.0
+            end
+        end
     end
 
     return (
@@ -546,6 +566,8 @@ function simulate_v19(p, operating, save_times;
         boundary_temperature=vec(perim_temperature_history[1, :]),
         gas_temperature=Tg_history,
         heat_transfer_coefficient=h_history,
+        receiver_nusselt=nu_history,
+        receiver_effectiveness=effectiveness_history,
         receiver_gas_heat=qgas_history,
         ode_solution=solution,
     )

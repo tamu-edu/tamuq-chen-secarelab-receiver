@@ -5,9 +5,9 @@ include(joinpath(@__DIR__, "..", "1D_v19.jl"))
 @testset "1D_v19 2-Zone Core/Perimeter Macro-ECM smoke test" begin
     @test length(pnew_v19) == 13
     @test H_FRONT_FIXED_v19 == 10.0
-    @test fit_heat_transfer_indices_v19 == [1, 2, 4, 5, 10, 11, 12]
+    @test fit_heat_transfer_indices_v19 == [1, 2, 4, 5, 7, 8, 9, 10, 11, 12]
     @test isempty(fit_source_indices_v19)
-    @test isempty(fit_power_scale_indices_v19)
+    @test fit_power_scale_indices_v19 == [7, 8, 9]
     @test isempty(fit_radiation_indices_v19)
     @test pnew_v19[1] > 0.0
     @test pnew_v19[3] == PRANDTL_EXPONENT_FIXED_v19
