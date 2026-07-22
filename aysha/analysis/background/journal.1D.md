@@ -1586,3 +1586,332 @@ flow-slope decoupling, for example:
 3. Keep source distribution fixed at the v12a fitted values during that test
    so flow-decoupling is not hidden by another optical refit.
 ```
+
+## 2026-07-21 - v13 Axial Radiation and Thermocouple Diagnostics
+
+Motivation:
+
+After rejecting a two-gas-branch model as likely overfitting, v13 tested two
+more defensible possibilities without adding fitted parameters:
+
+```text
+1. nonlocal axial surface-to-surface radiative exchange inside the receiver
+2. a fixed front-biased thermocouple-wire measurement model
+```
+
+Implementation:
+
+```text
+1D_v13.jl
+run_1D_v13.jl
+test/smoke_1D_v13.jl
+```
+
+v13 freezes the v11/v12a closure:
+
+| parameter | fixed value |
+|---|---:|
+| A_Nu | 1.0996 |
+| B_Re | 1.0000 |
+| C_Pr | 0.3183 |
+| L_entry_m | 0.0379 |
+| beta_opt | 184.67 1/m |
+| front_dep | 0.0 |
+
+The effective source distribution is the v12a result:
+
+```text
+first-cell source fraction = 0.637
+downstream source fraction = 0.363
+```
+
+The axial view-radiation diagnostic uses a fixed geometry-tied kernel:
+
+```text
+emissivity = 0.85
+maximum row-sum view fraction = 0.06
+axial decay length = 50 mm
+```
+
+The thermocouple diagnostic is only a measurement-layer correction; it does not
+change the energy balance:
+
+```text
+T_tc(z) = T_solid(z) - f_wire(z) * (T_solid(z) - 298.15 K)
+f_wire(z) = 0.25 * exp(-z / 25 mm)
+```
+
+Validation:
+
+```text
+test/smoke_1D_v13.jl passed: 83/83 tests
+run_1D_v13.jl completed
+```
+
+Generated artifacts:
+
+```text
+summaries/1D_v13/analysis_results_all_variants_1D_v13.csv
+summaries/1D_v13/steady_results_*_1D_v13.csv
+summaries/1D_v13/diagnostics/cell_diagnostics_*_1D_v13.csv
+summaries/1D_v13/plots/*.png
+```
+
+Variants:
+
+```text
+baseline_v12a_source
+axial_view_rad_fixed
+axial_view_rad_upper
+tc_wire_fixed
+combined_fixed
+```
+
+Mean signed heating steady errors:
+
+| variant | T8 | T9_pair | T10_pair | T3 | T9_pair - T8 |
+|---|---:|---:|---:|---:|---:|
+| baseline_v12a_source | -192 K | -241 K | -159 K | -121 K | -50 K |
+| axial_view_rad_fixed | -193 K | -242 K | -159 K | -120 K | -49 K |
+| axial_view_rad_upper | -194 K | -243 K | -159 K | -120 K | -49 K |
+| tc_wire_fixed | -256 K | -250 K | -160 K | -121 K | +6 K |
+| combined_fixed | -256 K | -250 K | -160 K | -120 K | +6 K |
+
+Compact representative ordering:
+
+| variant | E67 T9-T8 | E80 T9-T8 | E76 T9-T8 | mean |Q_view| | mean T8 TC shift |
+|---|---:|---:|---:|---:|---:|
+| baseline_v12a_source | -25.7 K | -59.6 K | -102.0 K | 0.000 W | 0.0 K |
+| axial_view_rad_fixed | -25.8 K | -59.4 K | -100.8 K | 0.586 W | 0.0 K |
+| axial_view_rad_upper | -26.0 K | -58.8 K | -98.6 K | 1.711 W | 0.0 K |
+| tc_wire_fixed | +24.9 K | -6.9 K | -27.4 K | 0.000 W | -63.9 K |
+| combined_fixed | +24.8 K | -6.7 K | -26.5 K | 0.586 W | -63.8 K |
+
+Flow-slope diagnostic for the combined fixed variant:
+
+| irradiance | sensor | model slope | experimental slope |
+|---:|---|---:|---:|
+| 456 kW/m2 | T8 | -26 K/(L/min) | -34 K/(L/min) |
+| 456 kW/m2 | T9_pair | -23 K/(L/min) | -17 K/(L/min) |
+| 456 kW/m2 | T10_pair | -16 K/(L/min) | -2 K/(L/min) |
+| 456 kW/m2 | T3 | -13 K/(L/min) | +1 K/(L/min) |
+| 304 kW/m2 | T8 | -18 K/(L/min) | -24 K/(L/min) |
+| 304 kW/m2 | T9_pair | -15 K/(L/min) | -13 K/(L/min) |
+| 304 kW/m2 | T10_pair | -11 K/(L/min) | -3 K/(L/min) |
+| 304 kW/m2 | T3 | -9 K/(L/min) | 0 K/(L/min) |
+
+Interpretation:
+
+1. The axial view-radiation model is too weak to explain the mismatch. Even the
+   upper-bound variant produces only about `1-2 W` of total redistributed
+   axial radiative exchange in representative heating cases. It barely changes
+   T9-T8 or the steady-state errors.
+2. The thermocouple-wire diagnostic can flip the high-flow E67 ordering toward
+   `T9 > T8`, but only by imposing a large T8 downward measurement shift
+   (`~64 K` mean, and up to `~85 K` in low-flow hotter cases). This improves
+   the ordering metric while making the absolute T8 error much worse.
+3. Combining fixed axial radiation with the thermocouple model does not solve
+   the rear flow-slope issue. T10/T11 and T3 remain far too flow-sensitive.
+4. Therefore the internal hot-ridge mismatch is unlikely to be solved by
+   conservative axial radiation alone or by a defensible simple thermocouple
+   measurement correction.
+
+Recommendation:
+
+```text
+The next defendable direction should not be another fitted transport branch.
+
+Before adding more 1D closure flexibility, perform an energy/input and
+measurement-consistency audit:
+
+1. Compare measured gas enthalpy rise + estimated losses with the modeled
+   absorbed power for each irradiance.
+2. Revisit whether the experimental "irradiance" corresponds to aperture
+   average, peak, illuminated area average, or receiver-absorbed equivalent.
+3. Add a diagnostic per-irradiance power-scale solve, not as final physics, but
+   to estimate the missing watts required after v12a/v13 fixed mechanisms.
+4. If the required power scale is reasonable and consistent by irradiance,
+   then the model is energy-starved.
+5. If the required power scale varies mainly with flow, then the remaining
+   issue is still flow/measurement coupling rather than optics.
+```
+
+## 2026-07-21 - v14 Absorbed-Power Scale Audit
+
+Motivation:
+
+v13 showed that fixed axial radiation and a simple thermocouple correction do
+not explain the mismatch. The next question was whether the model is simply
+energy-starved under the nominal irradiance/absorptivity inputs, and whether
+the required correction is grouped by irradiance level or by flow rate.
+
+Implementation:
+
+```text
+1D_v14.jl
+run_1D_v14.jl
+test/smoke_1D_v14.jl
+```
+
+v14 keeps the v11/v12a closure fixed:
+
+| parameter | fixed value |
+|---|---:|
+| A_Nu | 1.0996 |
+| B_Re | 1.0000 |
+| C_Pr | 0.3183 |
+| L_entry_m | 0.0379 |
+| beta_opt | 184.67 1/m |
+| front_dep | 0.0 |
+
+The only fitted parameters are absorbed-power scale factors:
+
+```text
+scale_456
+scale_304
+scale_256
+```
+
+The model still uses:
+
+```text
+eta_abs = 0.8 fixed
+eta_opt = 1.0 fixed before scale
+Rosseland off
+axial view radiation off
+thermocouple measurement model off
+```
+
+Validation:
+
+```text
+test/smoke_1D_v14.jl passed: 92/92 tests
+run_1D_v14.jl completed
+```
+
+Generated artifacts:
+
+```text
+summaries/1D_v14/analysis_results_all_variants_1D_v14.csv
+summaries/1D_v14/steady_results_baseline_scale1_1D_v14.csv
+summaries/1D_v14/steady_results_per_irradiance_power_fit_1D_v14.csv
+summaries/1D_v14/per_case_power_scale_audit_1D_v14.csv
+summaries/1D_v14/flow_slopes_*_1D_v14.csv
+summaries/1D_v14/diagnostics/cell_diagnostics_*_1D_v14.csv
+summaries/1D_v14/plots/*.png
+```
+
+Per-irradiance fitted scales:
+
+| irradiance | scale | nominal absorbed power | scaled absorbed power | added absorbed power |
+|---:|---:|---:|---:|---:|
+| 456 kW/m2 | 1.670 | 131.7 W | 219.9 W | +88.2 W |
+| 304 kW/m2 | 1.717 | 87.8 W | 150.8 W | +63.0 W |
+| 256 kW/m2 | 0.983 | 73.9 W | 72.7 W | -1.3 W |
+
+Objective change:
+
+```text
+baseline v12a/v13 scale=1 = 0.20035
+per-irradiance power fit  = 0.09531
+```
+
+Mean signed heating steady errors:
+
+| sensor | baseline | per-irradiance power fit |
+|---|---:|---:|
+| T8 | -192 K | -28 K |
+| T9_pair | -241 K | -92 K |
+| T10_pair | -159 K | -34 K |
+| T3 | -121 K | -15 K |
+| T2 | -11 K | -2 K |
+| T9_pair - T8 | -50 K | -65 K |
+| T10_pair - T8 | +33 K | -6 K |
+
+Interpretation of these errors:
+
+1. A large input-energy deficit is strongly indicated for the 456 and
+   304 kW/m2 datasets. Raising absorbed power by about `+60 to +90 W` greatly
+   improves absolute temperatures.
+2. The 256 kW/m2 group does not want added power. Its fitted scale is almost
+   exactly 1.0.
+3. Power scaling improves the global level but worsens the internal hot-ridge
+   metric `T9_pair - T8`: the model becomes too front-hot after the added power.
+4. This confirms that the energy deficit and the axial/flow-shape mismatch are
+   separate problems.
+
+Per-case power-scale audit:
+
+| irradiance | mean scale | min scale | max scale | mean added power |
+|---:|---:|---:|---:|---:|
+| 456 kW/m2 | 1.677 | 1.550 | 1.776 | +89 W |
+| 304 kW/m2 | 1.755 | 1.617 | 1.972 | +66 W |
+| 256 kW/m2 | 1.008 | 0.898 | 1.152 | +1 W |
+
+Per-case scale slope versus flow:
+
+| irradiance | d(scale)/d(flow) |
+|---:|---:|
+| 456 kW/m2 | -0.0126 per L/min |
+| 304 kW/m2 | +0.0243 per L/min |
+| 256 kW/m2 | +0.0274 per L/min |
+
+The scales cluster more by irradiance than by flow, especially for the two
+higher irradiance levels. This supports an irradiance/input calibration issue
+for 304 and 456 kW/m2.
+
+Flow-slope consequence after per-irradiance power scaling:
+
+| irradiance | sensor | model slope | experimental slope |
+|---:|---|---:|---:|
+| 456 kW/m2 | T8 | -41 K/(L/min) | -34 K/(L/min) |
+| 456 kW/m2 | T9_pair | -31 K/(L/min) | -17 K/(L/min) |
+| 456 kW/m2 | T10_pair | -21 K/(L/min) | -2 K/(L/min) |
+| 456 kW/m2 | T3 | -17 K/(L/min) | +1 K/(L/min) |
+| 304 kW/m2 | T8 | -32 K/(L/min) | -24 K/(L/min) |
+| 304 kW/m2 | T9_pair | -23 K/(L/min) | -13 K/(L/min) |
+| 304 kW/m2 | T10_pair | -15 K/(L/min) | -3 K/(L/min) |
+| 304 kW/m2 | T3 | -12 K/(L/min) | 0 K/(L/min) |
+| 256 kW/m2 | T8 | -23 K/(L/min) | -21 K/(L/min) |
+| 256 kW/m2 | T9_pair | -16 K/(L/min) | -14 K/(L/min) |
+| 256 kW/m2 | T10_pair | -11 K/(L/min) | -6 K/(L/min) |
+| 256 kW/m2 | T3 | -8 K/(L/min) | -3 K/(L/min) |
+
+This is the key diagnostic result:
+
+```text
+Power scaling fixes much of the absolute heating level,
+but it makes the downstream flow-slope problem more obvious.
+```
+
+Recommended next direction:
+
+```text
+1. Treat per-irradiance absorbed-power calibration as necessary for the
+   304 and 456 kW/m2 datasets, but not sufficient.
+
+2. Do not use a single global power scale:
+   the 256 kW/m2 group rejects it.
+
+3. Do not interpret the remaining mismatch as purely optical:
+   after adding the missing watts, T10/T11 and T3 are still much too
+   flow-sensitive.
+
+4. Next model revision should combine:
+   a) per-irradiance power-scale inputs fixed from v14, and
+   b) a conservative downstream flow-sensitivity reduction that is not a
+      two-branch overfit.
+
+Candidate conservative form:
+
+   replace the gas-solid exchange effectiveness downstream with a bounded
+   thermal-equilibration ceiling:
+
+   epsilon_eff(z, flow) = min(epsilon_Nu(z, flow), epsilon_cap(z))
+
+   where epsilon_cap(z) is monotonic and physically interpreted as unresolved
+   nonuniform exchange / finite thermal participation, not a new heat source.
+
+This should be tested as a diagnostic with one or two global parameters and
+reported directly through epsilon_eff(z), Qgas(z), and the flow-slope tables.
+```
