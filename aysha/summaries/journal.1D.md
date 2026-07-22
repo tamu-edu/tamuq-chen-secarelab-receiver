@@ -1586,3 +1586,1461 @@ flow-slope decoupling, for example:
 3. Keep source distribution fixed at the v12a fitted values during that test
    so flow-decoupling is not hidden by another optical refit.
 ```
+
+## 2026-07-21 - v13 Axial Radiation and Thermocouple Diagnostics
+
+Motivation:
+
+After rejecting a two-gas-branch model as likely overfitting, v13 tested two
+more defensible possibilities without adding fitted parameters:
+
+```text
+1. nonlocal axial surface-to-surface radiative exchange inside the receiver
+2. a fixed front-biased thermocouple-wire measurement model
+```
+
+Implementation:
+
+```text
+1D_v13.jl
+run_1D_v13.jl
+test/smoke_1D_v13.jl
+```
+
+v13 freezes the v11/v12a closure:
+
+| parameter | fixed value |
+|---|---:|
+| A_Nu | 1.0996 |
+| B_Re | 1.0000 |
+| C_Pr | 0.3183 |
+| L_entry_m | 0.0379 |
+| beta_opt | 184.67 1/m |
+| front_dep | 0.0 |
+
+The effective source distribution is the v12a result:
+
+```text
+first-cell source fraction = 0.637
+downstream source fraction = 0.363
+```
+
+The axial view-radiation diagnostic uses a fixed geometry-tied kernel:
+
+```text
+emissivity = 0.85
+maximum row-sum view fraction = 0.06
+axial decay length = 50 mm
+```
+
+The thermocouple diagnostic is only a measurement-layer correction; it does not
+change the energy balance:
+
+```text
+T_tc(z) = T_solid(z) - f_wire(z) * (T_solid(z) - 298.15 K)
+f_wire(z) = 0.25 * exp(-z / 25 mm)
+```
+
+Validation:
+
+```text
+test/smoke_1D_v13.jl passed: 83/83 tests
+run_1D_v13.jl completed
+```
+
+Generated artifacts:
+
+```text
+summaries/1D_v13/analysis_results_all_variants_1D_v13.csv
+summaries/1D_v13/steady_results_*_1D_v13.csv
+summaries/1D_v13/diagnostics/cell_diagnostics_*_1D_v13.csv
+summaries/1D_v13/plots/*.png
+```
+
+Variants:
+
+```text
+baseline_v12a_source
+axial_view_rad_fixed
+axial_view_rad_upper
+tc_wire_fixed
+combined_fixed
+```
+
+Mean signed heating steady errors:
+
+| variant | T8 | T9_pair | T10_pair | T3 | T9_pair - T8 |
+|---|---:|---:|---:|---:|---:|
+| baseline_v12a_source | -192 K | -241 K | -159 K | -121 K | -50 K |
+| axial_view_rad_fixed | -193 K | -242 K | -159 K | -120 K | -49 K |
+| axial_view_rad_upper | -194 K | -243 K | -159 K | -120 K | -49 K |
+| tc_wire_fixed | -256 K | -250 K | -160 K | -121 K | +6 K |
+| combined_fixed | -256 K | -250 K | -160 K | -120 K | +6 K |
+
+Compact representative ordering:
+
+| variant | E67 T9-T8 | E80 T9-T8 | E76 T9-T8 | mean |Q_view| | mean T8 TC shift |
+|---|---:|---:|---:|---:|---:|
+| baseline_v12a_source | -25.7 K | -59.6 K | -102.0 K | 0.000 W | 0.0 K |
+| axial_view_rad_fixed | -25.8 K | -59.4 K | -100.8 K | 0.586 W | 0.0 K |
+| axial_view_rad_upper | -26.0 K | -58.8 K | -98.6 K | 1.711 W | 0.0 K |
+| tc_wire_fixed | +24.9 K | -6.9 K | -27.4 K | 0.000 W | -63.9 K |
+| combined_fixed | +24.8 K | -6.7 K | -26.5 K | 0.586 W | -63.8 K |
+
+Flow-slope diagnostic for the combined fixed variant:
+
+| irradiance | sensor | model slope | experimental slope |
+|---:|---|---:|---:|
+| 456 kW/m2 | T8 | -26 K/(L/min) | -34 K/(L/min) |
+| 456 kW/m2 | T9_pair | -23 K/(L/min) | -17 K/(L/min) |
+| 456 kW/m2 | T10_pair | -16 K/(L/min) | -2 K/(L/min) |
+| 456 kW/m2 | T3 | -13 K/(L/min) | +1 K/(L/min) |
+| 304 kW/m2 | T8 | -18 K/(L/min) | -24 K/(L/min) |
+| 304 kW/m2 | T9_pair | -15 K/(L/min) | -13 K/(L/min) |
+| 304 kW/m2 | T10_pair | -11 K/(L/min) | -3 K/(L/min) |
+| 304 kW/m2 | T3 | -9 K/(L/min) | 0 K/(L/min) |
+
+Interpretation:
+
+1. The axial view-radiation model is too weak to explain the mismatch. Even the
+   upper-bound variant produces only about `1-2 W` of total redistributed
+   axial radiative exchange in representative heating cases. It barely changes
+   T9-T8 or the steady-state errors.
+2. The thermocouple-wire diagnostic can flip the high-flow E67 ordering toward
+   `T9 > T8`, but only by imposing a large T8 downward measurement shift
+   (`~64 K` mean, and up to `~85 K` in low-flow hotter cases). This improves
+   the ordering metric while making the absolute T8 error much worse.
+3. Combining fixed axial radiation with the thermocouple model does not solve
+   the rear flow-slope issue. T10/T11 and T3 remain far too flow-sensitive.
+4. Therefore the internal hot-ridge mismatch is unlikely to be solved by
+   conservative axial radiation alone or by a defensible simple thermocouple
+   measurement correction.
+
+Recommendation:
+
+```text
+The next defendable direction should not be another fitted transport branch.
+
+Before adding more 1D closure flexibility, perform an energy/input and
+measurement-consistency audit:
+
+1. Compare measured gas enthalpy rise + estimated losses with the modeled
+   absorbed power for each irradiance.
+2. Revisit whether the experimental "irradiance" corresponds to aperture
+   average, peak, illuminated area average, or receiver-absorbed equivalent.
+3. Add a diagnostic per-irradiance power-scale solve, not as final physics, but
+   to estimate the missing watts required after v12a/v13 fixed mechanisms.
+4. If the required power scale is reasonable and consistent by irradiance,
+   then the model is energy-starved.
+5. If the required power scale varies mainly with flow, then the remaining
+   issue is still flow/measurement coupling rather than optics.
+```
+
+## 2026-07-21 - v14 Absorbed-Power Scale Audit
+
+Motivation:
+
+v13 showed that fixed axial radiation and a simple thermocouple correction do
+not explain the mismatch. The next question was whether the model is simply
+energy-starved under the nominal irradiance/absorptivity inputs, and whether
+the required correction is grouped by irradiance level or by flow rate.
+
+Implementation:
+
+```text
+1D_v14.jl
+run_1D_v14.jl
+test/smoke_1D_v14.jl
+```
+
+v14 keeps the v11/v12a closure fixed:
+
+| parameter | fixed value |
+|---|---:|
+| A_Nu | 1.0996 |
+| B_Re | 1.0000 |
+| C_Pr | 0.3183 |
+| L_entry_m | 0.0379 |
+| beta_opt | 184.67 1/m |
+| front_dep | 0.0 |
+
+The only fitted parameters are absorbed-power scale factors:
+
+```text
+scale_456
+scale_304
+scale_256
+```
+
+The model still uses:
+
+```text
+eta_abs = 0.8 fixed
+eta_opt = 1.0 fixed before scale
+Rosseland off
+axial view radiation off
+thermocouple measurement model off
+```
+
+Validation:
+
+```text
+test/smoke_1D_v14.jl passed: 92/92 tests
+run_1D_v14.jl completed
+```
+
+Generated artifacts:
+
+```text
+summaries/1D_v14/analysis_results_all_variants_1D_v14.csv
+summaries/1D_v14/steady_results_baseline_scale1_1D_v14.csv
+summaries/1D_v14/steady_results_per_irradiance_power_fit_1D_v14.csv
+summaries/1D_v14/per_case_power_scale_audit_1D_v14.csv
+summaries/1D_v14/flow_slopes_*_1D_v14.csv
+summaries/1D_v14/diagnostics/cell_diagnostics_*_1D_v14.csv
+summaries/1D_v14/plots/*.png
+```
+
+Per-irradiance fitted scales:
+
+| irradiance | scale | nominal absorbed power | scaled absorbed power | added absorbed power |
+|---:|---:|---:|---:|---:|
+| 456 kW/m2 | 1.670 | 131.7 W | 219.9 W | +88.2 W |
+| 304 kW/m2 | 1.717 | 87.8 W | 150.8 W | +63.0 W |
+| 256 kW/m2 | 0.983 | 73.9 W | 72.7 W | -1.3 W |
+
+Objective change:
+
+```text
+baseline v12a/v13 scale=1 = 0.20035
+per-irradiance power fit  = 0.09531
+```
+
+Mean signed heating steady errors:
+
+| sensor | baseline | per-irradiance power fit |
+|---|---:|---:|
+| T8 | -192 K | -28 K |
+| T9_pair | -241 K | -92 K |
+| T10_pair | -159 K | -34 K |
+| T3 | -121 K | -15 K |
+| T2 | -11 K | -2 K |
+| T9_pair - T8 | -50 K | -65 K |
+| T10_pair - T8 | +33 K | -6 K |
+
+Interpretation of these errors:
+
+1. A large input-energy deficit is strongly indicated for the 456 and
+   304 kW/m2 datasets. Raising absorbed power by about `+60 to +90 W` greatly
+   improves absolute temperatures.
+2. The 256 kW/m2 group does not want added power. Its fitted scale is almost
+   exactly 1.0.
+3. Power scaling improves the global level but worsens the internal hot-ridge
+   metric `T9_pair - T8`: the model becomes too front-hot after the added power.
+4. This confirms that the energy deficit and the axial/flow-shape mismatch are
+   separate problems.
+
+Per-case power-scale audit:
+
+| irradiance | mean scale | min scale | max scale | mean added power |
+|---:|---:|---:|---:|---:|
+| 456 kW/m2 | 1.677 | 1.550 | 1.776 | +89 W |
+| 304 kW/m2 | 1.755 | 1.617 | 1.972 | +66 W |
+| 256 kW/m2 | 1.008 | 0.898 | 1.152 | +1 W |
+
+Per-case scale slope versus flow:
+
+| irradiance | d(scale)/d(flow) |
+|---:|---:|
+| 456 kW/m2 | -0.0126 per L/min |
+| 304 kW/m2 | +0.0243 per L/min |
+| 256 kW/m2 | +0.0274 per L/min |
+
+The scales cluster more by irradiance than by flow, especially for the two
+higher irradiance levels. This supports an irradiance/input calibration issue
+for 304 and 456 kW/m2.
+
+Flow-slope consequence after per-irradiance power scaling:
+
+| irradiance | sensor | model slope | experimental slope |
+|---:|---|---:|---:|
+| 456 kW/m2 | T8 | -41 K/(L/min) | -34 K/(L/min) |
+| 456 kW/m2 | T9_pair | -31 K/(L/min) | -17 K/(L/min) |
+| 456 kW/m2 | T10_pair | -21 K/(L/min) | -2 K/(L/min) |
+| 456 kW/m2 | T3 | -17 K/(L/min) | +1 K/(L/min) |
+| 304 kW/m2 | T8 | -32 K/(L/min) | -24 K/(L/min) |
+| 304 kW/m2 | T9_pair | -23 K/(L/min) | -13 K/(L/min) |
+| 304 kW/m2 | T10_pair | -15 K/(L/min) | -3 K/(L/min) |
+| 304 kW/m2 | T3 | -12 K/(L/min) | 0 K/(L/min) |
+| 256 kW/m2 | T8 | -23 K/(L/min) | -21 K/(L/min) |
+| 256 kW/m2 | T9_pair | -16 K/(L/min) | -14 K/(L/min) |
+| 256 kW/m2 | T10_pair | -11 K/(L/min) | -6 K/(L/min) |
+| 256 kW/m2 | T3 | -8 K/(L/min) | -3 K/(L/min) |
+
+This is the key diagnostic result:
+
+```text
+Power scaling fixes much of the absolute heating level,
+but it makes the downstream flow-slope problem more obvious.
+```
+
+Recommended next direction:
+
+```text
+1. Treat per-irradiance absorbed-power calibration as necessary for the
+   304 and 456 kW/m2 datasets, but not sufficient.
+
+2. Do not use a single global power scale:
+   the 256 kW/m2 group rejects it.
+
+3. Do not interpret the remaining mismatch as purely optical:
+   after adding the missing watts, T10/T11 and T3 are still much too
+   flow-sensitive.
+
+4. Next model revision should combine:
+   a) per-irradiance power-scale inputs fixed from v14, and
+   b) a conservative downstream flow-sensitivity reduction that is not a
+      two-branch overfit.
+
+Candidate conservative form:
+
+   replace the gas-solid exchange effectiveness downstream with a bounded
+   thermal-equilibration ceiling:
+
+   epsilon_eff(z, flow) = min(epsilon_Nu(z, flow), epsilon_cap(z))
+
+   where epsilon_cap(z) is monotonic and physically interpreted as unresolved
+   nonuniform exchange / finite thermal participation, not a new heat source.
+
+This should be tested as a diagnostic with one or two global parameters and
+reported directly through epsilon_eff(z), Qgas(z), and the flow-slope tables.
+```
+
+---
+
+## 2026-07-21 - v15a apparent heat-transfer refit with fixed power scales
+
+Created `1D_v15a.jl`, `run_1D_v15a.jl`, and
+`test/smoke_1D_v15a.jl`.
+
+Purpose:
+
+```text
+Use the v14 per-irradiance absorbed-power scales as fixed inputs, correct the
+thermocouple topology to the side-wall chain T8/T12/T11, switch the flow
+conversion to standard L/min, and repeat the receiver heat-transfer fit with
+Pr fixed to 1/3.
+```
+
+Fixed v14 absorbed-power scales used in v15a:
+
+| irradiance | scale | scaled absorbed power |
+|---:|---:|---:|
+| 456 kW/m2 | 1.6695 | 219.9 W |
+| 304 kW/m2 | 1.7171 | 150.8 W |
+| 256 kW/m2 | 0.9827 | 72.7 W |
+
+Topology/data changes:
+
+```text
+Old fitting targets:
+  T8, 0.5*(T9+T12), 0.5*(T10+T11), T3, T2
+
+v15a fitting targets:
+  T8, T12_wall, T11_wall, T3, T2
+
+T9 and T10 are no longer averaged into wall targets. They are retained in the
+steady-results table as interior / LTNE diagnostics through Lambda58 and
+Lambda107.
+```
+
+Heat-transfer law:
+
+```text
+Nu_app = A * Re^B * Pr^(1/3)
+```
+
+The fully developed duct floor `Nu = 3.61` and the axial entry-shape multiplier
+were removed from the receiver heat-transfer closure.
+
+The fitted v15a coefficients are:
+
+| coefficient | value |
+|---|---:|
+| A | 5.2965e-4 |
+| B | 3.0000 |
+| C | 1/3 fixed |
+
+Important caveat:
+
+```text
+B reached the upper optimization bound. Therefore v15a does not provide a
+settled physical Nu correlation. It shows that the 1D model still wants to use
+the heat-transfer law to compensate a missing flow/topology mechanism.
+```
+
+Initial apparent-Nu seed, based on the independent measured-data analysis:
+
+```text
+A = 3.5e-4, B = 1.44, C = 1/3
+```
+
+When used directly as the local 1D cell coefficient, this seed made the receiver
+front too hot, the downstream wall too cold, and T3 too cold. The model fit then
+drove the local effective Nu to very high values to recover gas heating and
+absolute levels.
+
+Mean steady errors after fitted v15a:
+
+| sensor | mean steady error |
+|---|---:|
+| T8 | -26 K |
+| T12_wall | -88 K |
+| T11_wall | -42 K |
+| T3 | -11 K |
+| T2 | -1 K |
+| T12_wall - T8 | -63 K |
+| T11_wall - T8 | -16 K |
+
+Fitted v15a flow slopes:
+
+| irradiance | sensor | model slope | experimental slope |
+|---:|---|---:|---:|
+| 456 kW/m2 | T8 | -41 K/(L/min) | -34 K/(L/min) |
+| 456 kW/m2 | T12_wall | -31 K/(L/min) | -17 K/(L/min) |
+| 456 kW/m2 | T11_wall | -21 K/(L/min) | -1 K/(L/min) |
+| 456 kW/m2 | T3 | -17 K/(L/min) | +1 K/(L/min) |
+| 304 kW/m2 | T8 | -32 K/(L/min) | -24 K/(L/min) |
+| 304 kW/m2 | T12_wall | -23 K/(L/min) | -13 K/(L/min) |
+| 304 kW/m2 | T11_wall | -15 K/(L/min) | -2 K/(L/min) |
+| 304 kW/m2 | T3 | -12 K/(L/min) | 0 K/(L/min) |
+| 256 kW/m2 | T8 | -23 K/(L/min) | -21 K/(L/min) |
+| 256 kW/m2 | T12_wall | -16 K/(L/min) | -14 K/(L/min) |
+| 256 kW/m2 | T11_wall | -11 K/(L/min) | -5 K/(L/min) |
+| 256 kW/m2 | T3 | -9 K/(L/min) | -3 K/(L/min) |
+
+Interpretation:
+
+```text
+v15a confirms that the old paired-sensor fitting target was not defensible, and
+that fixed v14 power scales should be carried forward. However, replacing the
+receiver gas-solid exchange with a simple apparent Nu law is not enough. The
+model still over-predicts downstream and T3 flow sensitivity, while the fitted
+B exponent runs to its bound.
+```
+
+Recommended next direction:
+
+```text
+Do not accept the v15a fitted B=3 as a physical heat-transfer correlation.
+Use v15a as a diagnostic checkpoint. The next revision should introduce a
+structural mechanism that separates:
+
+1. local channel gas-solid exchange,
+2. side-wall thermocouple temperature seen by T8/T12/T11, and
+3. the Re-dependent active/participating fraction of the cross-section.
+
+A conservative v15b candidate is a bounded active-exchange fraction or
+wall-observation map, fitted against T8/T12/T11 and tested against Lambda58 /
+Lambda107, instead of forcing all unresolved cross-sectional physics into Nu.
+```
+
+---
+
+## 2026-07-21 - v15b side-wall observation map and restored temporal profiles
+
+Created `1D_v15b.jl`, `run_1D_v15b.jl`, and
+`test/smoke_1D_v15b.jl`.
+
+Purpose:
+
+```text
+Test whether the corrected side-wall chain can be represented as a passive
+observation of a hotter side-wall field, while keeping the 1D thermal state as
+the exchange-average solid. Also restore generation of temporal profiles in the
+runner, which had been missing for several iterations.
+```
+
+Fixed inputs retained from v15a:
+
+```text
+Power scales:
+  456 kW/m2 -> 1.6695
+  304 kW/m2 -> 1.7171
+  256 kW/m2 -> 0.9827
+
+Optical/source:
+  beta_opt  = 184.6724 1/m
+  front_dep = 0.0
+  eta_abs   = 0.8
+  eta_opt   = 1.0
+
+Nu law:
+  Nu_app = A * Re^B * Pr^(1/3)
+```
+
+Added side-wall observation map:
+
+```text
+T_wall_obs(z,t) = T_1D(z,t)
+                  + wall_gap_gain * f_z(z)
+                    * max(T_1D(z,t) - T_gas(z,t), 0)
+
+f_z(z) = wall_gap_front + (1 - wall_gap_front) * (z/L)^wall_gap_exp
+```
+
+This correction is algebraic only. It does not add energy or change the gas
+heat balance. It tests whether the thermocouples are simply reading a hotter
+side-wall field than the exchange-average solid represented by the 1D model.
+
+Fitted v15b parameters:
+
+| parameter | value |
+|---|---:|
+| A | 7.4859e-4 |
+| B | 2.7565 |
+| C | 1/3 fixed |
+| wall_gap_gain | 0.0000 |
+| wall_gap_exp | 3.1517 |
+| wall_gap_front | 0.1141 |
+
+The side-wall map was rejected:
+
+```text
+wall_gap_gain -> 0
+```
+
+Therefore the v15b added observation-map degree of freedom does not explain the
+current mismatch. The optimizer still mostly adjusts the apparent Nu law and
+lands near the v15a behavior.
+
+Objective comparison:
+
+| revision | objective |
+|---|---:|
+| v15a fitted apparent Nu | 0.12225 |
+| v15b fitted observation map | 0.12478 |
+
+v15b is slightly worse than v15a despite the extra degrees of freedom. This is a
+negative result, not a successful correction.
+
+Fitted v15b mean steady errors:
+
+| sensor | mean steady error |
+|---|---:|
+| T8 | -26 K |
+| T12_wall | -89 K |
+| T11_wall | -42 K |
+| T3 | -11 K |
+| T2 | -1 K |
+| T12_wall - T8 | -63 K |
+| T11_wall - T8 | -16 K |
+
+Fitted v15b flow slopes:
+
+| irradiance | sensor | model slope | experimental slope |
+|---:|---|---:|---:|
+| 456 kW/m2 | T8 | -41 K/(L/min) | -34 K/(L/min) |
+| 456 kW/m2 | T12_wall | -31 K/(L/min) | -17 K/(L/min) |
+| 456 kW/m2 | T11_wall | -21 K/(L/min) | -1 K/(L/min) |
+| 456 kW/m2 | T3 | -17 K/(L/min) | +1 K/(L/min) |
+| 304 kW/m2 | T8 | -32 K/(L/min) | -24 K/(L/min) |
+| 304 kW/m2 | T12_wall | -23 K/(L/min) | -13 K/(L/min) |
+| 304 kW/m2 | T11_wall | -15 K/(L/min) | -2 K/(L/min) |
+| 304 kW/m2 | T3 | -12 K/(L/min) | 0 K/(L/min) |
+| 256 kW/m2 | T8 | -23 K/(L/min) | -21 K/(L/min) |
+| 256 kW/m2 | T12_wall | -16 K/(L/min) | -14 K/(L/min) |
+| 256 kW/m2 | T11_wall | -11 K/(L/min) | -5 K/(L/min) |
+| 256 kW/m2 | T3 | -9 K/(L/min) | -3 K/(L/min) |
+
+Profile-output restoration:
+
+```text
+run_1D_v15b.jl now saves:
+
+1. steady comparison plots for the initial and fitted variants,
+2. axial T-vs-length plots for representative initial cases,
+3. axial T-vs-length plots for all fitted heating cases,
+4. transient temporal plots for representative initial heating cases,
+5. transient temporal plots for all fitted heating cases,
+6. transient temporal plots for all fitted cooling cases.
+```
+
+Output folders:
+
+```text
+summaries/1D_v15b/plots/axial_profiles
+summaries/1D_v15b/plots/transients
+summaries/1D_v15b/diagnostics
+```
+
+Interpretation:
+
+```text
+The passive side-wall observation correction is not the missing mechanism.
+Because the optimizer drives wall_gap_gain to zero, the spatial mismatch cannot
+be fixed by simply saying the wall thermocouples see a hotter cross-sectional
+surface while the gas heat balance remains unchanged.
+
+The remaining mismatch is still the same structural one:
+the model cools the downstream receiver and T3 too strongly with increasing
+flow, while the experiments show a much flatter rear/T3 response.
+```
+
+Recommended next revision:
+
+```text
+Move from a passive observation map to an energy-coupled mechanism. The most
+defensible next test is not another sensor correction, but a bounded axial
+thermal redistribution / active-participation term that moves heat downstream
+or delays downstream heat removal without changing the fixed power scales.
+
+Candidate v15c/v16 direction:
+
+  Add an axial redistribution closure:
+    Q_redist(z) = -d/dz( k_app(z, Re, T) A dT/dz )
+
+  where k_app includes the existing SiC axial conduction plus a bounded
+  radiation/assembly-mediated term. Fit only one or two global parameters and
+  check whether it flattens T11 and T3 flow slopes without damaging T8.
+```
+
+---
+
+## 2026-07-22 - v15c energy-coupled axial redistribution test
+
+Created `1D_v15c.jl`, `run_1D_v15c.jl`, and
+`test/smoke_1D_v15c.jl`.
+
+Purpose:
+
+```text
+Move beyond passive observation corrections and test an energy-coupled axial
+redistribution mechanism. The new term acts inside the solid energy equation as
+an additional effective axial conductivity, intended to represent unresolved
+radiation/assembly-mediated heat spreading without adding a radial mesh.
+```
+
+Fixed inputs retained:
+
+```text
+Power scales:
+  456 kW/m2 -> 1.6695
+  304 kW/m2 -> 1.7171
+  256 kW/m2 -> 0.9827
+
+Optical/source:
+  beta_opt  = 184.6724 1/m
+  front_dep = 0.0
+  eta_abs   = 0.8
+  eta_opt   = 1.0
+
+Wall-chain fitting targets:
+  T8, T12_wall, T11_wall, T3, T2
+
+Nu law:
+  Nu_app = A * Re^B * Pr^(1/3)
+```
+
+Added energy-coupled redistribution:
+
+```text
+Q_redist = k_redist(T,z,Re) * A_frt * (T_i - T_{i+1}) / dx
+
+k_redist = k_axial_ref
+           * (T/900 K)^3
+           * (Re/50)^Re_exp
+           * (z/L)^axial_exp
+```
+
+Fitted v15c parameters:
+
+| parameter | value |
+|---|---:|
+| A | 1.0661e-3 |
+| B | 2.6307 |
+| C | 1/3 fixed |
+| k_axial_ref | 0.0000 W/m/K |
+| axial_exp | 2.1372 |
+| Re_exp | 0.6277 |
+
+Main outcome:
+
+```text
+k_axial_ref -> 0
+```
+
+Therefore this particular axial redistribution closure was also rejected by the
+optimizer. Like v15b, v15c converges back to essentially the same behavior as
+the apparent-Nu-only model.
+
+Objective comparison:
+
+| revision | objective |
+|---|---:|
+| v15a fitted apparent Nu | 0.12225 |
+| v15b side-wall observation map | 0.12478 |
+| v15c axial redistribution | 0.12478 |
+
+Fitted v15c mean steady errors:
+
+| sensor | mean steady error |
+|---|---:|
+| T8 | -26 K |
+| T12_wall | -89 K |
+| T11_wall | -42 K |
+| T3 | -11 K |
+| T2 | -1 K |
+| T12_wall - T8 | -63 K |
+| T11_wall - T8 | -16 K |
+
+Fitted v15c flow slopes:
+
+| irradiance | sensor | model slope | experimental slope |
+|---:|---|---:|---:|
+| 456 kW/m2 | T8 | -41 K/(L/min) | -34 K/(L/min) |
+| 456 kW/m2 | T12_wall | -31 K/(L/min) | -17 K/(L/min) |
+| 456 kW/m2 | T11_wall | -21 K/(L/min) | -1 K/(L/min) |
+| 456 kW/m2 | T3 | -17 K/(L/min) | +1 K/(L/min) |
+| 304 kW/m2 | T8 | -32 K/(L/min) | -24 K/(L/min) |
+| 304 kW/m2 | T12_wall | -23 K/(L/min) | -13 K/(L/min) |
+| 304 kW/m2 | T11_wall | -15 K/(L/min) | -2 K/(L/min) |
+| 304 kW/m2 | T3 | -12 K/(L/min) | 0 K/(L/min) |
+| 256 kW/m2 | T8 | -23 K/(L/min) | -21 K/(L/min) |
+| 256 kW/m2 | T12_wall | -16 K/(L/min) | -14 K/(L/min) |
+| 256 kW/m2 | T11_wall | -11 K/(L/min) | -5 K/(L/min) |
+| 256 kW/m2 | T3 | -9 K/(L/min) | -3 K/(L/min) |
+
+Profile outputs:
+
+```text
+run_1D_v15c.jl saves the same expanded profile set as v15b:
+
+1. steady comparison plots for initial and fitted variants,
+2. axial T-vs-length plots for representative initial heating cases,
+3. axial T-vs-length plots for all fitted heating cases,
+4. transient temporal plots for representative initial heating cases,
+5. transient temporal plots for all fitted heating cases,
+6. transient temporal plots for all fitted cooling cases.
+```
+
+Interpretation:
+
+```text
+Two conservative hypotheses have now been rejected by fitted behavior:
+
+1. v15b: passive side-wall observation correction.
+2. v15c: energy-coupled axial redistribution by enhanced axial conductivity.
+
+Both extra mechanisms go inactive, and the model returns to a steep apparent Nu
+law. This suggests the remaining mismatch is not caused by a simple missing
+axial heat-spreading path inside the single 1D solid state.
+```
+
+Recommended next direction:
+
+```text
+The next structural test should target the gas-side thermal capacity / mixing
+history rather than the solid-side axial redistribution alone.
+
+A defensible candidate is a delayed outlet / distributed rear gas mixing model:
+not a second arbitrary gas branch, but a finite residence-volume after the
+receiver and before T3. This could flatten T3 and rear response dynamically
+without changing the absorbed-power scales. It should be parameterized by a
+physical volume or residence time derived from the known adaptor/tube/flange
+geometry, not by per-case fitting.
+
+If that still fails, the next honest conclusion is that a single-state 1D solid
+model cannot represent the cross-sectional active fraction, and a minimal
+two-solid-zone model may be more defensible than continuing to force Nu.
+```
+
+---
+
+## 2026-07-22 - Hayes 2021 lessons for v16a model class
+
+Reviewed `literature/Hayes, 2021 Multi-scale modelling of monolith reactors A
+30-year perspective from 1990 to 2020.pdf` together with
+`summaries/claude_manuscript_full_draft.md`.
+
+Key lesson from Hayes:
+
+```text
+Monolith models should be chosen as a hierarchy, not as increasingly flexible
+curve fits:
+
+1. detailed single-channel model,
+2. reduced 1D single-channel model,
+3. homogeneous continuum model,
+4. heterogeneous continuum model,
+5. full monolith / ECM model.
+```
+
+The current v15 family is effectively a homogeneous one-solid-temperature
+model. Hayes explicitly warns that collapsing all phases into one temperature
+is only defensible when heat/mass transfer resistances and transient
+nonequilibrium can be ignored. That condition is not met here.
+
+Experimental constraints from the manuscript:
+
+```text
+1. T8/T12/T11 are side-wall probes.
+2. T9/T10 are interior, flow-exposed probes and show LTNE.
+3. Apparent Nu is one to two orders below duct theory.
+4. Apparent Nu has a super-linear Re exponent (~1.44), interpreted as
+   flow-dependent participation, not a film coefficient.
+5. Wall and gas heating transients have different time scales.
+6. The slow effective capacitance is about 301 J/K, around seven times the
+   monolith capacitance, so housing/insulation participation matters.
+7. Delivered-power factors should remain fixed and should not be double-counted:
+   eta_abs * scale = 1.336, 1.374, 0.786 for 456/304/256 kW/m2.
+```
+
+Implication for v16a:
+
+```text
+Do not use the manuscript apparent Nu directly as the local gas-solid h.
+Instead, use it as a validation observable computed from model T3 and model
+wall-chain temperatures.
+
+The next defensible model class is a minimal heterogeneous 1D continuum:
+
+  gas phase Tg(z,t)
+  active/internal solid Ta(z,t)
+  wall/housing-coupled solid Tw(z,t)
+  rear tube Ttube(z,t)
+  cavity/insulation lump Tcavity(t)
+
+Gas exchanges with Ta.
+T8/T12/T11 compare to Tw.
+Ta and Tw exchange with finite conductance.
+Tw couples to the cavity/T2 lump.
+```
+
+Recommended v16a fitted parameters:
+
+```text
+A, B            active-zone gas-solid exchange, with C fixed to 1/3
+f_wall          absorbed-power fraction deposited in wall/housing zone
+G_aw            active-wall conductance per receiver length
+C_wall_eff      effective participating wall/housing heat capacity
+```
+
+Fixed in v16a:
+
+```text
+eta_abs, eta_opt, beta_opt, front_dep, per-irradiance power scales,
+standard-flow mass conversion, T3 sample at 140 mm.
+```
+
+Required v16a diagnostics:
+
+```text
+1. temporal plots restored for all fitted heating/cooling runs,
+2. axial T-vs-length plots for all fitted heating runs,
+3. apparent epsilon and apparent Nu reconstructed from model outputs,
+4. Lambda58 and Lambda107 retained as validation diagnostics,
+5. fitted/effective capacitance compared with the measured 301 J/K,
+6. flow-slope tables for T8, T12_wall, T11_wall, and T3.
+```
+
+## 2026-07-22 - v16a implementation and first result
+
+Implemented v16a as the minimal heterogeneous 1D model implied by the Hayes
+hierarchy and the manuscript analysis:
+
+```text
+Tg(z,t)       gas phase
+Ta(z,t)       active/internal solid branch; gas exchanges only with this branch
+Tw(z,t)       wall/housing-coupled branch; T8/T12/T11 compare to this branch
+Ttube(z,t)    rear alumina tube/adaptor/flange extension
+Tcavity(t)    cavity/insulation/metal lump, compared with T2
+```
+
+The v16a fitted set is:
+
+```text
+A, B, f_wall, G_aw, C_wall_eff
+```
+
+Fixed in the fit:
+
+```text
+Pr exponent = 1/3
+eta_opt = 1.0
+front_dep = 1.0
+v14 per-irradiance absorbed-power scales = 1.66954, 1.71707, 0.98270
+T3 sample position = 140 mm
+```
+
+Validation:
+
+```text
+test/smoke_1D_v16a.jl passed: 103/103.
+run_1D_v16a.jl completed.
+Plots regenerated: 18 axial profiles and 21 transient profiles.
+```
+
+First fit:
+
+```text
+objective = 0.10803
+A = 6.7064e-4
+B = 2.2059
+f_wall = 0.00108
+G_aw = 12.65 W/m/K
+C_wall_eff = 86.31 J/K
+C_active_eff ~= 58.02 J/K
+C_participating_eff ~= 144.34 J/K
+measured slow C_eff ~= 301 J/K
+```
+
+Main observations:
+
+```text
+1. v16a improves the scalar objective relative to v15c (0.108 vs ~0.125), so
+   the heterogeneous active/wall topology is useful.
+2. The fit drives f_wall almost to zero. Direct wall absorption is therefore
+   not supported by the present objective/source assumptions.
+3. The model still predicts the rear wall chain too cold, especially T12, and
+   gives negative T12-T8 over much of the heating data. This is opposite to
+   the observed positive T12/T9/T10/T11-side elevation at many high-flow cases.
+4. T2 is now very well captured at steady state (mean absolute steady error
+   about 3-4 K), so the cavity/flange rear loss structure is no longer the
+   dominant T2 issue in this configuration.
+5. The fitted participating heat capacity is still too small: about 144 J/K
+   versus the manuscript estimate of about 301 J/K. The optimizer prefers a
+   faster wall branch unless the measured capacitance is explicitly enforced
+   or additional measurements constrain the transient mode.
+6. The fitted B remains high (2.21). This is lower than the v15a bound-hitting
+   result but still implies that the Nu law is compensating for missing
+   flow-dependent participation/thermal-path physics.
+7. Flow slopes remain too negative downstream and at T3, especially at the
+   higher irradiance levels. The model removes heat too strongly with
+   increasing flow in regions where experiments are nearly flow-independent.
+```
+
+Implication:
+
+```text
+v16a is a useful structural step, but not yet the final physics. The next
+revision should not simply add more wall power. The near-zero fitted f_wall
+indicates that the model needs a constrained mechanism that transports front
+absorbed energy deeper into the active/wall structure while preserving a
+separate gas-exposed active branch.
+```
+
+Recommended next revision:
+
+```text
+v16b:
+  - include T9 and T10 explicitly as active-branch targets,
+  - keep T8/T12/T11 as wall-branch targets,
+  - add one physically bounded axial radiation/ETC transport strength in the
+    active branch, preferably k_rad = k0 * (T/900 K)^3 with no Re multiplier,
+  - regularize or bound C_wall_eff so C_active + C_wall_eff remains near the
+    measured ~301 J/K unless the data strongly reject it,
+  - keep eta_opt, front_dep, and power scales fixed.
+
+This tests whether the observed internal-hotter-than-front behavior can be
+explained as LTNE plus axial radiative/effective transport, without invoking a
+secondary gas branch or arbitrary per-flow optical corrections.
+```
+
+## 2026-07-22 - v16b pre-implementation decision log
+
+Tests/lessons carried forward from v16a:
+
+```text
+1. Smoke validation passed and the full runner completed, so the active/wall
+   state split is numerically stable.
+2. T2 is no longer the main mismatch in v16a. Rear tube/flange/cavity heat
+   loss is adequate enough for the present stage.
+3. The direct wall-deposition parameter collapsed to f_wall ~= 0.001. This is
+   a strong warning against claiming wall-side direct absorption as the missing
+   mechanism.
+4. The wall branch remains too cold downstream, while T12/T11/T9/T10
+   observations often remain elevated relative to T8. The model is missing a
+   deeper heat-transport/participation path.
+5. The fitted B is still high, meaning the apparent Nu correlation is still
+   absorbing structural error.
+6. The fitted participating capacity is lower than the independent manuscript
+   estimate, so the transient mode remains under-constrained if only
+   T8/T12/T11/T3/T2 are used.
+```
+
+Questions v16b should answer:
+
+```text
+1. If T9/T10 are compared to the active branch explicitly, does the fitted
+   active branch naturally become hotter than the wall/front branch?
+2. Can a bounded axial ETC/radiative transport term move front-deposited
+   energy deeper without requiring per-flow optical factors or a secondary gas
+   branch?
+3. Does the fitted Nu exponent B decrease once deeper energy transport is
+   available?
+4. Does enforcing/regularizing the participating heat capacity toward
+   ~301 J/K improve temporal behavior without destroying steady-state fits?
+5. Are the remaining downstream flow slopes still too negative after axial ETC
+   is introduced?
+```
+
+v16b direction:
+
+```text
+Keep:
+  - v16a active/wall/rear/cavity topology,
+  - eta_opt = 1.0,
+  - front_dep = 1.0,
+  - v14 per-irradiance power scales,
+  - Pr exponent = 1/3,
+  - no secondary gas branch.
+
+Add:
+  - T9 and T10 as active-branch targets,
+  - one active-branch axial ETC parameter k_ETC,ref with
+    k_ETC(z,T) = k_ETC,ref * (T/900 K)^3,
+  - heat-capacity regularization toward C_active + C_wall_eff ~= 301 J/K.
+
+Fit:
+  - A, B, f_wall, G_aw, C_wall_eff, k_ETC,ref.
+
+Interpretation rule:
+  If k_ETC,ref fits to zero, the axial-radiative/ETC hypothesis is rejected in
+  this 1D form. If f_wall again fits near zero while k_ETC,ref is finite, the
+  evidence favors front absorption followed by internal axial redistribution.
+```
+
+## 2026-07-22 - v16b implementation and first result
+
+Implemented v16b from v16a with:
+
+```text
+1. T8, T12, T11 compared to the wall branch Tw.
+2. T9 and T10 compared explicitly to the active/internal branch Ta.
+3. Separate initial profiles:
+   - wall branch initialized from T8/T12/T11,
+   - active branch initialized from T8/T9/T10.
+4. One active axial ETC/radiative transport term:
+   k_ETC(T) = k_ETC,ref * (T/900 K)^3
+   with no Reynolds multiplier.
+5. Light regularization toward the manuscript effective heat capacity:
+   C_active + C_wall_eff ~= 301 J/K.
+```
+
+Validation:
+
+```text
+test/smoke_1D_v16b.jl passed: 106/106.
+run_1D_v16b.jl completed.
+Plots regenerated: 18 axial profiles and 21 transient profiles.
+```
+
+First fit:
+
+```text
+objective = 0.10059
+return_code = MaxIters
+A = 1.1181e-3
+B = 2.8516
+f_wall = 1.37e-5
+G_aw = 31.63 W/m/K
+C_wall_eff = 153.33 J/K
+k_ETC,ref = 0.0159 W/m/K
+C_active_eff ~= 58.02 J/K
+C_participating_eff ~= 211.35 J/K
+measured slow C_eff ~= 301 J/K
+```
+
+Observations:
+
+```text
+1. v16b lowers the fitted objective relative to v16a, but the objective is not
+   identical because v16b includes T9/T10 and capacitance regularization.
+2. k_ETC,ref fitted essentially to zero. The simple active-branch axial
+   k ~ T^3 ETC/radiation mechanism is therefore not supported in this 1D form.
+3. f_wall again fitted essentially to zero. The optimizer continues to reject
+   direct wall power deposition when front_dep and the v14 power scales are
+   fixed.
+4. B increased to 2.85, moving back toward the earlier problem where the Nu
+   law compensates for missing structure.
+5. C_participating_eff increased from v16a (~144 J/K) to ~211 J/K, but remains
+   below the independent ~301 J/K estimate. The data prefer more participating
+   capacitance than v16a but still reject the full manuscript value under this
+   topology.
+6. T2 remains well captured: heating mean absolute steady error is about
+   3.3 K.
+7. T12-T9 and T11-T10 remain qualitatively wrong. Experiments have positive
+   T12-T9 and T11-T10 at steady state, while v16b predicts negative values:
+   the active branch remains hotter than the wall branch at those axial
+   positions.
+8. Flow slopes remain too negative at high irradiance, especially downstream
+   and at T3. The model still removes too much energy as flow increases.
+```
+
+Scientific interpretation:
+
+```text
+The simple two-branch split is not enough. Treating T9/T10 as active and
+T12/T11 as wall-targets reveals that the measured side-wall probes are hotter
+than the corresponding interior probes, but the model naturally produces the
+opposite unless the wall receives or retains heat through a mechanism not yet
+represented.
+
+The rejected k_ETC,ref does not rule out radiation/ETC generally; it rejects
+only a single, uniform active-branch axial k_ETC term. The missing mechanism
+may be lateral/wall participation, anisotropic effective conductivity,
+thermocouple embedding/contact topology, or a source/cavity coupling that heats
+the side-wall measurement path without changing the optical power per flow.
+```
+
+Next questions:
+
+```text
+1. Are T12/T11 true wall temperatures, or do they measure a local solid rib /
+   casing-contact path with different axial/lateral conduction than the simple
+   Tw branch?
+2. Does the positive T12-T9 and T11-T10 gap imply lateral heating of the
+   side/corner structure rather than active-gas-channel heating?
+3. Should the next model split the solid by topology rather than by
+   active-versus-wall:
+      gas-exposed channel matrix,
+      side/corner/casing-coupled matrix,
+      cavity lump?
+4. Should front_dep=1.0 now be challenged only as a second-stage optical
+   calibration, not as a per-flow parameter?
+5. Is the high B really a heat-transfer law, or is it an apparent
+   flow-dependent participating-volume law that should be separated from local
+   h?
+```
+
+Recommended direction after v16b:
+
+```text
+v17 candidate:
+  - keep T9/T10 explicit,
+  - keep T8/T12/T11 explicit,
+  - replace active/wall split with a topological split:
+      core/channel solid that exchanges with gas,
+      side/corner solid that receives strong axial/lateral conduction and
+      couples to cavity/casing,
+  - fit a bounded side-core conductance and side axial conduction/participation,
+  - keep no secondary gas branch,
+  - keep eta/front_dep/power scales fixed for this stage.
+
+This direction tests whether the side thermocouples are reporting a
+side/corner thermal path rather than a generic wall branch.
+```
+
+## 2026-07-22 - v17 pre-implementation hypothesis
+
+The v16b result shifted the model question. Since T12/T11 are experimentally
+hotter than T9/T10 at matched axial stations, the next model should represent
+topological participation rather than a generic active/wall split.
+
+v17 hypothesis:
+
+```text
+The monolith has two effective solid pathways:
+
+1. core/channel solid:
+   - exchanges directly with the gas,
+   - receives most front-deposited radiation,
+   - is strongly flow-sensitive.
+
+2. side/corner/casing-coupled solid:
+   - weak or no direct gas exchange,
+   - receives heat through core-side conduction and only a small bounded source
+     leakage,
+   - can transport/retain heat axially along side/corner material,
+   - compares to T8/T12/T11.
+```
+
+v17 should test:
+
+```text
+1. Whether a side/corner axial participation term can produce T12 > T9 and
+   T11 > T10 without secondary gas flow.
+2. Whether the Nu exponent B drops once side/corner participation is available.
+3. Whether T2 remains close while the side-chain temperatures improve.
+4. Whether the participating heat capacity can move closer to ~301 J/K without
+   forcing extreme conductances.
+```
+
+v17 parameter discipline:
+
+```text
+Fit:
+  A, B, f_side_source, G_core_side, C_side_eff, k_side_axial_ref
+
+Keep fixed:
+  Pr exponent = 1/3
+  eta_opt = 1.0
+  front_dep = 1.0
+  v14 power scales
+  rear tube/flange/cavity geometry
+  no secondary gas branch
+
+Bound f_side_source tightly. v16a/v16b both rejected direct wall/source
+deposition, so v17 should only allow small leakage, not use it as the main fix.
+```
+
+## 2026-07-22 - v17 implementation and first result
+
+Implemented v17 as a topological reinterpretation of the v16b split:
+
+```text
+core/channel branch:
+  - same state array as active_temperature,
+  - gas-exposed,
+  - receives nearly all front-deposited source,
+  - compared to T9/T10.
+
+side/corner branch:
+  - same state array as wall_temperature,
+  - no direct gas exchange,
+  - receives bounded source leakage only,
+  - has fitted side axial participation k_side(T) = k_side_ref*(T/900 K)^3,
+  - compares to T8/T12/T11,
+  - couples to the cavity/T2 lump.
+
+rear tube:
+  - coupled to both core and side through fixed topological fractions rather
+    than through the fitted source-leakage fraction.
+```
+
+Validation:
+
+```text
+test/smoke_1D_v17.jl passed: 106/106.
+run_1D_v17.jl completed.
+Plots regenerated: 18 axial profiles and 21 transient profiles.
+```
+
+First fit:
+
+```text
+objective = 0.10163
+return_code = MaxIters
+A = 1.5021e-3
+B = 2.5335
+f_side = 3.11e-4
+G_core_side = 32.64 W/m/K
+C_side_eff = 157.45 J/K
+k_side_ref = 0.0149 W/m/K
+C_active_eff ~= 58.02 J/K
+C_participating_eff ~= 215.47 J/K
+measured slow C_eff ~= 301 J/K
+```
+
+Observations:
+
+```text
+1. v17 is slightly worse than v16b in scalar objective (0.1016 vs 0.1006), but
+   the objective is close enough that the comparison should be interpreted
+   physically rather than as a pure ranking.
+2. B decreased from 2.85 in v16b to 2.53 in v17, so topological rear/side
+   coupling reduces but does not remove the apparent heat-transfer
+   compensation.
+3. f_side again fitted almost to zero, even with a tight 0-0.10 bound.
+4. k_side_ref again fitted almost to zero. A single side axial k~T^3
+   participation term is therefore not the missing mechanism in this form.
+5. C_participating_eff remains around 215 J/K, still below the independent
+   ~301 J/K estimate.
+6. T2 remains good: heating mean absolute steady error is about 3.5 K.
+7. The qualitative side/core gap remains wrong:
+   experiments: T12-T9 > 0 and T11-T10 > 0,
+   v17: T12-T9 < 0 and T11-T10 < 0.
+8. Flow slopes remain too negative downstream and at T3, especially at high
+   irradiance.
+```
+
+Interpretation:
+
+```text
+v17 rejects the simplest side/corner axial-participation explanation. The
+model still naturally makes the gas-exposed core hotter than the side/corner
+branch, while the data show the opposite at matched axial stations.
+
+This suggests that the problem may not be solvable by adding a passive side
+solid path fed only by core-side conduction. Something must either:
+
+  - heat the side/corner measurement path more directly,
+  - cool the T9/T10 measurement path more strongly than the model assumes,
+  - or mean that T9/T10/T12/T11 are not sampling the branches as assumed.
+```
+
+Recommended next direction:
+
+```text
+Before adding another fitted branch, perform a measurement-topology audit:
+
+1. Revisit the physical thermocouple placement/depth/contact for T9/T10 vs
+   T12/T11. The persistent sign error may be a sensor interpretation issue.
+2. Compare side-core gaps against flow and irradiance using only experimental
+   data:
+      T12 - T9
+      T11 - T10
+      T12 - T8
+      T11 - T8
+   The goal is to decide whether the gap is mainly optical, conductive, or
+   cooling-related.
+3. Run a diagnostic-only forced-side-source sweep, not an optimization, with
+   f_side fixed at small values such as 0.02, 0.05, 0.10, while keeping the
+   other v17 fit parameters fixed. This will show whether any plausible
+   side/corner heating can flip the sign.
+4. If the forced sweep shows that a small f_side can fix the sign without
+   damaging T2/T3, then v17b should include a physically justified side/corner
+   source path. If even f_side=0.10 cannot fix it, the next target should be
+   the T9/T10 measurement model or local gas cooling interpretation.
+```
+
+## 2026-07-22 - v17 forced side-source sweep
+
+Ran `run_1D_v17_side_source_sweep.jl` as a diagnostic-only test. The fitted
+v17 side-topology parameters were held fixed and only `f_side` was forced to:
+
+```text
+0.00, 0.02, 0.05, 0.10
+```
+
+Outputs:
+
+```text
+summaries/1D_v17/side_source_sweep/side_source_sweep_detailed_1D_v17.csv
+summaries/1D_v17/side_source_sweep/side_source_sweep_summary_1D_v17.csv
+summaries/1D_v17/side_source_sweep/side_source_sweep_flow_slopes_1D_v17.csv
+summaries/1D_v17/side_source_sweep/plots/side_source_gap_sweep_1D_v17.png
+summaries/1D_v17/side_source_sweep/plots/side_source_error_sweep_1D_v17.png
+```
+
+Sweep summary:
+
+```text
+f_side  mean(T12-T9)_model  mean(T12-T9)_exp  positive_fraction
+0.00    -8.77 K             +24.48 K          0.00
+0.02    -8.74 K             +24.48 K          0.00
+0.05    -8.70 K             +24.48 K          0.00
+0.10    -8.64 K             +24.48 K          0.00
+
+f_side  mean(T11-T10)_model mean(T11-T10)_exp positive_fraction
+0.00    -8.19 K             +35.97 K          0.00
+0.02    -8.17 K             +35.97 K          0.00
+0.05    -8.13 K             +35.97 K          0.00
+0.10    -8.07 K             +35.97 K          0.00
+```
+
+Error tradeoff:
+
+```text
+f_side  gap12 MAE  gap11 MAE  T2 MAE  T3 MAE  side MAE  core MAE
+0.00    33.25 K    44.16 K    3.53 K  56.53 K 78.32 K   72.21 K
+0.02    33.23 K    44.14 K    3.58 K  56.33 K 78.63 K   72.39 K
+0.05    33.18 K    44.10 K    3.66 K  56.02 K 79.12 K   72.66 K
+0.10    33.12 K    44.04 K    3.79 K  55.52 K 80.00 K   73.13 K
+```
+
+Interpretation:
+
+```text
+Forced side-source leakage up to 10% cannot flip the side-core sign. It only
+nudges the mean gaps by about 0.1 K while slightly worsening side/core absolute
+temperature errors and T2. This rejects small plausible side/corner direct
+absorption as the missing mechanism under the current front-deposited source
+and core/side conductance topology.
+```
+
+Updated direction:
+
+```text
+The next model change should not be another source-leakage fit. The persistent
+negative model gaps point more strongly toward the measurement interpretation
+or local cooling interpretation for T9/T10:
+
+1. T9/T10 may be gas-biased thermocouple readings rather than true core solid
+   temperatures. A bead or wire partly exposed to the internal flow would read
+   lower than the nearby solid, and the bias should strengthen with flow.
+2. Side probes T12/T11 may be better embedded/contacted in solid/casing paths,
+   so they read closer to solid temperature than T9/T10.
+3. A defensible v18 diagnostic would keep the thermal model fixed and introduce
+   a constrained measurement model only for T9/T10:
+
+      T9_meas_model  = (1 - alpha9) * Tcore(z9)  + alpha9 * Tg(z9)
+      T10_meas_model = (1 - alpha10) * Tcore(z10) + alpha10 * Tg(z10)
+
+   with alpha increasing monotonically with flow/Re and bounded to physically
+   small/moderate values.
+
+4. If this measurement model fixes the sign and flow trends without damaging
+   T2/T3, the manuscript interpretation becomes: T9/T10 are internal
+   flow-biased measurements, while T12/T11 are side/corner solid measurements.
+   If it fails, then the remaining suspect is the gas heat-removal model itself
+   or a more detailed non-1D thermal topology.
+```
+
+## 2026-07-22 - v18 pre-implementation plan
+
+Reviewed the follow-up in `summaries/1D_v17_geminicomments.md`. Gemini agrees
+with a two-pronged path:
+
+```text
+v18: GPT/Codex tests T9/T10 measurement bias in the existing 1D framework.
+v19: Gemini proceeds in parallel toward a 2-zone core/perimeter macro-ECM.
+```
+
+v18 hypothesis:
+
+```text
+T9 and T10 may not be pure core-solid measurements. Because they are internal
+channel probes, their bead/wire thermal balance may be biased toward the local
+gas temperature, with stronger bias at higher flow.
+```
+
+v18 model:
+
+```text
+Keep the fitted v17 thermal model fixed.
+
+For T9 and T10 only:
+
+T9_model  = (1 - alpha9(Re))  * Tcore(z9)  + alpha9(Re)  * Tg(z9)
+T10_model = (1 - alpha10(Re)) * Tcore(z10) + alpha10(Re) * Tg(z10)
+
+alpha9(Re)  = alpha9_max  * Re^m / (Re^m + Re50^m)
+alpha10(Re) = alpha10_max * Re^m / (Re^m + Re50^m)
+```
+
+Fit only:
+
+```text
+alpha9_max, alpha10_max, Re50, m
+```
+
+Fixed:
+
+```text
+v17 thermal parameters:
+  A = 1.5021e-3
+  B = 2.5335
+  f_side = 3.11e-4
+  G_core_side = 32.64 W/m/K
+  C_side_eff = 157.45 J/K
+  k_side_ref = 0.0149 W/m/K
+
+eta_opt = 1.0
+front_dep = 1.0
+v14 power scales
+Pr exponent = 1/3
+rear/cavity geometry
+```
+
+Interpretation rule:
+
+```text
+If reasonable alpha values make T12-T9 and T11-T10 positive without damaging
+T2/T3, then the sign inversion is at least partly a measurement-topology issue.
+
+If alpha values must hit extreme bounds or fail to fix the sign, then the
+measurement-bias hypothesis is weak and the next serious path is v19-style
+core/perimeter macro-ECM.
+```

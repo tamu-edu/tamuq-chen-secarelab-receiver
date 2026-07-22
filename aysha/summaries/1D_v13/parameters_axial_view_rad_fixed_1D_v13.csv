@@ -1,0 +1,30 @@
+index,name,value
+1,A_Nu,1.099639225439012
+2,B_Re,1.0
+3,C_Pr,0.31833744247285517
+4,L_entry_m,0.03790557942990763
+5,beta_opt,184.67243519237965
+6,front_dep,0.0
+# fixed,Nu_fd_receiver,3.61
+# fixed,entry_shape_exponent,0.3333333333333333
+# fixed,eta_abs,0.8
+# fixed,eta_opt,1.0
+# fixed,beta_opt,184.67243519237965
+# fixed,front_dep,0.0
+# derived,front_cell_source_fraction,0.6365105278484928
+# derived,downstream_source_fraction,0.3634894721515072
+# fixed,axial_view_enabled,true
+# fixed,axial_view_strength,1.0
+# fixed,axial_view_emissivity,0.85
+# fixed,axial_view_row_sum,0.06
+# fixed,axial_view_length_m,0.05
+# fixed,tc_model_enabled,false
+# fixed,tc_wire_loss_front_fraction,0.25
+# fixed,tc_wire_loss_length_m,0.025
+# fixed,tc_wire_sink_temperature_K,298.15
+# fixed,h_front,10.0
+# fixed,eps_front,0.95
+# fixed,ell_rad_m,0.001
+# fixed,T3_sample_position_m,0.14
+# fixed,cavity_heat_capacity_J_per_K,4025.7299551151973
+# fixed,water_flange_temperature_K,298.15
