@@ -1,0 +1,28 @@
+index,name,value
+1,A_Nu,4.309512544987468
+2,B_Re,0.4464306198769722
+3,C_Pr_fixed,0.3333333333333333
+4,phi_0,0.9782073811513172
+5,m_rec,0.10162387847870431
+6,front_dep,1.0
+7,scale_456,2.0600648951307643
+8,scale_304,2.170056116195684
+9,scale_256,1.0635086644426774
+10,G_core_perim_W_m_K,99.65457510246097
+11,C_perim_eff_J_K,153.366182114366
+12,k_perim_ref_W_m_K,0.0
+13,beta_opt,184.67243519237965
+14,f_perim_source,0.3443984056357577
+15,beta_perim_1_m,33.02420185995854
+16,f_core_tube,0.8472801003795039
+# fitted,phi_0,0.9782073811513172
+# fitted,m_rec,0.10162387847870431
+# fitted,G_core_perim_W_m_K,99.65457510246097
+# fitted,C_perim_eff_J_K,153.366182114366
+# fitted,k_perim_ref_W_m_K,0.0
+# fitted,f_perim_source,0.3443984056357577
+# fitted,beta_perim_1_m,33.02420185995854
+# fitted,f_core_tube,0.8472801003795039
+# derived,C_core_eff_J_K,72.52693256582086
+# derived,C_participating_eff_J_K,225.89311468018687
+# reference,measured_C_eff_J_K,301.0

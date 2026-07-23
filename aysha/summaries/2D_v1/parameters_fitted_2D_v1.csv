@@ -1,0 +1,15 @@
+index,name,value
+1,A_Nu,2.5
+2,B_Re,0.333
+3,k_scale_r,0.030000000000000002
+4,k_scale_z,1.0
+5,sigma_beam_mm,14.0
+6,spillage_fraction,0.2
+7,C_cavity_eff_J_K,301.0
+8,scale_456,1.336
+9,scale_304,1.374
+10,scale_256,0.786
+11,phi_0,1.0
+12,m_rec,0.0
+13,front_dep_fraction,0.2
+14,flange_conductance_scale,1.0

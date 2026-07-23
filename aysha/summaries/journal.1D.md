@@ -3155,47 +3155,45 @@ Purpose:
 - Incorporates active flow participation $\phi_{\text{act}}(\text{Re}) = \text{clamp}(\phi_0 (\text{Re}/\text{Re}_{\text{ref}})^{m_{\text{rec}}}, 0.1, 1.0)$, bounded laminar developing-flow convection ($\text{Nu}_{\text{floor}} = 3.61$), and explicit radial conductance $G_{\text{core-perim}}$ between the core and perimeter states.
 - Accommodates front-rim spillage power from the v14 absorbed power scale ($P_{\text{spill}} = (\text{scale} - 1.0) Q_{\text{solar}}$) into the perimeter zone, and holds the ~301 J/K assembly thermal capacitance.
 
-Fitted Calibration Results (15 heating + 3 cooling runs, 99 iterations):
+Fitted Calibration Results (15 heating + 3 cooling runs, 73 iterations):
 
 ```text
-Objective Loss: 0.15956 (down from initial 0.45871)
+Objective Loss: 0.17922 (down from initial 0.45871)
 
-Fitted Parameters:
-  p[1]  A_Nu               = 3.0466    (laminar developing prefactor)
-  p[2]  B_Re               = 0.3599    (Reynolds exponent)
-  p[4]  phi_0              = 0.9983    (active flow fraction at Re=50)
-  p[5]  m_rec              = 0.1202    (flow recruitment exponent)
-  p[10] G_core_perim       = 38.240 W/m/K (radial core-perimeter conductance)
-  p[11] C_perim_eff        = 109.856 J/K  (perimeter participating capacity)
-  p[12] k_perim_ref        = 22.105 W/m/K (perimeter axial participation at 900 K)
+Fitted Parameters (10 free parameters):
+  p[1]  A_Nu               = 0.8085    (laminar developing prefactor)
+  p[2]  B_Re               = 0.2125    (Reynolds exponent)
+  p[4]  phi_0              = 0.8188    (active flow fraction at Re=50)
+  p[5]  m_rec              = 0.0000    (flow recruitment exponent)
+  p[7]  scale_456          = 1.2287    (fitted absorbed-power scale at 456 kW/m2)
+  p[8]  scale_304          = 1.3000    (fitted absorbed-power scale at 304 kW/m2)
+  p[9]  scale_256          = 0.9937    (fitted absorbed-power scale at 256 kW/m2)
+  p[10] G_core_perim       = 25.301 W/m/K (radial core-perimeter conductance)
+  p[11] C_perim_eff        = 81.858 J/K   (perimeter participating capacity)
+  p[12] k_perim_ref        = 2.943 W/m/K  (perimeter axial participation at 900 K)
 
 Derived Quantities:
   C_core_eff               = 72.53 J/K
-  C_participating_total    = 182.38 J/K
+  C_participating_total    = 154.39 J/K
   Reference Capacitance    = 301.0 J/K
 ```
 
 Key Findings & Diagnostic Insights:
-1. **Optimization Convergence**: The objective loss dropped by **65%** from `0.4587` to `0.1596`, demonstrating that the 2-zone core/perimeter continuum macro-ECM provides a vastly superior physical fit compared to single-branch 1D formulations.
-2. **Radial Coupling ($G_{\text{core-perim}} = 38.24\text{ W/m/K}$)**: A strong radial thermal coupling is identified between the central channel core and the surrounding perimeter housing. Spillage heat deposited into the perimeter is effectively conducted radially into the core, stabilizing solid temperatures.
-3. **Active Flow Participation ($\phi_0 \approx 1.0, m_{\text{rec}} = 0.12$)**: The fitted flow recruitment exponent indicates near-complete channel participation across the operating Reynolds number range ($\text{Re} \approx 20 - 150$), validating that flow maldistribution is minor within the central monolith matrix.
-4. **Thermal Mass Distribution ($C_{\text{perim}} = 109.86\text{ J/K}$)**: The housing/perimeter holds over 60% of the total participating thermal mass, acting as an effective thermal flywheel that governs transient response during solar flux changes and shutdown cooling.
+1. **Power Scaling Relaxation**: When the absorbed-power scale factors were freed, `scale_456` calibrated down from `1.6695` to `1.2287` and `scale_304` calibrated down from `1.7171` to `1.3000`, while `scale_256` remained near unity (`0.9937`).
+2. **Radial Coupling ($G_{\text{core-perim}} = 25.30\text{ W/m/K}$)**: Radial core-perimeter thermal coupling remains robust, transferring heat between the core and perimeter states.
+3. **Active Flow Participation ($\phi_0 = 0.8188, m_{\text{rec}} = 0.0$)**: Indicates ~82% active flow participation across the core matrix independent of Reynolds number in this configuration.
 
-Conclusions & Next Steps:
-- The 2-Zone Macro-ECM successfully bridges detailed multi-branch reactor physics and continuum 1D design models.
-- The model cleanly captures both core gas heating and perimeter housing losses, providing robust effective macroscopic heat transfer parameters for structured monolithic solar receivers.
-
-Quantitative Sensor RMSE & Bias Summary (Fitted v19 Variant):
+Quantitative Sensor RMSE & Bias Summary (Refitted v19 Variant with Freed Power Scales):
 
 ```text
 Sensor        Heating RMSE (K)    Heating Steady Error (K)    Cooling RMSE (K)    Cooling Steady Error (K)
-T8                  74.9                -58.1                       34.8                +15.2
-T12_perim          150.3               -141.0                       29.3                +18.1
-T11_perim           87.8                -78.2                       40.1                +26.9
-T9_core            117.8               -110.5                       20.8                +15.3
-T10_core            53.8                -21.7                       35.7                +22.4
-T3                  60.5                 +2.1                       51.1                +32.7
-T2                   3.8                 -4.8                        3.6                 +5.7
+T8                 107.1               -100.1                       31.4                +18.0
+T12_perim          187.9               -186.2                       24.3                +20.4
+T11_perim          120.3               -132.8                       34.1                +29.0
+T9_core            159.2               -157.0                       15.9                +17.8
+T10_core            70.5                -77.4                       29.3                +24.7
+T3                  59.4                -65.0                       46.6                +35.0
+T2                   4.9                 -8.0                        3.5                 +5.6
 ```
 
 Generated Plot Artifacts:
@@ -3205,3 +3203,1435 @@ Generated Plot Artifacts:
 - Complete directory of 18 axial profiles and 21 transient figures: [summaries/1D_v19/plots/](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/summaries/1D_v19/plots)
 
 
+## 2026-07-22 - GPT expert review of completed v18 and v19
+
+Reviewed `1D_v19.jl`, `run_1D_v19.jl`, `test/smoke_1D_v19.jl`, and the
+completed v18/v19 result tables after both branches were available.
+
+Validation:
+
+```text
+test/smoke_1D_v19.jl passed: 49/49 tests.
+```
+
+Important consistency corrections for the v19 journal interpretation:
+
+```text
+Current fitted v19 result files report:
+  objective = 0.156953
+  return_code = MaxIters
+
+  A_Nu        = 2.5949
+  B_Re        = 0.3460
+  phi_0       = 0.9855
+  m_rec       = 0.0000
+  G_core_perim= 43.783 W/m/K
+  C_perim_eff = 125.952 J/K
+  k_perim_ref = 22.278 W/m/K
+
+  C_core_eff          = 72.53 J/K
+  C_participating_eff = 198.48 J/K
+  reference C_eff     = 301.0 J/K
+```
+
+This differs from the earlier v19 journal block, which listed `objective =
+0.1596`, `m_rec = 0.1202`, `G_core_perim = 38.240 W/m/K`, and `C_perim_eff =
+109.856 J/K`. The result files should be treated as the current source of
+truth.
+
+Soundness concerns in the current v19 implementation:
+
+```text
+1. Power scales are described as fixed v14 inputs, but p[7:9] are included in
+   fit_heat_transfer_indices_v19 and fit_power_scale_indices_v19. The present
+   run happened to keep them at the v14 values, but the code does not enforce
+   that intent. If the scientific plan is fixed v14 power scales, remove
+   p[7:9] from the fit indices and freeze their bounds.
+
+2. The active-flow participation model is internally incomplete. The receiver
+   gas march uses mdot_active = phi_active * mdot_total and heats that active
+   stream, but the rear tube then propagates the active-stream outlet
+   temperature with mdot_total. A strict two-stream formulation would mix the
+   heated active stream with an unheated/bypassed inactive stream before the
+   rear tube and T3 comparison. The fitted phi_0 ~= 0.985 and m_rec = 0 make
+   this nearly irrelevant in the present best fit, but it means v19 does not
+   actually test strong flow recruitment in a fully energy-consistent way.
+
+3. The claimed 301 J/K thermal flywheel is not enforced. v19 has a fitted
+   perimeter capacity plus an additional cavity state, and the optimized
+   participating core+perimeter capacity is only 198.5 J/K. The regularization
+   is too weak to justify saying the model "holds" the measured 301 J/K.
+
+4. The fitted perimeter axial conductivity, k_perim_ref ~= 22 W/m/K, should not
+   be interpreted as a material conductivity. It is an effective axial
+   participation parameter that likely represents metal/housing/felt pathways
+   compressed into one 1D branch.
+```
+
+Quantitative comparison against v18:
+
+```text
+Average RMSE / average absolute steady error
+
+v18 fitted:
+  heating: 59.47 K RMSE, 56.90 K steady
+  cooling: 27.01 K RMSE, 13.85 K steady
+
+v19 fitted:
+  heating: 74.17 K RMSE, 74.57 K steady
+  cooling: 30.78 K RMSE, 19.48 K steady
+```
+
+The v19 fit improves its own initial parameter set in average RMSE, but it is
+not yet a better global fit than v18 on the simple aggregate metrics above.
+
+Side-core sign diagnostic:
+
+```text
+T12 - T9:
+  v18 model mean = -8.77 K
+  v19 model mean = -4.94 K
+  experiment mean = +24.48 K
+  v19 positive fraction = 0%
+
+T11 - T10:
+  v18 model mean = -8.19 K
+  v19 model mean = -4.75 K
+  experiment mean = +35.97 K
+  v19 positive fraction = 0%
+```
+
+v19 softens the wrong sign but does not fix it. Therefore, the current 2-zone
+macro-ECM is directionally helpful but not physically sufficient.
+
+Flow-slope diagnostic:
+
+```text
+T8 slope improves substantially:
+  456 kW/m2: v18 -40.33, v19 -29.71, experiment -34.15 K/(L/min)
+  304 kW/m2: v18 -31.40, v19 -24.45, experiment -23.65 K/(L/min)
+  256 kW/m2: v18 -22.50, v19 -19.79, experiment -20.89 K/(L/min)
+
+Rear/core/gas slopes remain too flow-sensitive:
+  At 456 kW/m2:
+    T11 experiment -1.37, v19 -24.03 K/(L/min)
+    T10 experiment -3.54, v19 -23.85 K/(L/min)
+    T3  experiment +0.54, v19 -21.72 K/(L/min)
+```
+
+Expert interpretation after v18 and v19:
+
+```text
+v18 falsifies the simple T9/T10 gas-biased measurement explanation.
+
+v19 confirms that a perimeter/housing branch is a useful model direction,
+especially for front/side flow-slope behavior, but the present implementation
+does not yet reproduce the defining side-core inversion or the flow-independent
+rear/gas behavior.
+
+The missing mechanism is probably not simply "more perimeter heat." It must
+also reduce downstream gas/solid flow sensitivity and/or change where gas heat
+exchange is effective along the receiver.
+```
+
+Recommended next revision:
+
+```text
+Do not tune v19 harder in its current form. First fix the model semantics:
+
+1. Freeze p[7:9] if v14 power scales are intended as fixed first-stage inputs.
+2. Either remove phi_active or implement it as an energy-consistent active +
+   bypass gas mixing model before the rear tube/T3 station.
+3. Add explicit diagnostics for core-to-perimeter heat flow, perimeter source
+   power, receiver gas heat, rear-tube gas heat, cavity heat, and flange heat.
+4. Treat C_eff ~= 301 J/K as either a hard/strong prior or state clearly that
+   the fitted participating capacity rejects the independent estimate.
+
+After those corrections, the next physics test should target axial heat-removal
+redistribution: a model in which the front thermal field can remain strongly
+flow-dependent while the rear approaches a weak-flow-sensitivity reservoir.
+This could be represented by a downstream thermal shunt/perimeter reservoir
+with limited gas access, or by an axial function for gas-contact participation
+that weakens after the entrance region while maintaining heat storage in the
+solid/perimeter path.
+```
+
+## 2026-07-22 - v20 decision after user clarification
+
+User clarification:
+
+```text
+The v19 power scales were intentionally allowed to refit because the previous
+v14 scales belonged to an earlier model structure.
+```
+
+Correction to the v19 review:
+
+```text
+Allowing p[7:9] to move is not a code error if v19/v20 are interpreted as new
+energy-accounting structures. The issue is not that power scales were fitted;
+the issue is that power scale and spatial power partition must be separated in
+the model and in the interpretation.
+```
+
+Expert opinion after v18 and v19:
+
+```text
+v18 is a falsification result:
+  simple gas-biased T9/T10 measurement mixing is rejected because modeled gas
+  is hotter than modeled core at T9/T10.
+
+v19 is a topology result:
+  a separate perimeter/housing branch is directionally useful, especially for
+  front/side flow slopes, but the present branch is too compressed and still
+  cannot make T12 > T9 or T11 > T10.
+
+Therefore the next model should not merely tune v19. It should separate:
+  1. total absorbed power by irradiance level,
+  2. spatial partition of that absorbed power between core and perimeter/rim,
+  3. energy-consistent active/bypass gas mixing,
+  4. rear-tube/flange/cavity heat ledger.
+```
+
+v20 implementation target:
+
+```text
+1D_v20 = energy-accounting two-zone macro model.
+
+Add:
+  - f_perim_source: fitted fraction of total absorbed power deposited directly
+    into the perimeter/rim branch,
+  - beta_perim: fitted axial attenuation/shape for the perimeter source,
+  - core_tube_fraction: fitted split of receiver-exit solid heat conducted
+    into the rear tube from core vs perimeter,
+  - energy-consistent active/bypass gas treatment:
+      active gas heats through the receiver,
+      bypass gas remains near inlet,
+      the two are mixed before the rear tube and T3 station.
+
+Retain:
+  - fitted per-irradiance total power scales,
+  - bounded laminar/developing Nu model with Pr^(1/3),
+  - explicit core/perimeter states,
+  - rear tube, water-cooled flange, cavity/T2 state,
+  - temporal, axial, steady, flow-slope, and cell diagnostics.
+```
+
+Acceptance criteria for v20:
+
+```text
+v20 should be judged by physics diagnostics, not only objective:
+
+1. T12 - T9 and T11 - T10 should become positive for most/all heating cases.
+2. T2 should remain close to experiment.
+3. T3 flow slope should become much flatter than v19, especially at 456 and
+   304 kW/m2.
+4. Fitted power scales and f_perim_source should remain interpretable; the
+   solution should not require extreme perimeter deposition at all irradiances.
+5. If phi_active fits near 1 again, active-flow recruitment should be removed
+   from later models rather than carried as decorative complexity.
+```
+
+## 2026-07-22 - v20 implementation and first result
+
+Implemented:
+
+```text
+1D_v20.jl
+run_1D_v20.jl
+test/smoke_1D_v20.jl
+summaries/1D_v20/
+```
+
+v20 changes relative to v19:
+
+```text
+1. Total absorbed power scales remain fitted by irradiance level.
+2. Total absorbed power is split explicitly:
+      Q_core  = (1 - f_perim_source) Q_abs
+      Q_perim = f_perim_source Q_abs
+3. Perimeter/rim power has its own axial attenuation `beta_perim`.
+4. Active-flow participation is energy-accounting consistent:
+      active stream heats in the receiver,
+      bypass stream remains near inlet,
+      the streams mix before the rear tube/T3 section.
+5. The core/perimeter split of rear-tube solid heat leakage is fitted through
+   `f_core_tube`.
+6. Cell diagnostics now include core source, perimeter source, core-perimeter
+   heat flow, active fraction, receiver gas heat, and rear-tube gas heat.
+```
+
+Validation:
+
+```text
+test/smoke_1D_v20.jl passed: 58/58 tests.
+```
+
+Fit result:
+
+```text
+objective = 0.237703
+return_code = MaxIters
+
+A_Nu          = 4.3095
+B_Re          = 0.4464
+phi_0         = 0.9782
+m_rec         = 0.1016
+scale_456     = 2.0601
+scale_304     = 2.1701
+scale_256     = 1.0635
+G_core_perim  = 99.65 W/m/K
+C_perim_eff   = 153.37 J/K
+k_perim_ref   = 0.0 W/m/K
+f_perim_source= 0.3444
+beta_perim    = 33.02 1/m
+f_core_tube   = 0.8473
+
+C_participating_eff = 225.89 J/K
+reference C_eff     = 301.0 J/K
+```
+
+Acceptance-test outcome:
+
+```text
+T12 - T9:
+  model mean = -0.55 K
+  experiment mean = +24.48 K
+  model positive fraction = 13%
+  experiment positive fraction = 100%
+
+T11 - T10:
+  model mean = -2.53 K
+  experiment mean = +35.97 K
+  model positive fraction = 0%
+  experiment positive fraction = 100%
+
+T2:
+  MAE = 2.20 K
+  bias = +1.63 K
+
+T3:
+  MAE = 87.27 K
+  bias = +53.78 K
+```
+
+Flow-slope outcome:
+
+```text
+At 456 kW/m2:
+  T8  model -44.44 vs experiment -34.15 K/(L/min)
+  T12 model -36.72 vs experiment -16.81 K/(L/min)
+  T11 model -26.53 vs experiment  -1.37 K/(L/min)
+  T9  model -36.93 vs experiment -16.73 K/(L/min)
+  T10 model -26.63 vs experiment  -3.54 K/(L/min)
+  T3  model -21.03 vs experiment  +0.54 K/(L/min)
+```
+
+Interpretation:
+
+```text
+v20 is a useful partial falsification/diagnostic. Explicit perimeter deposition
+is strongly used by the optimizer (`f_perim_source ~= 0.34`), and it nearly
+neutralizes T12-T9. This supports the idea that perimeter/rim heating is real.
+
+However, v20 does not solve the full sign pattern and it worsens T3: the gas is
+now too hot on average. The active-flow model again fits very close to full
+participation (`active fraction ~= 0.94-1.00`), so active-flow recruitment is
+not the missing degree of freedom.
+
+The optimizer also drives `k_perim_ref` to zero while pushing
+`G_core_perim` to the upper bound. That means the model wants a locally coupled
+core/perimeter pair with little axial perimeter smoothing, not a long
+conductive side rail.
+```
+
+Expert conclusion:
+
+```text
+The remaining problem is likely downstream/rear heat removal from the core/gas
+path, not simply insufficient side heating. v20 can heat the perimeter enough
+to help T12-T9, but T10 and T3 become too hot, and T11-T10 remains negative.
+
+To flip T11-T10 physically, the next model must cool or drain the downstream
+core/gas path more strongly while preserving a hot perimeter/cavity branch.
+That points back to the original rear-loss hypothesis, but now in a more
+specific form: a fitted downstream/rear thermal sink or rear-adaptor/flange
+conductance acting mainly on the core/rear-tube gas path.
+```
+
+Recommended next revision:
+
+```text
+v21 should remove decorative active-flow recruitment unless intentionally kept
+as a diagnostic, and instead fit a bounded rear-loss pathway:
+
+1. Keep explicit total power scales and f_perim_source.
+2. Keep perimeter/core branches.
+3. Add a fitted rear/adaptor/flange heat-removal scale applied to the rear
+   receiver/tube path, preferably strongest downstream of T10 and before/near
+   T3.
+4. Add a diagnostic table comparing:
+      Q_abs,
+      Q_core_source,
+      Q_perim_source,
+      Q_gas_receiver,
+      Q_rear_tube_gas,
+      Q_flange,
+      Q_cavity,
+      Q_front_loss.
+5. Judge primarily on T11-T10, T3 slope, and T2.
+```
+
+## v21/v22 Cooling-Model Rework After Artificial T3/T11/T10 Upturn
+
+Motivation:
+
+```text
+The user observed an artificial jump/increase in the cooling traces, especially
+T3, T11 and T10. This is a hard physical check: once the lamp is off, the
+receiver-side model should not heat those sensors unless there is a documented
+internal redistribution mechanism that also appears in the experiment.
+```
+
+v21 implementation:
+
+```text
+v21 added the rear/adaptor/flange loss pathway suggested after v20:
+
+1. Cooling cases use zero irradiance instead of retaining the irradiance label.
+2. Active-flow recruitment was frozen at full participation.
+3. A downstream rear-core/perimeter sink was fitted.
+4. A cooling-upturn penalty was added for T11, T10 and T3.
+
+Result:
+  objective = 0.129626
+  T12-T9 model mean = +11.65 K vs experiment +24.48 K, positive in 100% of cases
+  T11-T10 model mean = +20.14 K vs experiment +35.97 K, positive in 100% of cases
+  heating mean RMSE = 57.55 K
+  cooling mean RMSE = 21.64 K
+  T3 steady MAE = 58.52 K, bias = -56.27 K
+
+Important flaw:
+  T3 and T11 cooled monotonically, but T10 still had a first-step cooling upturn:
+    C69 +9.60 K
+    C80 +3.00 K
+    C81 +4.19 K
+```
+
+Diagnosis of the remaining T10 artifact:
+
+```text
+The first correction was to remove a rear-tube initialization inconsistency.
+The rear tube had been initialized from the perimeter-side exit temperature
+while the fitted receiver-to-tube heat leak routed almost all heat through the
+core branch (`f_core_tube ~= 1`). During cooling this made the rear tube
+artificially hotter than the T10-side core and injected heat into T10.
+
+After fixing that initialization, the remaining T10 rise was controlled mainly
+by axial solid conduction from the hotter upstream core into T10. A sweep showed
+that the final bounded model gives monotonic T10 cooling for all cooling cases
+when the effective core axial-conduction scale is <= about 0.125.
+```
+
+v22 implementation:
+
+```text
+v22 keeps the v21 energy-accounting/rear-loss structure but reworks cooling:
+
+1. Rear-tube initial state now uses the same core/perimeter exit blend as the
+   fitted receiver-to-tube coupling.
+2. Rear sink influence starts smoothly from the wall-chain region rather than
+   discontinuously at T9.
+3. The rear-sink shape is bounded to [0.25, 1.0], preventing a sink that is too
+   rear-only to affect T10.
+4. A fitted effective core axial-conduction scale was added and bounded to
+   [0.0, 0.125] based on the monotonic-cooling sweep.
+5. The cooling-upturn penalty now uses the maximum positive step, not only the
+   mean positive-step energy.
+```
+
+v22 final fitted result:
+
+```text
+objective = 0.168354
+return_code = MaxTime
+
+A_Nu = 4.9216
+B_Re = 0.5117
+power scales: 456=2.4106, 304=2.4976, 256=1.2278
+G_core_perim = 17.14 W/m/K
+C_perim_eff = 220.12 J/K
+k_perim_ref = 3.66 W/m/K
+f_perim_source = 0.4809
+beta_perim = 0.375 1/m
+f_core_tube = 0.9993
+flange_scale = 0.1014
+G_rear_core = 3.51 W/m/K
+G_rear_perim = 0.0 W/m/K
+rear_sink_shape = 0.9998
+k_core_axial_scale = 0.0101
+
+participating C_eff = 292.65 J/K vs reference 301.0 J/K
+```
+
+v22 acceptance checks:
+
+```text
+Cooling monotonicity:
+  C69/C80/C81 T3, T11 and T10 all have max_upturn_model = 0.0 K.
+  T10 first deltas:
+    C69 -2.12 K
+    C80 -9.04 K
+    C81 -12.80 K
+
+Spatial sign pattern:
+  T12-T9 model mean = +20.80 K vs experiment +24.48 K, positive in 100% of cases
+  T11-T10 model mean = +29.86 K vs experiment +35.97 K, positive in 100% of cases
+
+Errors:
+  heating mean RMSE = 70.84 K
+  heating mean abs steady error = 71.93 K
+  cooling mean RMSE = 27.79 K
+  cooling mean abs steady error = 13.00 K
+  T2 steady MAE = 4.10 K, bias = -2.73 K
+  T3 steady MAE = 98.70 K, bias = -91.63 K
+```
+
+Interpretation:
+
+```text
+v22 removes the cooling artifact, but it is not the best global fit. The price
+is a worse T3 steady bias and higher heating errors than v21. This is useful
+because it separates two issues:
+
+1. The artificial cooling jump is mostly an initialization/effective axial
+   conduction problem.
+2. The poor T3 level is still a rear-tube/gas-outlet energy-accounting problem.
+
+The optimizer driving `k_core_axial_scale` to 0.010 is a strong clue: the
+thermocouple-resolved 1D core string should not use bulk-solid axial conduction
+through the full monolith cross-section. Either the effective axial path is much
+weaker, or T9/T10 are sampling different local thermal branches that a single
+core string cannot represent.
+```
+
+Recommended next revision:
+
+```text
+Use v22 as the cooling-artifact baseline and v21 as the global-fit baseline.
+The next model should keep the corrected cooling initialization and reduced
+effective axial core conduction, then focus specifically on T3:
+
+1. Add diagnostics for the rear-tube gas/solid energy split during cooling and
+   heating.
+2. Revisit the T3 mapping: compare gas at 140 mm with rear-tube wall/mixed gas
+   alternatives before adding any new fitted heat-transfer law.
+3. Consider a measured-output model for T3 only, with a small thermocouple/gas
+   lag or mixing volume, because v22 can make the solids behave physically while
+   still predicting T3 much too hot.
+4. Avoid reintroducing full axial core conduction unless the cooling monotonicity
+   check remains satisfied.
+```
+
+## v23 Flux-Partition Multi-Zone LTNE Step
+
+Motivation:
+
+```text
+The user asked whether the existing multi-zone structure could use a
+non-uniform irradiance/flux distribution rather than jumping immediately to a
+2D axisymmetric model. The decision was to first test a reduced-order flux
+partition inside the current LTNE network.
+
+The key modeling distinction is:
+  transverse flux map => how much incident energy goes to receiver/core versus
+                         off-receiver/cavity/perimeter spillover
+  axial deposition    => where that captured energy is deposited along z
+```
+
+Implementation:
+
+```text
+v23 branches from v22 and keeps:
+  - core gas/solid LTNE channel zone
+  - perimeter/cavity thermal zone
+  - rear tube/flange path
+  - corrected rear-tube initial condition
+  - fixed zero effective axial core conduction for resolved cooling monotonicity
+
+New v23 flux layer:
+  - Uses a fixed 2D Gaussian transverse flux profile with sigma = 30 mm.
+  - Integrates this profile over a circular cavity/aperture radius of 75 mm.
+  - Separates the receiver square, 19 mm x 19 mm, from the rest of the aperture.
+  - Replaces the direct fitted perimeter fraction with:
+
+        f_perim_source = spill_capture * flux_spillover_fraction
+
+    capped at 0.80 as before.
+
+This means p[14] is no longer an abstract direct perimeter power fraction. It
+is now a fitted capture factor for the flux that misses the receiver square but
+is available to heat the modeled perimeter/cavity structure.
+```
+
+Input still needed for stronger v23/v24:
+
+```text
+The current Gaussian flux profile is only a placeholder based on the attached
+plot. A raw flux CSV would make this much more defensible:
+
+  x_mm, y_mm, q_kW_m2
+
+or, if only line scans are available:
+
+  position_mm, q_x_kW_m2, q_y_kW_m2
+
+Useful metadata:
+  - whether the reported irradiance levels are peak, aperture-average, or
+    receiver-face average
+  - beam center offset relative to receiver center
+  - whether the flux map was measured at the receiver plane or another plane
+```
+
+Final fitted result:
+
+```text
+objective = 0.165788
+return_code = MaxTime
+
+A_Nu = 4.9248
+B_Re = 0.5163
+power scales: 456=2.4156, 304=2.4976, 256=1.1904
+G_core_perim = 16.04 W/m/K
+C_perim_eff = 214.29 J/K
+k_perim_ref = 7.59 W/m/K
+spill_capture = 0.5251
+flux_receiver_fraction = 0.0692
+flux_spillover_fraction = 0.9308
+derived f_perim_source = 0.4888
+beta_perim = 1.802 1/m
+f_core_tube = 0.9993
+flange_scale = 0.1014
+G_rear_core = 3.34 W/m/K
+G_rear_perim = 0.0 W/m/K
+rear_sink_shape = 0.9998
+k_core_axial_scale = 0.0
+
+participating C_eff = 286.82 J/K vs reference 301.0 J/K
+```
+
+v23 checks:
+
+```text
+Spatial sign pattern:
+  T12-T9 model mean = +21.52 K vs experiment +24.48 K, positive in 100% of cases
+  T11-T10 model mean = +31.51 K vs experiment +35.97 K, positive in 100% of cases
+
+Errors:
+  heating mean RMSE = 69.69 K
+  heating mean abs steady error = 70.11 K
+  cooling mean RMSE = 27.86 K
+  cooling mean abs steady error = 13.31 K
+  T2 steady MAE = 3.85 K, bias = -2.46 K
+  T3 steady MAE = 92.94 K, bias = -85.50 K
+
+Cooling trace:
+  T3 and T11 have no model upturns in C69/C80/C81.
+  T10 has no upturn in C80/C81.
+  C69 T10 has a small first-step +1.74 K upturn, accepted as negligible relative
+  to the remaining model-data discrepancies and likely within practical
+  transient/measurement tolerance.
+```
+
+Interpretation:
+
+```text
+v23 is a better working-design structure than v22 because the perimeter power
+source now has a physical origin: intercepted off-receiver/spillover flux. The
+fit still chooses a derived perimeter source fraction close to v22
+(`~0.49`), but now that value can be defended as roughly half of the
+available spillover being thermally captured by the participating perimeter
+zone.
+
+The power scales did not relax at high irradiance:
+  456 and 304 kW/m2 remain near the upper bound ~2.4-2.5.
+
+This means the non-uniform flux partition helps the explanation of side/cavity
+heating, but does not yet solve absolute energy calibration. The lower
+temperatures/T3 issue is still a rear-gas/output measurement problem or an
+irradiance-definition problem, not primarily a side-flux partition problem.
+```
+
+Recommended next direction:
+
+```text
+Use v23 as the reduced-order multi-zone LTNE working baseline, but do not claim
+final design validation yet.
+
+Next checks:
+  1. Replace the Gaussian flux placeholder with raw flux-map integration.
+  2. Clarify irradiance definition: peak, aperture-average, or receiver-average.
+  3. Add an energy-closure report using the flux partition:
+       incident over aperture,
+       receiver-square intercepted,
+       spillover available,
+       spillover captured,
+       modeled participating absorbed power,
+       gas pickup,
+       rear/flange/cavity losses.
+  4. Revisit T3 as a measurement/output model: gas at 140 mm is still too low
+     in steady state, so T3 likely needs a mixed outlet/tube-wall/thermocouple
+     representation before the model can be used for design predictions.
+```
+
+## v24 Aperture-Average Irradiance Clarification
+
+New user clarification:
+
+```text
+The reported irradiance is aperture-average. The heat-flux gauge was placed
+behind the same aperture as the receiver by sliding it into/out of the receiver
+position for measurements.
+
+However, the schematic/flux-map reference came from an earlier test, and the
+apertures between the receiver experiments and the flux mapping were different.
+```
+
+Implication:
+
+```text
+The v24 accounting correction is conceptually right:
+
+  Q_incident = I_aperture_avg * A_aperture
+
+and the non-uniform flux map should partition that aperture power into:
+  receiver-square intercepted power,
+  available spillover power,
+  captured spillover power.
+
+But the v24 run that used a 150 mm diameter aperture from the schematic is not
+quantitatively final for the receiver experiments. It is only a diagnostic
+implementation of the corrected accounting. The correct receiver-experiment
+aperture area must replace the mapping/schematic aperture before interpreting
+the fitted power scales or spillover capture.
+```
+
+v24 diagnostic run:
+
+```text
+With the provisional 150 mm aperture assumption, the fit drove power scales down
+substantially:
+
+  scale_456 = 0.4045
+  scale_304 = 0.6754
+  scale_256 = 0.2907
+
+This confirms the importance of using aperture area instead of receiver area,
+but these numbers should not be treated as physical until the correct receiver
+aperture dimensions are supplied.
+```
+
+Needed before finalizing v24/v25:
+
+```text
+1. Receiver-experiment aperture diameter/area used for the reported
+   aperture-average irradiance.
+2. Flux-map aperture diameter/area from the earlier mapping test.
+3. Whether the map shape can be assumed transferable between apertures, or
+   whether only the qualitative bell-shaped profile should be used.
+4. Beam center offset, if known, for the receiver experiments.
+```
+
+## 1D_v25 Shape-Only Flux Prior and 3D High-Cp/k Lesson
+
+New clarification:
+
+```text
+The flux-map image should be used only as an indication of transverse flux
+shape, not for absolute flux magnitude or power integration. For the incident
+flux, use the experimental irradiance multiplied by the fitted power scale.
+
+Also, in the 3D model the axial profile could only be captured when artificially
+large solid heat capacity and solid thermal conductivity were used.
+```
+
+Implementation response:
+
+```text
+Created `1D_v25.jl`, `run_1D_v25.jl`, and `test/smoke_1D_v25.jl`.
+
+v25 keeps the v24 cooling/rear-tube correction but removes the provisional
+aperture-area power normalization. The Gaussian flux map is now a shape-only
+prior used to guide the perimeter source fraction:
+
+  q_incident,scaled = irradiance * power_scale
+  Q_abs,receiver = eta_abs * q_incident,scaled * A_receiver_front
+  Q_perimeter = f_perim_source * Q_abs,receiver
+  Q_core = (1 - f_perim_source) * Q_abs,receiver
+
+Thus the shape prior redistributes fitted participating power but does not
+independently reduce total absorbed power based on the old mapping aperture.
+```
+
+Validation:
+
+```text
+`test/smoke_1D_v25.jl` passed 74/74 checks.
+
+A short runner check was executed with 12 iterations, 11 fit nodes, and 15 plot
+nodes. It completed and regenerated steady, axial-profile, transient, and
+diagnostic outputs in `summaries/1D_v25/`.
+
+The short check ended at:
+  objective = 0.171577
+  return_code = MaxIters
+
+This is a consistency check, not a final recalibration. The parameter vector was
+seeded from v23 because v25 has the same fitted-irradiance power convention.
+```
+
+Observed implication from v25 short check:
+
+```text
+The steady flow slopes remain too strong downstream at high irradiance:
+
+  456 kW/m2:
+    T8  model -36.0 K/LPM vs experiment -34.1 K/LPM
+    T12 model -26.6 K/LPM vs experiment -16.8 K/LPM
+    T11 model -13.0 K/LPM vs experiment  -1.4 K/LPM
+    T9  model -28.0 K/LPM vs experiment -16.7 K/LPM
+    T10 model -11.6 K/LPM vs experiment  -3.5 K/LPM
+
+The front sensor T8 has approximately the right flow sensitivity, but deeper
+solid/perimeter sensors are still too coupled to flow in the model. This is
+consistent with the original observation that the rear receiver temperatures
+behave more flow-independent than the current LTNE gas-removal path predicts.
+```
+
+Expert interpretation:
+
+```text
+The 3D requirement for artificially high solid Cp_s and k_s is not just a
+numerical trick; it is a strong model-form clue. It says the real system behaves
+as though there is more effective axial heat redistribution and/or more coupled
+thermal inventory than the explicitly modeled ceramic receiver alone provides.
+
+The likely missing mechanism is therefore not merely a different local Nu
+correlation. A modified Nu can adjust gas pickup, but it cannot easily explain
+why the axial profile needs both extra inertia and extra axial smoothing while
+the rear sensors remain comparatively flow-independent.
+
+Defensible next revision:
+  1. Keep v25 power accounting.
+  2. Replace the fitted high local solid properties with an explicit effective
+     axial redistribution pathway or participating reservoir.
+  3. Represent this as a physics-labeled macro term, for example:
+       - an axial radiative/conductive redistribution conductance,
+       - a distributed cavity/solid thermal reservoir coupled along z,
+       - or a delayed solid-energy exchange state,
+     rather than by inflating material Cp_s and k_s directly.
+  4. Refit only after selecting one such mechanism and compare whether it
+     reduces the excessive downstream flow sensitivity without degrading T8.
+```
+
+## 1D_v25 Power-Scale Limiter Check
+
+User observation:
+
+```text
+From the temporal, axial, and parity plots, the fitted power scaling might be
+expected to increase further. Check whether a limiting factor is present. Also
+stop producing initial-variant plots.
+```
+
+Implementation update:
+
+```text
+`run_1D_v25.jl` now generates only the fitted variant:
+  - no `initial_energy_accounting` parameter table,
+  - no initial steady/parity plot,
+  - no initial axial-profile plots,
+  - no initial transient plots.
+
+Existing initial files in `summaries/1D_v25/` may remain from earlier runs, but
+future v25 runner executions will not regenerate them.
+```
+
+Diagnostic:
+
+```text
+Added `diagnostics_v25_power_sensitivity.jl`.
+
+The diagnostic keeps all fitted parameters fixed and perturbs only the three
+power scales. It confirmed a hard bound:
+
+  ub_full_v25[7:9] = 2.50
+
+Therefore:
+  scale_304 = 2.4976 is effectively pinned at the upper bound.
+  scale_456 = 2.4156 is close to the upper bound.
+  scale_256 = 1.1904 is not bound-limited.
+```
+
+Power-scale sensitivity at 11 nodes:
+
+```text
+All scales:
+  0.80x -> objective 0.2195
+  0.90x -> objective 0.1890
+  1.00x -> objective 0.1716
+  1.05x -> Inf because 456/304 exceed the 2.50 upper bound
+
+Individual scales:
+  scale_456:
+    1.00x -> 2.4156, objective 0.1716
+    1.05x -> 2.5363, Inf due to upper-bound violation
+
+  scale_304:
+    1.00x -> 2.4976, objective 0.1716
+    1.05x -> 2.6224, Inf due to upper-bound violation
+
+  scale_256:
+    1.00x -> 1.1904, objective 0.1716
+    1.05x -> 1.2500, objective 0.1714
+    1.10x -> 1.3095, objective 0.1718
+```
+
+Interpretation:
+
+```text
+Yes, there is a direct limiting factor for the two higher irradiance levels:
+the power-scale upper bound of 2.50. The 304 kW/m2 scale is already at the cap;
+the 456 kW/m2 scale is close enough that a 5% increase violates the bound.
+
+The lower irradiance scale is not bound-limited. It has a shallow local optimum
+near 1.25 for the current fixed parameter vector, suggesting that a longer fit
+or a staged refit could move it slightly upward.
+
+Even if the upper bound is relaxed, the model-form issue remains: increasing
+power improves underpredicted low-temperature cases, but it can overheat the
+low-flow/high-temperature cases and worsen axial/temporal ordering. The
+existing objective therefore contains both a hard ceiling and a physical
+tradeoff signal. A clean next test is to relax the power-scale upper bound
+only after adding an explicit axial redistribution/thermal-inventory mechanism,
+otherwise the optimizer may use power scale to mask the missing transport
+physics.
+```
+
+## 1D_v25 Absorptance Multiplier Correction
+
+Follow-up question:
+
+```text
+Is there still any absorbance or power-distribution property pushing the power
+scale higher? There should be a way to allow more power.
+```
+
+Finding:
+
+```text
+Yes. v25 still inherited:
+
+  ETA_ABS_FIXED_v25 = ETA_ABS_FIXED_V5 = 0.80
+
+Therefore the actual heat input was:
+
+  Q_abs = 0.80 * power_scale * irradiance * A_receiver_front
+
+This hidden 0.80 multiplier forces the fitted power scale to be about 25%
+higher than it would be if `power_scale * irradiance` is the calibrated
+incident/participating flux convention.
+```
+
+Implementation update:
+
+```text
+Changed `ETA_ABS_FIXED_v25` to 1.0.
+
+To keep the default starting heat input continuous with the previous v25 seed,
+the three default power scales were multiplied by 0.80:
+
+  old scale_456 = 2.4156 -> new seed = 1.9325
+  old scale_304 = 2.4976 -> new seed = 1.9980
+  old scale_256 = 1.1904 -> new seed = 0.9523
+
+The power-scale upper bounds were relaxed:
+
+  ub_full_v25[7:9] = 5.00
+
+The flux-map partition remains shape-only. It redistributes the fitted
+receiver-scale power between core and perimeter, but it does not reduce the
+total modeled power.
+```
+
+Updated sensitivity check:
+
+```text
+`diagnostics_v25_power_sensitivity.jl` now uses `copy(pnew_v25)` so it stays
+aligned with the current model defaults.
+
+With eta fixed to 1.0 and the power-scale cap relaxed, the hard Inf wall is
+removed. At 11 nodes:
+
+  all scales 1.00x -> objective 0.1760
+  all scales 1.05x -> objective 0.1721
+  all scales 1.10x -> objective 0.1714
+  all scales 1.20x -> objective 0.1785
+
+Individual scale increases also show room:
+
+  scale_456 optimum neighborhood: about 1.05x from the new seed
+  scale_304 optimum neighborhood: about 1.20x from the new seed
+  scale_256 optimum neighborhood: about 1.10x from the new seed
+```
+
+Interpretation:
+
+```text
+The previous high fitted power scales were partly an accounting artifact:
+`eta_abs = 0.80` was still active. Removing it makes the scale easier to
+interpret as the direct irradiance multiplier.
+
+Power scales above 1 can still be physically plausible here because the
+reported irradiance is aperture-average while the receiver occupies the central
+high-flux part of the aperture. In that convention, the power scale may include
+the ratio between local receiver-average flux and aperture-average flux, plus
+any remaining calibration factor.
+
+The next full fit should be rerun with eta fixed to 1.0 and ub_power = 5.0.
+If the optimizer still wants high power after that, the remaining cause is more
+likely model-form missing physics, especially effective axial redistribution
+and coupled thermal inventory.
+```
+
+## 1D_v25 Full Corrected Fit and Remaining Power-Path Limiters
+
+Execution update:
+
+```text
+Ran the full corrected v25 runner after:
+  - fixing ETA_ABS_FIXED_v25 = 1.0,
+  - relaxing power-scale upper bounds to 5.0,
+  - removing initial-variant output generation.
+
+The runner now produces only `fitted_energy_accounting` metrics, tables, axial
+profiles, transient plots, and parity/steady comparison plots. Old generated
+v25 files containing `initial` in their names were removed from
+`summaries/1D_v25/`.
+```
+
+Full corrected fit result:
+
+```text
+objective = 0.15862758036303487
+return_code = MaxTime
+
+Fitted parameters:
+  A_Nu = 4.9176
+  B_Re = 0.5128
+  scale_456 = 2.0034
+  scale_304 = 1.9980
+  scale_256 = 0.9523
+  beta_perim = 3.6294 1/m
+
+Other key fitted values stayed near the previous v25 seed:
+  G_core_perim = 16.04 W/m/K
+  C_perim_eff = 214.29 J/K
+  k_perim_ref = 7.59 W/m/K
+  spill_capture = 0.525
+  f_perim_source = 0.489
+  flange_scale = 0.101
+  G_rear_core = 3.34 W/m/K
+  G_rear_perim = 0
+  k_core_axial_scale = 0
+```
+
+Important interpretation:
+
+```text
+After setting eta_abs to 1.0, the fitted scale_456 and scale_304 are no longer
+at the upper bound. The old high values were partly the hidden 0.8 absorptance
+convention. However, the absolute modeled heat is still similar to v23/v24
+because the scale values moved from ~2.5 with eta=0.8 to ~2.0 with eta=1.0.
+```
+
+Aggregate heating bias from the full corrected fit:
+
+```text
+Mean steady error over heating cases:
+  T8  = -46.8 K
+  T12 = -79.3 K
+  T11 = -46.3 K
+  T9  = -76.3 K
+  T10 = -40.2 K
+  T3  = -105.7 K
+  T2  =  -3.2 K
+
+The model remains biased low for most receiver/gas temperatures while T2 remains
+well controlled.
+```
+
+Parameter-bound diagnostic:
+
+```text
+Added `diagnostics_v25_power_path.jl`.
+
+The full corrected fit is not power-bound limited:
+  scale_456 = 2.0034 within [0.02, 5.0]
+  scale_304 = 1.9980 within [0.02, 5.0]
+  scale_256 = 0.9523 within [0.02, 5.0]
+
+Remaining bound/near-bound signals:
+  A_Nu is near its upper bound of 5.0.
+  f_core_tube is near 1.0.
+  flange_scale is near its lower bound.
+  G_rear_perim is at 0.
+  k_core_axial_scale is at 0.
+  beta_opt, front_dep, phi_0, and m_rec are fixed.
+```
+
+Power-path diagnostic:
+
+```text
+Representative steady energy paths show that the rear-core sink can remove a
+large fraction of total input, especially at low irradiance:
+
+  E67, 456 kW/m2:
+    Q_abs,total = 329.8 W
+    Q_receiver_gas = 126.6 W
+    Q_rear_core_sink = 110.3 W
+    Q_front_loss = 14.0 W
+    Q_cavity_ambient = 31.0 W
+
+  E76, 304 kW/m2:
+    Q_abs,total = 219.3 W
+    Q_receiver_gas = 23.6 W
+    Q_rear_core_sink = 100.1 W
+    Q_front_loss = 30.2 W
+    Q_cavity_ambient = 42.6 W
+
+  E80, 256 kW/m2:
+    Q_abs,total = 88.0 W
+    Q_receiver_gas = 14.6 W
+    Q_rear_core_sink = 41.6 W
+    Q_front_loss = 3.8 W
+    Q_cavity_ambient = 15.2 W
+
+This means the model is not simply unable to accept more power. Rather, a
+large amount of the fitted power is being diverted into the rear/core sink and
+cavity loss paths before it can raise the measured receiver/gas temperatures.
+```
+
+Expert conclusion:
+
+```text
+Remaining factors that can suppress modeled temperatures:
+
+1. The rear-core sink is strong relative to total input, especially at low
+   irradiance. It was introduced to handle rear losses and monotonic cooling,
+   but the present form may over-remove heat from the solid during heating.
+
+2. A_Nu is near its upper bound. The optimizer wants strong gas exchange even
+   though many solid temperatures are low. This conflicting signal suggests the
+   gas/output channel and solid-temperature fields are still not being matched
+   by a single local heat-transfer law.
+
+3. k_core_axial_scale is zero. The code has no active axial redistribution in
+   the core, even though the 3D model required artificially high Cp_s and k_s to
+   match the axial profile.
+
+4. beta_opt and front_dep are fixed. The core source shape is locked, so the
+   fit can increase total power but cannot freely move that power deeper into
+   the receiver.
+
+Recommended next move:
+  v26 should not only raise power. It should relax or reformulate the heat path:
+    - separate rear loss used for cooling from rear loss during irradiated
+      operation,
+    - add explicit axial redistribution/thermal inventory instead of fixed
+      k_core_axial_scale = 0,
+    - optionally allow a deeper core-source shape or effective radiative
+      redistribution term while keeping total power accounting clean.
+```
+
+## 1D_v25 Low-Irradiance Power-Scale Follow-Up
+
+Question:
+
+```text
+v25 still appears to need more power, especially at the lower irradiance level.
+Why is scale_256 not increasing when most steady-state temperatures are
+underpredicted?
+```
+
+Diagnostics added:
+
+```text
+`diagnostics_v25_low_irradiance_scale.jl`
+  Varies only scale_256 and reports total objective, 256-only objective, and
+  mean 256 kW/m2 steady errors.
+
+`diagnostics_v25_low_irradiance_loss_breakdown.jl`
+  Breaks the 256 kW/m2 objective into sensor losses and axial ordering loss.
+```
+
+Main result:
+
+```text
+Increasing scale_256 does heat the low-irradiance cases, but the current
+objective minimum remains near the fitted value because a uniform power increase
+creates an axial-profile/ordering conflict.
+
+For scale_256 factors relative to the fitted value:
+
+  1.00x:
+    scale_256 = 0.9523
+    total objective = 0.1703
+    256-only heating objective = 0.2855
+    mean 256 errors:
+      T8  -84 K
+      T12 -149 K
+      T11 -131 K
+      T9  -135 K
+      T10 -116 K
+      T3  -144 K
+
+  1.20x:
+    scale_256 = 1.1428
+    total objective = 0.1742
+    256-only heating objective = 0.2973
+    mean 256 errors:
+      T8  -32 K
+      T12 -100 K
+      T11  -96 K
+      T9   -88 K
+      T10  -83 K
+      T3  -123 K
+
+  1.50x:
+    scale_256 = 1.4285
+    total objective = 0.1961
+    256-only heating objective = 0.3629
+    mean 256 errors:
+      T8  +42 K
+      T12 -30 K
+      T11 -42 K
+      T9  -20 K
+      T10 -33 K
+      T3  -91 K
+```
+
+Loss-breakdown interpretation:
+
+```text
+From 1.00x to 1.50x, the individual sensor losses mostly improve:
+  T12 loss: 0.126 -> 0.012
+  T11 loss: 0.136 -> 0.018
+  T9  loss: 0.109 -> 0.006
+  T10 loss: 0.114 -> 0.012
+  T3  loss: 0.213 -> 0.080
+
+But the axial ordering loss worsens:
+  1.00x ordering loss = 0.177
+  1.20x ordering loss = 0.239
+  1.50x ordering loss = 0.340
+
+T8 also crosses from underpredicted to overpredicted as scale_256 increases.
+Therefore the uniform low-irradiance power scale is being held back by an
+axial-shape conflict, not by a power bound.
+```
+
+Conclusion:
+
+```text
+The model needs more energy deeper in the receiver, not just more total 256
+kW/m2 power. A single scale_256 heats the front/perimeter and rear together,
+but the data require a redistribution: raise T12/T11/T9/T10/T3 while not
+overheating T8 or degrading the measured axial ordering.
+
+This reinforces the v26 direction:
+  - add/restore an explicit axial redistribution mechanism,
+  - allow deeper effective volumetric/radiative deposition,
+  - or make the rear/core sink less active during irradiated heating while
+    retaining enough cooling behavior.
+```
+
+## 1D_v26 Cooling-Side Corrections and Rear-Overcooling Check
+
+User hypothesis and requested changes:
+
+```text
+The rear may be overcooling the system.
+
+For cooling simulations, each thermocouple initial temperature should be its
+measured t0.
+
+T3 appears always colder; try moving the T3 comparison forward a few mm,
+ideally to 137 mm, the receiver end.
+
+For cooling experiments, set ambient/inlet air to 17 C because the room cools
+faster when the lamps are off due to AC.
+```
+
+Implementation:
+
+```text
+Created `1D_v26.jl`, `run_1D_v26.jl`, `test/smoke_1D_v26.jl`, and
+`diagnostics_v26_power_path.jl`.
+
+Changes from v25:
+  - T3 comparison position changed from 140 mm to L = 137 mm.
+  - Cooling inlet and ambient histories are forced to 17 C = 290.15 K.
+  - Cooling output row 1 is explicitly aligned to the experimental t0 for all
+    seven compared thermocouple channels:
+      T8, T12, T11, T9, T10, T3, T2.
+```
+
+Validation:
+
+```text
+`test/smoke_1D_v26.jl` passed 76/76 checks, including exact cooling t0 output
+alignment.
+
+Full v26 runner completed with:
+  objective = 0.39354943565733647
+  return_code = MaxTime
+```
+
+v26 fitted parameters:
+
+```text
+A_Nu = 4.9153
+B_Re = 0.5090
+scale_456 = 1.8937
+scale_304 = 1.9469
+scale_256 = 0.9363
+G_core_perim = 14.42 W/m/K
+C_perim_eff = 217.21 J/K
+k_perim_ref = 8.10 W/m/K
+spill_capture = 0.542
+f_perim_source = 0.505
+beta_perim = 1.796 1/m
+G_rear_core = 6.315 W/m/K
+G_rear_perim = 0
+k_core_axial_scale = 0
+```
+
+Key outcome:
+
+```text
+The cooling-side corrections improved cooling consistency, especially T3 and
+T2, but the full objective worsened because the heating cases became severely
+underpredicted.
+
+Mean heating steady errors:
+  T8  =  -94 K
+  T12 = -163 K
+  T11 = -161 K
+  T9  = -169 K
+  T10 = -170 K
+  T3  = -209 K
+  T2  =   -9 K
+
+Mean cooling steady errors:
+  T8  = -11 K
+  T12 = -16 K
+  T11 = -18 K
+  T9  = -19 K
+  T10 = -25 K
+  T3  = +11 K
+  T2  =  +0 K
+```
+
+Rear-overcooling diagnostic:
+
+```text
+v26 strongly supports the rear-overcooling concern. After forcing cooler
+cooling air, the optimizer increased G_rear_core from the v25 value near
+3.34 W/m/K to 6.32 W/m/K. This helps cooling but over-removes heat during
+irradiated heating because the same rear sink acts in both phases.
+
+Representative v26 heating energy paths:
+
+  E67, 456 kW/m2:
+    Q_abs,total = 311.7 W
+    Q_receiver_gas = 82.4 W
+    Q_rear_core_sink = 157.6 W
+    Q_cavity_ambient = 25.2 W
+
+  E76, 304 kW/m2:
+    Q_abs,total = 213.7 W
+    Q_receiver_gas = 12.9 W
+    Q_rear_core_sink = 128.7 W
+    Q_cavity_ambient = 33.3 W
+
+  E80, 256 kW/m2:
+    Q_abs,total = 86.5 W
+    Q_receiver_gas = 8.4 W
+    Q_rear_core_sink = 54.2 W
+    Q_cavity_ambient = 11.9 W
+
+At 256 kW/m2, the direct rear-core sink alone removes more than half of the
+modeled heat input. This is not physically defensible as a single shared
+heating/cooling sink if the heating temperatures are already too low.
+```
+
+T3 interpretation:
+
+```text
+Moving T3 from 140 mm to 137 mm made heating T3 colder, not warmer, because it
+samples the gas before the short rear tube can exchange additional heat with
+the tube/adaptor. The v26 heating T3 bias became much worse:
+
+  mean heating T3 steady error = -209 K
+
+Therefore the measured T3 is probably not pure gas at the receiver exit. It is
+more likely an effective downstream measurement influenced by the rear tube,
+mixing, wall temperature, sensor bead mounting, or a short measurement lag.
+```
+
+Recommendation:
+
+```text
+Do not keep v26 as the next baseline in its current form. Use it as evidence.
+
+For v27:
+  1. Keep cooling t0 alignment.
+  2. Use 17 C cooling inlet/ambient, but preferably as a cooling-only ambient
+     schedule or ramp rather than allowing the same rear sink to dominate
+     heating.
+  3. Split rear heat removal into separate heating and cooling activity:
+       G_rear_core_heating
+       G_rear_core_cooling
+     or multiply rear loss by an irradiance/off-state gate.
+  4. Revert T3 comparison to 140 mm or replace it with a T3 measurement model:
+       gas/tube-wall weighted outlet temperature near 137-150 mm.
+  5. Continue to add explicit axial redistribution/thermal inventory, because
+     even after fixing rear overcooling the low-irradiance cases need deeper
+     heat retention rather than only more total power.
+```
+
+## 2026-07-22 - 2D_v1 Axisymmetric Continuum Macro-ECM Model Implementation and Initial Results
+
+Files:
+- `2D_v1.jl`
+- `run_2D_v1.jl`
+- `test/smoke_2D_v1.jl`
+- `summaries/2D_v1/analysis_results_2D_v1.csv`
+- `summaries/2D_v1/plots/transients/`
+- `summaries/2D_v1/plots/2d_profiles/`
+
+Purpose:
+- Developed the 2D Axisymmetric Continuum Macro-ECM formulation (`2D_v1.jl`) following the clean, self-contained architecture of `1D_v1.jl`.
+- Formulates a 2D finite-volume discretization ($N_r \times N_z$ grid) for the solid continuum $T_s(r, z, t)$, incorporating:
+  - Anisotropic effective thermal conductivities ($k_{s,r}^{\text{eff}}$ radially and $k_{s,z}^{\text{eff}}$ axially).
+  - Concentrated Gaussian radial solar beam profile $I(r) = I_{\text{peak}} \exp\left(-\frac{r^2}{2\sigma_{\text{beam}}^2}\right)$ with Beer-Lambert depth absorption $q_{\text{solar}}^{\prime\prime\prime}(r, z) \propto e^{-\beta_{\text{opt}} z}$.
+  - Quasi-steady 2D gas flow $T_g(r, z, t)$ across radial channel rings.
+  - Lumped housing/cavity thermal state $T_{\text{cavity}}(t)$ coupled via outer radial insulation conductance.
+
+Validation:
+- `test/smoke_2D_v1.jl` passed 25/25 checks.
+
+Initial Simulation Results (Cases E67, E76, E80):
+- Successfully generated 2D temperature field contour heatmaps ($T_s(r, z)$) and transient comparison plots.
+- The 2D spatial continuum naturally captures radial temperature variations between the central core ($r \approx 0$) and perimeter housing ($r = R_{\text{outer}}$), establishing a continuous physical framework for receiver upscaling.
