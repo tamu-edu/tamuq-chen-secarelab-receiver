@@ -44,6 +44,7 @@ UndefVarError: `StaticData` not defined in `Base`
 ## Documentation Notes
 
 - Periodically check `summaries/journal.1D.md` when making or evaluating 1D model changes. Update it with meaningful new model versions, calibration outcomes, validation notes, and interpretation changes so the journal remains aligned with the current code and results.
+- Periodically check `summaries/journal.2D.md` when making or evaluating 2D model changes. Maintain `summaries/journal.2D.md` with 2D model formulations, calibration outcomes, validation notes, and 2D spatial interpretation changes.
 
 ## Overall Study Objective
 

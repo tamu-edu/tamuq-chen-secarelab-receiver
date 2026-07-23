@@ -1,0 +1,11 @@
+index,name,value
+1,A_Nu,0.5376604030610538
+2,B_Re,0.41522221584927305
+3,k_scale_r,0.03246319055355563
+4,k_scale_z,0.1
+5,sigma_beam_mm,8.0
+6,spillage_fraction,0.05
+7,C_cavity_eff_J_K,269.49274714079553
+8,scale_456,0.8
+9,scale_304,0.8
+10,scale_256,0.5
