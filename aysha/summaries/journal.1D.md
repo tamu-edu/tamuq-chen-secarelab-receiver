@@ -4799,6 +4799,223 @@ Recommended next revisions:
    more defensible than repeatedly adjusting local sinks and source fractions.
 ```
 
+## 1D_v28 Direct Rear-Sink Removal and Smooth Explicit-Flange Cooling Gate
+
+Purpose:
+
+```text
+Test the stricter interpretation requested after the v27 review:
+  - remove the distributed direct rear-core/perimeter sink,
+  - replace the hard lamp-on/lamp-off rear-sink branch with a smooth operating
+    gate,
+  - allow the Nusselt prefactor A_Nu to exceed the old upper bound,
+  - compare T3 to gas temperature at 140 mm without a fitted wall blend.
+```
+
+Implementation:
+
+```text
+Updated/used:
+  - `1D_v28.jl`
+  - `run_1D_v28.jl`
+  - `test/smoke_1D_v28.jl`
+  - `diagnostics_v28_power_path.jl`
+
+Main structural changes:
+  1. Removed `G_rear_core_heat`, `G_rear_core_cool`,
+     `G_rear_perim`, and `rear_sink_shape` from the model balance.
+
+  2. Removed `f_T3_wall`; T3 is now:
+
+       T3_model = Tgas(140 mm)
+
+  3. Added a smooth explicit-flange cooling gate:
+
+       gate = [1 / (1 + (I / I_gate)^4)] * [1 - exp(-t / tau_cool)]
+       flange_scale_eff = flange_scale * (1 + flange_cool_gain * gate)
+
+     with `I_gate = 1000 W/m2`.
+
+  4. Relaxed `A_Nu` upper bound from 5 to 25.
+```
+
+Validation:
+
+```text
+`test/smoke_1D_v28.jl` passed 77/77 checks.
+
+The full runner completed after elevated filesystem permission was granted for
+creating `summaries/1D_v28/`.
+
+Full v28 fit:
+  objective = 117.71188433231664
+```
+
+Fitted v28 parameters:
+
+```text
+A_Nu = 1.9151
+B_Re = 0.5097
+scale_456 = 0.7023
+scale_304 = 0.8758
+scale_256 = 0.9516
+G_core_perim = 0.5 W/m/K        # lower bound
+C_perim_eff = 50.0 J/K         # lower bound
+k_perim_ref = 0.0 W/m/K        # lower bound
+spill_capture = 0.352
+beta_perim = 6.873 1/m
+f_core_tube = 0.9995
+flange_scale = 0.1014          # near lower bound
+flange_cool_gain = 6.319
+flange_cool_tau = 116.8 s
+k_core_axial_scale = 0.0       # lower bound
+```
+
+Interpretation:
+
+```text
+v28 is scientifically valuable as a negative test, but it should not replace
+v27 as a predictive baseline.
+
+Removing the direct rear sink did not simply improve physicality. It exposed
+that the explicit rear tube/flange path, as currently modeled, cannot reproduce
+the combined heating/cooling constraints. The optimizer compensated by:
+  - lowering high/mid irradiance power scales,
+  - collapsing core-perimeter coupling to the lower bound,
+  - collapsing perimeter heat capacity and perimeter axial conductivity,
+  - turning off core axial redistribution.
+
+This is a strong warning that the v27 direct rear sink was not merely a bad
+patch; it was also standing in for missing rear/adaptor thermal inventory and
+loss topology. A direct distributed sink is too artificial for final science,
+but removing it without replacing the missing rear reservoir makes the model
+less identifiable and much less predictive.
+```
+
+Recommended next move:
+
+```text
+Do not add the direct rear-core sink back unchanged. Instead, v29 should add a
+physically bounded rear/adaptor reservoir state:
+
+  receiver exit solid -> rear/adaptor reservoir -> explicit rear tube/flange/cavity
+
+with one heat capacity and one or two geometry-bounded conductances. That keeps
+the energy pathway physical while preserving the cooling inertia that v28 lost.
+
+Also keep T3 as pure gas for one more revision. If T3 remains biased only after
+the rear reservoir is physically represented, revisit the measurement model.
+```
+
+## 2026-07-23 - 1D_v29 Rear/Adaptor Reservoir Topology Test
+
+Files:
+- `1D_v29.jl`
+- `run_1D_v29.jl`
+- `test/smoke_1D_v29.jl`
+- `diagnostics_v29_power_path.jl`
+- `summaries/1D_v29/`
+- `summaries/1D_v29_strategy_forward.md`
+
+Purpose:
+
+```text
+Implemented the planned v29a topology test:
+
+  receiver exit core/perimeter -> bounded rear/adaptor reservoir
+                                -> explicit rear tube/cavity/flange hardware
+
+The v27 direct distributed rear-core/perimeter sink remains removed, and T3 is
+kept as pure gas temperature at 140 mm. The smooth operating-state gate from
+v28 is retained only on the explicit rear-tube-to-flange hardware path.
+```
+
+Main structural changes:
+
+```text
+Added state:
+  T_rear = rear/adaptor/holder reservoir temperature
+
+Added parameters:
+  C_rear_eff       [J/K]
+  G_receiver_rear  [W/K]
+  G_rear_tube      [W/K]
+  G_rear_cavity    [W/K]
+
+Removed/kept absent:
+  direct distributed receiver rear sink
+  hard lamp-on/off rear-sink switch
+  T3 wall-blend parameter
+```
+
+Validation:
+
+```text
+`test/smoke_1D_v29.jl` passed 85/85 checks.
+
+Full v29 fit:
+  objective = 53.0940821799407
+  return_code = MaxIters
+```
+
+Fitted v29 parameters:
+
+```text
+A_Nu = 4.9508
+B_Re = 0.5130
+scale_456 = 1.9928
+scale_304 = 1.9928
+scale_256 = 0.9527
+G_core_perim = 15.9149 W/m/K
+C_perim_eff = 184.2376 J/K
+k_perim_ref = 7.0756 W/m/K
+spill_capture = 0.5179
+beta_perim = 3.6395 1/m
+f_core_rear = 0.9993             # near upper bound
+flange_scale = 0.1014            # near lower bound
+flange_cool_gain = 6.3531
+flange_cool_tau = 116.755 s
+k_core_axial_scale = 0.0336
+C_rear_eff = 79.3349 J/K
+G_receiver_rear = 1.2597 W/K
+G_rear_tube = 0.4539 W/K         # near lower bound
+G_rear_cavity = 0.4101 W/K
+
+C_receiver_participating = 256.765 J/K
+C_total_with_rear = 336.099 J/K
+measured receiver assembly reference = 301 J/K
+```
+
+Interpretation:
+
+```text
+v29a is physically cleaner than v27 because rear heat now passes through an
+explicit bounded state rather than a direct distributed sink. It also improves
+substantially over v28's failed direct-sink-removal result:
+
+  v28 objective = 117.71
+  v29 objective = 53.09
+
+However, v29a is still not close to the v27 empirical fit:
+
+  v27 objective = 0.175
+
+Therefore, a single bounded rear reservoir connected only through final-cell
+receiver coupling and explicit tube/cavity paths is not sufficient to replace
+the v27 surrogate. The fit still shows scientific warning signs:
+  - T3 remains strongly biased low in several heating cases.
+  - `f_core_rear` is essentially all core.
+  - `flange_scale` remains at the lower edge.
+  - `G_rear_tube` is near the lower edge.
+  - the objective remains dominated by structured residuals rather than noise.
+
+This supports the broader lesson: the missing physics is rear/outlet topology,
+but it is probably not captured by a single lump connected only at the terminal
+cell. The next revision should test a more distributed rear-contact/manifold
+topology or an explicitly labeled T3/outlet measurement submodel, not restore a
+hidden receiver-volume sink.
+```
+
 ## 2026-07-22 - 2D_v1 Axisymmetric Continuum Macro-ECM Model Implementation and Initial Results
 
 Files:

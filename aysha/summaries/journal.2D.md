@@ -51,53 +51,58 @@ T2                  16.9                -25.7                       25.5        
 
 ---
 
-## 2026-07-23 — High-Resolution Multi-Domain 2D Axisymmetric Model Calibration Results
+## 2026-07-23 — 2D_v2 Multi-Domain Model Formulation & Calibration Results
 
-Major Physical & Numerical Refinements Incorporated:
-1. **Cooling Transient Initial Condition ($t_0$) Correction**:
-   - Cooling runs ($C_{69}, C_{80}, C_{81}$) now initialize from the solved **hot steady state** ($u_{\text{hot}} = u(t_{\text{end}})$) of their corresponding heating runs ($E_{69}, E_{80}, E_{81}$).
-   - The model accurately predicts dynamic cooling thermal decay starting at $\sim 1000 - 1300\text{ K}$ down to ambient as cold air flows through the receiver without solar flux.
-2. **Physical Placement of Thermocouple $T_2$**:
-   - Thermocouple $T_2$ is sampled at $r = R_{\text{rec}} + 40.0\text{ mm} = 73.9\text{ mm}$ (embedded 40 mm outside the receiver wall inside the insulation housing).
-   - This brought $T_2$ predictions down from $+380\text{ K}$ overestimation to within $+10 - +70\text{ K}$ of experiment.
-3. **Porous Solid Mass Correction ($40.0\text{ g}$ Measured Mass)**:
-   - Corrected receiver cell solid thermal mass to use $A_{\text{solid}} = (1 - \varepsilon) A_{\text{frt}}$ rather than gross cell volume, matching the exact $40.0\text{ g}$ measured mass of the porous SiC monolith.
-   - This eliminated the $2.86\times$ unphysically slow thermal response and restored fast dynamic thermal response.
-4. **High Spatial Grid Resolution**:
-   - Discretized disc into a **$17 \times 25$ grid** ($10$ SiC core rings + $5$ alumina felt rings + $2$ aluminum casing rings $\times 25$ axial depth cells along $137\text{ mm}$).
-   - Rear alumina exit tube discretized into **$20$ axial grid cells** along $150\text{ mm}$.
+Physical & Mathematical Formulations Introduced in 2D_v2:
+1. **Churchill-Chu Natural Convection Plume Correlation at Front Aperture**:
+   - Dynamically calculates front face buoyant plume convection:
+     $$\text{Ra}_L = \frac{g \beta (T_{\text{front}} - T_{\text{amb}}) L^3}{\nu \alpha}$$
+     $$\text{Nu}_{\text{front}} = \left\{0.825 + \frac{0.387 \text{Ra}_L^{1/6}}{\left[1 + (0.492 / \text{Pr})^{9/16}\right]^{8/27}}\right\}^2$$
+     $$h_{\text{front}}(T) = \max\left(10.0, \frac{\text{Nu}_{\text{front}} k_{\text{air}}}{L}\right)$$
+   - Dynamically increases front aperture heat dissipation from $10\text{ W/m}^2\text{K}$ at room temperature up to **$35 - 50\text{ W/m}^2\text{K}$ at $1000 - 1300\text{ K}$**.
+2. **Temperature-Dependent Alumina Felt Insulation Thermal Conductivity**:
+   - Accounts for matrix conduction plus radiative pore transport through alumina fibers:
+     $$k_{\text{felt}}(T) = 0.06 + 1.2 \times 10^{-10} T^3\text{ W/m/K}$$
+   - Increases radial dissipation into the outer housing from $0.06\text{ W/m/K}$ at $300\text{ K}$ up to **$0.32\text{ W/m/K}$ at $1300\text{ K}$**.
+3. **Radial Preferential Flow Distribution**:
+   - Preferential central core channel cooling:
+     $$\psi(r_i) = 1 - c_{\text{radial\_flow}} \left(\frac{r_i}{R_{\text{rec}}}\right)^2$$
+4. **Cooling Transients Initial Condition ($t_0$) & 40 g Solid Mass**:
+   - Initializes cooling from solved hot steady state $u_{\text{hot}} = u(t_{\text{end}})$.
+   - Corrected porous solid cell volume to $A_{\text{solid}} \cdot dz$, matching exact $40.0\text{ g}$ measured mass.
 
-Quantitative Sensor Metric Summary across Heating & Cooling Runs:
+Quantitative Sensor Metric Summary (2D_v2 Fitted Results):
 
 ```text
-Phase/Case        Sensor      Fitted RMSE (K)    Fitted Steady Error (K)
-Heating (E81)     T8               171.5                 +217.2
-Heating (E81)     T12_perim         57.0                  +70.8
-Heating (E81)     T11_perim         27.5                  +30.0
-Heating (E81)     T9_core           69.1                  +92.7
-Heating (E81)     T10_core          46.6                  +50.5
-Heating (E81)     T3                30.8                  +19.4
-Heating (E81)     T2                53.9                  +76.7
+Phase/Case        Sensor      2D_v1 Fitted RMSE (K)    2D_v2 Fitted RMSE (K)    2D_v2 Steady Error (K)
+Heating (E81)     T8                 171.5                    171.5                    +217.2
+Heating (E81)     T12_perim           57.0                     57.0                     +70.8
+Heating (E81)     T11_perim           27.5                     25.5                     +25.0
+Heating (E81)     T9_core             69.1                     64.6                     +84.1
+Heating (E81)     T10_core            46.6                     44.6                     +45.6
+Heating (E81)     T3                  30.8                     30.0                     +15.9
+Heating (E81)     T2                  53.9                     53.9                     +76.7
 
-Cooling (C81)     T8               101.9                   +1.2
-Cooling (C81)     T12_perim         61.3                   -1.5
-Cooling (C81)     T11_perim         26.7                   -5.1
-Cooling (C81)     T9_core           60.8                   -2.4
-Cooling (C81)     T10_core          29.5                   -6.0
-Cooling (C81)     T3                21.5                   -7.0
-Cooling (C81)     T2                41.3                   +9.9
+Cooling (C81)     T8                 101.9                     98.8                      +1.0
+Cooling (C81)     T12_perim           61.3                     58.4                      -1.6
+Cooling (C81)     T11_perim           26.7                     25.0                      -5.2
+Cooling (C81)     T9_core             60.8                     57.8                      -2.5
+Cooling (C81)     T10_core            29.5                     27.8                      -6.2
+Cooling (C81)     T3                  21.5                     21.4                      -7.1
+Cooling (C81)     T2                  41.3                     42.6                     +10.4
 ```
 
-Generated Fitted Artifacts (`fitted` output only):
-- Fitted Metrics CSV: [analysis_results_2D_v1.csv](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/summaries/2D_v1/analysis_results_2D_v1.csv)
-- Fitted Steady State Results CSV: [steady_results_2D_v1.csv](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/summaries/2D_v1/steady_results_2D_v1.csv)
-- Fitted Flow Slopes CSV: [flow_slopes_2D_v1.csv](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/summaries/2D_v1/flow_slopes_2D_v1.csv)
-- Fitted Parameters CSV: [parameters_fitted_2D_v1.csv](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/summaries/2D_v1/parameters_fitted_2D_v1.csv)
-- Fitted Steady Parity Plot: [steady_comparison_2D_v1.png](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/summaries/2D_v1/plots/steady_comparison_2D_v1.png)
-- Fitted Representative Axial Profiles (E67): [axial_profile_E67_2D_v1.png](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/summaries/2D_v1/plots/axial_profiles/axial_profile_E67_2D_v1.png)
-- Fitted Representative 2D Heatmap (E67): [heatmap_2D_E67_2D_v1.png](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/summaries/2D_v1/plots/2d_profiles/heatmap_2D_E67_2D_v1.png)
-- Fitted Cooling Transient Plot (C81): [transient_C81_cooling_2D_v1.png](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/summaries/2D_v1/plots/transients/transient_C81_cooling_2D_v1.png)
-- Complete directory of figures: [summaries/2D_v1/plots/](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/summaries/2D_v1/plots)
+Generated 2D_v2 Artifacts (`fitted` output only):
+- Fitted Metrics CSV: [analysis_results_2D_v2.csv](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/summaries/2D_v2/analysis_results_2D_v2.csv)
+- Fitted Steady State Results CSV: [steady_results_2D_v2.csv](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/summaries/2D_v2/steady_results_2D_v2.csv)
+- Fitted Flow Slopes CSV: [flow_slopes_2D_v2.csv](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/summaries/2D_v2/flow_slopes_2D_v2.csv)
+- Fitted Parameters CSV: [parameters_fitted_2D_v2.csv](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/summaries/2D_v2/parameters_fitted_2D_v2.csv)
+- Fitted Steady Parity Plot: [steady_comparison_2D_v2.png](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/summaries/2D_v2/plots/steady_comparison_2D_v2.png)
+- Fitted Representative Axial Profiles (E67): [axial_profile_E67_2D_v2.png](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/summaries/2D_v2/plots/axial_profiles/axial_profile_E67_2D_v2.png)
+- Fitted Representative 2D Heatmap (E67): [heatmap_2D_E67_2D_v2.png](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/summaries/2D_v2/plots/2d_profiles/heatmap_2D_E67_2D_v2.png)
+- Fitted Cooling Transient Plot (C81): [transient_C81_cooling_2D_v2.png](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/summaries/2D_v2/plots/transients/transient_C81_cooling_2D_v2.png)
+- Complete directory of figures: [summaries/2D_v2/plots/](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/summaries/2D_v2/plots)
+
 
 
 

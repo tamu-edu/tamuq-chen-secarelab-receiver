@@ -155,26 +155,26 @@ end
 # Default v28 parameter vector p[1:20]
 begin # v28 parameter values and bounds
     pnew_v28 = [
-        4.917604150346132,  # p[1]  A_Nu (laminar developing prefactor)
-        0.5127772232675154, # p[2]  B_Re (Reynolds exponent bounded 0.0 to 0.6)
+        1.9151209369796083, # p[1]  A_Nu (laminar developing prefactor)
+        0.5096755901291579, # p[2]  B_Re (Reynolds exponent bounded 0.0 to 0.6)
         PRANDTL_EXPONENT_FIXED_v28, # p[3]  C_Pr (= 1/3)
         1.0,                # p[4]  phi_0 (fixed full active flow fraction)
         0.0,                # p[5]  m_rec (flow recruitment exponent)
         1.0,                # p[6]  front_dep (frozen v12a front-cell deposition)
-        2.002466304587915,  # p[7]  scale_456
-        1.996605361016035,  # p[8]  scale_304
-        0.9519931605398161, # p[9]  scale_256
-        17.85826648407777,  # p[10] G_core_perim (radial core-perimeter conductance [W/m/K])
-        222.13066742029187, # p[11] C_perim_eff (perimeter participating capacity [J/K])
-        7.617466671895104,  # p[12] k_perim_ref (perimeter axial conductivity at 900K [W/m/K])
+        0.7022497560546166, # p[7]  scale_456
+        0.8758028663986246, # p[8]  scale_304
+        0.951578829045599,  # p[9]  scale_256
+        0.5,                # p[10] G_core_perim (radial core-perimeter conductance [W/m/K])
+        50.0,               # p[11] C_perim_eff (perimeter participating capacity [J/K])
+        0.0,                # p[12] k_perim_ref (perimeter axial conductivity at 900K [W/m/K])
         184.67243519237965, # p[13] beta_opt [1/m]
-        0.5251444984572524, # p[14] spill_capture (captured spillover fraction)
-        3.629206240369939,  # p[15] beta_perim (perimeter source attenuation [1/m])
-        0.9993097145331002, # p[16] f_core_tube (rear-tube heat leak core fraction)
-        0.10138173496160813,# p[17] flange_scale (rear/flange heat-removal multiplier)
-        4.0,                # p[18] flange_cool_gain (smooth lamp-off gain)
-        180.0,              # p[19] flange_cool_tau [s]
-        0.03608858862322474,# p[20] k_core_axial_scale
+        0.3518279793601149, # p[14] spill_capture (captured spillover fraction)
+        6.8732964011708155, # p[15] beta_perim (perimeter source attenuation [1/m])
+        0.999469435733115,  # p[16] f_core_tube (rear-tube heat leak core fraction)
+        0.10138839656865689,# p[17] flange_scale (rear/flange heat-removal multiplier)
+        6.319469517058668,  # p[18] flange_cool_gain (smooth lamp-off gain)
+        116.79728159893118, # p[19] flange_cool_tau [s]
+        0.0,                # p[20] k_core_axial_scale
     ]
     lb_full_v28 = [
         0.01,
