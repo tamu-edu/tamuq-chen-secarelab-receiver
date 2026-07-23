@@ -4611,6 +4611,194 @@ For v27:
      heat retention rather than only more total power.
 ```
 
+## 1D_v27 Split Rear Sink, T3 Wall Mix, and Axial Redistribution
+
+Purpose:
+
+```text
+Proceed with the v26 recommendations while avoiding the v26 failure mode:
+cooling improvements should not force the same rear sink to overcool
+irradiated heating cases.
+```
+
+Implementation:
+
+```text
+Created:
+  - `1D_v27.jl`
+  - `run_1D_v27.jl`
+  - `test/smoke_1D_v27.jl`
+  - `diagnostics_v27_power_path.jl`
+
+v27 changes relative to v26:
+  1. Keeps cooling t0 output alignment.
+  2. Keeps cooling inlet/ambient fixed at 17 C.
+  3. Reverts T3 sampling from 137 mm to 140 mm.
+  4. Adds a T3 gas/tube-wall measurement model:
+
+       T3_model = (1 - f_T3_wall) * Tgas(140 mm)
+                  + f_T3_wall * Ttube_wall(140 mm)
+
+  5. Splits rear-core sink into:
+
+       G_rear_core_heat = p[18]
+       G_rear_core_cool = p[22]
+
+     Heating cases use `G_rear_core_heat`; zero-irradiance cooling cases use
+     `G_rear_core_cool`.
+
+  6. Allows core axial redistribution to fit:
+
+       k_core_axial_scale = p[21], bound 0 to 0.50
+
+  7. Adds T3 wall fraction:
+
+       f_T3_wall = p[23], bound 0 to 1
+```
+
+Validation:
+
+```text
+`test/smoke_1D_v27.jl` passed 79/79 checks.
+
+Full v27 runner completed with:
+  objective = 0.17506355554436148
+  return_code = MaxTime
+```
+
+Fitted v27 parameters:
+
+```text
+A_Nu = 4.9176
+B_Re = 0.5128
+scale_456 = 2.0025
+scale_304 = 1.9966
+scale_256 = 0.9520
+G_core_perim = 17.86 W/m/K
+C_perim_eff = 222.13 J/K
+k_perim_ref = 7.62 W/m/K
+spill_capture = 0.525
+f_perim_source = 0.489
+beta_perim = 3.629 1/m
+G_rear_core_heat = 3.33 W/m/K
+G_rear_core_cool = 8.87 W/m/K
+G_rear_perim = 0
+k_core_axial_scale = 0.0361
+f_T3_wall = 0.176
+```
+
+Interpretation:
+
+```text
+v27 confirms the rear-overcooling diagnosis from v26. The model now keeps the
+heating rear-core sink near the v25 value (~3.33 W/m/K) while allowing cooling
+to use a stronger rear-core sink (~8.87 W/m/K). This prevents the v26 collapse,
+where heating rear loss became too large.
+
+The fitted T3 wall fraction is modest (~18%), supporting the idea that T3 is
+not pure receiver-exit gas but also not purely a wall measurement.
+
+The fitted core axial redistribution is small but nonzero. That is an important
+scientific signal: once it is allowed back into the model under the cooling
+upturn guard, the fit uses it.
+```
+
+v27 power-path examples:
+
+```text
+E67, 456 kW/m2:
+  Q_abs,total = 329.6 W
+  Q_receiver_gas = 127.2 W
+  Q_rear_core_sink = 109.9 W
+  Q_cavity_ambient = 30.8 W
+
+E76, 304 kW/m2:
+  Q_abs,total = 219.1 W
+  Q_receiver_gas = 24.5 W
+  Q_rear_core_sink = 99.4 W
+  Q_cavity_ambient = 42.3 W
+
+E80, 256 kW/m2:
+  Q_abs,total = 88.0 W
+  Q_receiver_gas = 15.0 W
+  Q_rear_core_sink = 41.1 W
+  Q_cavity_ambient = 15.0 W
+```
+
+Performance summary:
+
+```text
+Mean heating steady errors:
+  T8  =  -49 K
+  T12 =  -84 K
+  T11 =  -52 K
+  T9  =  -79 K
+  T10 =  -42 K
+  T3  = -117 K
+  T2  =   -3 K
+
+Mean cooling steady errors:
+  T8  = -11 K
+  T12 = -16 K
+  T11 = -19 K
+  T9  = -19 K
+  T10 = -25 K
+  T3  = +12 K
+  T2  =  -0 K
+```
+
+Expert opinion:
+
+```text
+v27 is a better physical structure than v26, but not yet a better predictive
+baseline than v25. It resolves the strongest overcooling pathology by splitting
+heating/cooling rear loss, but heating temperatures are still systematically
+low, especially deeper in the receiver and for T3.
+
+The remaining issue is still not total power alone. The model needs a mechanism
+that puts or retains more heat deeper in the receiver without overheating T8.
+```
+
+Recommended next revisions:
+
+```text
+1. Add a heating/cooling gate for the rear sink instead of a hard irradiance
+   switch:
+
+     G_rear_core_eff = G_heat + s_off(t) * (G_cool - G_heat)
+
+   where `s_off` can transition after lamp shutoff. This is more physical than
+   an instantaneous irradiance branch.
+
+2. Allow the core source shape to move deeper:
+
+   beta_opt is currently fixed at 184.7 1/m and front_dep is fixed at 1.0.
+   The low-irradiance scale checks showed that deeper sensors want more energy
+   while T8 cannot take a uniform power increase. The next model should add a
+   fitted deep-source or axial redistribution shape, not just a higher scale.
+
+3. Refine T3 as a measurement model:
+
+   Keep 140 mm, but consider fitting either:
+     - T3 position in 137-150 mm,
+     - wall fraction,
+     - or a first-order thermocouple lag.
+
+   Current f_T3_wall ~0.18 helps but T3 remains low.
+
+4. Constrain rear heating loss by energy plausibility:
+
+   The rear-core sink is still a large heating loss fraction, especially at
+   256 kW/m2. Add a soft penalty if rear-core heating loss consumes an excessive
+   fraction of absorbed power.
+
+5. Consider a reservoir/redistribution state:
+
+   The 3D observation that high Cp_s and k_s were needed suggests an explicit
+   participating thermal inventory or axial radiative/conductive reservoir is
+   more defensible than repeatedly adjusting local sinks and source fractions.
+```
+
 ## 2026-07-22 - 2D_v1 Axisymmetric Continuum Macro-ECM Model Implementation and Initial Results
 
 Files:
