@@ -465,7 +465,7 @@ end
 
 begin # execution & output generation
     println("[run_1D_v30] Running energy-accounting 2-Zone Core/Perimeter Runner.")
-    println("[run_1D_v30] Fitting power scales, source partition, core-perimeter coupling, rear reservoir, and flange path...")
+    println("[run_1D_v30] Fitting power scales, source partition, core-perimeter coupling, rear contact rail, and flange path...")
 
     fit = calibrate_v30(
         nodes=RUNNER_FIT_NODES_v30,

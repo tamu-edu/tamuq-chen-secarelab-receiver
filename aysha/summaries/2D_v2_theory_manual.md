@@ -375,33 +375,34 @@ where:
 
 ---
 
-### 8.3 Quantitative Performance Summary Table (`2D_v2`)
+### 8.3 Quantitative Performance Summary Table (`2D_v3` Calibrated Results)
 
 ```text
-Phase/Case        Sensor      2D_v1 Fitted RMSE (K)    2D_v2 Fitted RMSE (K)    2D_v2 Steady Error (K)
-Heating (E81)     T8                 171.5                    171.5                    +217.2
-Heating (E81)     T12_perim           57.0                     57.0                     +70.8
-Heating (E81)     T11_perim           27.5                     25.5                     +25.0
-Heating (E81)     T9_core             69.1                     64.6                     +84.1
-Heating (E81)     T10_core            46.6                     44.6                     +45.6
-Heating (E81)     T3                  30.8                     30.0                     +15.9
-Heating (E81)     T2                  53.9                     53.9                     +76.7
+Phase/Case        Sensor      2D_v2 Fitted RMSE (K)    2D_v3 Calibrated RMSE (K)    2D_v3 Steady Error (K)
+Heating (E81)     T8                 171.5                      123.7                     -99.1
+Heating (E81)     T12_perim           57.0                      180.7                    -184.5
+Heating (E81)     T11_perim           25.5                      119.9                    -145.9
+Heating (E81)     T9_core             64.6                      157.4                    -163.1
+Heating (E81)     T10_core            44.6                       98.0                    -124.9
+Heating (E81)     T3                  30.0                       85.6                    -118.5
+Heating (E81)     T2                  53.9                       22.5                     +31.2
 
-Cooling (C81)     T8                 101.9                     98.8                      +1.0
-Cooling (C81)     T12_perim           61.3                     58.4                      -1.6
-Cooling (C81)     T11_perim           26.7                     25.0                      -5.2
-Cooling (C81)     T9_core             60.8                     57.8                      -2.5
-Cooling (C81)     T10_core            29.5                     27.8                      -6.2
-Cooling (C81)     T3                  21.5                     21.4                      -7.1
-Cooling (C81)     T2                  41.3                     42.6                     +10.4
+Cooling (C81)     T8                  98.8                       44.1                     +0.08
+Cooling (C81)     T12_perim           58.4                       21.5                     -2.57
+Cooling (C81)     T11_perim           25.0                       36.2                     -6.09
+Cooling (C81)     T9_core             57.8                       21.7                     -3.46
+Cooling (C81)     T10_core            27.8                       37.4                     -7.07
+Cooling (C81)     T3                  21.4                       50.3                     -7.97
+Cooling (C81)     T2                  42.6                       37.9                     +8.13
 ```
 
 ---
 
 ## Conclusion & Code Structure References
 
-- Model Core: [`2D_v2.jl`](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/2D_v2.jl)
-- Calibration & Output Runner: [`run_2D_v2.jl`](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/run_2D_v2.jl)
-- Unit Smoke Test Suite: [`test/smoke_2D_v2.jl`](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/test/smoke_2D_v2.jl)
+- Model Core: [`2D_v3.jl`](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/2D_v3.jl)
+- Calibration & Output Runner: [`run_2D_v3.jl`](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/run_2D_v3.jl)
+- Unit Smoke Test Suite: [`test/smoke_2D_v3.jl`](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/test/smoke_2D_v3.jl)
 - Model Development Journal: [`summaries/journal.2D.md`](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/summaries/journal.2D.md)
-- Complete Directory of Calibrated Artifacts: [`summaries/2D_v2/`](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/summaries/2D_v2/)
+- Complete Directory of Calibrated Artifacts: [`summaries/2D_v3/`](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/summaries/2D_v3/)
+

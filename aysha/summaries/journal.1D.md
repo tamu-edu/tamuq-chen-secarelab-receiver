@@ -5016,6 +5016,132 @@ topology or an explicitly labeled T3/outlet measurement submodel, not restore a
 hidden receiver-volume sink.
 ```
 
+## 2026-07-23 - 1D_v30 Distributed Rear-Contact Rail Topology Test
+
+Files:
+- `1D_v30.jl`
+- `run_1D_v30.jl`
+- `test/smoke_1D_v30.jl`
+- `diagnostics_v30_power_path.jl`
+- `summaries/1D_v30/`
+
+Purpose:
+
+```text
+Implemented the next topology test after v29:
+
+  receiver core/perimeter[i] -> distributed rear/adaptor rail[i]
+                            -> rear tube/cavity/flange hardware
+
+The rear rail has the same axial resolution as the receiver. Its receiver
+contact and heat capacity are distributed by a fixed downstream ramp beginning
+near T8, rather than by a fitted rear-sink shape. T3 remains pure gas at
+140 mm. The model still has no direct receiver-volume sink to water/ambient.
+```
+
+Main structural changes relative to v29:
+
+```text
+Replaced scalar `T_rear` with vector `T_rear[i]`.
+
+Added:
+  rear_contact_weights[i]  # fixed, normalized downstream ramp
+  G_rear_axial             # rear-rail axial conductance per link
+
+Heat paths:
+  Qcore_rear[i]  = G_receiver_rear * w_rear[i] * f_core_rear
+                   * (Tcore[i] - Trear[i])
+
+  Qperim_rear[i] = G_receiver_rear * w_rear[i] * (1 - f_core_rear)
+                   * (Tperim[i] - Trear[i])
+
+  Qrear_cavity[i] = G_rear_cavity * w_rear[i] * (Trear[i] - Tcavity)
+
+  Qrear_tube = G_rear_tube * (Trear[end] - Ttube[1])
+```
+
+Validation:
+
+```text
+`test/smoke_1D_v30.jl` passed 91/91 checks.
+
+Full v30 fit:
+  objective = 12.698388353657599
+  return_code = MaxTime
+```
+
+Fitted v30 parameters:
+
+```text
+A_Nu = 5.0229
+B_Re = 0.5133
+scale_456 = 1.9812
+scale_304 = 1.9874
+scale_256 = 0.9482
+G_core_perim = 0.5 W/m/K         # lower bound
+C_perim_eff = 50.0 J/K          # lower bound
+k_perim_ref = 5.0453 W/m/K
+spill_capture = 0.5261
+beta_perim = 3.6279 1/m
+f_core_rear = 0.9993             # near upper bound
+flange_scale = 0.1014            # near lower bound
+flange_cool_gain = 6.4926
+flange_cool_tau = 116.511 s
+k_core_axial_scale = 0.0279
+C_rear_eff = 50.0 J/K            # lower bound
+G_receiver_rear = 1.9356 W/K
+G_rear_tube = 0.2225 W/K         # near lower bound
+G_rear_cavity = 0.8134 W/K
+G_rear_axial = 0.0 W/K           # lower bound
+
+C_receiver_participating = 122.527 J/K
+C_total_with_rear = 172.527 J/K
+measured receiver assembly reference = 301 J/K
+```
+
+Interpretation:
+
+```text
+v30 substantially improves the score relative to v29:
+
+  v29 objective = 53.09
+  v30 objective = 12.70
+
+However, the improvement is not scientifically acceptable as a coefficient
+validation model. The optimizer achieves the better fit by collapsing:
+  - core-perimeter conductance,
+  - perimeter participating heat capacity,
+  - rear rail heat capacity,
+  - rear axial conductance,
+  - rear-tube conductance near its lower edge.
+
+The fitted total participating heat capacity, including the rear rail, is only
+~173 J/K, far below the 301 J/K measured receiver assembly reference. This
+means the distributed rear-contact rail can mimic some of the missing rear
+topology, but it does so by making the modeled thermal inventory too small.
+
+The fixed distributed-contact hypothesis is therefore a useful partial test but
+not the final physical answer. It supports moving away from a single terminal
+rear lump, but also shows that the rear/outlet problem is coupled to the
+perimeter/housing capacity and probably to the T3/outlet measurement pathway.
+```
+
+Recommended next move:
+
+```text
+Do not accept v30 as final. The next controlled test should prevent capacity
+collapse before judging the topology. Two good options:
+
+  1. A constrained v30b/v31 run with C_perim_eff and C_rear_eff held near
+     measured/geometry-derived values, fitting only rear conductances first.
+
+  2. A labeled T3/outlet sensor/manifold submodel added after the capacity-
+     constrained rear topology is tested.
+
+The important lesson is that topology freedom alone is not enough; the model
+must also preserve physically credible thermal inventory.
+```
+
 ## 2026-07-22 - 2D_v1 Axisymmetric Continuum Macro-ECM Model Implementation and Initial Results
 
 Files:
