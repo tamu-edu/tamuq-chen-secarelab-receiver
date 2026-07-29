@@ -1,0 +1,42 @@
+2D_v10 conservative front-exchange pre-fit sensitivity
+mesh=(nr_rec=10,nr_felt=5,nr_case=2,nz=30,nz_rear=20)
+front_reynolds_exponent=0.5
+front_coefficients=[0.0, 0.05, 0.1, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0]
+v9 thermal and hydraulic parameters fixed
+irradiance pattern unchanged and centered
+Cf=0.0, I=456.0: model slope=5.387091150733323, observed slope=17.33862389158247
+Cf=0.0, I=304.0: model slope=7.0954733832657855, observed slope=10.476819976890445
+Cf=0.0, I=256.0: model slope=8.780990201195742, observed slope=6.898088829268151
+Cf=0.05, I=456.0: model slope=5.373368028234144, observed slope=17.33862389158247
+Cf=0.05, I=304.0: model slope=7.005595709594287, observed slope=10.476819976890445
+Cf=0.05, I=256.0: model slope=8.616981222454298, observed slope=6.898088829268151
+Cf=0.1, I=456.0: model slope=5.358032610690208, observed slope=17.33862389158247
+Cf=0.1, I=304.0: model slope=6.915640348150953, observed slope=10.476819976890445
+Cf=0.1, I=256.0: model slope=8.45518562935996, observed slope=6.898088829268151
+Cf=0.25, I=456.0: model slope=5.301848137844266, observed slope=17.33862389158247
+Cf=0.25, I=304.0: model slope=6.645799409484152, observed slope=10.476819976890445
+Cf=0.25, I=256.0: model slope=7.983140634029085, observed slope=6.898088829268151
+Cf=0.5, I=456.0: model slope=5.178415074788486, observed slope=17.33862389158247
+Cf=0.5, I=304.0: model slope=6.198049928446289, observed slope=10.476819976890445
+Cf=0.5, I=256.0: model slope=7.239147810750275, observed slope=6.898088829268151
+Cf=1.0, I=456.0: model slope=4.839531347718442, observed slope=17.33862389158247
+Cf=1.0, I=304.0: model slope=5.321200932473883, observed slope=10.476819976890445
+Cf=1.0, I=256.0: model slope=5.902636078432356, observed slope=6.898088829268151
+Cf=2.0, I=456.0: model slope=3.9244288663276348, observed slope=17.33862389158247
+Cf=2.0, I=304.0: model slope=3.698115743581348, observed slope=10.476819976890445
+Cf=2.0, I=256.0: model slope=3.751893056571979, observed slope=6.898088829268151
+Cf=4.0, I=456.0: model slope=1.833210338361938, observed slope=17.33862389158247
+Cf=4.0, I=304.0: model slope=1.1050656539363886, observed slope=10.476819976890445
+Cf=4.0, I=256.0: model slope=0.922418326328317, observed slope=6.898088829268151
+Cf=8.0, I=456.0: model slope=-1.4502861530895854, observed slope=17.33862389158247
+Cf=8.0, I=304.0: model slope=-1.9678098112511222, observed slope=10.476819976890445
+Cf=8.0, I=256.0: model slope=-1.779399946524341, observed slope=6.898088829268151
+selected aggregate diagnostics:
+Cf=0.0: mean axial=-128.085337563355 K, axial RMSE=143.076371883403 K, mean mid radial=-1.23370816934812 K, mean deep radial=-0.701464733366614 K, T3 MAE=78.380351821729 K, mean h_front=0.0 W/m2/K, mean preheat=0.0 K
+Cf=1.0: mean axial=-77.6507273294074 K, axial RMSE=94.1706802028043 K, mean mid radial=-1.24434977230343 K, mean deep radial=-0.728862330530236 K, T3 MAE=68.617284176544 K, mean h_front=124.831439351053 W/m2/K, mean preheat=50.8082823664047 K
+Cf=2.0: mean axial=-38.0594973226005 K, axial RMSE=60.4330192002412 K, mean mid radial=-1.25024306537102 K, mean deep radial=-0.749042583520706 K, T3 MAE=65.8134068901249 K, mean h_front=249.662878702107 W/m2/K, mean preheat=89.3250796823205 K
+Cf=4.0: mean axial=18.9572545872676 K, axial RMSE=48.3112026242887 K, mean mid radial=-1.25483940885403 K, mean deep radial=-0.775724052749157 K, T3 MAE=69.1001774843831 K, mean h_front=499.325757404214 W/m2/K, mean preheat=142.654752243464 K
+Cf=8.0: mean axial=83.904010215045 K, axial RMSE=99.7613060998185 K, mean mid radial=-1.2547382319538 K, mean deep radial=-0.802421674597451 K, T3 MAE=76.0397588396187 K, mean h_front=998.651514808428 W/m2/K, mean preheat=200.421229826822 K
+acceptance=FAIL
+reason=axial mean can be forced only while measured flow slopes collapse/reverse; radial signs remain wrong
+calibration_action=do not fit C_f with m_f=0.5

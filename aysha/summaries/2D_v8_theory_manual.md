@@ -5,6 +5,11 @@
 **Target Codebase**: `2D_v8.jl`  
 **Date**: July 29, 2026  
 
+> **2D_v9 implementation addendum:** Section 9 records the implemented
+> temperature-dependent velocity and DP1 hydraulic extension that inherits
+> the v8 thermal/optical formulation. The cold hydraulic constraint is
+> verified; the hot-path pressure closure remains provisional.
+
 ---
 
 ## 1. Introduction & Physical System Overview
@@ -248,7 +253,7 @@ Seven experimental thermocouples record temperatures during testing:
 
 | Sensor Symbol | Physical Location | Radial Position $r$ | Axial Position $z$ | Physical Phase Measured |
 | :--- | :--- | :--- | :--- | :--- |
-| **$T_8$** | Perimeter skin | $r = R_{\text{rec}} = 10.72\text{ mm}$ | $z = 11.0\text{ mm}$ | SiC Solid |
+| **$T_8$** | Perimeter skin | $r = R_{\text{rec}} = 10.72\text{ mm}$ | $z = 5.0\text{ mm}$ | SiC Solid |
 | **$T_9$** | Core mid-depth | $r = 0.0\text{ mm}$ (Centerline) | $z = 58.0\text{ mm}$ | SiC Solid |
 | **$T_{12}$** | Perimeter mid-depth | $r = R_{\text{rec}} = 10.72\text{ mm}$ | $z = 58.0\text{ mm}$ | SiC Solid |
 | **$T_{10}$** | Core deep-rear | $r = 0.0\text{ mm}$ (Centerline) | $z = 107.0\text{ mm}$ | SiC Solid |
@@ -296,3 +301,397 @@ Structural parameters ($\sigma_{\text{beam}} = 14.0\text{ mm}$, $f_{\text{spilla
 2. **Mass Flow Conservation**: Strictly conserves total air mass flow across channel rings and into the exit mixing cup.
 3. **Physical Optical Transmission**: Retains un-renormalized Beer-Lambert absorption, modeling actual rear optical transmission.
 4. **Clean Macro-ECM Closure**: Removes non-identifiable single-channel laminar floors ($\text{Nu}_{\text{min}} = 0$), yielding robust, physically meaningful macroscopic heat transfer parameters.
+
+---
+
+## 9. Implemented `2D_v9` Hydraulic Extension
+
+`2D_v9` inherits the corrected geometry, energy conservation, LTNE coupling,
+optics and boundary conditions of `2D_v8`. Its hydraulic objective is to make
+the actual local gas velocity explicit and test the prescribed MFC mass flow
+against DP1. It does not add an unquantifiable bypass branch.
+
+The equations and numerical values in this section correspond to `2D_v9.jl`
+and its DP1 runner. The reference-flow conversion, velocity calculation and
+cold hydraulic coefficients are implemented and tested. They are not new
+fitted thermal-transfer coefficients.
+
+### 9.1 Verified sensor-coordinate correction
+
+The receiver thermocouple axial planes have been verified as 5, 58 and
+107 mm from the illuminated front face. T8 is therefore corrected from the
+previously documented 11 mm to 5 mm in the table in Section 6. The other
+receiver coordinates remain:
+
+$$
+z_{T8}=5\ \mathrm{mm},\qquad
+z_{T9}=z_{T12}=58\ \mathrm{mm},\qquad
+z_{T10}=z_{T11}=107\ \mathrm{mm}.
+$$
+
+The v9 observation map and cooling initialization must use these same verified
+coordinates. The change is prescribed experimental geometry, not an
+optimization variable.
+
+### 9.2 MFC reference state and conserved mass flow
+
+The Aalborg GFC manual gives the calibration reference state as 14.7 psia
+(approximately 101.4 kPa absolute) and 70 degF (21.1 degC or 294.25 K).
+The experimental readings were adjusted with the manufacturer's gas factors
+and were separately tested with a bubble flow meter. They are treated here as
+air-equivalent standard L/min; no second gas-factor correction is applied.
+
+For dry air,
+
+$$
+p_{\mathrm{ref}}=101.4\ \mathrm{kPa},\qquad
+T_{\mathrm{ref}}=294.25\ \mathrm{K},
+$$
+
+$$
+\rho_{\mathrm{ref}}
+=\frac{p_{\mathrm{ref}}}{R_{\mathrm{air}}T_{\mathrm{ref}}}
+\simeq1.200\ \mathrm{kg\,m^{-3}},
+$$
+
+and
+
+$$
+\dot m_{\mathrm{total}}
+=\rho_{\mathrm{ref}}\frac{Q_{\mathrm{std}}}{60000}.
+$$
+
+This supersedes the less explicit description in Section 3.1 but is
+numerically consistent with its value of 1.199 kg/m3. The corrected MFC flow
+remains the primary prescribed flow.
+
+### 9.3 Local density, actual volumetric flow and velocity
+
+The v8 Reynolds-number calculation is already compatible with a prescribed
+mass flow:
+
+$$
+\mathrm{Re}_{i,j}
+=\frac{\rho_{i,j}u_{i,j}D_h}{\mu_{i,j}}
+=\frac{\dot m_iD_h}{A_{\mathrm{flow},i}\mu_{i,j}}.
+$$
+
+Density cancels from Reynolds number, but it does not cancel from local
+velocity or dynamic pressure. V9 therefore evaluates
+
+$$
+\rho_{i,j}(t)
+=\frac{p_{i,j}(t)}{R_{\mathrm{air}}T_{g,i,j}(t)}
+\simeq
+\frac{p_{\mathrm{atm}}}{R_{\mathrm{air}}T_{g,i,j}(t)},
+$$
+
+$$
+\dot V_{i,j,\mathrm{actual}}(t)
+=\frac{\dot m_i}{\rho_{i,j}(t)},
+$$
+
+$$
+u_{i,j}(t)
+=\frac{\dot m_i}
+{\rho_{i,j}(t)A_{\mathrm{flow},i}}.
+$$
+
+The approximation $p_{i,j}\simeq p_{\mathrm{atm}}$ is sufficient initially
+because the measured receiver-path pressure difference is only a few
+millibar. Thus, standard volumetric flow is fixed by the MFC, mass flow is
+conserved, and actual hot-gas volumetric flow and velocity rise as density
+falls.
+
+### 9.4 DP1 measurement definition
+
+DP1 is a flush wall static-pressure tap in the gas path just inside the water
+jacket. Its reference port is open to atmosphere, as is the receiver front.
+It therefore measures static gauge pressure relative to the atmospheric
+receiver face and does not contain the directional stagnation-pressure term
+that a Pitot-type probe would measure.
+
+### 9.5 Square-channel pressure loss
+
+For fully developed laminar flow in a square channel, the Darcy friction
+factor satisfies
+
+$$
+f_D\mathrm{Re}=56.91.
+$$
+
+The pressure loss through axial cell $j$ of ring $i$ is therefore
+
+$$
+\Delta p_{i,j}
+=f_{D,i,j}\frac{\Delta z_j}{D_h}
+\frac{\rho_{i,j}u_{i,j}^2}{2}
+=28.455\frac{\mu_{i,j}u_{i,j}\Delta z_j}{D_h^2}.
+$$
+
+Summing the cells gives the ideal receiver-channel contribution:
+
+$$
+\Delta p_{\mathrm{square},i}
+=\sum_{j=1}^{N_z}\Delta p_{i,j}.
+$$
+
+Parallel channel rings experience a common end-to-end pressure difference.
+The first v9 implementation retains the conservative v8 ring allocation and
+uses this pressure calculation as an aggregate diagnostic. A later
+pressure-balanced ring allocation should be considered only after total-flow
+validation; one DP1 signal cannot independently identify arbitrary radial
+maldistribution.
+
+### 9.6 Cold-$t_0$ DP1 calibration
+
+Near-ambient $t_0$ data from nine heating runs provide the least thermally
+confounded normal-configuration pressure-flow set:
+
+```text
+E67, E68, E70, E72, E74, E75, E76, E78, E80
+```
+
+The calibration uses means from the raw inclusive interval
+$0\le t\le10$ s, before the normal 50-sample decimation. Selection requires
+both T3 and the mean of T8--T12 to lie within 5 K of ambient.
+
+Their empirical relation is
+
+$$
+DP1_{\mathrm{raw}}[\mathrm{mbar}]
+=-0.614226
++0.0455545\,Q_{\mathrm{std}}[\mathrm{L\,min^{-1}}],
+$$
+
+with
+
+$$
+R^2=0.98144,\qquad
+\mathrm{RMSE}=0.02768\ \mathrm{mbar}.
+$$
+
+The intercept is treated as the cold-dataset DP1 offset unless an independent
+zero measurement supersedes it. At the MFC reference temperature of
+294.25 K, the ideal fully developed square-channel slope is
+0.0233408 mbar/(standard L/min). Relative to this receiver-only pressure loss,
+the cold observed slope implies
+
+$$
+C_{\mathrm{hyd}}=1.95171\simeq1.95.
+$$
+
+This effective multiplier includes the square-channel resistance plus
+developing-flow, inlet, outlet and short water-jacket-path effects between the
+atmospheric receiver face and the DP1 tap. The provisional observation model,
+using the recorded DP1 sign convention, is
+
+$$
+DP1_{\mathrm{model}}
+=p_{0,\mathrm{DP1}}
++C_{\mathrm{hyd}}\Delta p_{\mathrm{square}},
+$$
+
+where
+
+$$
+p_{0,\mathrm{DP1}}\simeq-0.614226\ \mathrm{mbar},
+\qquad C_{\mathrm{hyd}}\simeq1.95.
+$$
+
+No free quadratic minor-loss term is included initially. Such a term may be
+added only if full cooling and heating histories show a systematic
+flow-dependent residual that the temperature-corrected laminar calculation
+cannot explain.
+
+### 9.7 Permitted role of DP1 in inference
+
+DP1 is used in the following hierarchy:
+
+1. validate local density, velocity and temperature-dependent pressure loss;
+2. test the corrected MFC standard flow as the prescribed receiver mass flow;
+3. constrain, if necessary, one common global flow multiplier;
+4. prevent flow-scale error from being absorbed by $A_{\mathrm{Nu}}$ and
+   $B_{\mathrm{Re}}$.
+
+DP1 is not used to infer a separate active-flow or bypass fraction for each
+experiment. The mass-flow multiplier, hydraulic resistance and DP1 offset
+must not all be left unconstrained because they can compensate for one
+another, especially in the laminar regime.
+
+### 9.8 Bubble-meter exclusion
+
+The bubble flow-meter tests used to check the manufacturer-factor-adjusted MFC
+values were performed **without the receiver**. The bubble meter also imposed
+its own pressure restriction. Its measured transfer curve characterizes that
+test apparatus, not the installed receiver path, and is excluded from the
+receiver-flow/DP1 calibration.
+
+### 9.9 Verification and present acceptance boundary
+
+V9 hydraulic results remain provisional until all of the following are
+completed:
+
+1. T8 observation and initialization tests pass at 5 mm.
+2. Standard-flow conversion reproduces
+   $\rho_{\mathrm{ref}}\simeq1.200\ \mathrm{kg\,m^{-3}}$.
+3. Mass-flow conservation remains exact while local actual velocity varies
+   with $\rho(T,p)$.
+4. Square-channel pressure loss has the correct units, sign, flow scaling and
+   temperature response.
+5. The cold-$t_0$ DP1 relation is reproduced within its experimental scatter.
+6. A common hydraulic closure is validated on full cooling histories and then
+   on heating histories.
+7. Thermal energy conservation, mesh sensitivity, observation mapping and
+   parameter-identifiability tests continue to pass.
+8. Only after hydraulic validation are the apparent Nusselt parameters
+   recalibrated.
+
+Items 1--5 and the hydraulic part of item 7 were completed on 2026-07-29:
+
+```text
+test/smoke_2D_v9.jl          34/34 passed
+test/check_2D_v9_physics.jl  46/46 passed
+test/check_2D_v9_mesh.jl       2/2 passed
+test/smoke_2D_v8.jl          34/34 passed
+```
+
+The full 15-heating/3-cooling audit is written to
+`summaries/2D_v9/dp1_summary_2D_v9.csv`. With the corrected MFC mass flow fixed
+at `mass_flow_scale = 1`, its endpoint statistics are:
+
+| Comparison | Bias, model-data (mbar) | RMSE (mbar) |
+| :--- | ---: | ---: |
+| 15 heating starts | -0.0159 | 0.0392 |
+| 15 heating final points | -0.4507 | 0.5233 |
+| 3 cooling initial points | -0.4218 | 0.4811 |
+| 3 cooling final points | -0.0336 | 0.0397 |
+
+The mean local channel velocities span 0.3404--1.4701 m/s initially and
+0.3395--2.3111 m/s at the final saved states. These are actual local
+velocities obtained from conserved standard-flow mass and $\rho(T)$, not
+standard volumetric flow divided by channel area.
+
+The cold and cooled endpoints validate the reference-flow conversion and
+linear cold resistance. The systematic hot underprediction means item 6 is
+not complete. A temperature/velocity-dependent common path loss, such as one
+global contraction/expansion coefficient, may be tested using complete
+histories after the v9 thermal state is calibrated. It must be calibrated on
+a subset and validated on held-out runs. An independent flow or bypass
+fraction per experiment remains prohibited, and the global flow scale,
+hydraulic multiplier, DP1 offset and minor-loss coefficient must not all be
+free simultaneously.
+
+The initial implementation assessment above is superseded by the full
+train/validation test in Section 9.10.
+
+### 9.10 Full v9 fitted test and acceptance boundary
+
+#### Calibration/validation separation
+
+Thermal and optical parameters are calibrated on:
+
+```text
+E67, E69, E71, E72, E74, E76, E77, E79, E81
+```
+
+and evaluated without refitting on:
+
+```text
+heating: E68, E70, E73, E75, E78, E80
+cooling: C69, C80, C81
+```
+
+Every irradiance group supplies three training and two validation heating
+cases. The MFC mass-flow multiplier remains fixed at 1.0, and DP1 is excluded
+from the thermal objective.
+
+The 120-evaluation derivative-free fit reduced the objective from 14.4361 to
+10.3625 but returned `MaxIters`. Its vector is
+
+| Parameter | Fitted value | Status |
+| :--- | ---: | :--- |
+| $A_{\mathrm{Nu}}$ | 0.00123739 | fitted |
+| $B_{\mathrm{Re}}$ | 1.44 | independently fixed |
+| $\chi_r$ | 0.180685 | fitted |
+| $\chi_z$ | 0.200000 | active lower bound |
+| $s_{456}$ | 1.050672 | fitted |
+| $s_{304}$ | 1.051748 | fitted |
+| $s_{256}$ | 0.621298 | fitted |
+| $\beta_{\mathrm{rad}}$ | 102.894 1/m | fitted |
+| $\beta_{\mathrm{opt}}$ | 21.2914 1/m | fitted |
+
+#### Incremental hot-path pressure term
+
+The cold empirical multiplier already incorporates the reference-state path
+loss. The fitted hot term must therefore vanish at the reference state to
+avoid double counting:
+
+$$
+DP1_{\mathrm{v9}} =
+p_{0,\mathrm{DP1}}+
+C_{\mathrm{hyd}}\Delta p_{\mathrm{square}}+
+K_{\mathrm{hot}}\left(
+\overline{q_{\mathrm{dyn}}}-
+\overline{q_{\mathrm{dyn,ref}}}
+\right),
+$$
+
+$$
+q_{\mathrm{dyn}}=\frac{\rho(T_g)u(T_g)^2}{2},
+\qquad
+q_{\mathrm{dyn,ref}}=
+\frac{\rho_{\mathrm{ref}}u_{\mathrm{ref}}^2}{2}.
+$$
+
+The ring overbar denotes the same mass-flow-weighted aggregate used for
+receiver pressure. Fitting only $K_{\mathrm{hot}}$ to the nine training DP1
+histories gives
+
+$$
+K_{\mathrm{hot}}=118.479.
+$$
+
+This is a lumped coefficient referenced to channel-end dynamic pressure. Its
+large magnitude is not the minor-loss coefficient of a known elbow,
+contraction or fitting. It includes the unknown tap-to-atmosphere path,
+developing flow and thermal-state discrepancy.
+
+| Phase | Base DP1 RMSE (mbar) | With $K_{\mathrm{hot}}$ (mbar) | Bias with $K_{\mathrm{hot}}$ (mbar) |
+| :--- | ---: | ---: | ---: |
+| Heating training | 0.4398 | 0.1708 | +0.0044 |
+| Held-out heating | 0.4106 | 0.1932 | +0.0113 |
+| Cooling validation | 0.1648 | 0.0958 | -0.0840 |
+
+The transfer to unseen heating and cooling data supports a common hot-path
+correction. It does not identify a bypass or justify changing the MFC mass
+flow.
+
+#### Thermal, spatial and numerical results
+
+| Phase | Mean sensor RMSE (K) | Steady MAE (K) | t90 MAE (s) |
+| :--- | ---: | ---: | ---: |
+| Heating training | 76.21 | 78.72 | 700.65 |
+| Held-out heating | 63.92 | 68.46 | 746.43 |
+| Cooling validation | 34.71 | 15.75 | 535.71 |
+
+The model reproduces 20/21 flow-slope signs, but it predicts the wrong
+core/perimeter sign at both 58 and 107 mm for all 15 heating experiments.
+Full-transient sensitivity has rank 7/8 at a relative cutoff of $10^{-3}$,
+condition number 21461, and $\chi_z$ is bound-active. Consequently, the
+thermal coefficients are not identifiable and validated.
+
+At the fitted point, the E73 maximum sensor change is 5.876 K from coarse to
+nominal mesh and 4.909 K from nominal to fine mesh. The nominal-to-fine DP1
+change is 0.00943 mbar, and the instantaneous energy-rate residual is
+$1.42\times10^{-14}$ W. These results establish numerical convergence and
+conservation, not physical coefficient validity.
+
+Final status: **v9 implementation and temperature-dependent velocity PASS;
+cold hydraulic constraint PASS; common hot DP1 prediction PROVISIONAL PASS;
+thermal coefficient extraction FAIL**.
+
+The completed post-processing set is under `summaries/2D_v9/plots/` and
+contains steady-temperature and DP1 parity figures, one four-panel transient
+figure for each of the 18 experiments, 15 heating axial profiles, 15 final 2D
+temperature fields and the fitted identifiability-correlation heat map.

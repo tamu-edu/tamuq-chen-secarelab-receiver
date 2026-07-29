@@ -61,6 +61,12 @@ experiment_metadata = NamedTuple{
     Tuple{String,Symbol,Float64,Float64,Float64,Float64},
 }[]
 
+hydraulic_t0_metadata = NamedTuple{
+    (:simulation_id, :phase, :flow_lpm, :dp1_mbar,
+     :T3_K, :Tsolid_mean_K, :Tamb_K, :window_s),
+    Tuple{String,Symbol,Float64,Float64,Float64,Float64,Float64,Float64},
+}[]
+
 function decimate_vector(values, step=dec)
     indices = unique(vcat(collect(1:step:length(values)), length(values)))
     return Float64.(values[indices])
@@ -69,7 +75,9 @@ end
 function read_receiver_file(filename)
     path = joinpath(raw_data_path, filename * ".csv")
     isfile(path) || error("Experimental file not found: $path")
-    selected = (2, 7, 8, 9, 10, 36, 37, 42, 43, 44, 45, 46, 49, 50)
+    # DP1 is appended so the established temperature-column indices remain
+    # unchanged. DP1 is a flush-wall gauge tap referenced to atmosphere.
+    selected = (2, 7, 8, 9, 10, 36, 37, 42, 43, 44, 45, 46, 49, 50, 17)
     rows = Vector{Vector{Float64}}()
     open(path, "r") do io
         first_line = true
@@ -94,6 +102,30 @@ end
 function import_receiver_experiment!(target, id, filename, irradiance, phase)
     data = read_receiver_file(filename)
 
+    t0_limit = data[1, 1] + 10.0
+    t0_last = something(findlast(t -> t <= t0_limit, view(data, :, 1)), 1)
+    t0_rows = 1:t0_last
+    t0_flow = mean(data[t0_rows, 2] .+ data[t0_rows, 3] .+
+                   data[t0_rows, 4] .+ data[t0_rows, 5])
+    t0_dp1 = mean(data[t0_rows, 15])
+    t0_T3 = mean(data[t0_rows, 7]) + 273.15
+    t0_Tsolid = mean((
+        mean(data[t0_rows, 8]), mean(data[t0_rows, 9]),
+        mean(data[t0_rows, 10]), mean(data[t0_rows, 11]),
+        mean(data[t0_rows, 12]),
+    )) + 273.15
+    t0_Tamb = 0.5 * (mean(data[t0_rows, 13]) + mean(data[t0_rows, 14])) + 273.15
+    push!(hydraulic_t0_metadata, (
+        simulation_id=id,
+        phase=phase,
+        flow_lpm=Float64(t0_flow),
+        dp1_mbar=Float64(t0_dp1),
+        T3_K=Float64(t0_T3),
+        Tsolid_mean_K=Float64(t0_Tsolid),
+        Tamb_K=Float64(t0_Tamb),
+        window_s=Float64(data[t0_last, 1] - data[1, 1]),
+    ))
+
     time = decimate_vector(data[:, 1])
     time .-= time[1]
     T2 = decimate_vector(data[:, 6]) .+ 273.15
@@ -105,6 +137,7 @@ function import_receiver_experiment!(target, id, filename, irradiance, phase)
     T12 = decimate_vector(data[:, 12]) .+ 273.15
     T15 = decimate_vector(data[:, 13]) .+ 273.15
     T16 = decimate_vector(data[:, 14]) .+ 273.15
+    DP1 = decimate_vector(data[:, 15])
 
     # The four controllers all carry air despite their inherited gas labels.
     flow_full = data[:, 2] .+ data[:, 3] .+ data[:, 4] .+ data[:, 5]
@@ -119,7 +152,8 @@ function import_receiver_experiment!(target, id, filename, irradiance, phase)
         ("_Tavg", T_avg), ("_Tavg_v4", T_avg_v4), ("_Tf", T3),
         ("_T2", T2), ("_T3", T3), ("_T8", T8), ("_T9", T9),
         ("_T10", T10), ("_T11", T11), ("_T12", T12),
-        ("_flow", flow), ("_Tin", inlet), ("_Tamb", ambient),
+        ("_flow", flow), ("_DP1", DP1),
+        ("_Tin", inlet), ("_Tamb", ambient),
     )
         push!(target, (simulation_id=id, obs_id=obs_id,
                        time=copy(time), temperatures=Float64.(values)))
