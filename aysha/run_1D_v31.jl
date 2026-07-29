@@ -19,12 +19,15 @@ include("1D_v31.jl")
 begin # runner configuration
     runner_int_v31(name, default) = parse(Int, get(ENV, name, string(default)))
     runner_float_v31(name, default) = parse(Float64, get(ENV, name, string(default)))
+    runner_bool_v31(name, default) =
+        lowercase(get(ENV, name, default ? "true" : "false")) in ("1", "true", "yes", "on")
 
     const RUNNER_PLOT_NODES_v31 = runner_int_v31("RECEIVER1D_v31_RUNNER_PLOT_NODES", default_nodes)
     const RUNNER_FIT_NODES_v31 = runner_int_v31("RECEIVER1D_v31_FIT_NODES", 15)
     const RUNNER_FIT_ITERATIONS_v31 = runner_int_v31("RECEIVER1D_v31_FIT_ITERATIONS", 100)
     const RUNNER_FIT_SECONDS_v31 = runner_float_v31("RECEIVER1D_v31_FIT_SECONDS", 360.0)
     const RUNNER_FIT_STAGE_v31 = Symbol(get(ENV, "RECEIVER1D_v31_FIT_STAGE", "rear"))
+    const RUNNER_WRITE_PLOTS_v31 = runner_bool_v31("RECEIVER1D_v31_WRITE_PLOTS", true)
 
     const RUNNER_OUTPUT_DIR_v31 = joinpath(@__DIR__, "summaries", "1D_v31")
     const RUNNER_PLOT_DIR_v31 = joinpath(RUNNER_OUTPUT_DIR_v31, "plots")
@@ -480,6 +483,7 @@ begin # execution & output generation
         println(io, "objective=$(fit.objective)")
         println(io, "return_code=$(fit.retcode)")
         println(io, "stage=$(RUNNER_FIT_STAGE_v31)")
+        println(io, "write_plots=$(RUNNER_WRITE_PLOTS_v31)")
         println(io, "parameters=$(fit.parameters)")
     end
 
@@ -513,23 +517,27 @@ begin # execution & output generation
             joinpath(RUNNER_OUTPUT_DIR_v31, "flow_slopes_$(variant.name)_1D_v31.csv"),
             steady_results,
         )
-        save_runner_plot_v31(
-            steady_comparison_plot_v31(steady_results; title_suffix=variant.name),
-            "steady_comparison_$(variant.name)_1D_v31.png",
-        )
+        if RUNNER_WRITE_PLOTS_v31
+            save_runner_plot_v31(
+                steady_comparison_plot_v31(steady_results; title_suffix=variant.name),
+                "steady_comparison_$(variant.name)_1D_v31.png",
+            )
+        end
         
         axial_keys = sim_key_heat
         transient_heat_keys = sim_key_heat
         transient_cool_keys = sim_key_cool
         
         for simulation_id in axial_keys
-            save_runner_plot_v31(
-                axial_profile_plot_v31(
-                    simulation_id, variant.params; variant_name=variant.name,
-                    nodes=RUNNER_PLOT_NODES_v31,
-                ),
-                joinpath("axial_profiles", "axial_profile_$(simulation_id)_$(variant.name)_1D_v31.png"),
-            )
+            if RUNNER_WRITE_PLOTS_v31
+                save_runner_plot_v31(
+                    axial_profile_plot_v31(
+                        simulation_id, variant.params; variant_name=variant.name,
+                        nodes=RUNNER_PLOT_NODES_v31,
+                    ),
+                    joinpath("axial_profiles", "axial_profile_$(simulation_id)_$(variant.name)_1D_v31.png"),
+                )
+            end
             write_cell_diagnostics_v31(
                 joinpath(RUNNER_DIAGNOSTIC_DIR_v31, "cell_diagnostics_$(simulation_id)_$(variant.name)_1D_v31.csv"),
                 simulation_id, variant.params; variant_name=variant.name,
@@ -537,24 +545,26 @@ begin # execution & output generation
             )
         end
         
-        for simulation_id in transient_heat_keys
-            save_runner_plot_v31(
-                plot_case_v31(
-                    simulation_id, variant.params; is_cooling=false,
-                    variant_name=variant.name, nodes=RUNNER_PLOT_NODES_v31,
-                ),
-                joinpath("transients", "transient_$(simulation_id)_$(variant.name)_1D_v31.png"),
-            )
-        end
-        
-        for simulation_id in transient_cool_keys
-            save_runner_plot_v31(
-                plot_case_v31(
-                    simulation_id, variant.params; is_cooling=true,
-                    variant_name=variant.name, nodes=RUNNER_PLOT_NODES_v31,
-                ),
-                joinpath("transients", "transient_$(simulation_id)_$(variant.name)_cooling_1D_v31.png"),
-            )
+        if RUNNER_WRITE_PLOTS_v31
+            for simulation_id in transient_heat_keys
+                save_runner_plot_v31(
+                    plot_case_v31(
+                        simulation_id, variant.params; is_cooling=false,
+                        variant_name=variant.name, nodes=RUNNER_PLOT_NODES_v31,
+                    ),
+                    joinpath("transients", "transient_$(simulation_id)_$(variant.name)_1D_v31.png"),
+                )
+            end
+
+            for simulation_id in transient_cool_keys
+                save_runner_plot_v31(
+                    plot_case_v31(
+                        simulation_id, variant.params; is_cooling=true,
+                        variant_name=variant.name, nodes=RUNNER_PLOT_NODES_v31,
+                    ),
+                    joinpath("transients", "transient_$(simulation_id)_$(variant.name)_cooling_1D_v31.png"),
+                )
+            end
         end
     end
 

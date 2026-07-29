@@ -1,0 +1,13 @@
+index,name,value,fitted
+1,A_Nu,5.975874081499714,true
+2,B_Re,1.790480345034612,true
+3,k_scale_r,0.13354763409921142,true
+4,k_scale_z,0.3005515707418088,true
+5,sigma_beam_mm,14.0,false
+6,spillage_fraction,0.1,false
+7,scale_456,0.8972646215842248,true
+8,scale_304,0.8941175900527165,true
+9,scale_256,0.6334456721724213,true
+10,beta_rad,211.29992700286405,true
+11,receiver_felt_contact_resistance_m2K_W,0.001,false
+12,beta_opt,300.0,true
