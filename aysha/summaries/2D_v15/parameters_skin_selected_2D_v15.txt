@@ -1,0 +1,6 @@
+objective=6.002044443343922
+skin_thickness_mm=0.05
+channel_conductance_scale=1.0
+mid_sign_correct_training=0/9
+deep_sign_correct_training=0/9
+all_v14_parameters_frozen=true

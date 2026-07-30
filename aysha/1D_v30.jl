@@ -165,31 +165,31 @@ end
 # Default v30 parameter vector p[1:25]
 begin # v30 parameter values and bounds
     pnew_v30 = [
-        4.950834769461716,  # p[1]  A_Nu (laminar developing prefactor; v27 seed)
-        0.5129939603419841, # p[2]  B_Re (Reynolds exponent bounded 0.0 to 0.6)
+        5.022922293757817,  # p[1]  A_Nu (laminar developing prefactor; v27 seed)
+        0.5133267688838168, # p[2]  B_Re (Reynolds exponent bounded 0.0 to 0.6)
         PRANDTL_EXPONENT_FIXED_v30, # p[3]  C_Pr (= 1/3)
         1.0,                # p[4]  phi_0 (fixed full active flow fraction)
         0.0,                # p[5]  m_rec (flow recruitment exponent)
         1.0,                # p[6]  front_dep (frozen v12a front-cell deposition)
-        1.992841438485846,  # p[7]  scale_456
-        1.9928320327667148, # p[8]  scale_304
-        0.9526974871686773, # p[9]  scale_256
-        15.914856465811004, # p[10] G_core_perim (radial core-perimeter conductance [W/m/K])
-        184.23760905497403, # p[11] C_perim_eff (perimeter participating capacity [J/K])
-        7.075566885526178,  # p[12] k_perim_ref (perimeter axial conductivity at 900K [W/m/K])
+        1.9811828483104401, # p[7]  scale_456
+        1.9873720312526904, # p[8]  scale_304
+        0.9481818340413103, # p[9]  scale_256
+        0.5,                # p[10] G_core_perim (radial core-perimeter conductance [W/m/K])
+        50.0,               # p[11] C_perim_eff (perimeter participating capacity [J/K])
+        5.045319638108573,  # p[12] k_perim_ref (perimeter axial conductivity at 900K [W/m/K])
         184.67243519237965, # p[13] beta_opt [1/m]
-        0.5179144665383333, # p[14] spill_capture (captured spillover fraction)
-        3.639534770463427,  # p[15] beta_perim (perimeter source attenuation [1/m])
-        0.9993102531221113, # p[16] f_core_rear (receiver-rear coupling core fraction)
-        0.10138182079580631,# p[17] flange_scale (rear/flange heat-removal multiplier)
-        6.353118641919998,  # p[18] flange_cool_gain (smooth lamp-off gain)
-        116.75498869515107, # p[19] flange_cool_tau [s]
-        0.033550794144135865,# p[20] k_core_axial_scale
-        79.33493321829668,  # p[21] C_rear_eff (rear/adaptor participating capacity [J/K])
-        1.2597221107178638, # p[22] G_recv_rear (receiver-to-rear conductance [W/K])
-        0.45386213741579845,# p[23] G_rear_tube (rear reservoir to tube conductance [W/K])
-        0.4101471364034885, # p[24] G_rear_cavity (rear reservoir to cavity conductance [W/K])
-        5.0,                # p[25] G_rear_axial (rear rail axial conductance per link [W/K])
+        0.5260985841287006, # p[14] spill_capture (captured spillover fraction)
+        3.627912152679222,  # p[15] beta_perim (perimeter source attenuation [1/m])
+        0.9993134300665368, # p[16] f_core_rear (receiver-rear coupling core fraction)
+        0.10138219425614439,# p[17] flange_scale (rear/flange heat-removal multiplier)
+        6.492594832657662,  # p[18] flange_cool_gain (smooth lamp-off gain)
+        116.51093421165298, # p[19] flange_cool_tau [s]
+        0.02787105475540781,# p[20] k_core_axial_scale
+        50.0,               # p[21] C_rear_eff (rear/adaptor participating capacity [J/K])
+        1.9355656026962773, # p[22] G_recv_rear (receiver-to-rear conductance [W/K])
+        0.22252213606434484,# p[23] G_rear_tube (rear rail to tube conductance [W/K])
+        0.8133555547684154, # p[24] G_rear_cavity (rear rail to cavity conductance [W/K])
+        0.0,                # p[25] G_rear_axial (rear rail axial conductance per link [W/K])
     ]
     lb_full_v30 = [
         0.01,

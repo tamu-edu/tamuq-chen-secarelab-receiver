@@ -1,0 +1,6 @@
+power_scale_456=1.65
+power_scale_304=1.8
+power_scale_256=1.25
+selected_on_nominal_mesh=true
+locally_refined=true
+cooling_parameters_frozen=true

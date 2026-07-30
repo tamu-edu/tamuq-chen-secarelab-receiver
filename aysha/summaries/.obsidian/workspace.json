@@ -186,6 +186,7 @@
   },
   "active": "6bedc788872dd8bf",
   "lastOpenFiles": [
+    "manuscript_incorporation_strategy.md",
     "1D_v30/analysis_results_all_variants_1D_v30.csv",
     "1D_v30/plots/transients/transient_C81_fitted_energy_accounting_cooling_1D_v30.png",
     "1D_v30/plots/transients/transient_C80_fitted_energy_accounting_cooling_1D_v30.png",
@@ -206,7 +207,6 @@
     "1D_v30/diagnostics/cell_diagnostics_E75_fitted_energy_accounting_1D_v30.csv",
     "1D_v30/diagnostics/cell_diagnostics_E74_fitted_energy_accounting_1D_v30.csv",
     "1D_v30/diagnostics/cell_diagnostics_E73_fitted_energy_accounting_1D_v30.csv",
-    "1D_v30/diagnostics/cell_diagnostics_E72_fitted_energy_accounting_1D_v30.csv",
     "1D_v29_strategy_forward.md",
     "2D_v2_theory_manual.md",
     "1D_v27_theory_manual.md",

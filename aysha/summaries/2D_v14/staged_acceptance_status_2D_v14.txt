@@ -1,0 +1,6 @@
+mid_radial_sign_correct=0/15
+deep_radial_sign_correct=0/15
+(phase = "heating_training", mean_sensor_rmse_K = 83.10082035441313, steady_mae_K = 81.40079272203577, t90_mae_s = 630.015873015873, axial_rmse_K = 46.381964365489445, mid_radial_rmse_K = 28.850883509436795, deep_radial_rmse_K = 46.564121840656625, dp1_rmse_mbar = 0.41347487832230023, mean_core_to_side_flow_ratio = 2.8252580804503946, mean_core_to_corner_flow_ratio = 2.808137458969428)
+(phase = "heating_validation", mean_sensor_rmse_K = 81.57082338276474, steady_mae_K = 77.80459095474171, t90_mae_s = 716.6666666666666, axial_rmse_K = 44.2767649900413, mid_radial_rmse_K = 29.70403877516656, deep_radial_rmse_K = 46.72512187786796, dp1_rmse_mbar = 0.28012705284121736, mean_core_to_side_flow_ratio = 2.7657894293161296, mean_core_to_corner_flow_ratio = 2.7491361163958126)
+(phase = "cooling_validation", mean_sensor_rmse_K = 32.73064505335325, steady_mae_K = 36.870345159401765, t90_mae_s = 607.1428571428571, axial_rmse_K = 12.629297414168812, mid_radial_rmse_K = 5.469852109425951, deep_radial_rmse_K = 11.502793657311155, dp1_rmse_mbar = 0.06372090200165681, mean_core_to_side_flow_ratio = 3.3432254137700057, mean_core_to_corner_flow_ratio = 3.367542392265738)
+status=REJECTED_FOR_COEFFICIENT_EXTRACTION

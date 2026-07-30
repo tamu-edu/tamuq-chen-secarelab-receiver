@@ -1,0 +1,5 @@
+(simulation_id = "E67", maximum_final_sensor_change_K = 6.928678920927325, mean_final_sensor_change_K = 3.066514388875776)
+(simulation_id = "E72", maximum_final_sensor_change_K = 3.8496915745440106, mean_final_sensor_change_K = 1.6480091886811985)
+(simulation_id = "E77", maximum_final_sensor_change_K = 2.979021666778749, mean_final_sensor_change_K = 1.517196929813492)
+Test Summary:                              | Pass  Total   Time
+2D v15 selected screen-to-nominal transfer |    2      2  45.6s

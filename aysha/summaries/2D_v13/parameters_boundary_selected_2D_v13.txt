@@ -1,0 +1,5 @@
+objective=4.846168322423694
+side_solid_fraction=0.025
+side_gas_heat_fraction=0.0125
+active_side_conductance_W_K_m=100.0
+side_felt_contact_h_W_m2K=5.0

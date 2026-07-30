@@ -1,0 +1,2 @@
+variant,axial_mean_K,axial_rmse_K,mid_radial_mean_K,mid_radial_rmse_K,deep_radial_mean_K,deep_radial_rmse_K,T3_mae_K,dp1_rmse_mbar,dp1_bias_mbar,slope_rmse_K_per_lpm,mean_core_edge_flow_ratio,max_pressure_equalization_error
+graetz_equal_groove_betaopt110,35.063818661879964,58.16717312028507,-1.008348147814676,25.613398496064896,-0.8825488717157327,38.18897125601341,91.18781877199058,0.4373898923843141,-0.18709174028059827,11.883206897929043,2.0406958254460648,8.936882984880771e-6

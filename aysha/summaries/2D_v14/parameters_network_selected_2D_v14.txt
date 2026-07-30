@@ -1,0 +1,5 @@
+objective=5.9894863257244095
+lateral_conductivity_scale=1.0
+edge_felt_contact_scale=1.0
+beam_sigma_mm=100.0
+v12_heating_parameters_frozen=true

@@ -1,0 +1,16 @@
+index,name,value
+1,A_Nu,2.8
+2,B_Re,0.4
+3,k_scale_r,0.008
+4,k_scale_z,1.5000000000000002
+5,sigma_beam_mm,14.0
+6,spillage_fraction,0.03250000000000001
+7,C_cavity_eff_J_K,301.0
+8,scale_456,0.72
+9,scale_304,0.72
+10,scale_256,0.58
+11,A_entry,1.5
+12,sic_k_temp_scale,1.0
+13,beta_rad,50.0
+14,perim_gap_resistance,1.0
+15,beta_opt,110.0

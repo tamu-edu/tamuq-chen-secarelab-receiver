@@ -1,0 +1,7 @@
+training_objective=1.7204957651521202
+training_primary_rmse_K=25.761546159447366
+holdout_primary_rmse_K=25.50099885523842
+skin_felt_contact_scale=0.3
+felt_conductivity_scale=7.2
+felt_heat_capacity_scale=1.5
+selected_on_nominal_mesh=true

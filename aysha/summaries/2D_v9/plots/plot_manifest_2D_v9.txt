@@ -1,0 +1,6 @@
+temperature_parity=D:\kkakosim\github\tamuq-chen-secarelab-receiver\aysha\summaries\2D_v9\plots\parity\steady_temperature_parity_2D_v9.png
+dp1_parity=D:\kkakosim\github\tamuq-chen-secarelab-receiver\aysha\summaries\2D_v9\plots\parity\dp1_parity_2D_v9.png
+transient_count=18
+axial_profile_count=15
+temperature_field_count=15
+identifiability=D:\kkakosim\github\tamuq-chen-secarelab-receiver\aysha\summaries\2D_v9\plots\diagnostics\identifiability_correlation_2D_v9.png

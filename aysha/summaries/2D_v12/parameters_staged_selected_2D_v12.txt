@@ -1,0 +1,12 @@
+felt_conductivity_scale=1.2
+felt_heat_capacity_scale=1.5
+receiver_adaptor_contact_h_W_m2K=15.0
+side_time_constant_s=180.0
+interior_time_constant_s=60.0
+outlet_time_constant_s=180.0
+interior_wall_fraction=0.8
+beta_opt_1_m=150.0
+heat_transfer_scale=1.2
+power_scale_456=1.25
+power_scale_304=1.05
+power_scale_256=0.77

@@ -1,0 +1,8 @@
+objective=0.43261338096823515
+felt_conductivity_scale=1.0
+felt_heat_capacity_scale=1.3
+receiver_adaptor_contact_h_W_m2K=25.0
+side_time_constant_s=180.0
+interior_time_constant_s=60.0
+outlet_time_constant_s=180.0
+interior_wall_fraction=0.8

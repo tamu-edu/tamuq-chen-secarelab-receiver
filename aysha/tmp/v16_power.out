@@ -1,0 +1,19 @@
+v16 power 456 1/5 loss=2.15911 rmse=106.0K scale=1.5
+v16 power 456 2/5 loss=1.89763 rmse=103.2K scale=1.8
+v16 power 456 3/5 loss=4.8215 rmse=161.3K scale=2.1
+v16 power 456 4/5 loss=10.34456 rmse=233.3K scale=2.4
+v16 power 456 5/5 loss=18.00039 rmse=305.7K scale=2.7
+v16 power 456 selected=1.8, heldout RMSE=89.7K
+v16 power 304 1/5 loss=2.7382 rmse=114.5K scale=1.5
+v16 power 304 2/5 loss=1.75293 rmse=96.0K scale=1.9
+v16 power 304 3/5 loss=3.93921 rmse=145.3K scale=2.3
+v16 power 304 4/5 loss=8.64915 rmse=213.5K scale=2.7
+v16 power 304 5/5 loss=15.36393 rmse=282.8K scale=3.1
+v16 power 304 selected=1.9, heldout RMSE=79.2K
+v16 power 256 1/5 loss=0.66135 rmse=54.6K scale=1.1
+v16 power 256 2/5 loss=0.80195 rmse=68.3K scale=1.4
+v16 power 256 3/5 loss=2.73823 rmse=123.4K scale=1.7
+v16 power 256 4/5 loss=6.23667 rmse=183.0K scale=2.0
+v16 power 256 5/5 loss=11.07201 rmse=241.8K scale=2.3
+v16 power 256 selected=1.1, heldout RMSE=57.3K
+v16 selected power scales = (1.8, 1.9, 1.1)
