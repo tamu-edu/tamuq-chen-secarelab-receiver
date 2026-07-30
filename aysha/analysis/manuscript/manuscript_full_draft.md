@@ -66,9 +66,7 @@ Fifteen heating experiments cover the three irradiance levels at five flow rates
 Temperatures are converted to kelvin and the ambient reference is T_amb = (T15 + T16)/2. The mass flow is ṁ = ρ_std q/60000 with ρ_std = 1.199 kg m⁻³ evaluated at the controller reference conditions. Steady-state values are means over the final 120 s of each run; the residual drift over this window is below 0.5 K and is carried as an uncertainty component. Air properties μ(T), k(T), and c_p(T) are interpolated from standard tabulations between 300 and 1200 K, and gas enthalpy differences are computed as ∫c_p dT rather than c_pΔT.
 
 The wall-temperature profile along the receiver is represented by the three side-wall probes. An energy-representative wall temperature is formed by trapezoidal quadrature of the piecewise-linear profile over the receiver length,
-
 $$\bar T_w = 0.248\,T_8 + 0.365\,T_{12} + 0.387\,T_{11},$$
-
 where the weights are the exact trapezoid coefficients for the probe positions with constant extrapolation to the end faces. The interior probes T9 and T10 are used only for the nonequilibrium metrics of Section 3.2 and enter no other quantity.
 
 ### 3.2 Dimensionless framework
