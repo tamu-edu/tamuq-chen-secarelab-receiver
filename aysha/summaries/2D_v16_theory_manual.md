@@ -115,11 +115,12 @@ damages heating.
 
 The next recommended model change is an axial, not radial, optical
 refinement.  The measured side temperature peaks at 58 mm in 10 of 15
-heating experiments, while v16 peaks at 5 mm in all 15.  A power-conserving
+heating experiments, while v16 predicts T8 at 11 mm above T12 in all 15.
+A power-conserving
 two-component axial source should represent near-entrance wall absorption
 plus deeper channel-radiation absorption while retaining the centered radial
 beam.  Its shared source split and deep extinction length should be fitted
-only to the verified 5/58/107 mm axial profiles before radial validation.
+only to the verified 11/58/107 mm axial profiles before radial validation.
 
 ### Power-refit correction
 
@@ -139,17 +140,18 @@ itself.
 
 The completed refit selected group multipliers of 1.65, 1.80, and 1.25 for
 the 456, 304, and 256 kW/m2 groups, respectively.  Held-out mean sensor RMSE
-improved from the frozen-power value of 124.91 K to 61.46 K.  The corrected
+improved from the frozen-power value of 124.91 K to approximately 61 K.  The
+corrected
 parity plot now places heating points on both sides of the 1:1 line.
 
 Spatial errors did not improve:
 
-- held-out axial RMSE: 107.75 K;
+- held-out axial RMSE: 110.54 K;
 - held-out mid-radial RMSE: 43.72 K;
 - held-out deep-radial RMSE: 55.70 K;
 - correct radial signs: 0/15 at both depths.
 
-For E72, refitted side temperatures are about 688, 648, and 599 K at 5, 58,
+For E72, refitted side temperatures are about 690, 648, and 599 K at 11, 58,
 and 107 mm, while the measurements are 738, 798, and 734 K.  Refitting total
 power corrects much of the temperature level but makes the incorrect
 front-loaded axial slope more evident.
@@ -158,3 +160,38 @@ Accordingly, the final v16 rejection is not based on unrefitted power.  The
 power correction was necessary and successful for absolute level; the
 remaining failure is spatial, mesh-sensitive, and consistent with an
 inadequate single-component axial absorption law.
+
+### T8-coordinate correction and complete refit
+
+The position of T8 was subsequently reconfirmed as 11 mm, not 5 mm.  The v16
+dependency chain now uses 11 mm in the cooling initial field, exterior-skin
+observation, validation metrics, and axial plots.  The nominal cooling
+candidate ranking, local power calibration, 256-group confirmation, complete
+121-point validation, and mesh test were rerun.
+
+The fitted values did not change:
+
+- skin/felt contact scale: 0.30;
+- felt conductivity scale: 7.20;
+- felt heat-capacity scale: 1.50; and
+- power scales: 1.65, 1.80, and 1.25.
+
+The authoritative corrected validation is:
+
+| Metric | Heating training | Heating held out | Cooling |
+|---|---:|---:|---:|
+| mean sensor RMSE (K) | 65.32 | 61.16 | 33.75 |
+| steady MAE (K) | 54.69 | 49.65 | 28.09 |
+| t90 MAE (s) | 810.2 | 877.4 | 892.9 |
+| axial RMSE (K) | 107.94 | 110.54 | 8.00 |
+| mid-radial RMSE (K) | 42.58 | 43.72 | 5.06 |
+| deep-radial RMSE (K) | 55.30 | 55.70 | 12.60 |
+| DP1 RMSE (mbar) | 0.250 | 0.181 | 0.052 |
+
+Relative to the 5 mm observation, held-out overall RMSE improves by 0.30 K,
+axial RMSE worsens by 2.78 K, and cooling RMSE worsens by 0.16 K.  The
+modeled middle-peak count remains 0/15, both radial signs remain 0/15, the
+felt conductivity remains at its extended upper bound, and the E72 mesh
+change remains 36.61 K.  The position correction is therefore necessary for
+geometric correctness but does not change the v16 rejection or the next-model
+physics diagnosis.

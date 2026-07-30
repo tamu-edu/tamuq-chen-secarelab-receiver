@@ -86,14 +86,17 @@ The model must respect the regime analysis before any new term is introduced.
 | slow mode | `C_eff=301 +/- 23 J/K`; `K_loss=0.10--0.16 W/K` | hardware/felt storage and losses must emerge from physical inventories and global contacts |
 | power ratio | 262--1665 kJ/kg | use as an operating coordinate and shape diagnostic, not as an extra free law |
 
-### Verified T8-position correction in the manuscript reduction
+### Verified T8 position and wall quadrature
 
-The current manuscript text and experimental reduction scripts still state
-`z_T8=11 mm` and use wall weights `(0.248, 0.365, 0.387)`.  The verified
-positions are 5, 58, and 107 mm.  With constant extrapolation to the 0 and
-137 mm end faces, the exact piecewise-linear quadrature is
+The correct side-wall positions are 11, 58, and 107 mm, as stated in the
+manuscript.  V9--v16 had incorrectly moved the T8 model observation to 5 mm.
+This is corrected in the v16 dependency chain and all post-v16 work.
 
-`Tbar_w = 0.229927 T8 + 0.372263 T12 + 0.397810 T11`.
+The manuscript reduction uses wall weights `(0.248, 0.365, 0.387)`.  If
+constant extrapolation to the 0 and 137 mm end faces and a piecewise-linear
+wall profile are intended, the exact 11/58/107 mm quadrature is
+
+`Tbar_w = 0.251825 T8 + 0.350365 T12 + 0.397810 T11`.
 
 A direct deterministic sensitivity calculation from
 `steady_state_metrics.csv` gives:
@@ -101,16 +104,13 @@ A direct deterministic sensitivity calculation from
 | reduction | apparent Nu law | `r2` | inversion `epsilon*` at 456 / 304 / 256 kW/m2 |
 |---|---|---:|---|
 | current manuscript weights | `3.0768e-4 Re^1.4435` | 0.9713 | 0.6712 / 0.6714 / 0.6258 |
-| corrected 5/58/107 mm weights | `3.2204e-4 Re^1.4327` | 0.9722 | 0.6729 / 0.6729 / 0.6283 |
+| exact 11/58/107 mm weights | `3.1044e-4 Re^1.4428` | 0.9710 | 0.6730 / 0.6732 / 0.6280 |
 
 Thus the principal nondimensional conclusions are robust: the apparent
 exchange remains far below duct theory, the exponent remains strongly
 superlinear, and the inversion remains near two-thirds effectiveness.
-Nevertheless, the manuscript text, main reduction, uncertainty propagation,
-figures, and reported rounded values must be regenerated consistently before
-the corrected values become the formal model acceptance targets.  Until then,
-the table above records both conventions and no model should exploit their
-small difference.
+The small weight difference should be reconciled when the manuscript pipeline
+is next regenerated, but it does not alter any model-selection decision.
 
 Two distinctions are mandatory:
 
@@ -135,7 +135,7 @@ All candidates start from the following audited foundation:
 - local `rho(T)`, `mu(T)`, `cp(T)`, and `k_g(T)`;
 - common-pressure channel flow, with no fitted bypass fraction;
 - centered radial illumination;
-- verified side-wall axial positions 5, 58, and 107 mm in the model-data map;
+- verified side-wall axial positions 11, 58, and 107 mm in the model-data map;
 - exterior-wall observation for the shallow-dip side thermocouples;
 - solid alumina adaptor with only receiver and tube openings;
 - continuous but non-firm receiver/felt contact;
@@ -151,8 +151,7 @@ not as an experiment-specific correction.
 
 ### Stage 0 -- invariant evaluator before further fitting
 
-First correct the experimental manuscript pipeline to 5/58/107 mm, regenerate
-its uncertainty intervals and figures, and freeze the revised invariant table.
+Freeze the 11/58/107 mm coordinates and a single documented wall quadrature.
 Then build one post-processor that applies those exact definitions to every
 candidate and data split:
 
@@ -294,7 +293,7 @@ Existing information is assigned once:
 
 - cold `t0` DP1 plus MFC flow: hydraulic identification;
 - hot DP1: hydraulic/property validation;
-- normalized 5/58/107 mm side profiles: axial-radiation identification;
+- normalized 11/58/107 mm side profiles: axial-radiation identification;
 - 58/107 mm interior-to-side deficits: LTNE/radial validation;
 - cooling training cases: contact, storage, and loss identification;
 - held-out cooling and all heating transients: transient validation;

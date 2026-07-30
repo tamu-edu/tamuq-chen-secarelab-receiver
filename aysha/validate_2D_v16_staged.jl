@@ -274,6 +274,10 @@ function run_validation_2D_v16(; max_points=121)
         OUTPUT_DIR_2D_v16,
         "staged_acceptance_status_2D_v16.txt",
     ), "w") do io
+        println(
+            io, "t8_position_mm=",
+            1000.0 * V16.V11.SIDE_TC_FRONT_Z_2D,
+        )
         println(io, "primary_cooling_rmse_K=", primary_cooling_rmse)
         println(io, "t2_cooling_rmse_K=", t2_cooling_rmse)
         println(io, "cooling_fit_useful=", cooling_fit_useful)
@@ -396,7 +400,7 @@ function run_validation_2D_v16(; max_points=121)
             linewidth=2,
         )
         scatter!(
-            axial, [5.0, 58.0, 107.0],
+            axial, [11.0, 58.0, 107.0],
             case.observed[end, 1:3];
             label="measured side TCs", color=:black,
         )

@@ -3026,16 +3026,16 @@ The corrected 121-point validation is:
 
 | Metric | Heating training | Heating held out | Cooling |
 |---|---:|---:|---:|
-| mean sensor RMSE (K) | 65.62 | 61.46 | 33.59 |
-| steady MAE (K) | 54.94 | 50.04 | 27.92 |
-| t90 MAE (s) | 810.2 | 875.0 | 892.9 |
-| axial RMSE (K) | 106.70 | 107.75 | 9.25 |
+| mean sensor RMSE (K) | 65.32 | 61.16 | 33.75 |
+| steady MAE (K) | 54.69 | 49.65 | 28.09 |
+| t90 MAE (s) | 810.2 | 877.4 | 892.9 |
+| axial RMSE (K) | 107.94 | 110.54 | 8.00 |
 | mid-radial RMSE (K) | 42.58 | 43.72 | 5.06 |
 | deep-radial RMSE (K) | 55.30 | 55.70 | 12.60 |
 | DP1 RMSE (mbar) | 0.250 | 0.181 | 0.052 |
 
 Refitting power reduces held-out mean sensor RMSE from the frozen-power
-124.91 K to 61.46 K.  The updated parity plot therefore has heating points
+124.91 K to approximately 61 K.  The updated parity plot therefore has heating points
 on both sides of the 1:1 line instead of systematic heating underprediction.
 Distinct markers are now used for training heating, held-out heating, and
 cooling so the regimes cannot be confused.
@@ -3043,13 +3043,13 @@ cooling so the regimes cannot be confused.
 This improvement strengthens, rather than removes, the spatial diagnosis.
 The extra power magnifies the wrong axial shape:
 
-- held-out axial RMSE increases from 83.91 to 107.75 K;
+- held-out axial RMSE increases from 83.91 to 110.54 K;
 - held-out mid/deep radial RMSE become 43.72/55.70 K;
 - both radial signs remain 0/15 correct; and
-- the modeled side maximum remains at 5 mm in 15/15 cases.
+- modeled T8 at 11 mm remains above T12 in 15/15 cases.
 
 For E72, the power-refitted model predicts side temperatures of approximately
-688/648/599 K at 5/58/107 mm, compared with measured
+690/648/599 K at 11/58/107 mm, compared with measured
 738/798/734 K.  Total temperature level is much closer, but the model still
 cools monotonically downstream instead of reaching the measured middle
 maximum.  The power-refitted E72 screen-to-nominal change also rises to
@@ -3111,7 +3111,7 @@ credit.
 The revised staged plan is:
 
 1. build a common evaluator for the manuscript invariants before more fitting;
-2. v17A: identify axial radiation/source shape from normalized 5/58/107 mm
+2. v17A: identify axial radiation/source shape from normalized 11/58/107 mm
    profiles, with lamp-group power factors nested only for absolute level;
 3. replace a successful empirical split by a conservative physical radiation
    closure;
@@ -3142,32 +3142,73 @@ simultaneously.
 The complete current strategy is recorded in
 `summaries/manuscript_2D_readiness_strategy.md`.
 
-### Manuscript T8-coordinate sensitivity found during the strategy audit
+### Final T8 correction: 11 mm and complete v16 rerun
 
-The manuscript draft and its Python dimensionless/uncertainty scripts still
-state `T8=11 mm` and use wall-profile weights
-`(0.248, 0.365, 0.387)`, despite the later verified location of 5 mm used by
-the 2D model.  For constant end extrapolation and a piecewise-linear wall
-profile over 137 mm, the exact weights for 5/58/107 mm are:
+The final apparatus correction is that T8 is at 11 mm, as stated in the
+manuscript, not at the 5 mm coordinate introduced into v9--v16.  The earlier
+5 mm journal statements are superseded.
 
-```text
-Tbar_w = 0.229927 T8 + 0.372263 T12 + 0.397810 T11.
-```
-
-A deterministic recalculation from the saved steady metrics gives:
+For constant end extrapolation and a piecewise-linear wall profile, the exact
+11/58/107 mm quadrature is:
 
 ```text
-old: Nu_app = 3.0768e-4 Re^1.4435, r2=0.9713
-new: Nu_app = 3.2204e-4 Re^1.4327, r2=0.9722
-
-old epsilon* = 0.6712 / 0.6714 / 0.6258
-new epsilon* = 0.6729 / 0.6729 / 0.6283
+Tbar_w = 0.251825 T8 + 0.350365 T12 + 0.397810 T11.
 ```
 
-The dimensionless physical conclusions are therefore robust to the coordinate
-correction, but the manuscript reduction and Monte Carlo uncertainty analysis
-must be regenerated consistently before the corrected rounded values are
-frozen.  This correction is now the first action in Stage 0 of the v17
-strategy; the manuscript file itself was not partially edited because doing so
-without regenerating all dependent values and figures would create an
-internally inconsistent draft.
+The manuscript's current rounded weights give
+`Nu_app=3.0768e-4 Re^1.4435`; exact positional weights give
+`3.1044e-4 Re^1.4428`.  The three inversion effectiveness values move only
+from `0.6712/0.6714/0.6258` to `0.6730/0.6732/0.6280`.  The dimensionless
+regime and invariant conclusions are unchanged.
+
+The code correction uses one shared `SIDE_TC_FRONT_Z_2D=11 mm` in the v11
+initial-field and observation implementation inherited by v14--v16.  V14 and
+v15 observations and v16 plot coordinates use that constant.  The following
+were rerun at the nominal mesh:
+
+1. no-refit 5-to-11 mm observation sensitivity;
+2. nominal cooling candidate re-ranking and held-out C81;
+3. local power fits for all three irradiance groups;
+4. the 256-group internal-minimum confirmation;
+5. complete 15-heating/3-cooling validation and all plots; and
+6. the screen-to-nominal mesh test.
+
+The fitted values are identical to the earlier selections:
+
+```text
+skin/felt contact scale = 0.30
+felt k scale            = 7.20
+felt Cp scale           = 1.50
+power scales            = 1.65 / 1.80 / 1.25
+```
+
+The corrected complete validation is:
+
+| Metric | Heating training | Heating held out | Cooling |
+|---|---:|---:|---:|
+| mean sensor RMSE (K) | 65.32 | 61.16 | 33.75 |
+| steady MAE (K) | 54.69 | 49.65 | 28.09 |
+| t90 MAE (s) | 810.2 | 877.4 | 892.9 |
+| axial RMSE (K) | 107.94 | 110.54 | 8.00 |
+| mid-radial RMSE (K) | 42.58 | 43.72 | 5.06 |
+| deep-radial RMSE (K) | 55.30 | 55.70 | 12.60 |
+| DP1 RMSE (mbar) | 0.250 | 0.181 | 0.052 |
+
+Compared with observing the same solved fields at 5 mm, held-out overall RMSE
+improves by 0.30 K, axial RMSE worsens by 2.78 K, and cooling RMSE worsens by
+0.16 K.  The T8 prediction moves by only -6.63 to +7.11 K across heating
+cases.  For E72 it moves from 687.74 to 690.43 K, while the observed value is
+737.66 K.
+
+The decisive results do not move:
+
+- the refitted power factors are unchanged;
+- the nonphysical felt conductivity remains at its extended bound;
+- the model still predicts T8 above T12 in all 15 heating cases;
+- both radial signs remain 0/15;
+- the E72 mesh change remains 36.61 K; and
+- v16 remains rejected for coefficient extraction.
+
+Therefore the 11 mm correction is important for geometric accuracy and
+reporting, but it does not change the investigation lessons or the v17
+axial-radiation-then-rear-manifold strategy.

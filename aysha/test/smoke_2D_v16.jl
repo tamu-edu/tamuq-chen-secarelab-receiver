@@ -4,6 +4,10 @@ using Statistics
 include(joinpath(@__DIR__, "..", "2D_v16.jl"))
 using .Receiver2D_v16
 
+@testset "2D v16 verified T8 coordinate" begin
+    @test Receiver2D_v16.V11.SIDE_TC_FRONT_Z_2D == 11.0e-3
+end
+
 function with_contact_2D_v16(p, contact)
     skin = SkinParameters2D(
         thickness=p.skin.thickness,

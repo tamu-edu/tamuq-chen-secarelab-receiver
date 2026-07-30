@@ -1283,8 +1283,8 @@ end
 function sensor_predictions2D(result::SimulationResult2D)
     obs = result.parameters.observation
     time = result.time
-    side5 = _sample_channel2D(
-        result, result.side_group, 5e-3,
+    side11 = _sample_channel2D(
+        result, result.side_group, V11.SIDE_TC_FRONT_Z_2D,
     )
     side58 = _sample_channel2D(
         result, result.side_group, 58e-3,
@@ -1316,7 +1316,7 @@ function sensor_predictions2D(result::SimulationResult2D)
     T2 = _sample_outer2D(result, rT2, 58e-3)
     return (
         T8=V12._filter_observation(
-            time, side5, obs.side_time_constant_s,
+            time, side11, obs.side_time_constant_s,
         ),
         T12=V12._filter_observation(
             time, side58, obs.side_time_constant_s,
