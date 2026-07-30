@@ -1,0 +1,18 @@
+v16 power refine 456 1/4 loss=1.58823 scale=1.65
+v16 power refine 456 2/4 loss=1.70192 scale=1.75
+v16 power refine 456 3/4 loss=2.18164 scale=1.85
+v16 power refine 456 4/4 loss=3.00208 scale=1.95
+v16 refined 456=1.65, heldout=87.1K
+v16 power refine 304 1/5 loss=1.80011 scale=1.7
+v16 power refine 304 2/5 loss=1.6719 scale=1.8
+v16 power refine 304 3/5 loss=1.75293 scale=1.9
+v16 power refine 304 4/5 loss=2.03065 scale=2.0
+v16 power refine 304 5/5 loss=2.49399 scale=2.1
+v16 refined 304=1.8, heldout=82.5K
+v16 power refine 256 1/5 loss=2.09129 scale=0.85
+v16 power refine 256 2/5 loss=1.34031 scale=0.95
+v16 power refine 256 3/5 loss=0.82959 scale=1.05
+v16 power refine 256 4/5 loss=0.54943 scale=1.15
+v16 power refine 256 5/5 loss=0.49194 scale=1.25
+v16 refined 256=1.25, heldout=46.8K
+v16 refined power scales = (1.65, 1.8, 1.25)

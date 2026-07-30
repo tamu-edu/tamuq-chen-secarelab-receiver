@@ -5,17 +5,20 @@ include(joinpath(@__DIR__, "..", "validate_2D_v16_staged.jl"))
 
 @testset "2D v16 selected screen-to-nominal transfer" begin
     selected = _selected_cooling_2D_v16()
+    power_scales = _selected_power_2D_v16()
     nominal = parameters_2D_v16(
         nominal_mesh=true,
         skin_felt_contact_scale=selected.contact,
         felt_conductivity_scale=selected.felt_k,
         felt_heat_capacity_scale=selected.felt_cp,
+        power_scales=power_scales,
     )
     screen = parameters_2D_v16(
         nominal_mesh=false, screen_mesh=true,
         skin_felt_contact_scale=selected.contact,
         felt_conductivity_scale=selected.felt_k,
         felt_heat_capacity_scale=selected.felt_cp,
+        power_scales=power_scales,
     )
     rows = NamedTuple[]
     for id in ("C69", "C81", "E72")

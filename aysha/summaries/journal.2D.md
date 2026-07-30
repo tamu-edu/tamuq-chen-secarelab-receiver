@@ -2888,7 +2888,7 @@ The definitive screen-to-nominal comparison also fails:
 |---|---:|
 | C69 | 28.68 K |
 | C81 | 11.60 K |
-| E72 | 23.67 K |
+| E72 | 36.61 K after the power refit |
 
 Thus the v16 cooling coefficients cannot be reported as mesh-stable
 macroscopic properties.
@@ -2964,3 +2964,104 @@ parity or cooling.
 Definitive artifacts are under `summaries/2D_v16/`; the 49 nonempty plots
 include parity, 18 temporal comparisons, 15 axial profiles, and 15 channel
 maps.
+
+### V16 correction: phase-resolved parity and required power refit
+
+The initial v16 parity figure can be misread because it pools three different
+phases and all seven sensors on one set of axes.  Its x-axis is observed
+temperature and its y-axis is modeled temperature.  The apparent
+overprediction near the lower-left is primarily cooling:
+
+- final cooling errors are positive for every sensor on average;
+- heating receiver and gas sensors are strongly negative;
+- heating T2 is the main positive-error exception.
+
+For held-out heating, mean final errors range from approximately -117 K for
+T10 to -238 K for T12, while T2 is about +15 K.  For cooling, mean final
+errors are about +4 to +52 K.  Thus the transient heating underprediction and
+the parity plot are consistent; the pooled plot contains both regimes.
+
+More importantly, v16 retained the v14 irradiance multipliers
+`(1.25, 1.2075, 0.8855)` while changing the felt conductivity and skin/felt
+loss path.  That freeze was appropriate for testing whether a cooling-only
+fit transferred without help, but it does not constitute a fully refitted
+heating model.  The earlier v16 heating metrics must therefore be labeled
+**frozen-power diagnostics**, not the final optimized v16 heating result.
+
+Before changing the axial source shape, v16 will receive one corrective
+calibration stage:
+
+1. freeze the nominally selected cooling parameters
+   `(contact, felt-k, felt-Cp) = (0.3, 7.2, 1.5)`;
+2. use the nominal mesh because the screen mesh failed transfer;
+3. fit one shared irradiance multiplier for each experimental irradiance
+   group using only its heating-training experiments;
+4. fit absolute temperature level using T8/T12/T11/T9/T10/T3, with T2 as a
+   low-weight guard;
+5. evaluate E68/E70, E73/E75, and E78/E80 without refitting; and
+6. rerun all cooling cases unchanged.
+
+Only the three group power multipliers may move.  The centered radial beam,
+single Beer-Lambert axial law, Graetz coefficient, hydraulic network, and
+all cooling-derived quantities remain frozen.  Consequently, this stage can
+correct temperature level but cannot be credited with fixing an axial or
+radial profile unless the corresponding held-out differences also improve.
+
+### Completed v16 power refit
+
+The nominal-mesh group fits and local refinements selected:
+
+| Irradiance group | Previous scale | Refitted scale | Held-out receiver RMSE |
+|---|---:|---:|---:|
+| 456 kW/m2 | 1.2500 | 1.65 | 87.1 K |
+| 304 kW/m2 | 1.2075 | 1.80 | 82.5 K |
+| 256 kW/m2 | 0.8855 | 1.25 | 46.8 K |
+
+The 256-group minimum was checked at 1.20, 1.25, 1.30, and 1.35; the complete
+objective has an internal minimum at 1.25.  The fit therefore confirms that
+the heating underprediction was partly a total-power calibration error after
+the v16 loss path changed.
+
+The corrected 121-point validation is:
+
+| Metric | Heating training | Heating held out | Cooling |
+|---|---:|---:|---:|
+| mean sensor RMSE (K) | 65.62 | 61.46 | 33.59 |
+| steady MAE (K) | 54.94 | 50.04 | 27.92 |
+| t90 MAE (s) | 810.2 | 875.0 | 892.9 |
+| axial RMSE (K) | 106.70 | 107.75 | 9.25 |
+| mid-radial RMSE (K) | 42.58 | 43.72 | 5.06 |
+| deep-radial RMSE (K) | 55.30 | 55.70 | 12.60 |
+| DP1 RMSE (mbar) | 0.250 | 0.181 | 0.052 |
+
+Refitting power reduces held-out mean sensor RMSE from the frozen-power
+124.91 K to 61.46 K.  The updated parity plot therefore has heating points
+on both sides of the 1:1 line instead of systematic heating underprediction.
+Distinct markers are now used for training heating, held-out heating, and
+cooling so the regimes cannot be confused.
+
+This improvement strengthens, rather than removes, the spatial diagnosis.
+The extra power magnifies the wrong axial shape:
+
+- held-out axial RMSE increases from 83.91 to 107.75 K;
+- held-out mid/deep radial RMSE become 43.72/55.70 K;
+- both radial signs remain 0/15 correct; and
+- the modeled side maximum remains at 5 mm in 15/15 cases.
+
+For E72, the power-refitted model predicts side temperatures of approximately
+688/648/599 K at 5/58/107 mm, compared with measured
+738/798/734 K.  Total temperature level is much closer, but the model still
+cools monotonically downstream instead of reaching the measured middle
+maximum.  The power-refitted E72 screen-to-nominal change also rises to
+36.61 K, so v16 remains mesh-unstable.
+
+The corrected conclusion is:
+
+- power scaling **did require refitting** and explains much of the absolute
+  heating bias;
+- felt-path parameters remain non-identifiable and mesh-sensitive; and
+- the remaining dominant error is the axial and radial distribution of
+  absorbed energy and heat removal, not insufficient total power.
+
+V16 remains rejected for coefficient extraction, while the evidence for the
+next power-conserving two-component axial source test is stronger.

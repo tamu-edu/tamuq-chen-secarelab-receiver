@@ -120,3 +120,41 @@ two-component axial source should represent near-entrance wall absorption
 plus deeper channel-radiation absorption while retaining the centered radial
 beam.  Its shared source split and deep extinction length should be fitted
 only to the verified 5/58/107 mm axial profiles before radial validation.
+
+### Power-refit correction
+
+The heating metrics above used the v14 group power multipliers unchanged.
+This was a deliberate transfer test, but not a final heating calibration:
+the v16 cooling fit changed the assembly loss path, so the absorbed-power
+multipliers must subsequently be re-identified.
+
+The pooled parity plot contains cooling overprediction at low temperature
+and heating underprediction at high temperature.  It does not contradict
+the heating transient plots.  The corrective stage fits one nominal-mesh
+power multiplier for each irradiance group using training heating cases,
+with all cooling, hydraulic, spatial, and heat-transfer quantities frozen.
+The held-out heating cases and all cooling cases are then rerun.  This stage
+tests absolute power level only; it cannot validate the axial source law by
+itself.
+
+The completed refit selected group multipliers of 1.65, 1.80, and 1.25 for
+the 456, 304, and 256 kW/m2 groups, respectively.  Held-out mean sensor RMSE
+improved from the frozen-power value of 124.91 K to 61.46 K.  The corrected
+parity plot now places heating points on both sides of the 1:1 line.
+
+Spatial errors did not improve:
+
+- held-out axial RMSE: 107.75 K;
+- held-out mid-radial RMSE: 43.72 K;
+- held-out deep-radial RMSE: 55.70 K;
+- correct radial signs: 0/15 at both depths.
+
+For E72, refitted side temperatures are about 688, 648, and 599 K at 5, 58,
+and 107 mm, while the measurements are 738, 798, and 734 K.  Refitting total
+power corrects much of the temperature level but makes the incorrect
+front-loaded axial slope more evident.
+
+Accordingly, the final v16 rejection is not based on unrefitted power.  The
+power correction was necessary and successful for absolute level; the
+remaining failure is spatial, mesh-sensitive, and consistent with an
+inadequate single-component axial absorption law.

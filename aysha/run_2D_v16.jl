@@ -29,6 +29,7 @@ function parameters_2D_v16(;
     skin_felt_contact_scale=3.0,
     felt_conductivity_scale=1.20,
     felt_heat_capacity_scale=1.50,
+    power_scales=(1.25, 1.2075, 0.8855),
 )
     source = inherited_parameters_2D_v14(
         nominal_mesh=nominal_mesh, screen_mesh=screen_mesh,
@@ -39,7 +40,7 @@ function parameters_2D_v16(;
     source = rebuild_heating_2D_v14(
         source; beta_opt=100.0, beam_sigma=100e-3,
         heat_scale=1.80,
-        power_scales=(1.25, 1.2075, 0.8855),
+        power_scales=power_scales,
     )
     geometry = _clone_with_2D_v16(V16.Geometry2D, source.geometry)
     solid = _clone_with_2D_v16(V16.SolidProperties2D, source.solid)
@@ -150,4 +151,3 @@ function _write_namedtuples_csv_2D_v16(path, rows)
         end
     end
 end
-

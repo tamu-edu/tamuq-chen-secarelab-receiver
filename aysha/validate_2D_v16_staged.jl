@@ -31,6 +31,26 @@ function _selected_cooling_2D_v16()
     )
 end
 
+function _selected_power_2D_v16()
+    path = joinpath(
+        OUTPUT_DIR_2D_v16,
+        "parameters_power_selected_2D_v16.txt",
+    )
+    isfile(path) || return (1.25, 1.2075, 0.8855)
+    values = Dict{String,Float64}()
+    for line in eachline(path)
+        occursin("=", line) || continue
+        key, raw = split(line, "="; limit=2)
+        value = tryparse(Float64, raw)
+        value === nothing || (values[key] = value)
+    end
+    return (
+        values["power_scale_456"],
+        values["power_scale_304"],
+        values["power_scale_256"],
+    )
+end
+
 function _phase_2D_v16(id, cooling)
     cooling && return "cooling_validation"
     return id in TRAIN_HEATING_2D_v16 ?
@@ -54,11 +74,13 @@ function run_validation_2D_v16(; max_points=121)
     map_dir = joinpath(plot_root, "channel_maps")
     foreach(mkpath, (plot_root, transient_dir, axial_dir, map_dir))
     selected = _selected_cooling_2D_v16()
+    power_scales = _selected_power_2D_v16()
     p = parameters_2D_v16(
         nominal_mesh=true,
         skin_felt_contact_scale=selected.contact,
         felt_conductivity_scale=selected.felt_k,
         felt_heat_capacity_scale=selected.felt_cp,
+        power_scales=power_scales,
     )
     specs = vcat(
         [(id=id, cooling=false) for id in HEATING_IDS_2D_v16],
@@ -263,6 +285,9 @@ function run_validation_2D_v16(; max_points=121)
             io, "parameter_identifiable=",
             parameter_identifiable,
         )
+        println(io, "power_scale_456=", power_scales[1])
+        println(io, "power_scale_304=", power_scales[2])
+        println(io, "power_scale_256=", power_scales[3])
         println(io, "mid_radial_sign_correct=$mid_sign/15")
         println(io, "deep_radial_sign_correct=$deep_sign/15")
         foreach(row -> println(io, row), aggregates)
@@ -281,10 +306,15 @@ function run_validation_2D_v16(; max_points=121)
     parity = plot(
         xlabel="Observed final temperature (K)",
         ylabel="Modeled final temperature (K)",
-        title="2D v16 cooling-identified parity",
+        title="2D v16 cooling + power-refitted parity",
         legend=:topleft, size=(850, 720),
     )
     all_values = Float64[]
+    phase_markers = Dict(
+        "heating_training" => :circle,
+        "heating_validation" => :diamond,
+        "cooling_validation" => :utriangle,
+    )
     for phase in keys(phase_colors)
         xs = Float64[]
         ys = Float64[]
@@ -303,6 +333,7 @@ function run_validation_2D_v16(; max_points=121)
         scatter!(
             parity, xs, ys; label=replace(phase, "_" => " "),
             color=phase_colors[phase], alpha=0.8,
+            marker=phase_markers[phase],
         )
     end
     lo, hi = extrema(all_values)
