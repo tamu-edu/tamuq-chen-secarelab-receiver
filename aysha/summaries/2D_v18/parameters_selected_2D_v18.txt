@@ -1,0 +1,12 @@
+source_model=beer_lambert
+deep_fraction=0.0
+deep_length_m=0.08
+exchange_multiplier=0.05
+power_scale_456=1.05
+power_scale_304=1.23
+power_scale_256=0.84
+felt_conductivity_scale=1.3
+felt_heat_capacity_scale=1.3
+felt_contact_scale=0.30
+selection_mesh=nominal
+T9_T10_in_objective=false

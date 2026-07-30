@@ -1,0 +1,9 @@
+source_model=near_deep
+deep_fraction=0.9
+deep_length_m=0.12
+training_normalized_rmse=0.0325123165833613
+training_recovered_peaks=5
+training_false_peaks=2
+holdout_recovered_peaks=2
+holdout_false_peaks=1
+stageA_pass=false

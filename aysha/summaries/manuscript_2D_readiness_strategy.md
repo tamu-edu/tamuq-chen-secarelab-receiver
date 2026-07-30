@@ -1,4 +1,4 @@
-# 2D model manuscript-readiness strategy after v16
+# 2D model manuscript-readiness strategy after the v17 hardware correction
 
 ## 1. Purpose and current status
 
@@ -16,16 +16,30 @@ admissible roles:
   conductive, radiative, and convective coefficients only after the full
   acceptance gate in Section 8 is passed.
 
-V16 remains in Role A.  After the required power refit its held-out mean-sensor
-RMSE is 61.46 K, but its held-out axial RMSE is 107.75 K, it predicts an
-entrance maximum in all 15 heating cases while 10 experiments peak at 58 mm,
-both radial signs are wrong in all 15 cases, the fitted felt conductivity is
-bound-active and nonphysical, and the result is mesh-sensitive.
+V17 remains in Role A.  It adds the verified rear aluminum-casing/backplate
+contact with the water-cooled flange, restores the felt-conductivity scale to
+1.00, and passes the screen-to-nominal mesh threshold.  It removes the
+systematic heating T2 bias (`+35.62 K` in v16 to `-3.54 K`) and proves that the
+v16 high felt conductivity and high power factors were compensating.
 
-The next objective is therefore not another unconstrained reduction of
-temperature RMSE.  It is a staged, falsifiable reconstruction of the missing
-axial-radiation and rear-manifold physics, judged primarily against the
-manuscript's measured dimensionless invariants.
+It is not a globally improved model.  Held-out heating mean-sensor RMSE is
+97.24 K, T2 timing remains wrong, the 58 mm maximum and both radial signs
+remain 0/15, and two of three power factors fall below independent closure
+brackets.  The casing/flange temperature data reach a high-conductance plateau,
+so the physical path is verified but its finite conductance is not identified.
+
+The manuscript-invariant evaluator changes the immediate diagnosis:
+
+- the apparent-`Nu` exponent already passes (`1.442` modeled versus `1.445`
+  measured);
+- its prefactor is 126% too high;
+- modeled effectiveness is 0.877--0.937 instead of 0.573--0.781; and
+- source shape, exchange magnitude, and power cannot be frozen sequentially
+  without recreating compensation.
+
+The next objective is a bounded joint source/exchange discrimination on a
+numerically adequate baseline, not an unconstrained RMSE reduction and not an
+immediate rear-manifold rewrite.
 
 ## 2. Channel count and exact symmetry reduction
 
@@ -141,127 +155,137 @@ All candidates start from the following audited foundation:
 - continuous but non-firm receiver/felt contact;
 - tube isolated from the felt over the adaptor and flange portions; and
 - physical felt, metal, adaptor, tube, flange, and housing inventories.
+- verified rear aluminum-casing/backplate contact with the water-cooled
+  flange, treated as a high-conductance boundary regime rather than an
+  identified contact coefficient.
 
 The v16 value `k_felt scale = 7.2` is not part of the foundation.  It is a
 rejected compensating fit.  V17 starts from supplier/literature-plausible
 global felt properties and treats their uncertainty as a bounded sensitivity,
 not as an experiment-specific correction.
 
-## 5. Staged next-model strategy
+## 5. Revised v17 strategy after the casing/flange results
 
-### Stage 0 -- invariant evaluator before further fitting
+### Completed Stage H -- verified hardware correction
 
-Freeze the 11/58/107 mm coordinates and a single documented wall quadrature.
-Then build one post-processor that applies those exact definitions to every
-candidate and data split:
+V17-H is complete:
 
-1. apparent `Nu(Re)` prefactor and exponent;
-2. effectiveness and the `T12-T8=0` crossover `epsilon*`;
-3. `Lambda_58` and `Lambda_107(Re)`;
-4. slow eigenvalue, emergent `C_eff`, and `K_loss(T)`;
-5. normalized heating master curves and wall/gas lag;
-6. delivered-power closure and group power factors;
-7. axial peak location, radial signs, temperature RMSE, and DP1 RMSE; and
-8. energy-rate residual and mesh-transfer error.
+- the rear aluminum casing/backplate is conservatively connected to the
+  water-cooled flange;
+- felt conductivity is restored to its nominal physical scale;
+- the heating T2 steady bias is removed;
+- exact energy closure passes; and
+- screen-to-nominal transfer is below 10.11 K on C69/C81/E72.
 
-This evaluator is a prerequisite, not a final clean-up task.
+The conductance is not identifiable above the clamping threshold.  Retain the
+pre-declared 20 W/K plateau value as a fixed numerical boundary choice and
+profile higher values only as uncertainty.  Do not report it as an extracted
+contact coefficient and do not reopen it as a nuisance parameter in every
+later fit.
 
-### Stage 1 -- v17A axial-radiation/source discrimination
+### Stage 0 -- evaluator and numerical precondition
 
-Retain the 15-orbit hydraulics, centered radial field, plausible hardware/felt
-foundation, and all radial parameters.  Change only the axial radiative
-description.
+The Julia evaluator now reports I1--I3 for v16 and v17.  Extend it before model
+selection to include:
 
-Use two substeps:
+1. the slow eigenvalue and emergent `C_eff` and `K_loss(T)`;
+2. normalized heating master curves and wall/gas lag;
+3. delivered-power closure;
+4. exact energy-rate residual; and
+5. nominal-to-refined axial/radial Richardson estimates.
 
-1. **Conservative diagnostic screen.**  Compare the single Beer--Lambert law
-   with a normalized two-component source consisting of near-entry absorption
-   and deeper channel-radiation deposition.  The shared source split and deep
-   length are common to all experiments, nonnegative, and normalized so total
-   core absorbed power is identical for every candidate.  Fit normalized axial
-   differences or profiles first, so group power cannot manufacture the shape.
-2. **Physical replacement.**  If deeper deposition passes the diagnostic,
-   replace the empirical split by a diffuse-gray axial radiosity/view-factor
-   network (or a demonstrably equivalent conservative closure) between channel
-   wall segments and the aperture.  The manuscript's `N_rc=O(1--5)` makes this
-   mechanism physically admissible.  Beer--Lambert extinction, wall
-   emissivity/absorptivity, and any scattering parameter must be global and
-   identifiable.
+Screen-to-nominal transfer now passes, but the nominal-to-refined estimate is
+still required.  Candidate effects smaller than the estimated discretization
+error cannot be ranked as physics.
 
-Profile one nuisance delivered-power multiplier per lamp configuration inside
-each source candidate.  Power factors set absolute level only; the candidate is
-ranked first by axial shape and inversion behavior.  Use the existing
-training/held-out experiment split throughout.
+### Stage 1 -- 2 by 2 source/exchange discrimination
 
-Proceed only if the model:
+The next physical screen changes two coupled axes together:
 
-- reproduces the 58 mm maximum in at least 8 of the 10 observed mid-peak cases;
-- produces a flux-independent crossover consistent with
-  `epsilon*=0.66 +/- 0.03`;
-- reduces held-out axial RMSE below 40 K;
-- improves held-out overall RMSE below the v16 value of 61.46 K; and
-- does not degrade cooling, DP1, conservation, or mesh transfer.
+| axis | baseline | alternative |
+|---|---|---|
+| axial source | current normalized Beer--Lambert deposition | conservative normalized near + deep deposition |
+| wall/gas exchange | current magnitude | one reduced global magnitude |
 
-Failure means that axial source redistribution alone is rejected; do not add
-more source zones.
+This produces four candidates.  The local exchange exponent is fixed: v17
+already gives `Re^1.442` against measured `Re^1.445`.  The alternative changes
+only the global magnitude required to correct the 126% apparent-`Nu`
+prefactor excess and the 0.877--0.937 effectiveness bias.
 
-### Stage 2 -- v17B rear-manifold pressure field
+The two-component source has one shared nonnegative split and one shared deep
+length.  Every source is normalized so identical delivered power is deposited.
+It is initially a diagnostic representation of deeper optical deposition or
+channel-wall reflection, not a published radiation coefficient.
 
-Freeze the accepted Stage-1 radiation law before changing radial hydraulics.
-Replace the independent per-channel rear groove penalty with a conservative
-rear-manifold pressure network:
+One power factor per lamp group is profiled inside every candidate, but it is
+bounded by the independent closure brackets.  Rank candidates primarily on:
 
-- each orbit discharges to a rear pressure node;
-- adjacent rear nodes exchange lateral flow;
-- the centered 13 mm diameter region connects freely to the outlet;
-- the surrounding region crosses the observed groove obstruction; and
-- total MFC mass flow remains conserved.
+- apparent-`Nu` prefactor and exponent;
+- effectiveness range and `epsilon*=0.66 +/- 0.03`;
+- 11/58/107 mm normalized axial shape and middle-peak count;
+- held-out absolute temperatures; and
+- unchanged cooling, conservation, and mesh adequacy.
 
-Because this geometry is centered and radial, the network remains exactly
-D4-symmetric and uses 15 orbit pressures.  Fit at most a small set of global
-hydraulic quantities, preferably one lateral-manifold conductance and one
-groove loss scale.  Cold `t0` DP1 measurements identify the hydraulic scale;
-hot DP1 and the radial temperature trends are validation outputs.  No bypass
-branch is estimated.
+Proceed only if one shared candidate:
 
-The decisive outputs are:
+- brings the apparent-`Nu` magnitude within stated experimental uncertainty
+  without changing the accepted exponent;
+- reproduces at least 8 of the 10 observed 58 mm peaks;
+- produces the inversion crossover without a flux-group switch;
+- reduces held-out axial RMSE below 40 K and held-out overall RMSE below the
+  v16 benchmark of 61.16 K;
+- keeps all three power factors inside their closure brackets; and
+- preserves energy closure and nominal-to-refined transfer.
 
-- radial side/interior signs and their convergence as total flow decreases;
-- the superlinear apparent `Nu(Re)` signature of flow-dependent solid
-  recruitment;
-- hot-channel/low-flow feedback strength; and
-- DP1 across cold and hot cases.
+If source redistribution improves the offset but exchange correction alone
+fixes effectiveness, retain both only if their parameter covariance is finite.
+Failure rejects the two-zone source; do not add more axial zones.
+
+### Stage 2 -- re-evaluate the radial/LTNE observation
+
+The independent assessment's proposed pure-gas re-observation has now been
+tested.  It does not work: wall fractions from zero to one all give 0/15
+correct signs at both depths.  Therefore a simple observation-weight change is
+not the radial solution.
+
+After Stage 1 changes the gas temperature field, rerun the same zero-cost
+blend sensitivity and the `Lambda_58/107(Re)` evaluator.  Only then decide
+between:
+
+1. a thermocouple lead/sheath response model justified by probe geometry;
+2. an assembly-scale radial energy-partition mechanism; or
+3. a rear pressure/manifold model.
+
+The centered 15-orbit rear-manifold formulation remains available, but it is
+deferred.  Implement it only if the corrected source/exchange field still has
+wrong LTNE signs and cold/hot DP1 provides independent leverage.  No bypass
+fraction is fitted.
 
 ### Stage 3 -- transient hardware and loss closure
 
-Only after axial and radial mechanisms pass independently:
+With source and exchange fixed:
 
-- fit global contact/loss quantities to cooling training cases;
-- hold measured material inventories fixed;
-- release any direct `C_eff=301 J/K` prior;
-- verify `C_eff` from the model's slow eigenmode;
-- validate the same parameters on held-out cooling and every heating run; and
-- confirm the normalized master-curve collapse and wall/gas lag.
-
-Felt conductivity and heat capacity may vary only within physically defensible
-global uncertainty ranges.  Boundary-seeking values are evidence of missing
-topology, not measured felt properties.
+- retain measured material inventories;
+- parameterize cooling by identifiable total storage and series `UA`
+  combinations rather than independently fitting contact and felt
+  conductivity in series;
+- release the `C_eff=301 J/K` and `K_loss=0.10--0.16 W/K` priors;
+- test whether those quantities re-emerge from the slow eigenmode;
+- investigate T2 dynamics through distributed aluminum/felt states and the
+  verified thermocouple attachment, not through experiment-specific `Cp`; and
+- validate on C81 and every heating case without phase-specific parameters.
 
 ### Stage 4 -- minimal joint confirmation
 
-Combine only mechanisms that passed their isolated stages.  Refit jointly with:
+Combine only mechanisms that pass their isolated signatures.  Refit jointly
+with shared parameters, bounded group power factors, no experiment-specific
+thermophysical properties, no side-weighted beam, no fitted bypass, and no
+heating/cooling regime switch.
 
-- shared physical transport/radiation/hydraulic parameters;
-- one nuisance power factor per lamp configuration;
-- no experiment-specific thermophysical properties;
-- no side-weighted beam;
-- no fitted bypass fraction; and
-- no heating/cooling regime switch.
-
-Use profile likelihood or an equivalent identifiability test, training/held-out
-experiments, and at least two axial meshes.  Report parameter covariance and
-prediction intervals.  A lower RMSE is insufficient if parameters are
-bound-active or mutually compensating.
+Use profile likelihood or an equivalent identifiability test, the established
+training/held-out splits, and refined-mesh confirmation.  Report parameter
+covariance and prediction intervals.  A lower RMSE is insufficient if a
+coefficient is bound-active or compensating.
 
 ## 6. Power treatment
 
@@ -285,6 +309,12 @@ the manuscript energy-closure brackets:
 Values outside these brackets may be used during a diagnostic screen, but they
 flag unresolved energy accounting and prevent Role B optical-coefficient
 claims.
+
+V17-H selected 1.05/1.00/0.75.  The 456 factor passes, while the 304 and 256
+factors are below their brackets.  This is evidence that restoring physical
+felt conductivity removed the v16 high-power compensation but did not repair
+the inherited source/exchange partition.  In the next 2 by 2 screen the factors
+are bounded by the brackets rather than merely checked afterward.
 
 ## 7. Information use without new experiments
 
@@ -338,20 +368,292 @@ coefficients.
 
 ## 9. Immediate implementation decision
 
-The immediate next calculation is **v17A on the existing 15 D4 orbits**, not a
-100-channel rewrite:
+The immediate next calculation remains on the existing 15 D4 orbits and is
+the Stage-1 **2 by 2 source/exchange screen**:
 
-1. implement the manuscript-invariant evaluator;
-2. document and test exact power conservation for alternative axial source
-   laws;
-3. screen the conservative two-component axial deposition using normalized
-   axial profiles with nested group power factors;
-4. promote it to a physical axial radiosity model only if the screen passes;
-5. freeze the axial result before testing the 15-orbit rear-manifold pressure
-   network.
+1. establish nominal-to-refined numerical error;
+2. implement and test exact power conservation for the two axial source laws;
+3. hold the local exchange exponent fixed and expose one global magnitude;
+4. evaluate all four source/exchange combinations with power factors bounded
+   by independent closure brackets; and
+5. rank on I1 magnitude, I2 effectiveness/inversion, normalized axial shape,
+   held-out temperatures, and numerical adequacy.
 
-This ordering targets the two unresolved observations separately: the wrong
-front-to-middle axial shape first, then the wrong radial flow/temperature
-ordering.  It preserves the study objective of extracting validated
-macroscopic coefficients rather than fitting an increasingly flexible
-temperature interpolator.
+Do not implement the rear-manifold network yet.  Re-run the already coded
+wall/gas observation sensitivity after the source/exchange field is corrected;
+only a remaining radial/LTNE failure can authorize the hydraulic expansion.
+
+This ordering incorporates the verified flange boundary, prevents the rejected
+v16 felt/power loop from returning, and tests source shape and exchange
+magnitude without pretending they are sequentially independent.
+
+## 10. V18 outcome and revised v19 architecture
+
+V18 completed the Stage-1 calculation and rejects the assumed factorization
+of local exchange, optical deposition, and the T3 observation:
+
+- exact source-power and energy-rate closure pass;
+- the C-mesh screen and M-mesh rerank both choose the lower diagnostic
+  exchange multiplier, `m_h=0.05`;
+- all three nested power factors choose the lower edges of their independent
+  closure brackets, `1.05/1.23/0.84`;
+- the M-mesh winner retains Beer--Lambert deposition (`J=3.087`), while the
+  mild near/deep runner has `J=3.135`, a difference below mesh uncertainty;
+- held-out heating primary-five mean RMSE is 71.50 K, with side 82.90 K, T3
+  101.53 K, T2 7.26 K, and axial-inversion RMSE 130.65 K;
+- C81 primary-five mean RMSE is 26.57 K and T2 RMSE is 8.71 K, so the felt/
+  cooling path is not the dominant remaining failure;
+- model apparent `Nu` becomes `0.006107 Re^0.7933` against measured
+  `0.0003047 Re^1.4449`; effectiveness RMSE is 0.188;
+- the selected model has 0/15 middle peaks; and
+- selected-candidate M-to-F history changes are 12.84--20.12 K RMS and up to
+  32.88 K, so the fitted weak-exchange regime also fails numerical adequacy.
+
+The single exchange multiplier must therefore be rejected.  It lowers the
+aggregate T3 error by moving the model into a nearly decoupled limit, but in
+doing so destroys the previously correct emergent flow exponent.  Neither
+`m_h=0.05` nor the upper-bound felt scales are publishable coefficients.
+
+The complete interaction audit supplies a useful non-scalar result.  A
+near/deep candidate with `f_deep=0.60`, `L_deep=50 mm`, and `m_h=0.10`
+reproduces all three representative 58 mm peaks with mean inversion error
+`-2.75 K`.  Its total objective is 5.06 versus 3.18 for the no-peak
+Beer--Lambert candidate.  Thus deeper centered deposition is capable of the
+required axial signature, but the current absolute side/gas/energy balance
+penalizes it strongly.  The correct conclusion is not that deeper deposition
+is falsified; it is that source shape and core--gas balance cannot be selected
+by one composite objective in the present equations.
+
+Across all 15 cases on the C diagnostic mesh, that shape candidate reproduces
+7/10 true peaks but also creates five false peaks.  On heating holdout it
+captures all four true peaks with two false peaks, while axial RMSE remains
+51.02 K, side RMSE 124.65 K, and T3 RMSE 130.46 K.  It is therefore a useful
+v19 source seed, not an accepted v18 source.
+
+### V19 keeps the 15-orbit model
+
+V19 does not abandon the 15 D4 orbits and does not replace them by 25 or 100
+independent fitted channels.  The 15 orbits exactly represent the full 100-
+channel square receiver under the verified symmetry.  They retain:
+
+- conserved MFC mass flow and local temperature-dependent properties;
+- common-pressure hydraulic allocation and the measured groove geometry;
+- physical orbit multiplicities, areas, inventories, and radial locations;
+- the full felt/casing/adaptor/tube/flange assembly; and
+- exact mass, power, and energy ledgers.
+
+What changes is the factorization of the inverse problem.
+
+### V19-A -- identify optical shape from side-profile invariants
+
+Use normalized T8/T12/T11 excess profiles, axial inversion, and their
+flow/power trends as the primary optical/source evidence.  Absolute
+temperature, T3, T9, and T10 do not choose the source in this stage.  Compare:
+
+1. normalized Beer--Lambert deposition; and
+2. the conservative near/deep basis, seeded around the v18 shape-correct
+   region rather than the scalar-objective winner.
+
+Every candidate remains radially centered and preserves delivered power
+exactly.  A near/deep fit remains a diagnostic optical kernel, not an
+extinction coefficient.  It advances only if its middle-peak signature
+transfers across heating holdout and the F mesh.  If supported, replace the
+empirical kernel later by a geometry-based channel ray/reflection calculation;
+do not create a side-weighted beam.
+
+### V19-B -- replace the local multiplier by an integrated conductance law
+
+Do not multiply the current local `h(z)` by another scalar.  Instead separate
+the total receiver wall--gas conductance from its axial distribution:
+
+```text
+UA_total(Re,T) = A_UA Re^n Phi(Tw/Tg, properties),
+hP dz = UA_total phi_Gz(z) dz / integral(phi_Gz dz).
+```
+
+`phi_Gz` is a normalized, finite-asymptote square-channel entry kernel.  The
+gas enthalpy march remains exactly conservative.  `A_UA` and `n` are fitted
+directly to the measured effectiveness/apparent-`Nu` trend with the measured
+`n=1.445` used as an explicit validation target, rather than hoping it
+emerges after a local scale change.  This produces the effective macroscopic
+coefficient sought by the study while avoiding the false interpretation of a
+cell-local Nusselt multiplier.
+
+### V19-C -- separate receiver outlet enthalpy from the T3 probe
+
+The conserved mass-average receiver outlet temperature and the measured T3
+are different model outputs.  T3 sits 3 mm downstream in the alumina tube and
+can exchange with the tube/adaptor while possessing finite bead/sheath
+response.  Add a bounded, global observation model driven by calculated
+outlet gas and local tube temperature.  The minimal admissible form has:
+
+- one equilibrium gas-versus-tube weighting fixed or bounded by probe
+  geometry and flow;
+- one physical response time; and
+- no experiment-specific parameters.
+
+Fit this operator first on C69/C80 and validate it on C81, then test heating.
+If it requires a kilosecond-scale time or a nearly pure tube reading outside
+physical bounds, reject the observation hypothesis.  Do not call the T3-based
+apparent `Nu` a channel coefficient until this check passes.
+
+### V19-D -- assembly nuisance parameters and absolute energy
+
+With optical shape and integrated gas conductance fixed, profile:
+
+- one bounded felt-conductivity scale;
+- one bounded total assembly-storage scale or felt heat-capacity scale; and
+- the three closure-bounded power factors.
+
+Keep felt contact at its established value unless a series-`UA` profile shows
+it is separately identifiable.  Cooling emphasizes side/felt/T3 curves and
+C81 stays untouched.  Heating absolute levels then test the single energy
+partition.  A parameter at a bound is a failed identification, not a reason
+to widen all bounds.
+
+### V19-E -- acceptance sequence
+
+Advance in this order:
+
+1. exact C/M/F transfer for the proposed parameter regime;
+2. side-shape and peak transfer;
+3. measured effectiveness and apparent-`Nu` magnitude/exponent;
+4. physical T3 observation bounds and cooling transfer;
+5. absolute side/felt/air histories with closure-bounded power;
+6. T9/T10 and LTNE as diagnostics; and
+7. joint holdout confirmation and uncertainty.
+
+Each stage retains its own observable gate.  No weighted sum may trade a
+correct axial shape for a wrong gas balance, or a correct felt history for a
+wrong outlet temperature.  The rear manifold and fitted bypass remain
+deferred.
+
+## 11. V19 outcome and post-v19 strategy
+
+V19 implements the proposed factorization, but the experiment rejects every
+stage independently:
+
+- the centered conservative near/deep source recovers only 7/10 observed
+  middle peaks and creates three false peaks;
+- integrated-UA fitting gives good effectiveness but fails apparent-Nu
+  magnitude/transfer, including a constrained acceptance-corner refinement;
+- the rear tube/probe model selects `h_tube-flange`, probe capacity, and stem
+  conductance at grid edges while retaining 73 K training T3 error;
+- cooling chooses lower-bound felt conductivity and heat capacity;
+- all three power factors choose their independent lower closure bounds; and
+- held-out heating primary-five/side/T3 RMSE remains
+  76.30/93.96/89.97 K.
+
+The fitted heating regime is also not mesh robust. M-to-F primary-history RMS
+is 10.51--32.17 K and reaches 51.24 K maximum over heating extremes and
+held-out representatives. Cooling transfer passes. Independent exchange-
+energy closure is below `1.13e-14` relative, and a tight-solver check differs
+by only 0.024 K RMS, so the heating failure is physical/structural plus
+spatial-discretization sensitivity rather than time-integration error.
+
+### Identifiability conclusion
+
+The v19 separation exposes a contradiction in the available information:
+Stage B treats measured T3 as receiver-exit gas to infer `Nu(Re)`, while
+Stage C demonstrates that T3 is strongly affected by an unvalidated
+downstream observation closure. Removing the complete Stage-C branch changes
+heating T3 histories by 31--40 K RMS. With no independent outlet-gas
+measurement and no new experiments possible, a unique point estimate of
+receiver wall--gas `UA` is not identifiable from these data.
+
+This does not invalidate the measured apparent correlation as a data
+reduction. It prevents interpreting its point-fitted prefactor/exponent as a
+validated local or receiver coefficient without conditioning on the T3
+operator.
+
+### Recommended next calculation
+
+Do not start v20 by adding another heat-transfer multiplier, arbitrary bypass,
+side-weighted beam, experiment-specific properties, or a larger joint fit.
+Use a set-valued, two-layer analysis:
+
+1. **Reconcile coordinates and conventions from existing records.** Resolve
+   whether T3 is at global 136 mm, at the receiver exit, or 3 mm into the rear
+   tube. Lock the MFC standard-flow convention, DP1 datum, and all sensor
+   coordinates in one machine-readable geometry table.
+2. **Finish thermodynamic housekeeping.** Replace `cp(T)T` outlet mixing by
+   integral enthalpy and retain the independent C/M/F derivative audit. This
+   should be a small numerical correction, not a new fitted mechanism.
+3. **Fit the plant without T3.** Use cooling side thermocouples and T2 to
+   bound assembly conductance/storage; use heating side profiles and
+   closure-bounded power to bound axial deposition. Keep T9/T10 diagnostic.
+4. **Infer an outlet-temperature interval, not a point.** Propagate a bounded
+   family of physically admissible T3 observation operators (exit versus
+   downstream location, lead sink, tube view) through all records. Report the
+   resulting interval for effectiveness and integrated `UA(Re)`.
+5. **Test identifiability.** A publishable coefficient requires the UA
+   interval to be narrower than experimental/model uncertainty and stable
+   under held-out cases and M/F meshes. If it is broad, the honest manuscript
+   result is a non-identifiability bound plus the measured apparent
+   correlation.
+6. **Only then improve optical physics.** If side-profile residuals remain
+   after the plant bounds, replace the empirical two-exponential source by a
+   geometry-based axial ray/reflection or radiative-transfer calculation.
+   Preserve the centered radial source unless existing optical geometry
+   provides evidence otherwise.
+
+The 15 D4 orbits remain the correct computational representation. The next
+advance is not more channels or more fitted scalars; it is separating what
+the current measurements can identify from what they cannot.
+
+## 12. V20 outcome and manuscript strategy
+
+V20 executes the post-v19 identifiability calculation rather than another
+joint fit.
+
+Exact variable-`Cp` enthalpy transport changes frozen nominal-mesh v19 sensor
+predictions by at most 0.61 K RMS across six representatives and 1.45 K at
+any point.
+The correction is retained but cannot explain the v19 residuals.
+
+The T3 audit leaves three discrete interpretations: 136 mm has the strongest
+archival support, 137 mm is the exact exit convention, and 140 mm is a later
+rear-tube convention. None is verified to metrology-grade confidence. The
+leakage-free observer profile finds no acceptable branch; its boundary
+minimum gives 69.93 K training T3 RMSE and 38.28 K C81 RMSE with +42.49 K
+final bias.
+
+The plant was then fitted without T3/T9/T10 in either its objective or
+physical cooling initialization. The nominal `(Nu50,n)` surface minimizes at
+the lower exponent boundary and contains a near-optimal ridge spanning
+`n=1.25--1.35` and `Nu50` ratios 1.35--1.95. Its minimum still has 126 K
+side-history RMSE.
+
+Bounded felt and power screens at both ridge endpoints select all lower
+nuisance bounds. The less-bad endpoint still gives 79.40 K heating-side
+RMSE, 51.95 K cooling-side RMSE, and 14.48 K cooling-T2 RMSE. Both plant
+gates fail.
+
+### Updated publication decision
+
+Stop coefficient extraction from the present 2D inverse model. Do not:
+
+- use the v20 ridge minimum as a fitted heat-transfer coefficient;
+- select the T3 coordinate by its small score difference;
+- extend felt or power bounds;
+- bootstrap a point estimate from a boundary ridge;
+- run F-mesh confirmation of a rejected coefficient candidate; or
+- add empirical branches merely to make T3 fit.
+
+For the manuscript:
+
+1. report the measured apparent effectiveness/`Nu(Re)` correlation as an
+   assembly-level data reduction conditional on T3;
+2. report the exact-enthalpy correction and its demonstrated small effect;
+3. present 136/137/140 mm as outlet-observation model-form uncertainty;
+4. show the T3-free `(Nu50,n)` ridge and bounded-nuisance failures;
+5. state that receiver `UA(Re)` is not uniquely identifiable without an
+   independent bulk outlet-enthalpy measurement or verified T3 transfer
+   function; and
+6. retain the 15-orbit model as a Role-A mechanistic interpretation tool.
+
+If work continues without new experiments, the only justified physics
+extension is a forward, geometry-based optical/radiative calculation tested
+against side-profile shapes. It must not be presented as resolving the
+gas-side coefficient unless it independently removes the plant and T3
+contradictions.

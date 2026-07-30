@@ -1,0 +1,7 @@
+source_model=near_deep
+deep_fraction=0.2
+deep_length_m=0.02
+exchange_multiplier=0.05
+power_scale_456=1.05
+power_scale_304=1.23
+power_scale_256=0.84

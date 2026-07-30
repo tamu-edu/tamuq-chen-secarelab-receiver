@@ -1,0 +1,5 @@
+v19-C plant h=0.0 score=(objective = 0.9117963778919754, side_rmse_K = 49.368827945715935, felt_rmse_K = 14.422541836794267)
+v19-C plant h=25.0 score=(objective = 0.8945313341738873, side_rmse_K = 48.74736471557358, felt_rmse_K = 14.424857831687028)
+v19-C plant h=100.0 score=(objective = 0.8766355549969214, side_rmse_K = 48.113069859747874, felt_rmse_K = 14.425970339084092)
+v19-C plant h=400.0 score=(objective = 0.8588171823153514, side_rmse_K = 47.48694469663687, felt_rmse_K = 14.427410593339964)
+v19-C plant=400.0 probe=(capacity = 3000.0, stem = 0.0, score = (objective = 2.4379748116469164, T3_rmse_K = 73.29104943343489, final_bias_K = 8.66855691031978, t90_mae_s = 1225.0, max_abs_final_bias_K = 12.554682097973625)) holdout=(objective = 1.4280812089395702, T3_rmse_K = 39.30053552161701, final_bias_K = 27.34027842262168, t90_mae_s = 1500.0, max_abs_final_bias_K = 27.34027842262168) pass=false

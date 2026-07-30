@@ -1,0 +1,18 @@
+v19-A 1/17 beer_lambert J=0.9572 peaks=0/3 false=0
+v19-A 2/17 near_deep_f0.4_L30mm J=0.7317 peaks=0/3 false=0
+v19-A 3/17 near_deep_f0.4_L60mm J=0.6181 peaks=0/3 false=0
+v19-A 4/17 near_deep_f0.4_L120mm J=0.5689 peaks=0/3 false=0
+v19-A 5/17 near_deep_f0.4_L200mm J=0.5547 peaks=0/3 false=0
+v19-A 6/17 near_deep_f0.6_L30mm J=0.6347 peaks=0/3 false=0
+v19-A 7/17 near_deep_f0.6_L60mm J=0.4984 peaks=0/3 false=0
+v19-A 8/17 near_deep_f0.6_L120mm J=0.4636 peaks=0/3 false=0
+v19-A 9/17 near_deep_f0.6_L200mm J=0.4649 peaks=0/3 false=0
+v19-A 10/17 near_deep_f0.8_L30mm J=0.549 peaks=0/3 false=0
+v19-A 11/17 near_deep_f0.8_L60mm J=0.4196 peaks=0/3 false=0
+v19-A 12/17 near_deep_f0.8_L120mm J=0.4424 peaks=0/3 false=0
+v19-A 13/17 near_deep_f0.8_L200mm J=0.4857 peaks=2/3 false=1
+v19-A 14/17 near_deep_f0.9_L30mm J=0.5106 peaks=0/3 false=0
+v19-A 15/17 near_deep_f0.9_L60mm J=0.399 peaks=0/3 false=0
+v19-A 16/17 near_deep_f0.9_L120mm J=0.4725 peaks=3/3 false=2
+v19-A 17/17 near_deep_f0.9_L200mm J=0.5482 peaks=3/3 false=2
+v19-A winner=(candidate = (model = :near_deep, fraction = 0.9, length_m = 0.12), score = (objective = 0.4090139256823398, normalized_rmse = 0.0325123165833613, observed_peaks = 6, recovered_peaks = 5, false_peaks = 2, inversion_rmse = 0.10806585307212521, rear_fall_rmse = 0.19475222169913475)) holdout=(objective = 0.3208100028244439, normalized_rmse = 0.029153875759383, observed_peaks = 4, recovered_peaks = 2, false_peaks = 1, inversion_rmse = 0.09082842140901247, rear_fall_rmse = 0.1864863046773586) pass=false

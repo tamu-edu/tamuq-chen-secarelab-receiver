@@ -1,0 +1,5 @@
+v19-B-refine anchor (prefactor = 0.0003693432, exponent = 1.54346) J=0.5911
+v19-B-refine anchor (prefactor = 0.000365, exponent = 1.54346) J=0.6339
+v19-B-refine anchor (prefactor = 0.0003693432, exponent = 1.53) J=0.8627
+v19-B-refine anchor (prefactor = 0.000365, exponent = 1.53) J=0.9569
+v19-B-refine winner=(candidate = (prefactor = 0.0003693432, exponent = 1.54346), score = (objective = 0.6918592203990029, effectiveness_rmse = 0.029378844982463032, log_Nu_rmse = 0.12031481374813742, effectiveness_min = 0.6087011403316949, effectiveness_max = 0.7544426049596923)) holdout=nothing nominal=nothing interior=false pass=false

@@ -1,0 +1,10 @@
+rear_tube_flange_contact_h_W_m2_K=400.0
+probe_capacity_areal_J_m2_K=3000.0
+probe_stem_conductance_areal_W_m2_K=0.0
+training_T3_rmse_K=73.29104943343489
+holdout_T3_rmse_K=39.30053552161701
+holdout_final_bias_K=27.34027842262168
+holdout_t90_mae_s=1500.0
+holdout_side_rmse_K=43.044541256339855
+holdout_felt_rmse_K=8.83512526856391
+stageC_pass=false

@@ -1,0 +1,7 @@
+nu_prefactor=0.00038
+reynolds_exponent=1.54
+training_effectiveness_rmse=0.03006986984127795
+training_log_Nu_rmse=0.11161980008556771
+holdout_effectiveness_rmse=0.028466612613590125
+holdout_log_Nu_rmse=0.10291482979395677
+stageB_pass=false

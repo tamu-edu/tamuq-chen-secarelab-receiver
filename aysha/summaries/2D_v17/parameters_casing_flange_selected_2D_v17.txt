@@ -1,0 +1,11 @@
+training_objective=2.281049425846113
+training_primary_rmse_K=27.902049525007495
+training_t2_rmse_K=15.312905259408058
+holdout_primary_rmse_K=22.922860842819205
+holdout_t2_rmse_K=8.690646348232235
+casing_flange_conductance_W_K=20.0
+felt_heat_capacity_scale=1.0
+skin_felt_contact_scale_fixed=0.30
+felt_conductivity_scale_fixed=1.00
+selected_on_nominal_mesh=true
+cooling_C81_held_out=true

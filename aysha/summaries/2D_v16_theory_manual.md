@@ -195,3 +195,35 @@ felt conductivity remains at its extended upper bound, and the E72 mesh
 change remains 36.61 K.  The position correction is therefore necessary for
 geometric correctness but does not change the v16 rejection or the next-model
 physics diagnosis.
+
+### Post-v16 verified casing/flange boundary correction
+
+The rear/back face of the aluminum casing is in contact with the
+water-cooled flange as part of the alumina-tube sealing arrangement.  V16 does
+not contain this path: its rear aluminum sleeve/backplate state loses heat
+only to ambient, while the fixed water-flange temperature acts only on the
+terminal alumina-tube cell.
+
+The next hardware model must add a conservative finite conductance
+
+```text
+Q_case,flange = G_case,flange (T_housing,rear - T_water,flange)
+```
+
+and include `Q_case,flange` in both the aluminum energy balance and the flange
+heat ledger.  `G_case,flange` represents contact, spreading, and water-side
+resistances and must be one shared global parameter.  It must not be modeled
+as a perfect-temperature boundary over the whole casing.
+
+This verified path can cool the outer felt/casing assembly without forcing
+the same heat through the T2 region or the alumina tube.  It is consequently
+a plausible cause of the systematic positive T2 bias and of the nonphysical
+v16 felt-conductivity fit.  It cannot create the measured 58 mm axial
+temperature maximum, so it belongs to the later hardware/loss-closure stage
+after the axial-source and hydraulic tests.
+
+This correction was implemented in v17.  It removed the systematic heating
+T2 steady bias and restored nominal felt conductivity, but its conductance
+entered a high-conductance plateau and was not identifiable.  Complete v17
+results and the revised source/exchange strategy are documented in
+`summaries/2D_v17_theory_manual.md`.

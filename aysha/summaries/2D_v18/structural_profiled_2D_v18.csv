@@ -1,0 +1,5 @@
+candidate,objective,power_scale_456,power_scale_304,power_scale_256
+beer_lambert_f0.0_L80.0_x1.0,5.872085132592598,1.05,1.23,0.84
+beer_lambert_f0.0_L80.0_x0.05,4.733116031891951,1.05,1.23,0.84
+near_deep_f0.2_L20.0_x1.0,6.00173177508334,1.05,1.23,0.84
+near_deep_f0.2_L20.0_x0.05,4.762514238663405,1.05,1.23,0.84

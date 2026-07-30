@@ -1,0 +1,14 @@
+v18 refined confirmation winner nominal J=3.0035
+v18 refined confirmation winner refined J=2.9083
+v18 refined confirmation runner nominal J=3.0522
+v18 refined confirmation runner refined J=2.9554
+(candidate = "winner", mesh = "nominal", objective = 3.0034708734815982, curve = 2.7928358434150264, level = 1.9507397797800732, side_shape = 0.4375624462395082, effectiveness = 7.253904470467096)
+(candidate = "winner", mesh = "refined", objective = 2.908290745698036, curve = 2.738917048203385, level = 1.90246818959616, side_shape = 0.4765406285936747, effectiveness = 6.893723028545378)
+(candidate = "runner", mesh = "nominal", objective = 3.052197980658535, curve = 2.83251148334621, level = 1.983091336019701, side_shape = 0.3759439463450163, effectiveness = 7.4492866910671625)
+(candidate = "runner", mesh = "refined", objective = 2.955362507084582, curve = 2.7790370810111895, level = 1.9325693667691812, side_shape = 0.4079353906301428, effectiveness = 7.08985054456171)
+(candidate = "winner", simulation_id = "E69", history_rms_K = 20.117239769458294, history_max_K = 32.86499932529102, final_max_K = 24.29951131062205)
+(candidate = "winner", simulation_id = "E74", history_rms_K = 18.97585615148856, history_max_K = 30.280379336018655, final_max_K = 22.631179754513596)
+(candidate = "winner", simulation_id = "E79", history_rms_K = 12.906011529582198, history_max_K = 19.603043809632936, final_max_K = 15.200490043624995)
+(candidate = "runner", simulation_id = "E69", history_rms_K = 20.04337761832794, history_max_K = 32.87863886539867, final_max_K = 24.254003807048548)
+(candidate = "runner", simulation_id = "E74", history_rms_K = 18.8974517355004, history_max_K = 30.265571365304936, final_max_K = 22.5824383930742)
+(candidate = "runner", simulation_id = "E79", history_rms_K = 12.84309827011743, history_max_K = 19.57108379998465, final_max_K = 15.15510836547935)

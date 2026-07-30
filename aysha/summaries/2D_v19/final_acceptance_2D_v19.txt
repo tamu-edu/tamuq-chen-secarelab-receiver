@@ -1,0 +1,17 @@
+stageA_pass=false
+stageB_pass=false
+stageC_pass=false
+stageD_felt_pass=false
+stageD_power_pass=false
+mesh_pass=false
+ledger_identity_pass=true
+independent_energy_audit_pass=true
+flow_solver_pass=false
+stageC_null_sensitive=true
+probe_sampling_pass=true
+solver_tolerance_pass=true
+solver_tolerance_rms_K=0.02408462454974348
+solver_tolerance_max_abs_K=0.07173746777721135
+probe_sampling_final_span_K=0.02716369587005829
+probe_sampling_t90_span_s=50.0
+v19_accepted=false

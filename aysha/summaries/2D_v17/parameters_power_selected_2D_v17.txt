@@ -1,0 +1,5 @@
+power_scale_456=1.05
+power_scale_304=1.0
+power_scale_256=0.75
+selected_on_nominal_mesh=true
+hardware_parameters_frozen=true

@@ -1,0 +1,28 @@
+v19 validation E67 complete
+v19 validation E68 complete
+v19 validation E69 complete
+v19 validation E70 complete
+v19 validation E71 complete
+v19 validation E72 complete
+v19 validation E73 complete
+v19 validation E74 complete
+v19 validation E75 complete
+v19 validation E76 complete
+v19 validation E77 complete
+v19 validation E78 complete
+v19 validation E79 complete
+v19 validation E80 complete
+v19 validation E81 complete
+v19 validation C69 complete
+v19 validation C80 complete
+v19 validation C81 complete
+v19 mesh confirmation E67 complete
+v19 mesh confirmation E71 complete
+v19 mesh confirmation E75 complete
+v19 mesh confirmation E80 complete
+v19 mesh confirmation C69 complete
+v19 mesh confirmation C81 complete
+(phase = "heating_training", primary_mean_sensor_rmse_K = 101.95151228760315, primary_pooled_rmse_K = 141.22952787516138, side_mean_rmse_K = 130.86855567670398, air_mean_rmse_K = 105.6232364779012, felt_mean_rmse_K = 11.528657930002602, axial_inversion_rmse_K = 50.02816027070154)
+(phase = "heating_validation", primary_mean_sensor_rmse_K = 76.30129450267532, primary_pooled_rmse_K = 97.46116849257268, side_mean_rmse_K = 93.96168127605408, air_mean_rmse_K = 89.96556634539814, felt_mean_rmse_K = 9.655862339816068, axial_inversion_rmse_K = 36.34845892678043)
+(phase = "cooling_training", primary_mean_sensor_rmse_K = 44.42041386376554, primary_pooled_rmse_K = 52.494755857619225, side_mean_rmse_K = 45.56115796644494, air_mean_rmse_K = 70.60941279459993, felt_mean_rmse_K = 14.809182624892934, axial_inversion_rmse_K = 0.42106125260486466)
+(phase = "cooling_validation", primary_mean_sensor_rmse_K = 37.25800000798033, primary_pooled_rmse_K = 40.43479109996714, side_mean_rmse_K = 46.02080201250417, air_mean_rmse_K = 39.20403383937836, felt_mean_rmse_K = 9.023560163010783, axial_inversion_rmse_K = 2.529421894828772)

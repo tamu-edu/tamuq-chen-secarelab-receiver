@@ -1,0 +1,16 @@
+candidate_count=15
+best_reynolds_exponent=1.25
+best_Nu50_ratio=1.35
+best_nu_prefactor=0.0008856566075684829
+best_objective=4.065078182251283
+best_side_rmse_K=125.95521888334572
+best_T2_rmse_K=10.81145860192236
+best_T3_diagnostic_rmse_K=125.81393054290284
+best_exponent_on_boundary=true
+best_Nu50_ratio_on_boundary=false
+within_10pct_count=4
+within_10pct_n_min=1.25
+within_10pct_n_max=1.35
+within_10pct_Nu50_ratio_min=1.35
+within_10pct_Nu50_ratio_max=1.95
+ua_identified=false

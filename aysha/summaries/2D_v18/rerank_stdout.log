@@ -1,0 +1,6 @@
+v18 nominal rerank 1/4 beer_lambert_f0.0_L80.0_x1.0 J=3.9498
+v18 nominal rerank 2/4 beer_lambert_f0.0_L80.0_x0.05 J=3.0873
+v18 nominal rerank 3/4 near_deep_f0.2_L20.0_x1.0 J=4.098
+v18 nominal rerank 4/4 near_deep_f0.2_L20.0_x0.05 J=3.1348
+v18 nominal winner=(candidate = (source_model = :beer_lambert, deep_fraction = 0.0, deep_length_m = 0.08, exchange_multiplier = 0.05), power_scales = (1.05, 1.23, 0.84), loss = 3.0873160736963534) felt=(conductivity = 1.3, capacity = 1.3, loss = 1.1676515924699138)
+v18 nominal runner=(candidate = (source_model = :near_deep, deep_fraction = 0.2, deep_length_m = 0.02, exchange_multiplier = 0.05), power_scales = (1.05, 1.23, 0.84), loss = 3.134791646993785)

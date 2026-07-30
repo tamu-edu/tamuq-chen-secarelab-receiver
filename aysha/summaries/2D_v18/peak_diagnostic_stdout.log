@@ -1,0 +1,17 @@
+v18 peak diagnostic E67 complete
+v18 peak diagnostic E68 complete
+v18 peak diagnostic E69 complete
+v18 peak diagnostic E70 complete
+v18 peak diagnostic E71 complete
+v18 peak diagnostic E72 complete
+v18 peak diagnostic E73 complete
+v18 peak diagnostic E74 complete
+v18 peak diagnostic E75 complete
+v18 peak diagnostic E76 complete
+v18 peak diagnostic E77 complete
+v18 peak diagnostic E78 complete
+v18 peak diagnostic E79 complete
+v18 peak diagnostic E80 complete
+v18 peak diagnostic E81 complete
+(phase = "heating_training", primary_rmse_K = 135.75327335396844, side_rmse_K = 138.46904614591833, air_rmse_K = 166.26070288997505, felt_rmse_K = 7.282540818088922, observed_peaks = 6, correct_peaks = 3, false_peaks = 3, axial_rmse_K = 77.00609609336726)
+(phase = "heating_validation", primary_rmse_K = 117.72747530892543, side_rmse_K = 124.64744503676657, air_rmse_K = 130.45554569992962, felt_rmse_K = 7.2127975531544655, observed_peaks = 4, correct_peaks = 4, false_peaks = 2, axial_rmse_K = 51.02035369342001)

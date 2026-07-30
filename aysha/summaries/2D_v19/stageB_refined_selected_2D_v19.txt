@@ -1,0 +1,9 @@
+nu_prefactor=0.0003693432
+reynolds_exponent=1.54346
+training_effectiveness_rmse=0.029378844982463032
+training_log_Nu_rmse=0.12031481374813742
+training_signature_pass=false
+holdout_run=false
+nominal_confirmation_run=false
+parameter_interior=false
+stageB_refined_pass=false

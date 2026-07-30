@@ -1,0 +1,16 @@
+enthalpy_smoke_pass=true
+frozen_enthalpy_effect_small=true
+t3_coordinate_verified=false
+t3_observer_gate=false
+ua_profile_interior=false
+ua_identified=false
+nuisance_ratio_1p35_plant_admissible=false
+nuisance_ratio_1p95_plant_admissible=false
+heating_gate=false
+cooling_gate=false
+selected_rows_flow_converged=true
+holdout_coefficient_confirmation_run=false
+bootstrap_coefficient_interval_run=false
+F_mesh_coefficient_confirmation_run=false
+v20_roleB_accepted=false
+decision=structural_non_identifiability

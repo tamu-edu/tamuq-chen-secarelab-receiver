@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "journal.1D.md",
+                "file": "journal.2D.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "journal.1D"
+              "title": "journal.2D"
             }
           }
         ]
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "journal.1D.md",
+                "file": "journal.2D.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of journal.1D"
+              "title": "Outline of journal.2D"
             }
           }
         ],
@@ -184,29 +184,36 @@
       "fix-math:Current file": false
     }
   },
-  "active": "6bedc788872dd8bf",
+  "active": "5c706a574f57aab2",
   "lastOpenFiles": [
+    "2D_v20/plots/Thumbs.db",
+    "2D_v20/plots/t3_location_profile_2D_v20.png",
+    "2D_v20/plots/ua_plant_profile_2D_v20.png",
+    "2D_v20/plots",
+    "2D_v20/final_acceptance_2D_v20.txt",
+    "2D_v20/plant_nuisance_selected_n125_r135_2D_v20.csv",
+    "2D_v20/plant_nuisance_power_n125_r135_2D_v20.csv",
+    "2D_v20/plant_nuisance_selected_n125_r195_2D_v20.csv",
+    "2D_v20/plant_nuisance_power_n125_r195_2D_v20.csv",
+    "2D_v20/plant_nuisance_felt_n125_r135_2D_v20.csv",
+    "2D_v20/plant_nuisance_felt_n125_r195_2D_v20.csv",
+    "2D_v20_theory_manual.md",
+    "2D_v20/ua_plant_profile_corrected_part12_2D_v20.csv",
+    "2D_v20/ua_plant_profile_corrected_part345_2D_v20.csv",
+    "2D_v19/plots/parity_primary_2D_v19.png",
+    "2D_v19/plots/transients/C81_transient.png",
+    "2D_v19/plots/transients/C80_transient.png",
+    "2D_v19/plots/transients/C69_transient.png",
+    "2D_v19/plots/axial_profiles/E81_axial.png",
+    "2D_v19/plots/transients/E81_transient.png",
+    "2D_v19/plots/axial_profiles/E80_axial.png",
+    "2D_v19/plots/transients/E80_transient.png",
+    "2D_v16_theory_manual.md",
+    "2D_v17_theory_manual.md",
+    "2D_v18_theory_manual.md",
+    "2D_v19_theory_manual.md",
+    "journal.1D.md",
     "manuscript_incorporation_strategy.md",
-    "1D_v30/analysis_results_all_variants_1D_v30.csv",
-    "1D_v30/plots/transients/transient_C81_fitted_energy_accounting_cooling_1D_v30.png",
-    "1D_v30/plots/transients/transient_C80_fitted_energy_accounting_cooling_1D_v30.png",
-    "1D_v30/plots/transients/transient_C69_fitted_energy_accounting_cooling_1D_v30.png",
-    "1D_v30/plots/transients/transient_E81_fitted_energy_accounting_1D_v30.png",
-    "1D_v30/plots/transients/transient_E80_fitted_energy_accounting_1D_v30.png",
-    "1D_v30/plots/transients/transient_E79_fitted_energy_accounting_1D_v30.png",
-    "1D_v30/plots/transients/transient_E78_fitted_energy_accounting_1D_v30.png",
-    "1D_v30/plots/transients/transient_E77_fitted_energy_accounting_1D_v30.png",
-    "1D_v30/plots/transients/transient_E76_fitted_energy_accounting_1D_v30.png",
-    "1D_v30/plots/transients/transient_E75_fitted_energy_accounting_1D_v30.png",
-    "1D_v30/diagnostics/cell_diagnostics_E81_fitted_energy_accounting_1D_v30.csv",
-    "1D_v30/diagnostics/cell_diagnostics_E80_fitted_energy_accounting_1D_v30.csv",
-    "1D_v30/diagnostics/cell_diagnostics_E79_fitted_energy_accounting_1D_v30.csv",
-    "1D_v30/diagnostics/cell_diagnostics_E78_fitted_energy_accounting_1D_v30.csv",
-    "1D_v30/diagnostics/cell_diagnostics_E77_fitted_energy_accounting_1D_v30.csv",
-    "1D_v30/diagnostics/cell_diagnostics_E76_fitted_energy_accounting_1D_v30.csv",
-    "1D_v30/diagnostics/cell_diagnostics_E75_fitted_energy_accounting_1D_v30.csv",
-    "1D_v30/diagnostics/cell_diagnostics_E74_fitted_energy_accounting_1D_v30.csv",
-    "1D_v30/diagnostics/cell_diagnostics_E73_fitted_energy_accounting_1D_v30.csv",
     "1D_v29_strategy_forward.md",
     "2D_v2_theory_manual.md",
     "1D_v27_theory_manual.md",
@@ -219,17 +226,11 @@
     "data_analysis_sections.md",
     "1D_v10_geminicomments.md",
     "1D_v8b_notes.md",
-    "journal.1D.md",
     "1D_v10notes.md",
     "1D_v8b_geminicomments.md",
     "1D_v8_theory_manual.md",
     "1D_theory.md",
     "1D_v8a_notes.md",
-    "1D_v7_geminicomments.md",
-    "1D_v6_geminicomments.md",
-    "1D_theory_manual_v3-v6.md",
-    "1D_v1_theory_manual.md",
-    "1D_modelling_v4_ideas.md",
-    "0D_modelling_v4.md"
+    "1D_v7_geminicomments.md"
   ]
 }

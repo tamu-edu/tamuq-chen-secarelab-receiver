@@ -1,0 +1,25 @@
+v19-D felt k=0.7 cp=0.75 J=1.3058
+v19-D felt k=0.7 cp=1.0 J=1.4063
+v19-D felt k=0.7 cp=1.5 J=1.7526
+v19-D felt k=1.0 cp=0.75 J=1.344
+v19-D felt k=1.0 cp=1.0 J=1.3101
+v19-D felt k=1.0 cp=1.5 J=1.4722
+v19-D felt k=1.3 cp=0.75 J=1.3962
+v19-D felt k=1.3 cp=1.0 J=1.3379
+v19-D felt k=1.3 cp=1.5 J=1.3471
+v19-D power 456 scale=1.05 J=4.748
+v19-D power 456 scale=1.1225 J=5.1501
+v19-D power 456 scale=1.195 J=6.0301
+v19-D power 456 scale=1.2675 J=7.1366
+v19-D power 456 scale=1.34 J=8.3534
+v19-D power 304 scale=1.23 J=6.9743
+v19-D power 304 scale=1.3175 J=7.795
+v19-D power 304 scale=1.405 J=8.7696
+v19-D power 304 scale=1.4925 J=9.7883
+v19-D power 304 scale=1.58 J=10.8601
+v19-D power 256 scale=0.84 J=3.4453
+v19-D power 256 scale=0.9075 J=4.3204
+v19-D power 256 scale=0.975 J=5.3533
+v19-D power 256 scale=1.0425 J=6.5106
+v19-D power 256 scale=1.11 J=7.7795
+v19-D felt=(selected = (conductivity = 0.7, capacity = 0.75, score = (objective = 1.3422959591504366, side_rmse_K = 49.493064552736385, air_rmse_K = 70.95031344584244, felt_rmse_K = 14.62668753648199, side_final_bias_K = 41.269999505957344, air_final_bias_K = 12.13171589484324, felt_final_bias_K = -4.998765416715678)), holdout = (objective = 1.0956652609976962, side_rmse_K = 45.91872093643273, air_rmse_K = 38.769298982991856, felt_rmse_K = 8.796538118820846, side_final_bias_K = 53.56776151967131, air_final_bias_K = 29.972226400652275, felt_final_bias_K = 2.515135984909456), interior = false, pass = false) power=(scales = (1.05, 1.23, 0.84), groups = NamedTuple[(name = "456", selected = (value = 1.05, score = (objective = 4.74798279073138, side_rmse_K = 150.91096919250506, air_rmse_K = 111.36465066957093, felt_rmse_K = 11.256961512028008, side_final_bias_K = 17.900656506163056, air_final_bias_K = -1.3702808457655304, felt_final_bias_K = 1.213901553229152)), holdout = (objective = 2.9272553465840327, side_rmse_K = 117.14472163395132, air_rmse_K = 100.05560685011076, felt_rmse_K = 10.12157110539162, side_final_bias_K = -12.23693246610421, air_final_bias_K = -14.736707161993543, felt_final_bias_K = -2.8743110232770377), interior = false), (name = "304", selected = (value = 1.23, score = (objective = 6.9742979980010915, side_rmse_K = 182.10628464061207, air_rmse_K = 129.47797956729673, felt_rmse_K = 14.48127794345262, side_final_bias_K = 84.76810619121683, air_final_bias_K = 28.704496279882076, felt_final_bias_K = 10.660557578838356)), holdout = (objective = 4.555193006128851, side_rmse_K = 129.8594376141517, air_rmse_K = 104.16099984583873, felt_rmse_K = 9.942371135770456, side_final_bias_K = 35.455014308864925, air_final_bias_K = 6.450552317844128, felt_final_bias_K = 4.413988545033622), interior = false), (name = "256", selected = (value = 0.84, score = (objective = 3.445319323986301, side_rmse_K = 99.55708799401985, air_rmse_K = 74.24082151217738, felt_rmse_K = 8.777481816441965, side_final_bias_K = 73.99468650969304, air_final_bias_K = 22.929563016345153, felt_final_bias_K = 7.254889566482298)), holdout = (objective = 1.9200014207044487, side_rmse_K = 69.42503117324547, air_rmse_K = 63.019186962155054, felt_rmse_K = 8.959498231869857, side_final_bias_K = 50.46938739690086, air_final_bias_K = 10.781562573592254, felt_final_bias_K = 6.703861616787481), interior = false)], pass = false) upstream=(stageA = false, stageB = false, stageC = false) accepted=false
