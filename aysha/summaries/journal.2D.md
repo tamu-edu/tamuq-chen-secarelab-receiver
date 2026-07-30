@@ -3065,3 +3065,109 @@ The corrected conclusion is:
 
 V16 remains rejected for coefficient extraction, while the evidence for the
 next power-conserving two-component axial source test is stronger.
+
+## 2026-07-30 - Post-v16 strategy correction: symmetry and manuscript invariants
+
+The proposed post-v16 rewrite was initially described as 100 coupled 1D
+channels.  That statement confused the number of **physical channels**, which
+must remain 100 in every extensive flow, perimeter, mass, and energy term, with
+the number of **independent state histories** required under the accepted
+symmetry.
+
+For the 10 by 10 square array:
+
+- no symmetry gives 100 independent channels;
+- horizontal and vertical reflection alone gives a 5 by 5 quadrant with 25;
+- full square dihedral symmetry, including `x <-> y`, gives 15 exact orbits.
+
+V14--v16 already implement the 15-orbit reduction, with multiplicities summing
+to 100.  The centered radial irradiance, centered circular 13 mm free rear
+region, square receiver, uniform-contact hypothesis, and negligible channel
+buoyancy (`Gr/Re^2 <= 10^-3`) all preserve this D4 symmetry.  The side
+thermocouples are observation operators and do not break the state symmetry.
+Therefore v17A and a centered rear-manifold v17B will retain 15 orbits.  A
+25-state quadrant is required only if diagonal interchange is physically
+broken; 100 is required only if evidenced geometry or forcing also breaks the
+mirror planes.
+
+The next-model strategy was also re-anchored to
+`analysis/manuscript/manuscript_full_draft.md`.  Its regime analysis rules out
+several previously discussed directions:
+
+- `Re=23--94`, `Pr=0.684--0.690`, and `Gz_L=0.18--0.70` imply deeply laminar,
+  nearly constant-Pr flow that is thermally developed by the outlet;
+- `Pe L/D_h=1500--5900` rules out axial gas conduction;
+- `Gr/Re^2 <= 10^-3` rules out buoyancy as the radial mechanism;
+- `Bi<10^-5` rules out wall-normal SiC resistance as the assembly bottleneck;
+- `N_rc` rising from about 1.6 at 600 K to about 5 at 1000 K identifies
+  nonlocal in-channel radiation as a physically strong axial candidate.
+
+Consequently, the two-component axial source is retained only as a
+power-conserving, falsifiable diagnostic.  If it can reproduce the 58 mm
+maximum and the effectiveness crossover, it must be promoted to a physical
+axial radiosity/view-factor model before its parameters receive coefficient
+credit.
+
+The revised staged plan is:
+
+1. build a common evaluator for the manuscript invariants before more fitting;
+2. v17A: identify axial radiation/source shape from normalized 5/58/107 mm
+   profiles, with lamp-group power factors nested only for absolute level;
+3. replace a successful empirical split by a conservative physical radiation
+   closure;
+4. freeze axial physics, then v17B: test a 15-orbit rear-manifold pressure
+   network against cold `t0` DP1 and validate against hot DP1 and radial trends;
+5. only then recalibrate physical global contact/loss terms to cooling, release
+   the `C_eff` prior, and perform joint held-out confirmation.
+
+The manuscript invariants are now primary acceptance outputs:
+
+```text
+I1  apparent Nu = 3.1e-4 Re^1.44
+I2  epsilon* = 0.66 +/- 0.03
+I3  Lambda_107 = 0.038 + 8.3e-4 Re
+I4  C_eff = 301 +/- 23 J/K with the prior released
+I5  K_loss = 0.10--0.16 W/K
+I6  delivered-power factors consistent with a single explicit convention
+```
+
+The local channel Graetz Nusselt number is not equated to I1.  I1 must be
+post-processed from the modeled side-wall and outlet observables using the
+manuscript definition; its superlinear exponent is a signature of
+flow-dependent assembly participation.  Role B coefficient extraction remains
+blocked until heating and cooling, spatial signs, invariant reproduction,
+parameter interiority, energy closure, and mesh transfer all pass
+simultaneously.
+
+The complete current strategy is recorded in
+`summaries/manuscript_2D_readiness_strategy.md`.
+
+### Manuscript T8-coordinate sensitivity found during the strategy audit
+
+The manuscript draft and its Python dimensionless/uncertainty scripts still
+state `T8=11 mm` and use wall-profile weights
+`(0.248, 0.365, 0.387)`, despite the later verified location of 5 mm used by
+the 2D model.  For constant end extrapolation and a piecewise-linear wall
+profile over 137 mm, the exact weights for 5/58/107 mm are:
+
+```text
+Tbar_w = 0.229927 T8 + 0.372263 T12 + 0.397810 T11.
+```
+
+A deterministic recalculation from the saved steady metrics gives:
+
+```text
+old: Nu_app = 3.0768e-4 Re^1.4435, r2=0.9713
+new: Nu_app = 3.2204e-4 Re^1.4327, r2=0.9722
+
+old epsilon* = 0.6712 / 0.6714 / 0.6258
+new epsilon* = 0.6729 / 0.6729 / 0.6283
+```
+
+The dimensionless physical conclusions are therefore robust to the coordinate
+correction, but the manuscript reduction and Monte Carlo uncertainty analysis
+must be regenerated consistently before the corrected rounded values are
+frozen.  This correction is now the first action in Stage 0 of the v17
+strategy; the manuscript file itself was not partially edited because doing so
+without regenerating all dependent values and figures would create an
+internally inconsistent draft.

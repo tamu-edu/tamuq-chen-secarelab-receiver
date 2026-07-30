@@ -1,69 +1,358 @@
-# 2D Model Manuscript-Incorporation Readiness Strategy (`2D_v3` -> Role B)
+# 2D model manuscript-readiness strategy after v16
 
----
+## 1. Purpose and current status
 
-## 1. Executive Gap Assessment & Gate Status
+This strategy supersedes the earlier `2D_v3` readiness note.  That note is no
+longer a valid status assessment: v8--v16 corrected major geometry, mass,
+power, hydraulic, hardware, and observation errors, and the latest validation
+shows that the 2D model has **not** cleared the coefficient-extraction gate.
 
-This document evaluates the **2D Axisymmetric Continuum Macro-ECM Model (`2D_v3`)** against the manuscript readiness criteria defined in [manuscript_incorporation_strategy.md](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/summaries/manuscript_incorporation_strategy.md).
+The experimental manuscript remains model-independent.  The 2D model has two
+admissible roles:
 
-### 1.1 Acceptance Gate Summary (Role B: Validated Coefficients)
+- **Role A -- structural interpretation:** test whether a specified physical
+  mechanism can reproduce the observed spatial and transient signatures.
+- **Role B -- coefficient identification:** report effective macroscopic
+  conductive, radiative, and convective coefficients only after the full
+  acceptance gate in Section 8 is passed.
 
-| # | Acceptance Gate Criterion | `2D_v3` Status | Validation Evidence |
-| :---: | :--- | :---: | :--- |
-| **G1** | **Fit Quality**: Objective loss within threshold without surrogate sinks | **PASS** | Objective loss dropped to **6.698** (down from 273.4 baseline) without any surrogate heat sinks. |
-| **G2** | **Parameter Interiority**: No physical transport parameter is bound-active | **PASS** | $A_{\text{Nu}} = 2.50$, $B_{\text{Re}} = 0.333$, $\chi_r = 0.030$, $\chi_z = 1.00$, $\sigma_{\text{beam}} = 14.0\text{ mm}$, $s_{\text{flange}} = 1.675$. All physical transport parameters are interior! |
-| **G3** | **Invariant Reproduction**: $I1-I6$ reproduced as emergent outputs | **PASS (5/6)** | $I5$ ($K_{\text{loss}} = 0.128 - 0.147\text{ W/K}$ in $0.10-0.16$ band), $I3$ (deep deficit), $I6$ (power delivery), $I2$ (inversion). $I4$ requires prior release pass. |
-| **G4** | **Simultaneous Heating & Cooling**: Both satisfied without regime switches | **PASS** | Heating and cooling solved simultaneously with raw experimental $t_0$ cooling initialization. Cooling steady errors $< \pm 0.08 - 8.1\text{ K}$. |
-| **G5** | **Energy Closure**: Explicit energy balance per case | **PASS** | Global energy conservation $Q_{\text{solar}} = Q_{\text{gas}} + Q_{\text{loss}} + \frac{dE}{dt}$ verified. |
+V16 remains in Role A.  After the required power refit its held-out mean-sensor
+RMSE is 61.46 K, but its held-out axial RMSE is 107.75 K, it predicts an
+entrance maximum in all 15 heating cases while 10 experiments peak at 58 mm,
+both radial signs are wrong in all 15 cases, the fitted felt conductivity is
+bound-active and nonphysical, and the result is mesh-sensitive.
 
----
+The next objective is therefore not another unconstrained reduction of
+temperature RMSE.  It is a staged, falsifiable reconstruction of the missing
+axial-radiation and rear-manifold physics, judged primarily against the
+manuscript's measured dimensionless invariants.
 
-## 2. Assessment of the 6 Manuscript Invariants ($I1 - I6$)
+## 2. Channel count and exact symmetry reduction
 
-| # | Manuscript Invariant | Target Value (from Manuscript) | `2D_v3` Current Output | Readiness / Action Required |
-| :---: | :--- | :--- | :--- | :--- |
-| **I1** | **Apparent Global Nusselt** | $\text{Nu} = 3.1\times 10^{-4} \text{Re}^{1.44}$ ($23 \le \text{Re} \le 94$, $r^2=0.97$) | Computed locally via Sieder-Tate correlation $\text{Nu}(z) = A_{\text{Nu}} \text{Re}^{B_{\text{Re}}} \text{Pr}^{1/3} (D_h/z)^{1/3}$. | **Near-Complete**: Post-process solved 2D fields into apparent global $h = \frac{Q_{\text{gas}}}{A_{\text{ex}} \Delta T_{\text{LMTD}}}$ and regress $\text{Nu}$ vs $\text{Re}$. |
-| **I2** | **Volumetric-Inversion Threshold** | $\varepsilon^* = 0.66 \pm 0.03$ (flux-independent) | Solid peak temperature $T_s(z)$ migrates interior when effectiveness $\varepsilon > \varepsilon^*$. | **Near-Complete**: Extract crossover $\varepsilon^*$ from 2D axial temperature profiles $T_s(z)$ across flow rates. |
-| **I3** | **Deep Nonequilibrium Slope** | $\Lambda_{107} = 0.038 + 8.3\times 10^{-4} \text{Re}$ ($\Delta T_{10-11}$ slope vs $\text{Re}$) | $T_{10}$ (deep core) vs $T_{11}$ (deep perim) temperature deficit matches sign and linear slope across $\text{Re}$. | **ACHIEVED**: Emergent $T_{10} - T_{11}$ deficit matches experimental slope across flow rates. |
-| **I4** | **Effective Heat Capacity** | $C_{\text{eff}} = 301 \pm 23 \text{ J/K}$ (released prior) | Currently $C_{\text{cavity}} = 301.0\text{ J/K}$ (soft prior). | **Action Required (F1)**: Release $C_{\text{cavity}}$ prior ($w_C = 0$) and verify emergent $C_{\text{eff}} \approx 301\text{ J/K}$. |
-| **I5** | **Parasitic Loss Conductance** | $K_{\text{loss}} = 0.10 - 0.16 \text{ W/K}$ | Total ambient + flange loss conductance $K_{\text{loss}} = \frac{Q_{\text{casing}} + Q_{\text{front}} + Q_{\text{flange}}}{\Delta T_{\text{excess}}}$. | **Near-Complete**: Compute total loss conductance $K_{\text{loss}}$ from 2D energy closure logs. |
-| **I6** | **Delivered-Power Scale Factors** | $+30-60\%$ over nominal at 456/304, nominal or less at 256 | In `2D_v3`, $f_{456}=0.550, f_{304}=0.550, f_{256}=0.450$ with $\eta_{\text{abs}} = 0.85$. | **Action Required (F2)**: Reconcile 1D and 2D power convention ($\eta_{\text{abs}} = 1.0$ vs $0.85$). |
+The receiver contains 100 physical channels.  This fixes total flow area,
+internal perimeter, SiC inventory, and all extensive energy terms.  It does
+**not** require 100 independent channel state histories.
 
----
+For a 10 by 10 square channel array:
 
-## 3. Staged Implementation Strategy for 2D Role B Certification
+| retained symmetry | independent channel groups | when it is justified |
+|---|---:|---|
+| none | 100 | evidenced off-center/asymmetric forcing, asymmetric outlet, or nonuniform contact |
+| horizontal and vertical reflections | 25 | diagonal interchange is broken but both mirror planes remain |
+| full square dihedral symmetry (D4) | 15 | centered/radial forcing and outlet, square material/contact geometry |
 
-```text
-┌───────────────────────────┐     ┌───────────────────────────┐     ┌───────────────────────────┐
-│ Step 1: Reconcile F2      ├────►│ Step 2: Post-Process      ├────►│ Step 3: Release C Prior   │
-│ Power Convention          │     │ Invariants I1, I2, I3, I5 │     │ (I4 Verification)         │
-└───────────────────────────┘     └───────────────────────────┘     └───────────────────────────┘
-                                                                                  │
-                                                                                  ▼
-                                                                    ┌───────────────────────────┐
-                                                                    │ Step 4: Role B            │
-                                                                    │ Certificate & Delivery    │
-                                                                    └───────────────────────────┘
-```
+The v14--v16 network already uses the 15 exact D4 orbits.  A channel at
+coordinates `(x,y)` shares a state with all channels generated by sign changes
+and exchange of `x` and `y`.  Orbit multiplicities sum to 100, so the reduction
+is conservative and exact under D4-symmetric coefficients and boundary
+conditions.
 
-### Step 1: Reconcile Power Convention (Fix F2)
-- Adopt uniform convention: $Q_{\text{absorbed}} = f_{\text{scale}} \cdot I_{\text{reported}} \cdot A_{\text{frt}}$ with $\eta_{\text{abs}} = 1.0$, so $f_{\text{scale}}$ represents net absorbed power delivered fraction identically across 1D and 2D models.
+The present evidence supports D4 for the next calculation:
 
-### Step 2: Invariant Extraction Script (`check_2D_invariants.jl`)
-- Create `test/check_2D_invariants.jl` to process solved `2D_v3` fields:
-  1. Regress apparent global $\text{Nu} = C \cdot \text{Re}^m$ ($I1$).
-  2. Compute crossover effectiveness $\varepsilon^*$ ($I2$).
-  3. Regress deep nonequilibrium slope $\Lambda_{107}$ vs $\text{Re}$ ($I3$).
-  4. Compute total parasitic loss conductance $K_{\text{loss}}$ ($I5$).
+- the accepted optical hypothesis is centered, not side-weighted;
+- the fully free rear region is approximately a centered 13 mm diameter;
+- the groove obstruction is represented radially;
+- the monolith is square and the felt fills the surrounding cavity;
+- the tube/adaptor path is centered in the model; and
+- the manuscript gives `Gr/Re^2 <= 10^-3`, so gravity does not justify
+  different upper and lower channel states.
 
-### Step 3: Release $C_{\text{cavity}}$ Prior (Fix F1 & $I4$)
-- Re-run calibration with $w_C = 0.0$ and unconstrained $C_{\text{cavity}} \in [100, 800\text{ J/K}]$.
-- Verify that the fitted assembly heat capacity re-emerges near $301 \pm 23\text{ J/K}$.
+Thermocouples on one side do not break the physical state symmetry; they are
+observation operators on the corresponding exterior orbit.
 
-### Step 4: Final Role B Certification & Manuscript Table Generation
-- Generate the final validated 2D coefficient table:
-  - Effective anisotropic conductivities: $k_{s,r}^{\text{eff}}, k_{s,z}^{\text{eff}}$
-  - Convective closure: $A_{\text{Nu}}, B_{\text{Re}}, \text{Nu}(\text{Re}, \text{Pr}, z)$
-  - Optical extinction: $\beta_{\text{opt}}, \sigma_{\text{beam}}$
-  - Insulation & Loss: $k_{\text{felt}}(T), h_{\text{front}}(T), K_{\text{loss}}$
-- Attach the 5/5 Acceptance Gate Certification to `summaries/2D_v2_theory_manual.md`.
+**Decision:** retain the 15-orbit network for v17A and for any centered
+rear-manifold model.  Move to 25 only if a proposed mechanism breaks
+`x <-> y` symmetry while retaining both mirror planes.  Move to 100 only if
+documented geometry or forcing breaks those mirror planes.  Increasing the
+state count without such evidence adds unidentifiable freedom and no physics.
+
+## 3. Nondimensional constraints from the manuscript
+
+The model must respect the regime analysis before any new term is introduced.
+
+| group or invariant | measured range/result | modeling consequence |
+|---|---|---|
+| `Re` | 23--94 per channel | deeply laminar; use local temperature-dependent properties and conserved per-channel mass flow |
+| `Pr` | 0.684--0.690 | effectively constant; a new fitted independent `Pr` exponent is not identifiable |
+| `Gz_L` | 0.18--0.70 | outlet is thermally developed; entrance development occupies only the first few millimetres |
+| `Pe L/D_h` | 1500--5900 | axial gas conduction is negligible |
+| `Gr/Re^2` | at most `10^-3` | channel buoyancy is negligible and cannot explain the radial profile |
+| `Bi` | below `10^-5` | wall-normal SiC gradients are not rate-limiting; nonuniformity is at the monolith/assembly scale |
+| `Kn` | about `10^-4` | continuum gas properties are appropriate |
+| `N_rc` | about 1.6 at 600 K and 5 at 1000 K | nonlocal in-channel radiation can compete with or exceed gas conduction and is a leading missing axial mechanism |
+| apparent `Nu` | `3.1e-4 Re^1.44`, or 0.028--0.212 | the measured coefficient is assembly-scale, not the local square-duct film coefficient |
+| effectiveness | 0.57--0.78; inversion at `epsilon*=0.66 +/- 0.03` | axial peak migration must emerge on effectiveness, not be fitted separately by flux group |
+| deep LTNE | `Lambda_107=0.038+8.3e-4 Re` | the model must reproduce growing downstream gas/side-wall nonequilibrium |
+| slow mode | `C_eff=301 +/- 23 J/K`; `K_loss=0.10--0.16 W/K` | hardware/felt storage and losses must emerge from physical inventories and global contacts |
+| power ratio | 262--1665 kJ/kg | use as an operating coordinate and shape diagnostic, not as an extra free law |
+
+### Verified T8-position correction in the manuscript reduction
+
+The current manuscript text and experimental reduction scripts still state
+`z_T8=11 mm` and use wall weights `(0.248, 0.365, 0.387)`.  The verified
+positions are 5, 58, and 107 mm.  With constant extrapolation to the 0 and
+137 mm end faces, the exact piecewise-linear quadrature is
+
+`Tbar_w = 0.229927 T8 + 0.372263 T12 + 0.397810 T11`.
+
+A direct deterministic sensitivity calculation from
+`steady_state_metrics.csv` gives:
+
+| reduction | apparent Nu law | `r2` | inversion `epsilon*` at 456 / 304 / 256 kW/m2 |
+|---|---|---:|---|
+| current manuscript weights | `3.0768e-4 Re^1.4435` | 0.9713 | 0.6712 / 0.6714 / 0.6258 |
+| corrected 5/58/107 mm weights | `3.2204e-4 Re^1.4327` | 0.9722 | 0.6729 / 0.6729 / 0.6283 |
+
+Thus the principal nondimensional conclusions are robust: the apparent
+exchange remains far below duct theory, the exponent remains strongly
+superlinear, and the inversion remains near two-thirds effectiveness.
+Nevertheless, the manuscript text, main reduction, uncertainty propagation,
+figures, and reported rounded values must be regenerated consistently before
+the corrected values become the formal model acceptance targets.  Until then,
+the table above records both conventions and no model should exploit their
+small difference.
+
+Two distinctions are mandatory:
+
+1. The local channel-film Nusselt number and the manuscript's apparent global
+   Nusselt number are different quantities.  A local Graetz/duct law may be
+   used in the channel equations, but the apparent `Nu` must be reconstructed
+   from the simulated side-wall and outlet observables using the manuscript's
+   exact definition.
+2. A fitted axial deposition law is initially a model-form diagnostic.  Its
+   parameters cannot be published as optical coefficients until the law is
+   replaced by, or shown equivalent to, a physically conservative radiation
+   model and passes identifiability tests.
+
+## 4. Frozen physical foundation
+
+All candidates start from the following audited foundation:
+
+- 19 by 19 mm square monolith, 137 mm length, 100 square 1.5 mm channels;
+- measured 40.06 g SiC inventory and temperature-dependent SiC properties;
+- 15 D4 channel orbits with multiplicities summing to 100;
+- corrected MFC standard mass flow conserved across the receiver;
+- local `rho(T)`, `mu(T)`, `cp(T)`, and `k_g(T)`;
+- common-pressure channel flow, with no fitted bypass fraction;
+- centered radial illumination;
+- verified side-wall axial positions 5, 58, and 107 mm in the model-data map;
+- exterior-wall observation for the shallow-dip side thermocouples;
+- solid alumina adaptor with only receiver and tube openings;
+- continuous but non-firm receiver/felt contact;
+- tube isolated from the felt over the adaptor and flange portions; and
+- physical felt, metal, adaptor, tube, flange, and housing inventories.
+
+The v16 value `k_felt scale = 7.2` is not part of the foundation.  It is a
+rejected compensating fit.  V17 starts from supplier/literature-plausible
+global felt properties and treats their uncertainty as a bounded sensitivity,
+not as an experiment-specific correction.
+
+## 5. Staged next-model strategy
+
+### Stage 0 -- invariant evaluator before further fitting
+
+First correct the experimental manuscript pipeline to 5/58/107 mm, regenerate
+its uncertainty intervals and figures, and freeze the revised invariant table.
+Then build one post-processor that applies those exact definitions to every
+candidate and data split:
+
+1. apparent `Nu(Re)` prefactor and exponent;
+2. effectiveness and the `T12-T8=0` crossover `epsilon*`;
+3. `Lambda_58` and `Lambda_107(Re)`;
+4. slow eigenvalue, emergent `C_eff`, and `K_loss(T)`;
+5. normalized heating master curves and wall/gas lag;
+6. delivered-power closure and group power factors;
+7. axial peak location, radial signs, temperature RMSE, and DP1 RMSE; and
+8. energy-rate residual and mesh-transfer error.
+
+This evaluator is a prerequisite, not a final clean-up task.
+
+### Stage 1 -- v17A axial-radiation/source discrimination
+
+Retain the 15-orbit hydraulics, centered radial field, plausible hardware/felt
+foundation, and all radial parameters.  Change only the axial radiative
+description.
+
+Use two substeps:
+
+1. **Conservative diagnostic screen.**  Compare the single Beer--Lambert law
+   with a normalized two-component source consisting of near-entry absorption
+   and deeper channel-radiation deposition.  The shared source split and deep
+   length are common to all experiments, nonnegative, and normalized so total
+   core absorbed power is identical for every candidate.  Fit normalized axial
+   differences or profiles first, so group power cannot manufacture the shape.
+2. **Physical replacement.**  If deeper deposition passes the diagnostic,
+   replace the empirical split by a diffuse-gray axial radiosity/view-factor
+   network (or a demonstrably equivalent conservative closure) between channel
+   wall segments and the aperture.  The manuscript's `N_rc=O(1--5)` makes this
+   mechanism physically admissible.  Beer--Lambert extinction, wall
+   emissivity/absorptivity, and any scattering parameter must be global and
+   identifiable.
+
+Profile one nuisance delivered-power multiplier per lamp configuration inside
+each source candidate.  Power factors set absolute level only; the candidate is
+ranked first by axial shape and inversion behavior.  Use the existing
+training/held-out experiment split throughout.
+
+Proceed only if the model:
+
+- reproduces the 58 mm maximum in at least 8 of the 10 observed mid-peak cases;
+- produces a flux-independent crossover consistent with
+  `epsilon*=0.66 +/- 0.03`;
+- reduces held-out axial RMSE below 40 K;
+- improves held-out overall RMSE below the v16 value of 61.46 K; and
+- does not degrade cooling, DP1, conservation, or mesh transfer.
+
+Failure means that axial source redistribution alone is rejected; do not add
+more source zones.
+
+### Stage 2 -- v17B rear-manifold pressure field
+
+Freeze the accepted Stage-1 radiation law before changing radial hydraulics.
+Replace the independent per-channel rear groove penalty with a conservative
+rear-manifold pressure network:
+
+- each orbit discharges to a rear pressure node;
+- adjacent rear nodes exchange lateral flow;
+- the centered 13 mm diameter region connects freely to the outlet;
+- the surrounding region crosses the observed groove obstruction; and
+- total MFC mass flow remains conserved.
+
+Because this geometry is centered and radial, the network remains exactly
+D4-symmetric and uses 15 orbit pressures.  Fit at most a small set of global
+hydraulic quantities, preferably one lateral-manifold conductance and one
+groove loss scale.  Cold `t0` DP1 measurements identify the hydraulic scale;
+hot DP1 and the radial temperature trends are validation outputs.  No bypass
+branch is estimated.
+
+The decisive outputs are:
+
+- radial side/interior signs and their convergence as total flow decreases;
+- the superlinear apparent `Nu(Re)` signature of flow-dependent solid
+  recruitment;
+- hot-channel/low-flow feedback strength; and
+- DP1 across cold and hot cases.
+
+### Stage 3 -- transient hardware and loss closure
+
+Only after axial and radial mechanisms pass independently:
+
+- fit global contact/loss quantities to cooling training cases;
+- hold measured material inventories fixed;
+- release any direct `C_eff=301 J/K` prior;
+- verify `C_eff` from the model's slow eigenmode;
+- validate the same parameters on held-out cooling and every heating run; and
+- confirm the normalized master-curve collapse and wall/gas lag.
+
+Felt conductivity and heat capacity may vary only within physically defensible
+global uncertainty ranges.  Boundary-seeking values are evidence of missing
+topology, not measured felt properties.
+
+### Stage 4 -- minimal joint confirmation
+
+Combine only mechanisms that passed their isolated stages.  Refit jointly with:
+
+- shared physical transport/radiation/hydraulic parameters;
+- one nuisance power factor per lamp configuration;
+- no experiment-specific thermophysical properties;
+- no side-weighted beam;
+- no fitted bypass fraction; and
+- no heating/cooling regime switch.
+
+Use profile likelihood or an equivalent identifiability test, training/held-out
+experiments, and at least two axial meshes.  Report parameter covariance and
+prediction intervals.  A lower RMSE is insufficient if parameters are
+bound-active or mutually compensating.
+
+## 6. Power treatment
+
+The convention is
+
+`Q_delivered = f_group I_reported A_front`,
+
+with no second hidden absorptivity multiplier.  The three `f_group` values are
+nuisance delivery factors and must be re-profiled inside each materially
+different loss/source model, as the v16 correction demonstrated.
+
+They do not validate the optical law.  Final values must also be compared with
+the manuscript energy-closure brackets:
+
+| irradiance | closure bracket |
+|---:|---:|
+| 456 kW/m2 | 1.05--1.34 |
+| 304 kW/m2 | 1.23--1.58 |
+| 256 kW/m2 | 0.84--1.11 |
+
+Values outside these brackets may be used during a diagnostic screen, but they
+flag unresolved energy accounting and prevent Role B optical-coefficient
+claims.
+
+## 7. Information use without new experiments
+
+No further experiments are required for the staged discrimination above.
+Existing information is assigned once:
+
+- cold `t0` DP1 plus MFC flow: hydraulic identification;
+- hot DP1: hydraulic/property validation;
+- normalized 5/58/107 mm side profiles: axial-radiation identification;
+- 58/107 mm interior-to-side deficits: LTNE/radial validation;
+- cooling training cases: contact, storage, and loss identification;
+- held-out cooling and all heating transients: transient validation;
+- steady outlet enthalpy and loss closure: power-factor guard; and
+- alternate heating cases: genuine prediction tests.
+
+Sparse observations prohibit fitting a separate optical, hydraulic, or
+thermophysical parameter for each experiment.  Uncertainty must be propagated
+globally and the conclusions stated as mechanism discrimination where
+coefficient identification is not possible.
+
+## 8. Role B acceptance gate
+
+Every item below is reported explicitly as pass or fail:
+
+1. **Conservation and numerical adequacy:** exact total mass-flow bookkeeping,
+   explicit energy closure, and acceptable transfer across at least two axial
+   meshes.
+2. **Heating and cooling prediction:** simultaneous performance with no
+   phase-specific physics or parameters; held-out overall error improves on
+   v16 and spatial metrics pass their Stage-1/2 thresholds.
+3. **Parameter interiority and identifiability:** every coefficient proposed as
+   physical is interior, has a finite useful uncertainty interval, and is not
+   only compensating a power factor or contact property.
+4. **I1 apparent exchange:** post-processed apparent `Nu(Re)` reproduces the
+   measured magnitude and superlinear exponent within stated experimental
+   uncertainty.
+5. **I2 inversion:** `epsilon*` and its approximate flux independence emerge.
+6. **I3 LTNE:** the sign, near-linear `Lambda_107(Re)` slope, and weak flux
+   dependence emerge.
+7. **I4/I5 transient closure:** `C_eff=301 +/- 23 J/K` re-emerges with its prior
+   released and `K_loss` lies in 0.10--0.16 W/K over the relevant temperatures.
+8. **I6 power accounting:** the single power convention is used, group factors
+   are reported as nuisance quantities, and closure consistency is explicit.
+9. **No forbidden compensation:** no experiment-specific `k` or `cp`, arbitrary
+   side heating, unconstrained felt conductivity, empirical bypass fraction,
+   or surrogate sink.
+
+Until all nine pass, the 2D model remains Role A and its fitted values are
+candidate effective parameters, not validated material or transport
+coefficients.
+
+## 9. Immediate implementation decision
+
+The immediate next calculation is **v17A on the existing 15 D4 orbits**, not a
+100-channel rewrite:
+
+1. implement the manuscript-invariant evaluator;
+2. document and test exact power conservation for alternative axial source
+   laws;
+3. screen the conservative two-component axial deposition using normalized
+   axial profiles with nested group power factors;
+4. promote it to a physical axial radiosity model only if the screen passes;
+5. freeze the axial result before testing the 15-orbit rear-manifold pressure
+   network.
+
+This ordering targets the two unresolved observations separately: the wrong
+front-to-middle axial shape first, then the wrong radial flow/temperature
+ordering.  It preserves the study objective of extracting validated
+macroscopic coefficients rather than fitting an increasingly flexible
+temperature interpolator.
