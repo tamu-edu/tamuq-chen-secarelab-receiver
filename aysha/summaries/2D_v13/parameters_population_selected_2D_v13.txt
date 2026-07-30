@@ -1,0 +1,6 @@
+objective=5.335081922497875
+side_solid_fraction=0.075
+side_gas_heat_fraction=0.0225
+active_side_conductance_W_K_m=30.0
+side_felt_contact_h_W_m2K=5.0
+inherited_v12_parameters_frozen=true

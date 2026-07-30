@@ -1,0 +1,101 @@
+Fitting cold t0 hydraulics without groove...
+Fitting cold t0 hydraulics with measured groove...
+cold no-groove theta=[-0.6138313681755245, 1.9440216980094194], RMSE=0.02540536195703181, AICc=-60.11031047818285
+cold groove theta=[-0.5428447496201336, 0.9701974617588522, 184.15800344228472], RMSE=0.02452183756803438, AICc=-55.9474421241962
+Running v11 variant apparent_prescribed_v9
+  E67
+  E68
+  E69
+  E70
+  E71
+  E72
+  E73
+  E74
+  E75
+  E76
+  E77
+  E78
+  E79
+  E80
+  E81
+Running v11 variant graetz_fd361_prescribed
+  E67
+  E68
+  E69
+  E70
+  E71
+  E72
+  E73
+  E74
+  E75
+  E76
+  E77
+  E78
+  E79
+  E80
+  E81
+Running v11 variant graetz_fd298_prescribed
+  E67
+  E68
+  E69
+  E70
+  E71
+  E72
+  E73
+  E74
+  E75
+  E76
+  E77
+  E78
+  E79
+  E80
+  E81
+Running v11 variant graetz_capuano366_prescribed
+  E67
+  E68
+  E69
+  E70
+  E71
+  E72
+  E73
+  E74
+  E75
+  E76
+  E77
+  E78
+  E79
+  E80
+  E81
+Running v11 variant graetz_fd361_equal_open
+  E67
+  E68
+  E69
+  E70
+  E71
+  E72
+  E73
+  E74
+  E75
+  E76
+  E77
+  E78
+  E79
+  E80
+  E81
+Running v11 variant graetz_fd361_equal_groove
+  E67
+  E68
+  E69
+  E70
+  E71
+  E72
+  E73
+  E74
+  E75
+  E76
+  E77
+  E78
+  E79
+  E80
+  E81
+v11 complete: D:\kkakosim\github\tamuq-chen-secarelab-receiver\aysha\summaries\2D_v11\model_form_summary_2D_v11.txt

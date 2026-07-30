@@ -1344,3 +1344,1623 @@ $$
 It is therefore incorporated as measured geometry plus a pressure-loss law,
 not as a fitted radial irradiance pattern, blocked-channel fraction or
 unmeasured bypass.
+
+## 2026-07-29: v11 implementation and no-refit model-form results
+
+### What was implemented
+
+`2D_v11.jl` implements the predeclared literature test without refitting the
+v9 optical, solid or external-loss parameters:
+
+1. The v10 exposed-front gas-temperature jump is disabled.
+2. The internal apparent closure can be replaced by the local Kays/Graetz
+   form
+
+   $$
+   \mathrm{Gz}=\mathrm{Re}\,\mathrm{Pr}\frac{D_h}{z},\qquad
+   \mathrm{Nu}
+   =
+   S_h\left[
+   \mathrm{Nu}_{fd}
+   \frac{0.104\,\mathrm{Gz}}
+        {1+0.016\,\mathrm{Gz}^{0.8}}
+   \right]
+   \left(\frac{T_g}{T_w}\right)^n.
+   $$
+
+   Local gas temperature supplies $\mu$, $c_p$ and $\mathrm{Pr}$; local wall
+   temperature supplies the conductivity used in
+   $h=\mathrm{Nu}k_w/D_h$. The production branch uses
+   `Nu_fd=3.61`, `n=0` and `S_h=1`. Alternatives `Nu_fd=2.98` and
+   `Nu_fd=3.66, n=0.45` were also tested.
+3. A parallel-ring iteration conserves the corrected MFC mass flow exactly
+   while solving for a common path pressure drop.
+4. The rear support is represented by an exact annular overlap outside the
+   measured 13 mm free diameter:
+
+   $$
+   \Delta p_{\mathrm{groove},i}
+   =
+   I_iK_{\mathrm{groove}}\frac{\rho_{i,\mathrm{out}}u_{i,\mathrm{out}}^2}{2}.
+   $$
+
+   All channels remain open and retain their complete internal flow and
+   heat-transfer areas. The historical heating-only excess-loss coefficient
+   is zero in this branch.
+5. Results now retain ring flow, ring pressure, groove pressure, overlap,
+   local `Pr`, `Gz`, `Nu`, velocity and the common-pressure convergence
+   residual.
+
+Reproducible entry points are `run_2D_v11.jl`,
+`plot_2D_v11.jl`, `test/smoke_2D_v11.jl` and
+`test/mesh_2D_v11.jl`. Numerical tables and figures are under
+`summaries/2D_v11/`.
+
+### Cold t0 identification: the groove is not uniquely identified by DP1
+
+Nine heating records satisfying the predeclared cold-state tolerance were
+used. The two cold fits were:
+
+| Cold hydraulic form | Offset (mbar) | Shared resistance scale | Groove K | RMSE (mbar) | AICc |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Equal pressure, no groove | -0.61383 | 1.94402 | 0 | 0.02541 | -60.11 |
+| Equal pressure, 13 mm free diameter | -0.54284 | 0.97020 | 184.16 | 0.02452 | -55.95 |
+
+The groove fit has a physically interesting decomposition: it changes the
+shared channel-resistance scale from about 1.94 to about 0.97 and assigns the
+remaining pressure loss to the measured rear restriction. It is not,
+however, a statistical improvement. RMSE improves by only 0.00088 mbar and
+the extra parameter worsens AICc by 4.16.
+
+Profiling fixed groove coefficients demonstrates the tradeoff:
+
+| Groove K | 0 | 10 | 40 | 80 | 160 |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| Fitted resistance scale | 1.944 | 1.751 | 1.384 | 1.163 | 0.996 |
+| Cold RMSE (mbar) | 0.02541 | 0.02492 | 0.02476 | 0.02465 | 0.02453 |
+
+Therefore cold DP1 supports a combined path resistance but cannot separately
+determine how much belongs to channel friction and how much belongs to the
+rear groove. `K=184.16` is a useful model-form test value, not a validated
+groove coefficient.
+
+### Full 15-case no-refit matrix
+
+Six variants were run over E67--E81 on the same sensitivity mesh:
+
+- historical v9 apparent heat transfer with prescribed radial flow;
+- fixed-flow Graetz with `Nu_fd=3.61`;
+- fixed-flow Graetz with `Nu_fd=2.98`;
+- fixed-flow Capuano alternative (`Nu_fd=3.66`, `n=0.45`);
+- Graetz with equal-pressure open discharge; and
+- Graetz with equal pressure plus the cold-fitted rear groove.
+
+This is intentionally a **frozen-v9 compatibility test**, not a fair
+recalibrated competition between v9 and v11. V10 also retained the v9 fit and
+varied only its new front-exchange terms. In the nominal Graetz branch,
+v9's fitted `A_Nu` and its fixed `B_Re` are inactive, and the old hot-excess
+hydraulic coefficient is disabled. However, v11 still inherits the
+v9-fitted radial and axial conductivity scales, three irradiance-group power
+scales, radiative extinction and optical extinction. In particular,
+`k_scale_z=0.2` was bound-active in the v9 fit. Those parameters can be
+compensators for the v9 apparent heat-transfer law and cannot be presumed
+optimal for Graetz heat transfer.
+
+Key aggregate results are:
+
+| Variant | Axial `T12-T8` RMSE (K) | Radial `T12-T9` RMSE (K) | Radial `T11-T10` RMSE (K) | T3 MAE (K) | hot DP1 RMSE (mbar) | flow-slope RMSE (K/LPM) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| v9 apparent, prescribed | 143.08 | 25.85 | 38.01 | 78.38 | 0.161 | 7.25 |
+| Graetz 3.61, prescribed | 178.64 | 25.45 | 38.08 | 99.95 | 0.523 | 22.72 |
+| Graetz 2.98, prescribed | 176.94 | 25.45 | 38.08 | 99.84 | 0.523 | 22.77 |
+| Capuano alternative, prescribed | 177.88 | 25.45 | 38.08 | 99.66 | 0.522 | 22.87 |
+| Graetz 3.61, equal-pressure open | 178.78 | 25.50 | 38.09 | 99.95 | 0.523 | 22.73 |
+| Graetz 3.61, equal-pressure groove | 176.14 | 24.83 | 37.97 | 99.91 | 0.570 | 23.01 |
+
+The v11 Graetz forms fail the axial-profile gate by a large margin. More
+importantly, they reverse every observed flow trend. The measured slopes of
+`T12-T8` are `+17.34`, `+10.48` and `+6.90 K/(L/min)` at 456, 304 and
+256 kW/m2. The nominal Graetz/groove predictions are `-14.59`, `-9.40`
+and `-6.29 K/(L/min)`.
+
+Changing the downstream asymptote or applying the published temperature
+correction has almost no practical effect. The literature-scale interfacial
+exchange is already strong enough that the gas/solid coupling is near its
+effective NTU saturation in this continuum model.
+
+### The rear-groove hypothesis produces flow maldistribution but not the measured solid radial profile
+
+The nominal groove branch predicts a mean core-to-edge mass-flux ratio of
+2.18, reaching approximately 3.1 at the highest flow. The ratio decreases
+toward roughly 1.5 at the lowest flow, so the quadratic restriction produces
+the expected convergence of channel flow distributions as total flow falls.
+Mass is conserved and ring pressure drops agree to better than
+`8.7e-6` relative error.
+
+Despite that strong hydraulic effect, the predicted solid radial offsets
+remain nearly zero:
+
+| Quantity | Measured mean scale | Groove-model mean | Model RMSE |
+| --- | ---: | ---: | ---: |
+| `T12-T9` at 58 mm | about +24.5 K | -0.25 K | 24.83 K |
+| `T11-T10` at 107 mm | about +36 K | -0.70 K | 37.97 K |
+
+For example, E67 has a predicted core/edge flow ratio of 2.67, but predicts
+`T12-T9=+0.68 K` and `T11-T10=-0.36 K`, compared with measured
+`+24.44 K` and `+53.06 K`. The current continuum solid therefore smooths
+the imposed hydraulic contrast before it appears in the side-versus-core
+thermocouple observables.
+
+This rejects **flow redistribution alone within the current axisymmetric
+solid model** as the explanation of the radial thermocouple profile. It does
+not show that the observed support groove is absent.
+
+Repeating the complete 15-case groove branch for 12, 13 and 14 mm free
+diameters does not change this conclusion:
+
+| Free diameter | Cold-fitted `K` | Mean core/edge mass flux | `T12-T9` mean / RMSE | `T11-T10` mean / RMSE |
+| ---: | ---: | ---: | ---: | ---: |
+| 12 mm | 291.68 | 3.33 | +0.19 / 24.38 K | -0.63 / 37.88 K |
+| 13 mm | 184.16 | 2.18 | -0.25 / 24.83 K | -0.70 / 37.97 K |
+| 14 mm | 207.18 | 2.26 | -0.25 / 24.82 K | -0.70 / 37.97 K |
+
+Even the 12 mm case, with the largest hydraulic contrast, leaves the radial
+solid signal near zero. The fitted `K` values remain non-unique decompositions
+of the cold path resistance.
+
+### Pressure result
+
+Replacing the empirical hot-excess v9 pressure term with the cold-fitted
+groove does not transfer to heating: hot DP1 RMSE rises from 0.161 mbar for
+the historical comparison to 0.570 mbar, with a -0.373 mbar bias. Because
+the hot pressure calculation uses the predicted gas-temperature field, its
+failure is coupled to the rejected thermal model. No heating-only groove
+refit is justified.
+
+### Verification
+
+- v9 regression: 34/34 tests passed.
+- v10 regression: 21/21 tests passed.
+- v11 unit/smoke suite: 27/27 tests passed.
+- v11 nominal-mesh confirmation: 4/4 tests passed.
+- Mass conservation is at floating-point precision.
+- The groove branch pressure-equality residual is below `8.7e-6`.
+- The uniform-state energy ledger residual is below `1e-8 W`.
+- The implemented local law approaches its prescribed finite
+  `Nu_fd` downstream.
+- Re-running E67, E72 and E77 on the nominal 14/7/3 radial,
+  45-node receiver and 30-node rear mesh changes any final sensor by at most
+  1.26 K. Axial offsets change by at most 0.36 K and radial offsets by at
+  most 0.04 K. The rejection is not a sensitivity-mesh artifact.
+
+### Decision
+
+V11 is retained as a tested model-form branch and **is not accepted as the
+new calibrated physical model**. More precisely, the frozen-v9 parameter
+point is rejected for v11; the run does not yet reject every independently
+recalibrated Graetz model. No heat-transfer scale was fitted in this first
+stage because the predeclared condition for a simple one-parameter scale was
+correct profile shape with a common magnitude error, whereas the inherited
+point has the wrong axial slope signs and essentially no radial signal.
+
+The next stage must therefore be a v11-specific sensitivity and
+identifiability audit followed, only if supported, by a constrained
+training-only refit. It must use the existing nine heating training cases and
+six held-out heating cases. At minimum it should examine `S_h`,
+`k_scale_r`, `k_scale_z`, `beta_opt` and the three irradiance-group delivery
+scales, while avoiding a simultaneous unconstrained refit of every v9
+parameter. Cooling remains validation. This is needed to distinguish a
+rejected transport form from rejection caused by v9 compensation parameters.
+
+### Inheritance sensitivity: the v9 optical fit materially confounds the axial verdict
+
+A broad one-at-a-time screen was subsequently run using the high- and
+low-flow records in every irradiance group. It tested:
+
+- `S_h=0.10, 0.25, 0.50`;
+- `k_scale_r=0.05, 0.30`;
+- `k_scale_z=0.50, 1.00`;
+- `beta_opt=10, 50, 110 1/m`;
+- `beta_rad=20, 300 1/m`; and
+- a common 0.8/1.2 factor on delivered power.
+
+The screen confirms that the user's concern is substantive. At the inherited
+v9 value `beta_opt=21.2914 1/m`, the six-endpoint axial RMSE is 203.73 K
+and all slopes are negative. Restoring `beta_opt=110 1/m` changes all three
+slopes to positive and reduces endpoint axial RMSE to 67.57 K. None of the
+other one-at-a-time inherited-parameter changes restores all three signs.
+
+The complete 15-case confirmation at `beta_opt=110 1/m` gives:
+
+| Metric | Frozen v9 `beta_opt=21.29` | `beta_opt=110` confirmation |
+| --- | ---: | ---: |
+| Axial `T12-T8` RMSE | 176.14 K | 58.17 K |
+| Mean `T12-T8` | 149.87 K | 35.06 K |
+| 456-kW/m2 slope | -14.59 | +0.19 K/(L/min) |
+| 304-kW/m2 slope | -9.40 | +1.05 K/(L/min) |
+| 256-kW/m2 slope | -6.29 | +0.52 K/(L/min) |
+| T3 MAE | 99.91 K | 91.19 K |
+| hot DP1 RMSE | 0.570 mbar | 0.437 mbar |
+| mid radial mean / RMSE | -0.25 / 24.83 K | -1.01 / 25.61 K |
+| deep radial mean / RMSE | -0.70 / 37.97 K | -0.88 / 38.19 K |
+
+The positive full-group correlations are weak (`0.05`, `0.23`, `0.24`) and
+the slopes remain far below the measured `17.34`, `10.48` and
+`6.90 K/(L/min)`. The result does not yet validate v11. It does show that
+the earlier statement “Graetz reverses the flow trends” was conditional on
+the v9 optical extinction and cannot be used to reject Graetz before a
+v11-specific refit.
+
+The radial verdict is more robust. Every broad sensitivity, including
+`k_scale_r=0.05`, leaves the radial means near zero or negative, and
+`beta_opt=110` does not improve them. Thus:
+
+- **axial/Graetz verdict:** reopened; controlled v11 recalibration is
+  justified;
+- **groove-only radial verdict:** still rejected within the current
+  axisymmetric solid/observation model.
+
+The next calibration must profile optical extinction jointly with the
+smallest identifiable subset of `S_h`, axial conductivity and group power
+scales, use only the nine established heating training cases, and report the
+six held-out cases and cooling unchanged. Radial conductivity should not be
+freed merely to chase the side TCs because its broad sensitivity has the
+wrong direction and the current annular observation model remains suspect.
+
+The next model should not add a side-weighted irradiance profile or another
+free Reynolds exponent. The evidence instead directs the next test toward
+the mapping between the three-dimensional square receiver/support/side-wall
+geometry and the thermocouple observations. In particular, the present
+axisymmetric perimeter state is an annular average, while the side
+thermocouples were fixed in shallow wall dips and the rear groove is a local
+mechanical boundary. A bounded square-sector/contact or two-solid-population
+test should separate:
+
+1. internal SiC radial conduction;
+2. local receiver-to-holder/groove thermal contact and rear obstruction; and
+3. the side-thermocouple observation/contact model.
+
+The conserved MFC mass flow, local $\rho(T)$ velocity, common-pressure
+hydraulics and measured 13 mm free-diameter geometry should remain. The
+groove coefficient must remain profiled or externally constrained rather
+than presented as independently identified.
+
+## 2026-07-29: completed staged v11-specific calibration
+
+### Fitting separation and method
+
+The agreed staged calibration was completed without validation leakage:
+
+```text
+training heating:
+E67 E69 E71 E72 E74 E76 E77 E79 E81
+
+held-out heating:
+E68 E70 E73 E75 E78 E80
+
+cooling validation:
+C69 C80 C81
+```
+
+Stage 1 fitted only optical extinction `beta_opt`, the Graetz multiplier
+`S_h`, and axial SiC conductivity scale `k_scale_z`. Its objective used
+axial differences at the verified 5, 58 and 107 mm locations, the core
+58-to-107 mm difference, the receiver/T3 relation and within-irradiance flow
+ordering. It did not include the structurally unresolved side-minus-core
+radial offsets.
+
+Twenty-two broad true-simulation design points were evaluated. A quadratic
+response surface proposed a candidate, after which seven true local
+evaluations selected the result. The response surface chose only where to
+evaluate; every selection loss came from actual v11 transient integrations.
+
+Stage 2 held the transport parameters fixed and profiled each irradiance
+group's power scale separately. It used `T8`, radially averaged temperatures
+at 58 and 107 mm, T3 and T2. This prevents the known side/core mismatch from
+controlling delivered power.
+
+### Selected parameters
+
+| Parameter | v9 inherited | Staged v11 | Status |
+| --- | ---: | ---: | --- |
+| `beta_opt` | 21.2914 1/m | 218.8 1/m | interior |
+| `S_h` | not applicable | 1.142 | interior, order unity |
+| `k_scale_z` | 0.2 | 0.2 | lower-bound active |
+| power scale, 456 | 1.05067 | 1.25 | interior |
+| power scale, 304 | 1.05175 | 1.05175 | unchanged |
+| power scale, 256 | 0.62130 | 0.77352 | interior |
+
+The final normalized training profile and level objectives are 3.5724 and
+1.4331. The six-parameter residual Jacobian has singular values
+
+```text
+31.70, 27.68, 17.77, 11.27, 5.06, 3.38
+```
+
+giving local rank 6/6, condition number 9.37 and maximum absolute column
+correlation 0.454. This is a cleaner local numerical rank than v9, but does
+not validate the parameters: `k_scale_z` is still bound-active and the
+independent validations fail.
+
+### What improved
+
+The complete E67--E81 axial `T12-T8` RMSE falls from 176.14 K at the
+frozen-v9 v11 point to 44.14 K. Training and held-out axial RMSE are similar,
+45.47 and 42.06 K, so this particular improvement transfers.
+
+All three full-group flow-slope signs are now correct:
+
+| Irradiance | Model slope | Observed slope | Model correlation |
+| ---: | ---: | ---: | ---: |
+| 456 kW/m2 | +8.02 | +17.34 | 0.848 |
+| 304 kW/m2 | +4.62 | +10.48 | 0.678 |
+| 256 kW/m2 | +4.24 | +6.90 | 0.762 |
+
+Thus the frozen-v9 negative-slope result was partly a wrong-parameter
+rejection. The staged model still predicts only about half the observed
+slope at 456 and 304 kW/m2 and remains above the predeclared 33.2 K axial
+RMSE target.
+
+Cooling DP1 RMSE is also good at 0.049 mbar. Mass conservation, energy
+closure and equal-pressure convergence remain satisfied.
+
+### What failed
+
+The axial-profile improvement does not transfer to the complete thermal
+response:
+
+| Phase | v9 mean sensor RMSE | staged v11 | v9 steady MAE | staged v11 |
+| --- | ---: | ---: | ---: | ---: |
+| Heating training | 76.21 K | 114.39 K | 78.72 K | 98.68 K |
+| Held-out heating | 63.92 K | 98.63 K | 68.46 K | 81.63 K |
+| Cooling validation | 34.71 K | 70.99 K | 15.75 K | 19.94 K |
+
+The time histories expose the primary failure. Staged v11 heats most
+receiver states to near plateau within a few hundred seconds, while the
+experiments continue evolving for roughly 1,000--3,000 seconds. It also
+cools too quickly. Mean absolute t90 errors are approximately 1,186 s in
+training, 1,280 s in held-out heating and 1,167 s in cooling. This is a
+missing thermal-timescale or observation-response issue, not a small optical
+power adjustment.
+
+Radial ordering remains wrong in every heating case:
+
+```text
+mean modeled T12-T9  = -1.22 K; sign correct 0/15
+mean modeled T11-T10 = -1.03 K; sign correct 0/15
+```
+
+Training/held-out radial RMSE remain about 25--26 K and 38 K. The staged
+transport/optical fit therefore does not rescue the groove-only radial
+mechanism.
+
+Heating DP1 also fails to transfer:
+
+```text
+training DP1 RMSE = 0.482 mbar
+held-out DP1 RMSE = 0.366 mbar
+v9 held-out reference = 0.193 mbar
+```
+
+The cooling DP1 improvement cannot compensate for this heating failure.
+
+### Numerical verification and decision
+
+`test/check_2D_v11_staged.jl` passes 12/12 checks. Parameters are finite and
+within bounds; the training profile improves from the `beta_opt=110` anchor;
+the uniform-state energy residual is zero; total mass is conserved; pressure
+equality remains below `1e-5`; and the largest sensitivity-to-nominal mesh
+final-sensor change over E67/E72/E77 is 2.58 K.
+
+The staged fit is **rejected for coefficient extraction**.
+
+Two conclusions can now be separated:
+
+1. A v11-specific optical/transport fit can restore the observed axial
+   flow-slope direction. The frozen-v9 v11 result was partly a
+   wrong-parameter rejection, exactly as questioned.
+2. The current v11 state and observation equations still cannot
+   simultaneously reproduce transient timescales, absolute held-out
+   temperatures, positive radial offsets and heating DP1. Therefore
+   `S_h=1.142`, `beta_opt=218.8 1/m` and the power scales must not be
+   reported as validated physical coefficients.
+
+Further fitting of `S_h`, `beta_opt`, power and conductivity inside the same
+state/observation model is not justified. The next test must independently
+constrain the missing time-scale/observation physics while addressing the
+square side-wall/support geometry:
+
+- a thermocouple/contact response model or independently measured sensor
+  time constant;
+- an audit of effective thermal mass and holder/contact storage using
+  cooling data;
+- a square-sector or two-solid-population representation for side/core
+  temperatures and local support contact; and
+- retention of conserved MFC mass flow, local `rho(T)` velocity,
+  equal-pressure channel allocation and the measured groove geometry.
+
+The formal result is in
+`summaries/2D_v11/staged_acceptance_status_2D_v11.txt`.
+
+---
+
+## 2026-07-29: v12 assembly-capacitance and observation-model formulation
+
+### Motivation and evidence carried forward
+
+Staged v11 improved the axial flow-trend direction but heated and cooled about
+1,200 s too quickly, predicted the wrong core/perimeter ordering in all 15
+heating cases and failed held-out absolute temperatures.  Independently, the
+experimental slow mode gives
+
+```text
+C_eff = 301 +/- 23 J/K
+```
+
+compared with approximately 42--47 J/K for the measured 40 g receiver.  The
+large fitted SiC `Cp` and `k` values used in earlier three-dimensional trials
+are therefore treated as model-form evidence for missing participating
+hardware, redistribution and observation physics, not as material-property
+measurements.
+
+### Geometry and hardware audit
+
+Annotated assembly images and subsequent clarification establish:
+
+```text
+SiC receiver                 19 x 19 mm, length 137 mm
+aluminum enclosure OD        150 mm
+aluminum radial thickness     18 mm
+enclosure inner radius        57 mm
+enclosure internal length    165 mm
+rear aluminum backplate       18 mm
+alumina adaptor OD            77.6 mm
+alumina adaptor length        57 mm
+receiver overlap              29 mm
+tube overlap                  28 mm
+alumina tube bore diameter    13 mm
+```
+
+The adaptor is solid apart from the square receiver opening in the overlap
+section and the tube bore in the rear section.  Its calculated volume and mass
+are
+
+```text
+overlap volume = 126.686 mL
+rear volume    = 128.709 mL
+total volume   = 255.395 mL
+mass at 3900 kg/m3 = 0.99604 kg
+```
+
+The felt fills all remaining cavity space.  Receiver/adaptor contact exists
+but is not firm.  The tube does not touch the felt: its internal portion is
+covered by the adaptor and the remaining portion is outside the cavity inside
+the continuously water-cooled flange.
+
+The v11 hardware representation was incomplete:
+
+1. the 0.996 kg alumina adaptor was absent and replaced by a direct
+   receiver-to-tube conductance;
+2. the aluminum sleeve ended at 137 rather than 165 mm;
+3. the 18 mm rear backplate was absent;
+4. the rear felt/adaptor topology and finite loose contact were absent; and
+5. interior flow-exposed thermocouples were compared directly with solid
+   temperature.
+
+Nominal v12 inventory at representative temperature is:
+
+| Component | Mass | Nominal capacity |
+| --- | ---: | ---: |
+| SiC receiver | 0.0401 kg | about 45 J/K |
+| cavity felt | 0.1926 kg | about 262 J/K at the nominal Cp |
+| alumina adaptor | 0.9960 kg | about 0.9--1.1 kJ/K |
+| aluminum sleeve | 3.325 kg | 2.993 kJ/K |
+| aluminum rear backplate | 0.852 kg | 0.767 kJ/K |
+| rear alumina tube | about 0.040 kg | about 36--45 J/K |
+
+These nominal capacities greatly exceed the observed 301 J/K slow-mode
+capacity.  V12 must therefore use finite contacts so only a fraction
+participates on the experimental time scale.  The capacities must not be
+lumped into the SiC state.
+
+### Felt-property correction and uncertainty
+
+The installed felt grade is unknown because the supplier did not provide a
+specification sheet.  The earlier v11 law,
+
+```text
+k_felt = 0.06 + 1.2e-10 T^3
+```
+
+gave about 0.21 W/m/K at 800 degC.  The supplied RS-3000 sheet, used only as
+a shape prior, reports 0.11 W/m/K at the same temperature.  V12 replaces the
+old cubic rise with interpolation through
+
+```text
+20, 500, 800, 1100, 1400, 1600 degC
+0.050, 0.080, 0.110, 0.170, 0.260, 0.320 W/m/K
+```
+
+and exposes one bounded global conductivity scale.  Density remains
+140 kg/m3.  A separate modest global felt-Cp scale is allowed because the
+grade is unknown.  Neither may vary by experiment.
+
+### V12 state and contact topology
+
+`2D_v12.jl` retains the conservative v11 receiver, gas, DP1 and
+equal-pressure ring equations and adds:
+
+```text
+T_adaptor(t)       physical 0.996 kg dense-alumina adaptor
+T_housing,rear(t)  missing 28 mm sleeve plus 18 mm backplate
+```
+
+The adaptor couples to:
+
+- the perimeter receiver cells over the measured rear 29 mm through a loose
+  receiver/adaptor contact coefficient;
+- the first 28 mm of rear tube through an adaptor/tube contact coefficient;
+  and
+- the rear felt through the cylindrical adaptor-to-felt resistance.
+
+The inherited v11 direct receiver-to-tube adaptor surrogate is disabled; it
+must not operate in parallel with the explicit adaptor state.
+
+There is explicitly no tube-to-felt path.  The extra aluminum housing state
+couples conductively to the existing sleeve and loses heat from its missing
+side/rear external area.  The continuously cooled flange remains the terminal
+tube boundary.
+
+### Thermocouple observations
+
+Side thermocouples remain solid-contact observations at 5, 58 and 107 mm with
+one shared response time.  T9 and T10 are flow-exposed channel probes, so their
+equilibrium target is
+
+```text
+T_TC,target = w_wall T_wall + (1-w_wall) T_gas
+```
+
+with one shared wall fraction and one shared response time.  T3 receives a
+shared outlet-probe response time.  These are observation equations and do
+not add thermal mass to the receiver energy balance.
+
+### Pre-fit verification and staged fit rules
+
+`test/smoke_2D_v12.jl` passes 31/31 checks covering the hardware inventory,
+felt-property knots, uniform equilibrium, augmented-state response, interior
+observation leverage, conserved MFC mass flow, equal-pressure convergence and
+the augmented instantaneous energy balance.
+
+The calibration order is fixed before fitting:
+
+1. cooling only: felt `k`/`Cp`, loose receiver/adaptor contact and shared
+   sensor time constants;
+2. heating training only: interior wall fraction and, only after stage 1,
+   optical/heat-transfer levels;
+3. unchanged held-out heating and cooling validation;
+4. rejection if the full response still needs experiment-specific material
+   properties, violates the 301 +/- 23 J/K participation constraint or fails
+   radial ordering.
+
+The physical SiC density, `Cp(T)` and `k(T)` are not fitted per experiment.
+
+### Completed v12 staged calibration and nominal validation
+
+An implementation audit before the definitive run found that the first v12
+draft still inherited v11's direct receiver-to-tube adaptor conductance.  That
+path bypassed the newly explicit adaptor while operating in parallel with it.
+It was removed, the smoke/energy tests were repeated, and every cooling,
+heating and validation stage below was rerun.  Earlier provisional v12 outputs
+are superseded.
+
+Cooling used only C69/C80/C81 and selected:
+
+| Quantity | Selected value | Qualification |
+| --- | ---: | --- |
+| felt conductivity scale | 1.20 | global effective grade/packing scale |
+| felt heat-capacity scale | 1.50 | refinement upper bound active |
+| receiver/adaptor contact `h` | 15 W/m2/K | weak/loose contact |
+| shared side-probe time | 180 s | tested upper bound active |
+| shared interior-probe time | 60 s | tested upper bound active |
+| shared outlet-probe time | 180 s | tested upper bound active |
+| interior wall fraction | 0.80 | tested upper bound active |
+
+The contact corresponds to only about
+
+```text
+G_rec-adaptor = h A_overlap
+               = 15 * (4 * 0.019 * 0.029)
+               = 0.0331 W/K.
+```
+
+Thus the confirmed 0.996 kg adaptor is present but only weakly participates
+on the experimental time scale.  The cooling fit assigns most of the
+additional accessible inventory to the felt.  The active bounds on felt Cp
+and all probe times show that cooling does not uniquely separate material
+storage from observation delay.
+
+Heating then froze all cooling quantities and the physical SiC properties.
+The nine established heating-training cases selected:
+
+```text
+beta_opt = 150 1/m
+Graetz heat-transfer scale S_h = 1.20
+power scales = 1.25, 1.05, 0.77 for 456, 304, 256 kW/m2
+```
+
+No experiment-specific `k` or `Cp` was used.  The six held-out heating cases
+and three cooling cases were evaluated on the nominal mesh without refitting.
+
+### Definitive nominal-mesh results
+
+| Phase | Mean sensor RMSE | Steady MAE | t90 MAE | Axial RMSE | DP1 RMSE |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| heating training | 91.70 K | 89.69 K | 756 s | 53.52 K | 0.459 mbar |
+| held-out heating | 90.21 K | 86.15 K | 848 s | 51.80 K | 0.349 mbar |
+| cooling validation | 31.17 K | 30.06 K | 700 s | 9.88 K | 0.058 mbar |
+
+Compared with prior models:
+
+- cooling RMSE improves from 70.99 K in staged v11 and 34.71 K in v9 to
+  31.17 K;
+- held-out heating improves from 98.63 K in staged v11 but remains worse than
+  63.92 K in v9;
+- transient timing improves markedly relative to staged v11's roughly
+  1,200--1,300 s errors, but remains unacceptable; and
+- heating DP1 remains worse than v9's 0.193 mbar held-out reference.
+
+The radial verdict does not improve:
+
+```text
+T12-T9 sign correct  = 0/15
+T11-T10 sign correct = 0/15
+mid radial RMSE      = 29.2--29.9 K
+deep radial RMSE     = 46.7--46.8 K
+```
+
+The flow-exposed observation model cannot create the missing profile because
+the calculated local gas and wall temperatures differ by only a few kelvin.
+The heating profiles remain almost radially uniform and much flatter/cooler
+than the measured square-receiver profiles.
+
+The very coarse screening mesh changes representative final sensors by
+5.94--16.04 K relative to the nominal mesh.  This is within the explicit
+20 K diagnostic gate but too large to support precise coefficient extraction.
+The nominal validation results themselves remain the decision basis.
+
+### V12 decision
+
+V12 is **rejected for coefficient extraction** but retained as a useful
+mechanism result.
+
+What is supported:
+
+1. the installed adaptor is approximately 0.996 kg under the confirmed solid
+   77.6 mm geometry;
+2. it is only weakly coupled through the loose receiver contact;
+3. correcting the felt/inventory topology substantially improves cooling; and
+4. the large artificial SiC Cp used previously was partly substituting for
+   accessible felt/housing storage and probe response.
+
+What is not supported:
+
+1. the selected felt `Cp` scale is validated, because it and the probe delays
+   are bound-active and confounded;
+2. the v12 optical and Graetz values are validated transport coefficients;
+3. an axisymmetric one-solid receiver can explain the side/core profile; or
+4. further fitting within this topology is justified.
+
+The next defensible model-form test is a square-sector or explicit two-solid
+population receiver.  It must distinguish gas-exposed channel-wall material
+from side/corner/support-connected material while retaining the v12 hardware
+inventory and loose adaptor contact.  No side-weighted irradiance source or
+experiment-specific material property should be introduced.
+
+Definitive artifacts are under `summaries/2D_v12/`, including all 18 temporal
+plots, 15 axial plots, parity, full transient/final CSVs, calibration traces,
+mesh transfer and the formal rejection file.
+
+## V13: conservative active-channel and side/support populations
+
+### Motivation and pre-fit decision
+
+V12 showed that observation lag and missing hardware inventory improve
+cooling but cannot produce the measured side-to-interior temperature
+difference.  The calculated channel gas and wall temperatures are too close,
+and an axisymmetric single receiver temperature field forces the shallow-dip
+side thermocouples to observe the same local population that transfers heat
+to the flowing gas.
+
+V13 therefore tests a model-form change, not another irradiance fit.  The
+measured SiC inventory is partitioned into two co-located macroscopic
+populations:
+
+1. an active channel-wall population that receives most of the gas heat
+   transfer; and
+2. a side/corner/support population observed by T8, T12 and T11, with reduced
+   gas participation, its own felt contact and the loose rear-adaptor support.
+
+The split is conservative:
+
+```text
+C_active = (1-f_side) C_SiC
+C_side   = f_side C_SiC
+C_active + C_side = C_SiC
+```
+
+No SiC mass or heat capacity is added.  The same radial/axial optical source
+is divided in direct proportion to the two solid fractions; there is no
+side-weighted illumination.  The populations exchange
+
+```text
+dQ_active-side = G'_as dz (T_active,mean - T_side).
+```
+
+The side population has a perimeter felt path
+
+```text
+dQ_side-felt = h_side-felt (4 w_rec dz)
+               (T_side - T_felt),
+```
+
+and it owns the measured loose receiver/adaptor contact over the final 29 mm.
+The active population retains the channel flow, equal-pressure ring
+allocation and Graetz heat-transfer equations.  A single global
+`f_gas,side <= f_side` allocates the fraction of receiver-to-gas heat transfer
+borne by the side population; the remainder is removed from the active
+population.  This explicitly tests reduced flow-accessible area without
+inventing or fitting an unmeasured bypass mass flow.
+
+Front radiation, receiver/felt exchange, active/side exchange and adaptor
+exchange are all split conservatively.  `test/smoke_2D_v13.jl` verifies the
+capacity inventory, uniform equilibrium, heated response, conserved MFC mass
+flow, equal-pressure convergence and instantaneous whole-assembly energy
+closure.
+
+### Frozen and fitted quantities
+
+The definitive v12 hardware, felt, observation, optical, Graetz, power and
+hydraulic values are frozen for the first v13 test.  Only four shared
+population quantities may change:
+
+```text
+f_side       side/support fraction of measured SiC inventory
+f_gas,side   absolute fraction of gas heat transfer assigned to that population
+G'_as        active-to-side conductance per receiver length
+h_side-felt  side/support-to-felt contact coefficient
+```
+
+They are fitted on the established nine heating-training cases with a
+cooling-retention penalty from C69/C80/C81.  The six held-out heating cases
+remain untouched until nominal-mesh validation.  Experiment-specific
+properties, side-weighted irradiance and a fitted bypass branch remain
+prohibited.
+
+### Completed v13 staged identification
+
+The initial 18-point population screen and 29-point refinement selected
+
+```text
+f_side       = 0.075
+f_gas,side   = 0.0225
+G'_as        = 30 W/K/m
+h_side-felt  = 5 W/m2/K
+```
+
+with the side fraction at the refinement lower bound and active/side
+conductance at its upper bound.  A formal bound expansion to
+`f_side = 0.025--0.10` and `G'_as = 30--100 W/K/m` moved the optimum farther
+toward
+
+```text
+f_side       = 0.025
+f_gas,side   = 0.0125
+G'_as        = 100 W/K/m
+h_side-felt  = 5 W/m2/K.
+```
+
+At 800 K the full receiver capacity is 49.25 J/K, so the selected side
+capacity is only about 1.23 J/K.  Its total active/side conductance is
+
+```text
+G_as = G'_as L = 100 * 0.137 = 13.7 W/K,
+```
+
+giving a characteristic equilibration time of only about 0.09 s.  The
+optimization therefore collapses the new field back into the v12
+single-solid limit; it does not identify a physically meaningful second slow
+population.
+
+Candidate diagnostics nevertheless show why the mechanism initially looked
+promising:
+
+| Population test | Mid radial sign | Deep radial sign | Heating RMSE | Cooling RMSE |
+| --- | ---: | ---: | ---: | ---: |
+| collapsed selected limit | 0/9 | 0/9 | 111.5 K | 32.0 K |
+| moderate split | 7/9 | 0/9 | 121.1 K | 41.6 K |
+| strongly separated | 9/9 | 3/9 | 163.4 K | 86.3 K |
+
+A separated side population can make the middle side thermocouple hotter than
+the interior probe, but it simultaneously produces the wrong deep profile
+and destroys overall heating/cooling levels.
+
+To avoid rejecting the topology merely because it inherited coefficients
+fitted to v12, a second heating stage re-screened every defensible population
+candidate over
+
+```text
+beta_opt = 75, 150, 250, 400 1/m
+S_h      = 0.75, 1.20, 1.80
+```
+
+and then refitted the three shared irradiance-group scales.  This independent
+stage again selected the collapsed population and
+
+```text
+beta_opt = 150 1/m
+S_h = 1.80
+power scales = 1.25, 1.2075, 0.77.
+```
+
+The Graetz scale and 304-kW/m2 power scale are at the tested upper bounds.
+Meaningful population splits were not rescued by the optical-depth or
+heat-transfer refit.
+
+### Definitive v13 nominal-mesh validation
+
+The six held-out heating cases and three cooling cases were run without
+further adjustment:
+
+| Phase | Mean sensor RMSE | Steady MAE | t90 MAE | Axial RMSE | Mid radial RMSE | Deep radial RMSE | DP1 RMSE |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| heating training | 88.00 K | 85.74 K | 735 s | 45.35 K | 27.50 K | 43.07 K | 0.402 mbar |
+| held-out heating | 82.60 K | 78.15 K | 820 s | 45.59 K | 28.27 K | 43.17 K | 0.287 mbar |
+| cooling validation | 31.04 K | 31.21 K | 688 s | 10.59 K | 4.96 K | 9.77 K | 0.062 mbar |
+
+Relative to v12, held-out heating RMSE improves from 90.21 to 82.60 K,
+held-out axial RMSE from 51.80 to 45.59 K and held-out DP1 RMSE from 0.349 to
+0.287 mbar.  Cooling is essentially unchanged.  These small gains come from
+the refitted heating coefficients, not an identified side population.
+
+Both heating profile-sign tests remain
+
+```text
+T12-T9 sign correct  = 0/15
+T11-T10 sign correct = 0/15.
+```
+
+The representative screen-to-nominal maximum final-sensor changes are
+7.86 K for E67, 3.07 K for E72 and 2.39 K for E77, passing the 20 K
+diagnostic gate and improving on v12 mesh transfer.  The rejection is
+therefore not a coarse-mesh artifact.
+
+`test/smoke_2D_v13.jl` passes 22 checks and
+`test/mesh_2D_v13_staged.jl` passes 2 checks.  All 34 requested plots were
+generated: one parity plot, 18 temporal plots and 15 axial plots.
+
+### V13 decision and physical interpretation
+
+V13 is **rejected for coefficient extraction**.
+
+The test does not support a globally co-located, weakly gas-coupled side
+thermal mass as the missing physics.  Forcing a significant split can create
+the mid-depth sign, which supports the broader idea that side and core
+channels experience different thermal-fluid conditions.  But one global
+side fraction and one global conductance cannot reproduce both the 58 and
+107 mm profiles while retaining cooling and temperature level.
+
+The next defensible step is an explicit square-channel network or square
+sector, not another lumped side population.  It should:
+
+1. represent center, edge and corner channel groups explicitly;
+2. solve their flow rates from a common pressure drop with local
+   temperature-dependent density and viscosity;
+3. apply the measured radial groove obstruction only at the rear exit;
+4. retain lateral SiC conduction between channel groups and the confirmed
+   felt/adaptor contacts; and
+5. map side thermocouples to the exterior wall and interior probes to their
+   actual channel groups.
+
+That model can test the proposed positive feedback—hotter channels have
+higher resistance, receive less flow and become hotter—without inventing an
+unmeasured total-flow bypass.  The v13 results show that this feedback must be
+spatially and axially resolved; a global gas-participation fraction is too
+coarse.
+
+Definitive v13 artifacts are under `summaries/2D_v13/`.
+
+## V14: square-channel orbit network
+
+### Pre-fit formulation and acceptance rules
+
+V13 established that a global co-located side population is too coarse.  V14
+therefore resolves the actual 10 by 10 square-channel topology while
+retaining symmetry.  The 100 channels are reduced to 15 exact square-symmetry
+orbits: channels related by horizontal, vertical and diagonal reflection
+share one solid and gas solution.  Orbit multiplicities sum to 100, so the
+reduction changes neither flow area nor receiver inventory.
+
+Each orbit has:
+
+- one SiC channel-cell temperature per axial cell;
+- one isolated axial gas stream;
+- its exact channel multiplicity;
+- its square-grid radius and rear-groove overlap;
+- the number of exterior receiver faces it owns; and
+- lateral conductive connections to neighboring channel orbits.
+
+The measured SiC solid area
+
+```text
+A_SiC = w_receiver^2 - 100 b_channel^2
+```
+
+is divided equally among the 100 channel cells and then multiplied by each
+orbit multiplicity.  Thus the total SiC mass and heat capacity remain exactly
+the photographed receiver values.
+
+#### Common-pressure channel flow
+
+Every physical channel in orbit `g` carries the same per-channel mass flow.
+At every thermal residual evaluation, v14 solves
+
+```text
+Delta p_g(mdot_g, Tgas_g(z)) = Delta p_common
+sum_g multiplicity_g mdot_g = mdot_MFC.
+```
+
+The local gas density, viscosity, heat capacity and conductivity use the
+calculated gas temperature.  The channel friction and Graetz heat-transfer
+laws are inherited from v11/v12.  The rear groove adds its cold-DP-calibrated
+quadratic loss according to the actual overlap of each square channel with
+the region outside the measured 6.5 mm free radius.  It does not close or
+remove outer channels.
+
+This is the first 2D version that can represent the proposed feedback at the
+individual channel-group level:
+
+```text
+hot channel -> lower density/higher resistance
+            -> less flow at common pressure drop
+            -> less convective cooling -> hotter channel.
+```
+
+The corrected MFC total flow remains conserved and no bypass is fitted.
+
+#### Solid network and observations
+
+Adjacent square-channel cells exchange heat through the inherited effective
+transverse SiC conductivity.  Each orbit also conducts axially.  Exterior
+channel groups exchange with the felt and the rear alumina support according
+to their exact number of exterior square faces.  The v12 felt, adaptor, tube,
+rear housing and water-cooled flange states remain explicit.
+
+The centered Gaussian/Beer-Lambert source already used by v12 is evaluated at
+the channel-orbit centroids and normalized over the physical square face.
+There is no side-weighted source.
+
+The thermocouple mapping is fixed before fitting:
+
+```text
+T8, T12, T11 -> midpoint exterior-side orbit at z=5, 58, 107 mm
+T9, T10      -> central-channel orbit at z=58, 107 mm,
+                with the established wall/gas observation blend
+T3           -> mixed rear gas at 3 mm
+T2           -> felt field at z=58 mm
+```
+
+The midpoint side orbit, central orbit and corner orbit are separately
+reported.  This mapping uses the verified axial positions and the confirmed
+shallow-dip placement in the middle of the side wall.
+
+#### Staged test
+
+V14 first runs with the definitive v12 hardware, observation, optics, Graetz,
+power and cold-DP parameters.  Before calibration it must pass:
+
+1. exact orbit multiplicity, flow area and SiC inventory closure;
+2. whole-assembly instantaneous energy closure;
+3. uniform equilibrium;
+4. conserved total MFC mass and common channel pressure drop;
+5. decreasing flow in a deliberately hotter channel group; and
+6. stronger groove loss outside the measured free diameter.
+
+Only after those checks will training fit a bounded transverse-conduction
+scale and, if the profile mechanism is present, independently re-evaluate
+optical depth, the single Graetz multiplier and shared power-group scales.
+The six held-out heating cases remain untouched until the nominal-mesh
+confirmation.  Experiment-specific properties and a bypass branch remain
+prohibited.
+
+### V14 numerical verification
+
+`test/smoke_2D_v14.jl` passes 35 checks.  The implemented network has:
+
+```text
+15 symmetry orbits
+sum of orbit multiplicities = 100 channels
+sum of exterior square faces = 40
+receiver mass = 0.0400588 kg
+```
+
+The hot-channel diagnostic deliberately raises the midpoint-side orbit by
+300 K.  Its common-pressure solution reduces that orbit's flow while
+preserving total MFC mass.  Uniform equilibrium, equal pressure and
+whole-assembly energy-rate closure also pass.
+
+### Required square-network cold hydraulic recalibration
+
+The first provisional v14 runs transferred v11's annular groove coefficient
+directly.  That is not valid because the square channel overlaps differ from
+annular overlap fractions.  Those provisional thermal results are
+superseded.
+
+Using only the 15 heating-experiment `t0` DP1/flow points, with the established
+physical sensor offset frozen, the square network selected:
+
+```text
+hydraulic resistance scale = 0.80
+groove loss coefficient K  = 335
+DP1 zero offset             = -0.542845 mbar
+t0 DP1 RMSE                 = 0.02347 mbar
+```
+
+The best nested no-groove model gives 0.03359 mbar RMSE with resistance scale
+1.661.  The groove term therefore improves cold DP1, although the two
+resistance contributions remain partially correlated.  All v14 thermal
+screens and validation were repeated after freezing the square-network
+values.
+
+### Completed staged v14 calibration
+
+The first thermal topology screen varied only:
+
+```text
+lateral conductivity multiplier = 0.05, 0.20, 1.00
+edge/felt contact multiplier     = 0.30, 1.00, 3.00
+centered beam sigma              = 14, 30, 100 mm
+```
+
+Increasing beam sigma broadens the centered Gaussian toward uniform
+illumination; it never biases power toward the side.
+
+Weak lateral coupling can produce the observed direction at 58 mm, but the
+tradeoff is severe:
+
+| Network candidate | Mid sign | Deep sign | Heating RMSE | Cooling RMSE |
+| --- | ---: | ---: | ---: | ---: |
+| inherited/homogenized | 0/9 | 0/9 | 114.6 K | 33.4 K |
+| moderate isolation | 7/9 | 0/9 | 136.9 K | 42.0 K |
+| strong isolation | 7/9 | 4/9 | 142.3 K | 47.1 K |
+
+The independent heating screen then tested every error-optimal and
+profile-producing network over `beta_opt=50--400 1/m` and
+`S_h=0.75--1.80`, followed by the three shared power-group scales.  It
+selected:
+
+```text
+lateral conductivity multiplier = 1.00
+edge/felt contact multiplier     = 3.00
+centered beam sigma              = 100 mm
+beta_opt                         = 100 1/m
+Graetz scale S_h                 = 1.80
+power scales                     = 1.25, 1.2075, 0.8855
+```
+
+The lateral, edge/felt, beam-width and Graetz quantities sit at tested bounds,
+as do the 304 and 256 kW/m2 power refinements.  The fit therefore prefers a
+nearly uniform beam and a strongly homogenized receiver, not the isolated
+channel configuration that generated some radial signs.
+
+### Definitive v14 nominal-mesh validation
+
+| Phase | Sensor RMSE | Steady MAE | t90 MAE | Axial RMSE | Mid radial RMSE | Deep radial RMSE | DP1 RMSE |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| heating training | 83.10 K | 81.40 K | 630 s | 46.38 K | 28.85 K | 46.56 K | 0.413 mbar |
+| held-out heating | 81.57 K | 77.80 K | 717 s | 44.28 K | 29.70 K | 46.73 K | 0.280 mbar |
+| cooling validation | 32.73 K | 36.87 K | 607 s | 12.63 K | 5.47 K | 11.50 K | 0.064 mbar |
+
+The square network modestly improves held-out overall RMSE relative to v12
+and v13, but cooling and radial errors degrade relative to v13.  Both
+heating radial signs remain wrong in all 15 cases:
+
+```text
+T12-T9 sign correct  = 0/15
+T11-T10 sign correct = 0/15.
+```
+
+The hydraulic effect itself is large and has the expected flow dependence.
+The final per-channel core/side flow ratio decreases from approximately
+4.26 at 18.7 L/min to 1.81--1.95 at 4.53 L/min.  Thus the quadratic groove
+does make the profiles hydraulically converge as total flow decreases.
+Nevertheless, the modeled `T12-T9` remains negative, approximately
+-1.8 to -8.6 K, while every experiment is positive by 20--27 K.  The final
+channel maps retain a core that is about 2--7 K hotter than the side/corner
+channels.
+
+The explicit interior observation diagnostic also fails to rescue the
+profile.  At 58 and 107 mm the local central-channel gas is generally
+1--14 K hotter than its local wall after being heated upstream.  Reducing the
+wall fraction would therefore make the modeled interior thermocouple hotter,
+not colder.  The wall fractions required to match the experiments lie
+outside the physical interval `[0,1]` in nearly every case.
+
+Representative screen-to-nominal final-sensor changes are 6.94 K for E67,
+3.85 K for E72 and 2.98 K for E77.  The mesh diagnostic passes its 20 K gate.
+All 49 nonzero plots were generated: parity, 18 transients, 15 axial profiles
+and 15 square channel/flow maps.
+
+### V14 decision
+
+V14 is **rejected for coefficient extraction**, but it gives a strong
+mechanism conclusion.
+
+The proposed common-pressure feedback is present and quantitatively large:
+outer channels receive much less flow, and the contrast weakens at lower
+total flow exactly as expected for the quadratic groove.  It is not,
+however, sufficient to reverse the predicted solid temperature ordering
+while also matching cooling and absolute temperatures.  Thermohydraulic
+maldistribution is therefore real but is not the missing radial-temperature
+mechanism by itself.
+
+The next model-form change should resolve the **exterior receiver wall
+actually touched by T8/T12/T11** separately from the orbit-averaged edge
+channel wall.  A perimeter-skin state must use physical outer-web mass,
+axial SiC conduction, conduction to the adjacent edge-channel cells,
+felt/adaptor contact and the same centered optical source.  It must not add
+mass or side-weighted irradiance.  Before fitting such a model, the exact
+transverse channel locations of T9/T10 and the approximate depth of the
+side-wall dips would materially constrain the observation mapping.
+
+Definitive artifacts are under `summaries/2D_v14/`.
+
+## V15 pre-fit plan: explicit exterior SiC perimeter wall
+
+### Motivation
+
+V14 demonstrated that the measured 13 mm free rear opening produces a real,
+large channel-flow redistribution and the expected reduction of that
+redistribution at lower total flow.  It nevertheless predicted the
+orbit-averaged outer channel wall colder than the interior measurements in
+all 15 heating experiments.  Increasing transverse isolation could reverse
+some profiles only by degrading the absolute temperatures and cooling
+transients.
+
+The side thermocouples were installed in shallow dips at the middle of the
+physical exterior side wall.  They therefore need not measure the
+orbit-averaged temperature of the complete outer channel solid assigned to
+the `(9,1)` symmetry orbit.  V15 tests the narrower hypothesis that these
+thermocouples follow a distinct exterior SiC perimeter-wall state.
+
+### Frozen physics
+
+V15 inherits the definitive v14 model without refitting:
+
+- the 10 by 10 square-channel network and its 15 exact symmetry orbits;
+- the common-pressure-drop channel-flow solution and temperature-dependent
+  gas properties;
+- the cold-flow hydraulic calibration
+  (`hydraulic_resistance_scale = 0.80`,
+  `groove_loss_coefficient = 335`, and
+  `DP1_offset = -0.54284475 mbar`);
+- the centered, nearly uniform irradiance distribution
+  (`beam_sigma = 100 mm`) and Beer-Lambert axial deposition;
+- the Graetz heat-transfer law, optical extinction, group power scales,
+  felt, solid adaptor, alumina tube, aluminum enclosure, and cooling flange;
+- the verified thermocouple axial locations of 5, 58, and 107 mm.
+
+No side-weighted optical source, bypass branch, artificial experiment-wise
+heat capacity, or experiment-wise conductivity is introduced.
+
+### New state and strict mass partition
+
+One exterior-perimeter SiC temperature, `Tskin(z,t)`, is added per axial
+cell.  Its cross-sectional area is the area of a square shell of effective
+thickness `delta_skin`,
+
+`A_skin = W^2 - (W - 2 delta_skin)^2`.
+
+That area is allocated among the exterior channel orbits in proportion to
+their physical boundary-face counts.  The same area is subtracted from the
+corresponding orbit solid areas.  Consequently,
+
+`A_channel,residual + A_skin = A_SiC,v14`
+
+at every axial location.  V15 must reproduce the v14 SiC mass and heat
+capacity to numerical precision; the new state is a partition, not added
+thermal mass.
+
+The v14 direct exterior-channel/felt and exterior-channel/adaptor exchanges
+are removed.  V15 instead uses
+
+`channel solid <-> exterior SiC skin <-> felt`
+
+and, over the measured rear overlap,
+
+`exterior SiC skin <-> solid alumina adaptor`.
+
+The skin has its own axial SiC conduction.  The removed share of the v14
+axial conduction, local solar deposition, and front radiative loss is
+transferred consistently to the skin state.  Internal channel/gas exchange
+remains on the residual channel solid because the exterior wall is not an
+additional gas passage.
+
+The only new fitted structural quantities are:
+
+1. the effective exterior-skin thickness; and
+2. a shared channel-to-skin spreading-conductance multiplier.
+
+The multiplier represents the unresolved two-dimensional spreading distance
+between the orbit-average channel solid and the shallow-dip exterior-wall
+location.  It is global, not experiment-specific.
+
+### Observation model
+
+`T8`, `T12`, and `T11` observe the filtered skin temperature at 5, 58, and
+107 mm.  `T9` and `T10` retain the v14 central-channel wall/gas observation
+model.  `T3`, `T2`, and all hardware states are unchanged.
+
+### Pre-declared acceptance tests
+
+Before inspecting a fitted result, v15 is accepted for coefficient
+extraction only if all of the following hold:
+
+1. receiver mass and heat capacity equal v14 to numerical precision;
+2. uniform-temperature equilibrium and whole-assembly energy closure pass;
+3. hydraulic flow splits and DP1 predictions are unchanged from v14 for the
+   same channel-temperature field;
+4. at least 12 of 15 heating cases have the correct sign for both
+   `T12 - T9` and `T11 - T10`;
+5. held-out heating mid- and deep-radial RMSE are each below 20 K;
+6. held-out mean sensor RMSE does not exceed the v14 value of 81.57 K;
+7. cooling mean sensor RMSE does not exceed 37.73 K, five kelvin above v14;
+8. screen-to-nominal maximum final-sensor change remains below 20 K.
+
+If a profile improvement requires the skin thickness or spreading
+conductance to remain at an implausible search boundary, v15 will be treated
+as a diagnostic model rather than evidence for a transferable heat-transfer
+coefficient.
+
+### V15 implementation and numerical verification
+
+`2D_v15.jl` implements the documented mass-conserving exterior-wall
+partition as a wrapper around the v14 channel-network equations.  At every
+ODE evaluation it:
+
+1. recovers the v14 energy rates;
+2. removes the former direct outer-channel/felt and
+   outer-channel/adaptor transfers;
+3. partitions the local SiC source, axial conductance, front radiating area,
+   mass, and heat capacity between residual channel solid and skin;
+4. applies channel/skin, skin/felt, and skin/adaptor exchanges; and
+5. advances the exterior skin as one additional state per axial cell.
+
+This construction retains the v14 lateral channel topology and gas exchange.
+The hydraulic calculation sees the same channel temperatures and equations
+as v14; adding the skin does not alter the cold-flow calibration.
+
+`test/smoke_2D_v15.jl` passes 28 checks:
+
+- the 15 orbits, 100 channels, and 40 exterior faces are retained;
+- the residual-channel and skin areas sum exactly to the v14 SiC area;
+- receiver mass and common-temperature heat capacity equal v14 to
+  `1e-14` relative tolerance;
+- hydraulic flow splits are bitwise identical for the same channel field;
+- uniform equilibrium includes the new skin and all seven observations;
+- heated states are finite and conserve total mass flow; and
+- whole-assembly energy closure is below `1e-7 W`.
+
+The selected screen-to-nominal mesh test also passes.  Maximum final-sensor
+changes were 6.929 K for E67, 3.850 K for E72, and 2.979 K for E77, all below
+the pre-declared 20 K limit.
+
+### V15 structural screen
+
+The screen froze every definitive v14 parameter and evaluated:
+
+- `delta_skin = 0.05, 0.15, 0.30 mm`; and
+- channel/skin spreading scale `= 0.01, 0.03, 0.10, 0.30, 1.00`.
+
+The first stage used E67, E72, and E77, one experiment from each irradiance
+group.  None of the 15 configurations gave the correct sign at either 58 or
+107 mm.  The four best objective values were then evaluated on all nine
+heating-training cases and the three cooling experiments.
+
+The numerical optimum was:
+
+| Quantity | Selected value | Search position |
+|---|---:|---|
+| effective skin thickness | 0.05 mm | lower bound |
+| channel/skin spreading scale | 1.00 | upper bound |
+| training mid sign | 0/9 | failed |
+| training deep sign | 0/9 | failed |
+
+Both selections collapse the new state toward v14: minimum mass reduces its
+dynamic independence and maximum coupling forces it toward the outer-channel
+temperature.  The fit therefore does not support a separately evolving
+exterior SiC wall under the inherited felt contact.
+
+### Definitive nominal-mesh validation
+
+| Metric | Heating training | Heating held out | Cooling |
+|---|---:|---:|---:|
+| mean sensor RMSE (K) | 83.03 | 81.50 | 32.93 |
+| steady MAE (K) | 81.30 | 77.90 | 36.99 |
+| t90 MAE (s) | 630.8 | 713.1 | 602.4 |
+| axial RMSE (K) | 50.16 | 47.59 | 12.50 |
+| mid radial RMSE (K) | 30.19 | 31.00 | 5.57 |
+| deep radial RMSE (K) | 49.34 | 49.49 | 12.85 |
+| DP1 RMSE (mbar) | 0.413 | 0.280 | 0.063 |
+
+The heating sign tests remain:
+
+- `T12 - T9`: 0/15 correct;
+- `T11 - T10`: 0/15 correct.
+
+Compared with v14, held-out mean sensor RMSE changes only from 81.57 to
+81.50 K, while mid-radial RMSE worsens from 29.70 to 31.00 K and deep-radial
+RMSE worsens from 46.73 to 49.49 K.  Cooling RMSE changes from 32.73 to
+32.93 K.  These differences are small and consistent with the selected skin
+state collapsing back toward v14.
+
+For all heating experiments the modeled radial differences remain negative:
+`T12 - T9` ranges approximately from -2.2 to -11.1 K and
+`T11 - T10` from -5.6 to -19.7 K, whereas the measurements are positive.
+The E72 axial plot makes the cause visible: the skin and outer-channel curves
+nearly coincide at about 525--580 K while the measured side thermocouples are
+about 740--800 K.
+
+### V15 decision and physical interpretation
+
+V15 is **rejected for coefficient extraction**.  The result is stronger than
+simply finding a poor parameter set:
+
+1. With the centered source, the skin receives only its mass-proportional
+   share of local SiC heating.
+2. The skin has no independent internal gas-heated surface.
+3. It can lose heat to the felt and adaptor.
+4. Weakening channel/skin coupling therefore makes the skin cooler, not
+   hotter; strengthening it returns the v14 orbit temperature.
+
+Consequently, a mass-conserving exterior wall alone cannot explain the hot
+side measurements while the inherited skin/felt exchange is retained.  This
+also rules out adding an arbitrary exterior thermal mass as the solution.
+
+The next physically identifiable test should not alter the centered optical
+field.  It should recalibrate the thermal path that directly changed when
+the skin was introduced:
+
+1. use C69/C80/C81 first to constrain a global skin/felt contact resistance,
+   felt conductivity scale, and felt heat-capacity scale from T8/T12/T11 and
+   T2 during zero-solar cooling;
+2. freeze those cooling-derived values;
+3. rerun the heating sign test with the v15 mass partition; and
+4. only then consider a shared heating-coefficient refit.
+
+This is physically motivated by the observed full but non-firm felt contact.
+It also prevents heating errors from forcing the edge/felt multiplier to the
+v14 upper bound of 3.0.  If a cooling-constrained weak contact still cannot
+produce the signs, the remaining explanation is more likely an observation
+or local-deposition issue than a missing bulk SiC thermal state.
+
+Definitive artifacts are under `summaries/2D_v15/`; 49 nonempty plots include
+one parity plot, 18 temporal plots, 15 axial profiles, and 15 channel maps.
+
+## V16 pre-fit plan: cooling-first skin/felt identification
+
+### Why this stage is necessary
+
+V15 inherited the v14 exterior/felt contact multiplier of 3.0 even though
+v14 fitted that multiplier while the side thermocouples still observed an
+orbit-averaged channel state.  Once v15 introduced an explicit exterior
+wall, that inherited coefficient became the direct loss path from the newly
+observed state and was no longer guaranteed to be transferable.
+
+The physical observation is that the alumina-silicate felt fills the cavity
+but its contact with the receiver is not firm.  The cooling data provide the
+only solar-independent way to identify this path.  V16 therefore fits it
+before looking again at heating profiles.
+
+The v15 cooling residuals also prevent assuming in advance that contact must
+be weaker.  At the ends of C69/C80/C81, the model is generally 12--66 K
+hotter than the measured SiC and gas temperatures, whereas the final T2 felt
+errors are only about 0.1--4.3 K.  Reducing contact alone would isolate the
+receiver and make its late cooling still slower.  A joint fit is required to
+separate contact, felt conduction, and felt storage.
+
+### Frozen model
+
+V16 retains:
+
+- the v14 square-channel hydraulics and cold DP1 calibration;
+- the v15 mass-conserving exterior SiC skin;
+- `delta_skin = 0.05 mm` and channel/skin spreading scale `= 1.0`;
+- the centered optical field and every heating, Graetz, loss, power, and
+  hardware parameter;
+- the measured sensor locations and observation time constants.
+
+No heating data enter the cooling fit.  No experiment-specific coefficient
+is allowed.
+
+### Cooling parameters and bounds
+
+Only three global quantities may vary:
+
+| Parameter | Screen values |
+|---|---|
+| skin/felt contact multiplier | 0.10, 0.30, 1.0, 3.0, 10.0 |
+| felt conductivity multiplier | 0.60, 1.20, 2.40 |
+| felt heat-capacity multiplier | 0.75, 1.50, 3.00 |
+
+The contact multiplier acts only on the new skin/felt interface.  It does not
+alter the felt/adaptor path or retrospectively alter the v14 channel
+equations.  Conductivity and capacity scales remain shared by the entire
+felt inventory.
+
+C69 and C80 are the calibration cases.  C81 is held out during selection.
+The primary cooling sensors are T8, T12, T11, and T2.  T9, T10, and T3 enter
+only as a lower-weight guard against transferring error elsewhere in the
+assembly.
+
+### Pre-declared acceptance
+
+The cooling identification is considered useful only if:
+
+1. all v15 mass, equilibrium, hydraulic, and energy tests remain valid;
+2. the selected screen configuration is finite and screen-to-nominal changes
+   remain below 20 K;
+3. mean primary-sensor cooling RMSE over all three cases improves by at least
+   10% from the v15 value of 26.87 K;
+4. held-out C81 primary-sensor RMSE does not exceed its v15 value of
+   approximately 28.14 K;
+5. mean T2 cooling RMSE remains below 20 K;
+6. one-step neighboring parameters do not cause a qualitative collapse,
+   and any boundary optimum is reported as non-identifiable.
+
+After selecting from C69/C80, the cooling-derived parameters will be frozen
+and all 15 heating experiments will be simulated.  The overall model is
+accepted for coefficient extraction only if the earlier spatial criteria
+also hold: at least 12/15 correct signs at both depths, held-out radial RMSE
+below 20 K, held-out mean sensor RMSE no worse than 81.57 K, and cooling mean
+sensor RMSE no worse than 37.73 K.
+
+### V16 implementation and cooling screen
+
+V16 retains the v15 equations but separates
+`skin.felt_contact_scale` from the historical v14
+`network.edge_felt_contact_scale`.  The old v14 transfer is still removed
+exactly before the new interface is applied, so the new multiplier changes
+only the skin/felt path.
+
+`test/smoke_2D_v16.jl` passes nine checks:
+
+- the v15 receiver mass and heat capacity remain conserved;
+- uniform equilibrium is unchanged;
+- changing the skin/felt multiplier changes skin cooling without changing
+  the inherited network multiplier; and
+- whole-assembly energy closure remains below `1e-7 W`.
+
+The initial 45-point screen fit C69 and C80 and held C81 out.  Its best
+screen-mesh point was:
+
+| Quantity | Initial selected value |
+|---|---:|
+| skin/felt contact multiplier | 1.0 |
+| felt conductivity multiplier | 2.4 |
+| felt heat-capacity multiplier | 1.5 |
+| C69/C80 primary RMSE | 23.45 K |
+| held-out C81 primary RMSE | 23.06 K |
+
+This was a meaningful transfer from calibration to C81, but the
+conductivity multiplier was at the original upper bound.
+
+### Boundary extension and nominal-mesh correction
+
+The conductivity range was extended to 3.6, 4.8, and 7.2 while testing
+neighboring contact and heat-capacity values.  The objective continued to
+improve toward weaker contact and larger conductivity.  The extended screen
+selected contact 0.3, conductivity scale 7.2, and capacity scale 1.5, again
+at the conductivity ceiling.
+
+The original screen-selected configuration also failed the pre-declared
+mesh-transfer rule: C69 changed by 24.61 K.  Therefore the ten best and
+boundary-diagnostic configurations were re-ranked directly on the nominal
+mesh.  The nominal mesh again selected:
+
+| Quantity | Definitive nominal selection |
+|---|---:|
+| skin/felt contact multiplier | 0.30 |
+| felt conductivity multiplier | 7.20 |
+| felt heat-capacity multiplier | 1.50 |
+| C69/C80 primary RMSE at 61 points | 25.76 K |
+| held-out C81 primary RMSE at 61 points | 25.50 K |
+
+This is not an identifiable felt property.  A multiplier of 7.2 corresponds
+to approximately 0.36 W/m/K near room temperature and 0.58 W/m/K at 500 C,
+far above the temperature-shaped felt prior.  The optimum remains at the
+extended ceiling, indicating that it represents a missing parallel cooling
+path or compensating model error.
+
+The definitive screen-to-nominal comparison also fails:
+
+| Case | Maximum final-sensor change |
+|---|---:|
+| C69 | 28.68 K |
+| C81 | 11.60 K |
+| E72 | 23.67 K |
+
+Thus the v16 cooling coefficients cannot be reported as mesh-stable
+macroscopic properties.
+
+### Frozen-parameter nominal validation
+
+With the nominally selected cooling parameters frozen, the 121-point
+all-case results are:
+
+| Metric | Heating training | Heating held out | Cooling |
+|---|---:|---:|---:|
+| mean sensor RMSE (K) | 113.19 | 124.91 | 33.59 |
+| steady MAE (K) | 123.78 | 138.96 | 27.92 |
+| t90 MAE (s) | 754.6 | 826.2 | 892.9 |
+| axial RMSE (K) | 81.29 | 83.91 | 9.25 |
+| mid-radial RMSE (K) | 36.66 | 37.63 | 5.06 |
+| deep-radial RMSE (K) | 49.61 | 49.87 | 12.60 |
+| DP1 RMSE (mbar) | 0.523 | 0.424 | 0.052 |
+
+The primary cooling sensors T8/T12/T11/T2 have an aggregate RMSE of
+23.12 K, compared with 26.87 K in v15, so the targeted cooling objective
+improves by about 14%.  T2 improves to 9.34 K.  However, T9/T10/T3 cooling
+errors increase enough that overall cooling RMSE becomes 33.59 K, slightly
+worse than v15's 32.93 K.
+
+Heating deteriorates decisively.  Held-out mean sensor RMSE rises from
+81.50 K in v15 to 124.91 K.  Both radial signs remain 0/15 correct.
+The high-conductivity, weak-contact boundary point tested separately on
+E67/E72/E77 also retains negative radial gaps and produces sensor RMSEs of
+153.1, 157.0, and 69.8 K, respectively.
+
+### V16 decision and new spatial diagnosis
+
+V16 is **rejected for coefficient extraction** for three independent
+reasons:
+
+1. the fitted felt conductivity runs to the extended upper boundary;
+2. the selected quantities fail mesh transfer; and
+3. cooling-derived parameters strongly degrade heating and do not change the
+   radial signs.
+
+The full/non-firm felt contact is real, and a lower interface multiplier is
+consistent with it.  Nevertheless, the data demand an unrealistically
+conductive parallel path to cool the assembly, so felt properties alone are
+not the missing physics behind the heating profiles.
+
+The axial data now give a sharper next direction.  In 10 of 15 heating
+experiments the measured side temperature is highest at 58 mm; the model is
+highest at 5 mm in all 15 cases.  For E72, for example, the measured
+5/58/107 mm side temperatures are approximately 738/798/734 K, while the
+v16 skin prediction is approximately 562/534/502 K.  Increasing radial or
+felt losses cannot move an axial heat maximum from the entrance toward the
+middle.
+
+The next model should therefore test the **axial optical/volumetric source
+law**, not a side-weighted radial beam:
+
+- retain the centered radial irradiance and v14 hydraulics;
+- replace the single Beer-Lambert solid source with a two-component axial
+  source: a near-entrance wall-absorption component and a deeper
+  channel-radiation component;
+- conserve total absorbed power exactly;
+- fit the shared source split and deep extinction length using the
+  5/58/107 mm axial profile only;
+- freeze those optical parameters before evaluating radial profiles and
+  cooling.
+
+This tests the structured-receiver volumetric effect without imposing extra
+power on the measured side.  It is also directly falsifiable: the new source
+must reproduce the middle-depth maximum without destroying total-temperature
+parity or cooling.
+
+Definitive artifacts are under `summaries/2D_v16/`; the 49 nonempty plots
+include parity, 18 temporal comparisons, 15 axial profiles, and 15 channel
+maps.

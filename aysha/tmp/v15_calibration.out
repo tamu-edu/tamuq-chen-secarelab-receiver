@@ -1,0 +1,20 @@
+v15 mechanism 1/15 loss=26.63141 signs=0/0 delta=0.05mm Gscale=0.01
+v15 mechanism 2/15 loss=12.95076 signs=0/0 delta=0.05mm Gscale=0.03
+v15 mechanism 3/15 loss=8.72935 signs=0/0 delta=0.05mm Gscale=0.1
+v15 mechanism 4/15 loss=7.6147 signs=0/0 delta=0.05mm Gscale=0.3
+v15 mechanism 5/15 loss=7.2132 signs=0/0 delta=0.05mm Gscale=1.0
+v15 mechanism 6/15 loss=26.84428 signs=0/0 delta=0.15mm Gscale=0.01
+v15 mechanism 7/15 loss=13.44011 signs=0/0 delta=0.15mm Gscale=0.03
+v15 mechanism 8/15 loss=8.91239 signs=0/0 delta=0.15mm Gscale=0.1
+v15 mechanism 9/15 loss=7.67352 signs=0/0 delta=0.15mm Gscale=0.3
+v15 mechanism 10/15 loss=7.22814 signs=0/0 delta=0.15mm Gscale=1.0
+v15 mechanism 11/15 loss=25.85061 signs=0/0 delta=0.3mm Gscale=0.01
+v15 mechanism 12/15 loss=13.96524 signs=0/0 delta=0.3mm Gscale=0.03
+v15 mechanism 13/15 loss=9.14733 signs=0/0 delta=0.3mm Gscale=0.1
+v15 mechanism 14/15 loss=7.75155 signs=0/0 delta=0.3mm Gscale=0.3
+v15 mechanism 15/15 loss=7.24948 signs=0/0 delta=0.3mm Gscale=1.0
+v15 full 1/4 loss=6.00204 signs=0/0
+v15 full 2/4 loss=6.00479 signs=0/0
+v15 full 3/4 loss=6.00897 signs=0/0
+v15 full 4/4 loss=6.57095 signs=0/0
+v15 selected = (thickness = 5.0e-5, conductance = 1.0, loss = (total = 6.002044443343922, transient = 1.1149943781546403, steady = 1.9667264905745574, radial = 1.8914220609753123, axial = 1.0419898123247378, cooling = 0.40318210473773647, signs_mid = 0, signs_deep = 0), parameters = Main.Receiver2D_v15.ModelParameters2D(Main.Receiver2D_v15.Receiver2D_v14.ModelParameters2D(Main.Receiver2D_v15.Receiver2D_v14.Receiver2D_v12.ModelParameters2D(Main.Receiver2D_v15.Receiver2D_v14.Receiver2D_v12.Receiver2D_v11.ModelParameters2D(Main.Receiver2D_v15.Receiver2D_v14.Receiver2D_v12.Receiver2D_v11.Geometry2D(0.137, 0.019, 0.01071960208740737, 0.057, 0.075, 0.0015, 0.0004, 100, 6, 3, 1, 18, 0.15, 10, 0.0065, 0.008, 0.003), Main.Receiver2D_v15.Receiver2D_v14.Receiver2D_v12.Receiver2D_v11.SolidProperties2D(2150.0, 0.05, 1.0, 50.0, 0.06, 140.0, 1360.0, 205.0, 2700.0, 900.0, 0.001), Main.Receiver2D_v15.Receiver2D_v14.Receiver2D_v12.Receiver2D_v11.HeatTransferParameters2D(0.001, 1.44, 0.3333333333333333, 0.0, 0.1, 0.0, 0.5, :graetz, 3.61, 0.0, 1.8), Main.Receiver2D_v15.Receiver2D_v14.Receiver2D_v12.Receiver2D_v11.LossParameters2D(0.85, 0.2, 1.0, 1.0, 0.0, 1.0), Main.Receiver2D_v15.Receiver2D_v14.Receiver2D_v12.Receiver2D_v11.OpticalParameters2D(1.0, 100.0, 0.1, 0.1, 0.2, 1.25, 1.2075, 0.8855), Main.Receiver2D_v15.Receiver2D_v14.Receiver2D_v12.Receiver2D_v11.HydraulicParameters2D(101400.0, 294.25, 101325.0, 1.0, -0.5428447496201336, 0.8, 0.0, :equal_pressure, 0.013, 335.0, 24, 1.0e-5, 0.55)), Main.Receiver2D_v15.Receiver2D_v14.Receiver2D_v12.AssemblyParameters2D(0.057, 0.075, 0.165, 0.018, 0.0388, 0.057, 0.029, 0.028, 3900.0, 15.0, 80.0, 1.0, 1.2, 1.5, 2700.0, 900.0, 205.0, 1.0), Main.Receiver2D_v15.Receiver2D_v14.Receiver2D_v12.ObservationParameters2D(180.0, 60.0, 180.0, 0.8)), Main.Receiver2D_v15.Receiver2D_v14.NetworkParameters2D(1.0, 3.0, 9)), Main.Receiver2D_v15.SkinParameters2D(5.0e-5, 1.0)))

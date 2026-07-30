@@ -528,3 +528,57 @@ This is the shortest literature-supported route to determine whether the
 missing flow sensitivity belongs to distributed channel entry heat transfer
 and thermal-hydraulic maldistribution rather than to a fitted front-web
 coefficient.
+
+## Implementation outcome
+
+This strategy was implemented in `2D_v11.jl` and run over E67--E81 on
+2026-07-29 at the frozen v9 solid/optical parameter point. The fixed Graetz
+forms fail the predeclared axial-profile and flow-slope gates at that point:
+the nominal equal-pressure/groove branch gives
+`T12-T8` RMSE 176.14 K and reverses all three measured flow-slope signs.
+
+The measured-groove branch does create the expected hydraulics. Its mean
+core/edge mass-flux ratio is 2.18 and becomes weaker at lower total flow.
+It does not create the measured solid radial profile: mean modeled
+`T12-T9` and `T11-T10` are -0.25 K and -0.70 K, with RMSE 24.83 K and
+37.97 K.
+
+Cold DP1 cannot uniquely divide channel and groove resistance. A groove fit
+gives `K=184.16` and channel-resistance scale 0.970, but improves cold RMSE
+only from 0.02541 to 0.02452 mbar and has worse AICc. Hot DP1 RMSE is
+0.570 mbar, so the cold-fitted groove does not validate the heating pressure
+model.
+
+Accordingly, the conditional heat-transfer scale in V11-D was not fitted.
+The required profile shape was absent. The complete formulation, results,
+gate decisions and next-model boundary are recorded in
+`summaries/2D_v11_theory_manual.md` and `summaries/journal.2D.md`.
+
+This no-refit outcome must not be read as a definitive recalibrated
+v9-versus-v11 ranking. V11 still inherits v9-fitted solid conductivity,
+optical extinction, radiative extinction and group power scales; these may
+compensate for the old apparent-Nu closure. A v11-specific
+sensitivity/identifiability audit and constrained train/validation refit is
+required before rejecting the Graetz form itself.
+
+The first inheritance screen confirms this caveat. Restoring optical
+extinction from the v9-fitted 21.29 to 110 1/m reduces the complete
+15-case axial RMSE from 176.14 to 58.17 K and changes all three flow-slope
+signs to positive. Their magnitudes and correlations remain inadequate, so
+110 1/m is not accepted as a fitted result. It establishes that a constrained
+v11-specific refit is necessary before judging the Graetz form. The same
+screen leaves both radial offsets near zero or negative, so it does not
+rescue the groove-only radial explanation.
+
+The agreed staged v11-specific calibration was then completed. It selected
+`beta_opt=218.8 1/m`, `S_h=1.142`, `k_scale_z=0.2`, and group power scales
+`1.25, 1.05175, 0.77352`. The local residual Jacobian is rank 6/6 with
+condition number 9.37, although `k_scale_z` is lower-bound active.
+
+This fit restores positive full-group axial slopes of 8.02, 4.62 and
+4.24 K/(L/min) and reduces all-heating axial RMSE to 44.14 K. It does not
+pass complete validation: held-out heating mean sensor RMSE is 98.63 K,
+cooling RMSE is 70.99 K, heating and cooling t90 errors are about 1,200 s,
+radial ordering is wrong in 0/15 heating cases, and held-out heating DP1
+RMSE is 0.366 mbar. The staged vector is therefore rejected for coefficient
+extraction despite its improved axial behavior.

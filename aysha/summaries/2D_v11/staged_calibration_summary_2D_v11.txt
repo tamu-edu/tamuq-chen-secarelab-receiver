@@ -1,0 +1,18 @@
+training_cases=["E67", "E69", "E71", "E72", "E74", "E76", "E77", "E79", "E81"]
+validation_heating=["E68", "E70", "E73", "E75", "E78", "E80"]
+validation_cooling=["C69", "C80", "C81"]
+profile_theta=[218.79999999999998, 1.142, 0.2]
+profile_objective=3.9670873098019572
+profile_evaluations=29
+profile_converged=true
+power_theta=[1.25, 1.051748201315345, 0.7735176398768443]
+power_objective=2.1476711611745087
+power_evaluations=27
+power_converged=true
+identifiability_singular_values=[31.700427395945667, 27.680308705066388, 17.76784350083791, 11.266767672880096, 5.0570987269568874, 3.3830814973713412]
+identifiability_rank=6/6
+identifiability_condition=9.370281922140197
+identifiability_max_correlation=0.4543261806729767
+(phase = "heating_training", mean_sensor_rmse_K = 114.38762894257971, median_sensor_rmse_K = 94.28703220187501, steady_mae_K = 98.68170922658969, t90_mae_s = 1186.3650793650793, axial_rmse_K = 45.466485494460365, mid_radial_rmse_K = 25.506892746200183, deep_radial_rmse_K = 38.28340667189174, dp1_rmse_mbar = 0.482361037465457, dp1_bias_mbar = -0.019214978727800792)
+(phase = "heating_validation", mean_sensor_rmse_K = 98.63311672576863, median_sensor_rmse_K = 86.1316128796939, steady_mae_K = 81.63225716776608, t90_mae_s = 1279.7619047619048, axial_rmse_K = 42.06151234126048, mid_radial_rmse_K = 26.307696178298244, deep_radial_rmse_K = 38.441233951717116, dp1_rmse_mbar = 0.36630141635182994, dp1_bias_mbar = 0.011267773264068045)
+(phase = "cooling_validation", mean_sensor_rmse_K = 70.98699613766034, median_sensor_rmse_K = 64.55108565299685, steady_mae_K = 19.940195702829733, t90_mae_s = 1166.6666666666667, axial_rmse_K = 8.350703629377614, mid_radial_rmse_K = 3.4252684709768655, deep_radial_rmse_K = 5.357948156077311, dp1_rmse_mbar = 0.04921920667694011, dp1_bias_mbar = -0.03595803223973271)

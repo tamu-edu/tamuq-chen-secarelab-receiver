@@ -1,0 +1,26 @@
+v16 refine 1/24 loss=2.16967 contact=0.3 k=2.4 Cp=0.75
+v16 refine 2/24 loss=2.1052 contact=0.3 k=2.4 Cp=1.5
+v16 refine 3/24 loss=2.07651 contact=0.3 k=3.6 Cp=0.75
+v16 refine 4/24 loss=1.83419 contact=0.3 k=3.6 Cp=1.5
+v16 refine 5/24 loss=1.99231 contact=0.3 k=4.8 Cp=0.75
+v16 refine 6/24 loss=1.73703 contact=0.3 k=4.8 Cp=1.5
+v16 refine 7/24 loss=1.87711 contact=0.3 k=7.2 Cp=0.75
+v16 refine 8/24 loss=1.68775 contact=0.3 k=7.2 Cp=1.5
+v16 refine 9/24 loss=1.94649 contact=1.0 k=2.4 Cp=0.75
+v16 refine 10/24 loss=1.78741 contact=1.0 k=2.4 Cp=1.5
+v16 refine 11/24 loss=1.9239 contact=1.0 k=3.6 Cp=0.75
+v16 refine 12/24 loss=1.72195 contact=1.0 k=3.6 Cp=1.5
+v16 refine 13/24 loss=1.90671 contact=1.0 k=4.8 Cp=0.75
+v16 refine 14/24 loss=1.73628 contact=1.0 k=4.8 Cp=1.5
+v16 refine 15/24 loss=1.90776 contact=1.0 k=7.2 Cp=0.75
+v16 refine 16/24 loss=1.81914 contact=1.0 k=7.2 Cp=1.5
+v16 refine 17/24 loss=2.06457 contact=3.0 k=2.4 Cp=0.75
+v16 refine 18/24 loss=2.16327 contact=3.0 k=2.4 Cp=1.5
+v16 refine 19/24 loss=2.17806 contact=3.0 k=3.6 Cp=0.75
+v16 refine 20/24 loss=2.26507 contact=3.0 k=3.6 Cp=1.5
+v16 refine 21/24 loss=2.25862 contact=3.0 k=4.8 Cp=0.75
+v16 refine 22/24 loss=2.36077 contact=3.0 k=4.8 Cp=1.5
+v16 refine 23/24 loss=2.36235 contact=3.0 k=7.2 Cp=0.75
+v16 refine 24/24 loss=2.49396 contact=3.0 k=7.2 Cp=1.5
+v16 refined selected = (contact = 0.3, felt_k = 7.2, felt_cp = 1.5, loss = (total = 1.6877504066335296, side_transient = 0.7410940038419476, felt_transient = 0.5069626695272736, guard_transient = 1.4897548730521137, side_final = 0.3520356028141167, felt_final = 0.18066038904825263, primary_rmse_K = 26.634503302871984, t2_rmse_K = 10.68019665753569), parameters = Main.Receiver2D_v16.Receiver2D_v15.ModelParameters2D(Main.Receiver2D_v16.Receiver2D_v15.Receiver2D_v14.ModelParameters2D(Main.Receiver2D_v16.Receiver2D_v15.Receiver2D_v14.Receiver2D_v12.ModelParameters2D(Main.Receiver2D_v16.Receiver2D_v15.Receiver2D_v14.Receiver2D_v12.Receiver2D_v11.ModelParameters2D(Main.Receiver2D_v16.Receiver2D_v15.Receiver2D_v14.Receiver2D_v12.Receiver2D_v11.Geometry2D(0.137, 0.019, 0.01071960208740737, 0.057, 0.075, 0.0015, 0.0004, 100, 6, 3, 1, 18, 0.15, 10, 0.0065, 0.008, 0.003), Main.Receiver2D_v16.Receiver2D_v15.Receiver2D_v14.Receiver2D_v12.Receiver2D_v11.SolidProperties2D(2150.0, 0.05, 1.0, 50.0, 0.06, 140.0, 1360.0, 205.0, 2700.0, 900.0, 0.001), Main.Receiver2D_v16.Receiver2D_v15.Receiver2D_v14.Receiver2D_v12.Receiver2D_v11.HeatTransferParameters2D(0.001, 1.44, 0.3333333333333333, 0.0, 0.1, 0.0, 0.5, :graetz, 3.61, 0.0, 1.8), Main.Receiver2D_v16.Receiver2D_v15.Receiver2D_v14.Receiver2D_v12.Receiver2D_v11.LossParameters2D(0.85, 0.2, 1.0, 1.0, 0.0, 1.0), Main.Receiver2D_v16.Receiver2D_v15.Receiver2D_v14.Receiver2D_v12.Receiver2D_v11.OpticalParameters2D(1.0, 100.0, 0.1, 0.1, 0.2, 1.25, 1.2075, 0.8855), Main.Receiver2D_v16.Receiver2D_v15.Receiver2D_v14.Receiver2D_v12.Receiver2D_v11.HydraulicParameters2D(101400.0, 294.25, 101325.0, 1.0, -0.5428447496201336, 0.8, 0.0, :equal_pressure, 0.013, 335.0, 24, 1.0e-5, 0.55)), Main.Receiver2D_v16.Receiver2D_v15.Receiver2D_v14.Receiver2D_v12.AssemblyParameters2D(0.057, 0.075, 0.165, 0.018, 0.0388, 0.057, 0.029, 0.028, 3900.0, 15.0, 80.0, 1.0, 7.2, 1.5, 2700.0, 900.0, 205.0, 1.0), Main.Receiver2D_v16.Receiver2D_v15.Receiver2D_v14.Receiver2D_v12.ObservationParameters2D(180.0, 60.0, 180.0, 0.8)), Main.Receiver2D_v16.Receiver2D_v15.Receiver2D_v14.NetworkParameters2D(1.0, 3.0, 9)), Main.Receiver2D_v16.Receiver2D_v15.SkinParameters2D(5.0e-5, 1.0, 0.3)))
+v16 refined holdout = (total = 1.2582672519932596, side_transient = 0.6128445776602139, felt_transient = 0.2767369066139872, guard_transient = 0.6229682547109001, side_final = 0.5857426255112309, felt_final = 0.34184664561754546, primary_rmse_K = 24.054467500286894, t2_rmse_K = 7.890868392524813)

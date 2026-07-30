@@ -1,0 +1,19 @@
+(simulation_id = "C69", maximum_final_sensor_change_K = 24.614984754569377, mean_final_sensor_change_K = 10.954033366547565)
+(simulation_id = "C81", maximum_final_sensor_change_K = 12.105780431491837, mean_final_sensor_change_K = 6.763235251465834)
+(simulation_id = "E72", maximum_final_sensor_change_K = 9.945388494419262, mean_final_sensor_change_K = 4.8577170415460955)
+2D v16 selected screen-to-nominal transfer: Test Failed at D:\kkakosim\github\tamuq-chen-secarelab-receiver\aysha\test\mesh_2D_v16_staged.jl:46
+  Expression: maximum((row.maximum_final_sensor_change_K for row = rows)) < 20.0
+   Evaluated: 24.614984754569377 < 20.0
+
+Stacktrace:
+ [1] top-level scope
+   @ D:\kkakosim\github\tamuq-chen-secarelab-receiver\aysha\test\mesh_2D_v16_staged.jl:7
+ [2] macro expansion
+   @ C:\Users\kkakosim\.julia\juliaup\julia-1.12.6+0.x64.w64.mingw32\share\julia\stdlib\v1.12\Test\src\Test.jl:1777 [inlined]
+ [3] macro expansion
+   @ D:\kkakosim\github\tamuq-chen-secarelab-receiver\aysha\test\mesh_2D_v16_staged.jl:46 [inlined]
+ [4] macro expansion
+   @ C:\Users\kkakosim\.julia\juliaup\julia-1.12.6+0.x64.w64.mingw32\share\julia\stdlib\v1.12\Test\src\Test.jl:680 [inlined]
+Test Summary:                              | Pass  Fail  Total   Time
+2D v16 selected screen-to-nominal transfer |    1     1      2  43.7s
+RNG of the outermost testset: Random.Xoshiro(0xe2d703138a4d8b0a, 0x76dd32e35f0b7a25, 0x03e35aa7033663e9, 0x19fe19ee5be23bac, 0x10d216853aaf8eba)

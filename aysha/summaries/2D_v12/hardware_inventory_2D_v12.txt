@@ -1,0 +1,14 @@
+receiver_mass_kg=0.040058800000000006
+receiver_capacity_J_K=49.24603541250001
+felt_volume_m3=0.001375592380767732
+felt_mass_kg=0.19258293330748247
+felt_capacity_J_K=261.91278929817616
+adaptor_volume_m3=0.00025539481282275576
+adaptor_mass_kg=0.9960397700087474
+adaptor_capacity_J_K=1095.775722279148
+aluminum_sleeve_mass_kg=3.325400956566024
+aluminum_sleeve_capacity_J_K=2992.8608609094213
+aluminum_backplate_mass_kg=0.8523821023998611
+aluminum_backplate_capacity_J_K=767.143892159875
+rear_tube_mass_kg=0.03997283952611313
+rear_tube_capacity_J_K=43.97541987996164

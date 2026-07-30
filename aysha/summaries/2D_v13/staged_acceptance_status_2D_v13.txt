@@ -1,0 +1,6 @@
+mid_radial_sign_correct=0/15
+deep_radial_sign_correct=0/15
+(phase = "heating_training", mean_sensor_rmse_K = 88.00403080286866, steady_mae_K = 85.73573364440624, t90_mae_s = 734.7777777777778, axial_rmse_K = 45.34687917305678, mid_radial_rmse_K = 27.504620541001415, deep_radial_rmse_K = 43.06517018874523, dp1_rmse_mbar = 0.40203947826220204)
+(phase = "heating_validation", mean_sensor_rmse_K = 82.59916050128248, steady_mae_K = 78.15434604721406, t90_mae_s = 820.2380952380952, axial_rmse_K = 45.58714894026927, mid_radial_rmse_K = 28.2705658217384, deep_radial_rmse_K = 43.16702991074329, dp1_rmse_mbar = 0.286637572079125)
+(phase = "cooling_validation", mean_sensor_rmse_K = 31.04267529790166, steady_mae_K = 31.210683934293126, t90_mae_s = 688.0952380952381, axial_rmse_K = 10.5885102154854, mid_radial_rmse_K = 4.963800919030227, deep_radial_rmse_K = 9.773073960145974, dp1_rmse_mbar = 0.062123780442718435)
+status=REJECTED_FOR_COEFFICIENT_EXTRACTION

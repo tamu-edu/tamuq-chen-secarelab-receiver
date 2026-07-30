@@ -1,0 +1,12 @@
+primary_cooling_rmse_K=23.120651256898867
+t2_cooling_rmse_K=9.342476319578088
+cooling_fit_useful=true
+felt_conductivity_at_extended_bound=true
+parameter_identifiable=false
+mesh_transfer_pass=false
+mid_radial_sign_correct=0/15
+deep_radial_sign_correct=0/15
+(phase = "heating_training", mean_sensor_rmse_K = 113.1867042631268, steady_mae_K = 123.78228873618616, t90_mae_s = 754.6190476190476, axial_rmse_K = 81.28560109241371, mid_radial_rmse_K = 36.66151796255393, deep_radial_rmse_K = 49.61125132902874, dp1_rmse_mbar = 0.5229416095449752, mean_core_to_side_flow_ratio = 2.8647521197490664)
+(phase = "heating_validation", mean_sensor_rmse_K = 124.91336144837285, steady_mae_K = 138.96483266850788, t90_mae_s = 826.1904761904761, axial_rmse_K = 83.90948372245909, mid_radial_rmse_K = 37.626551391779365, deep_radial_rmse_K = 49.86998625921461, dp1_rmse_mbar = 0.4240035528078673, mean_core_to_side_flow_ratio = 2.8088090611355625)
+(phase = "cooling_validation", mean_sensor_rmse_K = 33.59063885240828, steady_mae_K = 27.916712538906864, t90_mae_s = 892.8571428571429, axial_rmse_K = 9.246985054285755, mid_radial_rmse_K = 5.056525229894252, deep_radial_rmse_K = 12.601524911540352, dp1_rmse_mbar = 0.05152401385386354, mean_core_to_side_flow_ratio = 3.362828658670884)
+status=REJECTED_FOR_COEFFICIENT_EXTRACTION

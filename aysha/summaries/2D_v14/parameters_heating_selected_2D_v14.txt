@@ -1,0 +1,9 @@
+objective=5.565875748263771
+lateral_conductivity_scale=1.0
+edge_felt_contact_scale=3.0
+beam_sigma_mm=100.0
+beta_opt_1_m=100.0
+heat_transfer_scale=1.8
+power_scale_456=1.25
+power_scale_304=1.2075
+power_scale_256=0.8855

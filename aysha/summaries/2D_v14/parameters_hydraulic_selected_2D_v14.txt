@@ -1,0 +1,6 @@
+t0_rmse_mbar=0.023467784210523646
+hydraulic_resistance_scale=0.8
+groove_loss_coefficient=335.0
+dp1_zero_offset_mbar=-0.5428447496201336
+no_groove_best_rmse_mbar=0.03359201275659669
+no_groove_resistance_scale=1.6613445378151261

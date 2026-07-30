@@ -1,0 +1,10 @@
+objective=4.694747599698571
+side_solid_fraction=0.025
+side_gas_heat_fraction=0.0125
+active_side_conductance_W_K_m=100.0
+side_felt_contact_h_W_m2K=5.0
+beta_opt_1_m=150.0
+heat_transfer_scale=1.8
+power_scale_456=1.25
+power_scale_304=1.2075
+power_scale_256=0.77
