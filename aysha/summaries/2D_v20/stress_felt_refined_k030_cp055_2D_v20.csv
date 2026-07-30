@@ -1,0 +1,2 @@
+felt_conductivity_scale,felt_heat_capacity_scale,flow_converged,objective,side_rmse_K,side_final_bias_K,T2_rmse_K,T2_final_bias_K,T3_diagnostic_rmse_K
+0.3,0.55,true,1.0656672934283882,50.30641475895754,53.30708265352155,13.101793436447714,-2.759771439714413,71.96314028640083

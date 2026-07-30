@@ -1,0 +1,55 @@
+V20 GATE-FREE DIAGNOSTIC PLOT SUMMARY
+Stress-test parameters are diagnostic and are not validated fits.
+
+UA plot: D:\kkakosim\github\tamuq-chen-secarelab-receiver\aysha\summaries\2D_v20\plots\gatefree_ua_objective_profile_2D_v20.png
+UA diagnostic minimum: n=0.25, Nu50 ratio=2, objective=2.21567
+UA source row: stress_ua_profile_refined_n025_2D_v20.csv
+
+RMSE plot: D:\kkakosim\github\tamuq-chen-secarelab-receiver\aysha\summaries\2D_v20\plots\bounded_vs_gatefree_rmse_2D_v20.png
+Original bounded source: plant_nuisance_selected_n125_r195_2D_v20.csv
+Original RMSE [Hside, HT2, Cside, CT2]: 79.39999065054563, 8.471702087215652, 51.946043786461814, 14.480784160930018
+Gate-free representative-screen source: stress_nuisance_selected_n050_r200_2D_v20.csv
+Gate-free representative-screen RMSE [Hside, HT2, Cside, CT2]: 77.861478154039, 6.566958622306284, 50.814335526895974, 13.55617490500238
+The preceding orange comparison values are representative-screen metrics, not full validation.
+Original thresholds [Hside, HT2, Cside, CT2]: 60.0, 15.0, 35.0, 12.0
+
+All-training-power train/holdout plot: D:\kkakosim\github\tamuq-chen-secarelab-receiver\aysha\summaries\2D_v20\plots\gatefree_train_holdout_rmse_2D_v20.png
+FINAL ALL-TRAINING-POWER DIAGNOSTIC PARAMETERS
+mesh=nominal
+reynolds_exponent=0.5
+Nu50_ratio=2.0
+Nu50=0.17445125563458075
+nu_prefactor=0.024671133169143992
+felt_conductivity_scale=0.15
+felt_heat_capacity_scale=0.55
+felt_contact_scale=0.3
+power_scale_456=1.05
+power_scale_304=1.05
+power_scale_256=0.7
+T3_location=receiver_exit
+T3_capacity_areal_J_m2_K=30000.0
+T3_stem_conductance_areal_W_m2_K=0.0
+all_ode_success=true
+all_flow_converged=true
+original_heating_training_gate=false
+original_heating_holdout_gate=false
+original_cooling_training_gate=false
+original_cooling_holdout_gate=false
+observer_inside_original_bracket=false
+original_cooling_observer_gate=false
+original_all_posthoc_thresholds_pass=false
+FINAL PHASE METRICS
+heating_training: side_RMSE=115.959 K (limit 60), T2_RMSE=7.15207 K (limit 15), plant_pass=false
+  T3_RMSE=194.74 K, T3_final_bias=86.2203 K, T3_t90_MAE=1661.11 s, observer_pass=false
+heating_holdout: side_RMSE=94.3522 K (limit 60), T2_RMSE=6.30857 K (limit 15), plant_pass=false
+  T3_RMSE=129.84 K, T3_final_bias=48.0977 K, T3_t90_MAE=1783.33 s, observer_pass=false
+cooling_training: side_RMSE=55.0212 K (limit 35), T2_RMSE=13.2801 K (limit 12), plant_pass=false
+  T3_RMSE=44.182 K, T3_final_bias=14.0576 K, T3_t90_MAE=925 s, observer_pass=false
+cooling_holdout: side_RMSE=43.6744 K (limit 35), T2_RMSE=8.28261 K (limit 12), plant_pass=false
+  T3_RMSE=30.1375 K, T3_final_bias=48.3736 K, T3_t90_MAE=1500 s, observer_pass=false
+Final phase source: gatefree_validation_phases_alltrain_power_2D_v20.csv
+Final parameter source: gatefree_validation_summary_alltrain_power_2D_v20.csv
+
+T3 plot: D:\kkakosim\github\tamuq-chen-secarelab-receiver\aysha\summaries\2D_v20\plots\t3_capacity_profile_2D_v20.png
+T3 branch source: stress_t3_selected_beststress_2D_v20.csv
+T3 branch: location=receiver_exit, stem=0, selected capacity=30000

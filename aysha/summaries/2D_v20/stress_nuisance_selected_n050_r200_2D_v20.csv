@@ -1,0 +1,2 @@
+reynolds_exponent,Nu50_ratio,felt_conductivity_scale,felt_heat_capacity_scale,power_scale_456,power_scale_304,power_scale_256,heating_objective,heating_side_rmse_K,heating_T2_rmse_K,heating_T3_diagnostic_rmse_K,cooling_objective,cooling_side_rmse_K,cooling_T2_rmse_K,cooling_T3_diagnostic_rmse_K,flow_converged,original_heating_gate,original_cooling_gate
+0.5,2.0,0.4,0.55,1.05,1.23,0.7,1.892402486015362,77.861478154039,6.566958622306284,119.55307205197316,1.0970907023043739,50.814335526895974,13.55617490500238,71.42809323544327,true,false,false

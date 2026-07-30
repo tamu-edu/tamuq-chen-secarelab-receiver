@@ -4135,3 +4135,261 @@ correlation plus a formal non-identifiability statement for receiver
 `UA(Re)` under the available outlet-temperature information. Equations,
 assumptions, and routing are in `summaries/2D_v20_theory_manual.md`; outputs
 are under `summaries/2D_v20/`.
+
+## 2026-07-30 - V20 gate-free boundary-stress test
+
+### Purpose and rules
+
+The bounded v20 study ended with the `Nu(Re)`, felt, power, and T3-observer
+parameters on search limits. A deliberately gate-free stress test was
+therefore run to distinguish two possibilities:
+
+1. the original acceptance gates were prematurely rejecting a nearby useful
+   solution; or
+2. even substantially relaxed parameter bounds could not reconcile the side
+   wall, felt, and outlet-temperature records.
+
+Acceptance gates and boundary penalties were not used to rank any stress
+candidate. Candidates were ranked only by the stated T3-free side/T2 score,
+or by the T3 training score in the separate one-way observer profile.
+Parameters were allowed outside their physical identification priors, but
+basic nonnegative physics was retained: no negative conductivity, heat
+capacity, `Nu`, power, observer capacity, or conductance was allowed. The
+original heating, cooling, and observer gates were evaluated only after the
+search and full validation. Consequently, a stress minimum is a diagnostic
+compensator and not an identified material property or heat-transfer
+coefficient.
+
+Cooling continued to use the leakage-free side/T2-only initialization.
+T3/T9/T10 did not initialize the plant. The T3 observer was post-processed
+one way and could not feed energy back into the receiver, felt, casing, or
+gas solution. Every final-window quantity used the last 10% of each
+experiment's actual time span, not the last 10% of its sample indices.
+
+### Structural `UA` sweep
+
+The structural sweep extended the Reynolds exponent down through zero and
+the `Nu50` ratio beyond the original interval. Initial slices covered
+`n=0--1.25` and ratios as high as 4; the refined common slices used ratios
+`1.0--3.0` at `n=0`, 0.25, and 0.50. With the nuisance parameters still
+fixed, the lowest refined structural row was
+
+```text
+n = 0.25
+Nu50/Nu50_reference = 2.00
+objective = 2.21567
+side RMSE = 82.78 K
+T2 RMSE = 9.43 K.
+```
+
+The ratio minimum was interior to the refined ratio interval, but the
+exponent had moved far below both the measured apparent-correlation exponent
+and the original v20 identification range. After the felt and power
+coordinates were allowed to respond, the `n=0.50`, ratio-2.00 point slightly
+outperformed `n=0.25`, ratio-2.00: the corresponding representative-case
+heating/cooling objectives were 1.8924/1.0971 versus 1.9417/1.1401. The
+stress plant therefore used
+
+```text
+n = 0.50
+Nu50/Nu50_reference = 2.00
+Nu50 = 0.174451
+A_Nu = 0.0246711.
+```
+
+This coordinate movement does not establish a new correlation. It shows
+that the T3-free score can exchange a much flatter `Re` dependence against a
+larger `Nu50`, i.e. the original structural ridge continues outside the
+physical identification box.
+
+### Felt, source, and power coordinates
+
+The first expanded nuisance screen at `n=0.50`, ratio 2.00 selected felt
+`k/Cp` scales 0.40/0.55 and representative-case power scales
+1.05/1.23/0.70. Its heating side/T2 RMSE was 77.86/6.57 K and cooling
+side/T2 RMSE was 50.81/13.56 K. Both original plant gates still failed.
+
+A second cooling-only felt refinement selected `Cp` scale 0.55. The
+conductivity objective was exactly flat at scales 0.05 and 0.15
+(`objective=1.064571`, side/T2 RMSE 50.28/13.09 K) and changed only to
+1.065667 at scale 0.30. Scale 0.15 was retained as a representative point,
+but the plateau down to 0.05 means that felt conductivity is practically
+unidentified in this regime; it is not evidence for a conductivity 15% of
+the nominal value.
+
+The source extension compared the retained near/deep source with full-deep,
+longer-deep, and Beer--Lambert alternatives. The existing
+`f_deep=0.90`, `L_deep=0.12 m` choice remained lowest:
+
+| source | `f_deep` | `L_deep` | objective | side RMSE | T2 RMSE |
+|---|---:|---:|---:|---:|---:|
+| near/deep | 0.90 | 0.12 m | 1.7051 | 73.68 K | 7.28 K |
+| near/deep | 1.00 | 0.12 m | 1.9824 | 80.78 K | 7.26 K |
+| near/deep | 0.90 | 0.20 m | 2.0006 | 81.16 K | 7.25 K |
+| Beer--Lambert | 0 | 0.08 m | 2.9289 | 103.20 K | 7.50 K |
+
+Thus making the already deep source still deeper did not repair the side
+profiles. This stress comparison preserves the 0.90/0.12 choice but does not
+validate it as an optical property.
+
+The first power refinement used one representative experiment per lamp
+group and selected 1.05/1.23/0.75. Because that selection could be
+experiment-specific, every power coordinate was then reranked over all three
+heating-training experiments in its lamp group. The all-training selections
+were
+
+| group | selected scale | tested range | boundary-active? | group side RMSE | group T2 RMSE |
+|---|---:|---:|---|---:|---:|
+| 456 | 1.05 | 0.70--1.15 | no | 124.31 K | 9.32 K |
+| 304 | 1.05 | 0.70--1.23 | no | 126.58 K | 6.23 K |
+| 256 | 0.70 | 0.55--0.84 | no | 55.65 K | 3.97 K |
+
+The final stress-validation power vector was therefore 1.05/1.05/0.70.
+These selections are interior only to the deliberately expanded numerical
+stress grids. The 456 value equals its original closure lower bound, while
+the 304 and 256 values lie below their original independent closure brackets
+of 1.23--1.58 and 0.84--1.11. They therefore do not satisfy Role-B physical
+interiority, and they do not cure the large 456/304 side errors.
+
+### Expanded T3 observer
+
+At the stress plant, the gate-free discrete observer selected
+
+```text
+location = receiver exit, global x = 137 mm
+C''probe = 30000 J/(m2 K)
+G''stem = 0 W/(m2 K).
+```
+
+On C69/C80 its training mean/worst T3 RMSE was 41.75/58.72 K, with
+`t90` MAE 925 s. C81 gave 30.21 K RMSE, +48.21 K final bias, and
+-1500 s `t90` error. The extended capacity did not plateau: at the
+receiver-exit/zero-stem branch the training objective decreased monotonically
+from 2.548 at 1200 to 2.226 at 10000 and 1.330 at
+30000 J/(m2 K), while training RMSE fell from 74.43 to 41.75 K. Capacity
+therefore remained strongly upper-bound active and the stem remained
+lower-bound active. The observer is still unidentified.
+
+### Both full 18-case validations
+
+`validate_2D_v20_gatefree.jl` simulated all 15 heating experiments and
+C69/C80/C81. Errors below are pooled directly over all samples and all three
+side thermocouples where applicable, rather than averaged from per-case
+RMSEs.
+
+The first full pass used the refined felt point and the
+representative-experiment power vector 1.05/1.23/0.75:
+
+| phase | side RMSE | T2 RMSE | T3-observer RMSE |
+|---|---:|---:|---:|
+| heating training | 131.08 K | 7.64 K | 223.65 K |
+| heating holdout | 95.51 K | 6.47 K | 152.97 K |
+| cooling training | 55.02 K | 13.28 K | 44.18 K |
+| cooling holdout | 43.67 K | 8.28 K | 30.14 K |
+
+The second and final pass changed only the all-training-refined power vector
+to 1.05/1.05/0.70:
+
+| phase | side RMSE | T2 RMSE | T3-observer RMSE |
+|---|---:|---:|---:|
+| heating training | 115.96 K | 7.15 K | 194.74 K |
+| heating holdout | 94.35 K | 6.31 K | 129.84 K |
+| cooling training | 55.02 K | 13.28 K | 44.18 K |
+| cooling holdout | 43.67 K | 8.28 K | 30.14 K |
+
+The final-pass side/T2/T3 final-window biases were respectively
+`+7.72/-4.59/+86.22 K` for heating training,
+`-24.40/-6.94/+48.10 K` for heating holdout,
+`+52.83/-2.66/+14.06 K` for cooling training, and
+`+59.45/+2.79/+48.37 K` for C81.
+
+All 18 ODE solves completed and every coupled-flow solve converged. The
+maximum full-stream enthalpy relative residual was `6.11e-11`. The failure is
+therefore not a solver, flow-allocation, or gas-energy-conservation failure.
+
+Applied only after evaluation, the original plant thresholds were side/T2
+RMSE below 60/15 K for heating and 35/12 K for cooling. Every phase-level
+plant gate was false: heating failed on side temperature, cooling training
+failed on both side and T2, and cooling holdout failed on side temperature.
+The original cooling T3 observer gate was also false because its nominal
+30 K RMSE, 20 K final-bias, 500 s timing, and interior-parameter conditions
+were not jointly satisfied.
+
+### Interpretation
+
+The original acceptance gates are not causing the rejection. They were
+absent from every stress ranking, yet the unrestricted nonnegative search
+still produced side errors of 94--116 K in heating and 44--55 K in cooling
+on the full dataset. A modest relaxation of the original parameter brackets
+is therefore insufficient. Reaching these still-failing errors already
+requires a very flat `Nu(Re)` exponent, doubled `Nu50`, felt conductivity on
+a near-zero plateau, reduced optical powers, and a T3 thermal capacity ten
+times the former upper bound with zero stem conductance.
+
+These values are useful only for diagnosing compensation directions. They
+are not validated `Nu`, felt, source, power, or observer parameters and must
+not be reported as extracted material or heat-transfer properties. The
+stress test strengthens the v20 conclusion: the measured side profiles,
+felt response, and outlet-region T3 cannot be reconciled by retuning the
+existing scalar closures. It does not uniquely identify which missing
+spatial heat path, boundary condition, or core--gas closure is responsible.
+
+### Scripts and artifacts
+
+The reusable stress and validation scripts are:
+
+- `stress_profile_2D_v20_ua.jl`;
+- `stress_screen_2D_v20_nuisance.jl`;
+- `stress_refine_2D_v20_felt.jl`;
+- `stress_profile_2D_v20_source.jl`;
+- `stress_refine_2D_v20_power.jl`;
+- `stress_refine_2D_v20_power_group.jl`;
+- `stress_profile_2D_v20_t3.jl`; and
+- `validate_2D_v20_gatefree.jl`; and
+- `plot_2D_v20_gatefree_full.jl`.
+
+The principal artifacts are under `summaries/2D_v20/`:
+
+- `stress_ua_profile*_2D_v20.csv`;
+- `stress_nuisance_*_2D_v20.csv`;
+- `stress_felt_refined*_2D_v20.csv`;
+- `stress_source_profile_extension_2D_v20.csv`;
+- `stress_power_refined*_2D_v20.csv` and
+  `stress_power_group_*_2D_v20.csv`;
+- `stress_t3_profile_beststress_2D_v20.csv` and
+  `stress_t3_selected_beststress_2D_v20.csv`; and
+- `gatefree_validation_*_stress_best_2D_v20.csv` and
+  `gatefree_validation_*_alltrain_power_2D_v20.csv`.
+
+The initially generated gate-diagnostic figures did not constitute the full
+expected validation plot set. The completed suite is now under
+`summaries/2D_v20/plots/gatefree_full/` and contains:
+
+- two final-window parity plots, including a five-sensor faceted view;
+- temporal measured/model histories for all 18 heating and cooling cases;
+- continuous modeled side-wall axial profiles for all 15 heating cases; and
+- a 15-case axial overview with the common limits `x=0--137 mm` and
+  `T=500--1250 K`.
+
+All parity and axial values use the final 10% of actual experiment time.
+Each axial model curve uses every nominal-mesh axial center rather than only
+the three thermocouple coordinates. The individual axial figures and the
+overview use the same temperature scale throughout.
+
+### Standing axial-plot convention
+
+For v20 and every subsequent 2D version, the standard result package shall
+include an `axial_profiles_common_scale` overview in the same style as
+`summaries/2D_v20/plots/gatefree_full/axial_profiles_common_scale_2D_v20_gatefree.png`.
+The overview shall:
+
+- show all heating experiments as aligned small multiples;
+- draw each modeled axial profile as a continuous line through every axial
+  mesh center, not only at thermocouple coordinates;
+- overlay measured side thermocouples at 11, 58, and 107 mm;
+- use identical axial and temperature limits for every panel; and
+- state the averaging window and model version in the title, caption, or
+  accompanying manifest.
+
+Individual axial plots may still be produced for detailed inspection, but
+they do not replace the common-scale overview.

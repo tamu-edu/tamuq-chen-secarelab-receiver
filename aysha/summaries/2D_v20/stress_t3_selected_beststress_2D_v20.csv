@@ -1,0 +1,2 @@
+reynolds_exponent,Nu50_ratio,felt_conductivity_scale,felt_heat_capacity_scale,power_scale_456,power_scale_304,power_scale_256,location,global_z_mm,capacity_areal_J_m2_K,stem_conductance_areal_W_m2_K,training_objective,training_T3_rmse_K,training_max_T3_rmse_K,training_final_bias_K,training_t90_mae_s,validation_T3_rmse_K,validation_final_bias_K,validation_t90_error_s
+0.5,2.0,0.4,0.55,1.05,1.23,0.7,receiver_exit,137.0,30000.0,0.0,1.3302622191413471,41.747210116563025,58.720186837783665,13.194861582345697,925.0,30.21030325272318,48.211976433126054,-1500.0

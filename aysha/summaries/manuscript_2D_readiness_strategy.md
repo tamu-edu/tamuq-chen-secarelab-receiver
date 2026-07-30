@@ -629,6 +629,54 @@ nuisance bounds. The less-bad endpoint still gives 79.40 K heating-side
 RMSE, 51.95 K cooling-side RMSE, and 14.48 K cooling-T2 RMSE. Both plant
 gates fail.
 
+### Gate-free stress-test outcome
+
+A subsequent stress test removed every acceptance-gate and parameter-boundary
+penalty from ranking. The original gates were applied only after selection.
+All values in this subsection are **diagnostic stress values**, not validated
+coefficients, material properties, delivery factors, or probe properties.
+
+Extending the source family confirms the existing near/deep choice:
+`f_deep=0.90`, `L_deep=0.12 m`; moving to `f_deep=1.00` or
+`L_deep=0.20 m` worsens the side/T2 objective. The gate-free structural UA
+minimum is at `n=0.25`, `Nu50/Nu50_measured=2.00`, while the less-bad
+downstream nuisance branch uses `n=0.50` at the same ratio. Although the
+ratio is interior to the refined common `1.0--3.0` slice, the exponent
+changes with the downstream objective and remains far below the measured
+apparent exponent. This is not an interior, transferable joint coefficient
+basin.
+
+The cooling screen selects `felt Cp scale=0.55`, while felt-conductivity
+scales from `0.15` to `0.05` form a practical plateau rather than an
+identified optimum. All-training power profiles select 1.05/1.05/0.70 for
+the 456/304/256 groups. The 456 value is the original lower boundary; the
+304 and 256 values lie below their original independent closure brackets
+of 1.23--1.58 and 0.84--1.11.
+
+The T3 stress profile continues to `C''=30000 J/(m2 K)` and
+`G''stem=0 W/(m2 K)` without a capacity plateau. It therefore strengthens,
+rather than resolves, the observer non-identifiability.
+
+Final pooled side/T2 history RMSE values are:
+
+| phase | side RMSE | T2 RMSE |
+|---|---:|---:|
+| heating training | 115.96 K | 7.15 K |
+| heating holdout | 94.35 K | 6.31 K |
+| cooling training | 55.02 K | 13.28 K |
+| cooling holdout | 43.67 K | 8.28 K |
+
+All original heating and cooling gates fail when evaluated post hoc. All ODE,
+coupled-flow, equal-pressure, gas-reference, and total-enthalpy checks pass;
+the maximum relative enthalpy residual is below `6.2e-11`. The acceptance
+gates are strict but are not causing the scientific rejection. Modest
+relaxation does not remove the structural ridge, closure violations, felt
+plateau, T3 non-identifiability, or side-history error. The final training
+sets would require side limits near 116 K for heating and 56 K for cooling,
+about 93% and 60% above the declared limits. Wholesale abandonment could
+define only a lower-standard Role-A descriptive fit, not Role-B coefficient
+validation.
+
 ### Updated publication decision
 
 Stop coefficient extraction from the present 2D inverse model. Do not:

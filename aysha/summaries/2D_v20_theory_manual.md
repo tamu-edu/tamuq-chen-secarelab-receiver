@@ -321,7 +321,88 @@ UA profile, bootstrap coefficient interval, held-out branch selection, and F
 mesh confirmation are not authorized because they would quantify a rejected
 plant rather than identify a coefficient.
 
-## 11. Interpretation rule
+## 11. Gate-free diagnostic stress test
+
+After the bounded v20 calculation reached the stopping condition, a
+deliberately gate-free stress test was run to determine whether the declared
+acceptance thresholds or boundary penalties had created the rejection. These
+runs are **diagnostic only**. The original heating/cooling gates and all
+parameter-interiority or boundary penalties were excluded from candidate
+ranking; they were evaluated only after selection.
+
+The structural source extension does not continue toward its expanded upper
+bounds. At fixed `n=0.50` and `Nu50/Nu50_measured=2.00`, the best tested
+source remains:
+
+```text
+f_deep = 0.90
+L_deep = 0.12 m.
+```
+
+Increasing either value to `f_deep=1.00` or `L_deep=0.20 m` worsens the
+side/T2 objective. Thus the selected source is not an artifact of truncating
+those two source bounds.
+
+The gate-free UA-only structural surface has its lowest tested value at
+`n=0.25`, `Nu50/Nu50_measured=2.00`. After the downstream nuisance screens,
+the less-bad all-training branch uses `n=0.50` at the same ratio. The ratio
+is interior to the refined common `1.0--3.0` slice, but this does not
+establish an interior joint basin: the preferred exponent changes when
+downstream observables are included, remains far below the measured
+apparent exponent, and was not jointly profiled with every nuisance
+coordinate.
+
+Cooling prefers `felt Cp scale=0.55`. Felt-conductivity scales from `0.15`
+down to `0.05` lie on a practically flat response, so the stress test does
+not identify felt conductivity; moving farther below the original physical
+range merely exposes a plateau.
+
+All-training power profiles select:
+
+| irradiance group | diagnostic power scale | relation to original closure bracket |
+|---:|---:|---|
+| 456 | 1.05 | original lower boundary |
+| 304 | 1.05 | below the original 1.23--1.58 bracket |
+| 256 | 0.70 | below the original 0.84--1.11 bracket |
+
+The 304 and 256 values therefore improve temperatures only by violating the
+independent power-closure information. They are not revised delivery-factor
+estimates.
+
+The diagnostic T3 observer was extended to
+`C''=30000 J/(m2 K)` with `G''stem=0 W/(m2 K)`. Its score continued toward
+that extreme without reaching a capacity plateau. The T3 time response is
+therefore still not identified; `C''=30000` and zero stem conductance are
+stress coordinates, not probe properties.
+
+The final all-training-power combination gives the following pooled
+side/T2 history RMSE:
+
+| phase | cases | side RMSE | T2 RMSE |
+|---|---:|---:|---:|
+| heating training | 9 | 115.96 K | 7.15 K |
+| heating holdout | 6 | 94.35 K | 6.31 K |
+| cooling training | 2 | 55.02 K | 13.28 K |
+| cooling holdout | 1 | 43.67 K | 8.28 K |
+
+Applied post hoc, all four original plant gates fail because the side-history
+errors remain above 60 K for heating and 35 K for cooling. The gates are
+strict, but they are not causative: ranking without them drives UA, power,
+felt, and observer quantities farther into non-identifiable or
+closure-inconsistent regimes and still leaves large side residuals. Passing
+the final training sets by threshold change alone would require heating- and
+cooling-side limits of about 116 K and 56 K, roughly 93% and 60% above the
+declared limits. Modest gate relaxation cannot turn this into coefficient
+validation.
+
+The numerical checks pass for every final case: all ODE solves and coupled
+flow allocations converge, equal-pressure relative errors remain below
+`1.0e-5`, gas-reference relative errors below `7.4e-7`, and the maximum
+relative total-enthalpy residual is below `6.2e-11`. The remaining failure is
+therefore inverse-model structure and observability, not numerical
+integration or conservation.
+
+## 12. Interpretation rule
 
 V20 can establish non-identifiability even if it does not find an accepted
 model. A coefficient claim requires:
@@ -343,7 +424,7 @@ V20 reaches that stopping condition. It corrects thermodynamic bookkeeping
 and makes the inverse-problem failure cleaner, but it does not produce a
 validated `A_Nu`, `n`, felt property, power scale, or T3 probe parameter.
 
-## 12. Files
+## 13. Files
 
 - model: `2D_v20.jl`
 - experiment builder: `run_2D_v20.jl`
@@ -354,4 +435,6 @@ validated `A_Nu`, `n`, felt property, power scale, or T3 probe parameter.
 - T3-free UA profile: `profile_2D_v20_ua_plant.jl`
 - nuisance screen: `screen_2D_v20_plant_nuisance.jl`
 - profile aggregation: `aggregate_2D_v20_ua_profile.jl`
+- complete gate-free parity/temporal/axial plotting:
+  `plot_2D_v20_gatefree_full.jl`
 - numerical outputs: `summaries/2D_v20/`

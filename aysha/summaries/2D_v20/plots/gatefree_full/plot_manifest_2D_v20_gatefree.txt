@@ -1,0 +1,19 @@
+V20 GATE-FREE FULL PLOT MANIFEST
+Diagnostic stress parameters; not validated coefficients.
+heating_cases=15
+all_cases=18
+transient_plots=18
+axial_plots=15
+axial_x_limits_mm=0,137
+axial_y_limits_K=500.0,1250.0
+axial_profiles_use_final_actual_time_10_percent=true
+axial_model_curves_use_all_axial_mesh_centers=true
+parity_uses_final_actual_time_10_percent=true
+reynolds_exponent=0.5
+Nu50_ratio=2.0
+felt_k_scale=0.15
+felt_Cp_scale=0.55
+power_scales=1.05,1.05,0.7
+T3_location=receiver_exit
+T3_capacity_areal_J_m2_K=30000.0
+T3_stem_conductance_areal_W_m2_K=0.0
