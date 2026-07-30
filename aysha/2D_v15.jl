@@ -597,7 +597,9 @@ end
 function sensor_predictions2D(result::SimulationResult2D)
     obs = result.parameters.observation
     time = result.time
-    side5 = _sample_skin2D(result, 5e-3)
+    side11 = _sample_skin2D(
+        result, V11.SIDE_TC_FRONT_Z_2D,
+    )
     side58 = _sample_skin2D(result, 58e-3)
     side107 = _sample_skin2D(result, 107e-3)
     wall58 = V14._sample_channel2D(
@@ -624,7 +626,7 @@ function sensor_predictions2D(result::SimulationResult2D)
     T2 = V14._sample_outer2D(result, rT2, 58e-3)
     return (
         T8=V12._filter_observation(
-            time, side5, obs.side_time_constant_s,
+            time, side11, obs.side_time_constant_s,
         ),
         T12=V12._filter_observation(
             time, side58, obs.side_time_constant_s,
@@ -641,7 +643,7 @@ function sensor_predictions2D(result::SimulationResult2D)
         T3=V12._filter_observation(
             time, T3raw, obs.outlet_time_constant_s,
         ),
-        T2=T2, T8_skin=side5, T12_skin=side58,
+        T2=T2, T8_skin=side11, T12_skin=side58,
         T11_skin=side107, T9_wall=wall58, T10_wall=wall107,
         T9_gas=gas58, T10_gas=gas107,
     )

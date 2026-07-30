@@ -19,7 +19,7 @@
 #   3. A square-channel laminar pressure model predicts the atmospheric-
 #      referenced flush-tap DP1 signal. Cold t0 data determine one sensor
 #      offset and one shared hydraulic-resistance scale; no bypass is fitted.
-#   4. The verified T8 depth is 5 mm rather than 11 mm.
+#   4. T8 is located 11 mm from the irradiated face.
 #
 # Corrections inherited from v8:
 #   1. The 19 x 19 mm receiver area is 3.61e-4 m2 and its area-equivalent
@@ -55,12 +55,14 @@ export pack_parameters2D, unpack_parameters2D, calibrate2D, LB_2D, UB_2D, FIT_IN
 export geometry_invariants2D, solar_power_budget2D, energy_rate_ledger2D
 export hydraulic_summary2D
 export graetz_nusselt2D, groove_overlap_fractions2D
+export SIDE_TC_FRONT_Z_2D
 
 const SIGMA = 5.670374419e-8
 const WATER_FLANGE_TEMP = 298.15
 const G_ACCEL = 9.81
 const AIR_SPECIFIC_GAS_CONSTANT = 287.05
 const SQUARE_DUCT_DARCY_POISEUILLE = 56.91
+const SIDE_TC_FRONT_Z_2D = 11.0e-3
 
 # ============================================================================
 # Struct Definitions
@@ -555,10 +557,11 @@ function build_initial_state_2D(grid::DiscretizationGrid2D, p::ModelParameters2D
     r_perim_sample = grid.r_centers[grid.nr_rec]
 
     function axial_sensor_profile(z_val, T_mid, T_deep)
-        if z_val <= 5.0e-3
+        if z_val <= SIDE_TC_FRONT_Z_2D
             return T8
         elseif z_val <= 58.0e-3
-            frac = (z_val - 5.0e-3) / (58.0e-3 - 5.0e-3)
+            frac = (z_val - SIDE_TC_FRONT_Z_2D) /
+                   (58.0e-3 - SIDE_TC_FRONT_Z_2D)
             return (1.0 - frac) * T8 + frac * T_mid
         elseif z_val <= 107.0e-3
             frac = (z_val - 58.0e-3) / (107.0e-3 - 58.0e-3)
@@ -588,7 +591,7 @@ function build_initial_state_2D(grid::DiscretizationGrid2D, p::ModelParameters2D
     perim_profile = [axial_sensor_profile(z, T12, T11) for z in grid.z_centers]
     enforce_sample!(core_profile, 58.0e-3, T9)
     enforce_sample!(core_profile, 107.0e-3, T10)
-    enforce_sample!(perim_profile, 5.0e-3, T8)
+    enforce_sample!(perim_profile, SIDE_TC_FRONT_Z_2D, T8)
     enforce_sample!(perim_profile, 58.0e-3, T12)
     enforce_sample!(perim_profile, 107.0e-3, T11)
 
@@ -1446,7 +1449,10 @@ function sensor_predictions2D(result::SimulationResult2D)
     r_perim = result.receiver_radius
     r_t2 = result.receiver_radius + 40.0e-3
 
-    T8 = _sample_solid(result, r_perim, 5.0e-3; receiver_only=true)
+    T8 = _sample_solid(
+        result, r_perim, SIDE_TC_FRONT_Z_2D;
+        receiver_only=true,
+    )
     T12 = _sample_solid(result, r_perim, 58.0e-3; receiver_only=true)
     T11 = _sample_solid(result, r_perim, 107.0e-3; receiver_only=true)
     T9 = _sample_solid(result, r_core, 58.0e-3; receiver_only=true)
