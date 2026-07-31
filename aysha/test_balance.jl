@@ -1,0 +1,13 @@
+include("1D_v31.jl"); model, result, exp = solve_case_v31(pnew_v31, "E81");
+Qin = 1.270444 * 0.825 * max(0.0, 32.8475) * A_frt * 1.0;
+Tperim = result.perim_temperature[end, :];
+Tcore = result.core_temperature[end, :];
+Trear = result.rear_temperature[end, :];
+Qfront = H_FRONT_FIXED_v31 * A_frt * (Tperim[1] - 300.0) + EPS_FRONT_FIXED_v31 * sigma_sb * A_frt * (Tperim[1]^4 - 300.0^4);
+G_rear_cavity = rear_cavity_conductance_v31(pnew_v31);
+Qrear_loss = sum(G_rear_cavity * rear_contact_weights_v31(result.z_solid) .* (Trear .- 300.0));
+Qgas_out = sum(result.q_gas_received[end, :]);
+println("Qin: ", Qin);
+println("Qfront: ", Qfront);
+println("Qrear_loss: ", Qrear_loss);
+println("Qgas_out: ", Qgas_out);

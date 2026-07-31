@@ -1,0 +1,6 @@
+include("1D_v34.jl")
+println("Starting unbiased calibration...")
+fit = calibrate_v34(nodes=15, maximum_iterations=100, stage=:full)
+C_eff = participating_total_heat_capacity_v34(fit.parameters, 15)
+println("Unbiased C_eff: ", C_eff)
+println("Objective: ", fit.objective)

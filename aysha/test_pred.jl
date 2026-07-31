@@ -1,0 +1,1 @@
+include("1D_v33.jl"); model, result, exp = solve_case_v33(pnew_v33, "E81"); println("T8 Model: ", model[end, 1], " | T8 Exp: ", exp[end, 1]); println("T12 Model: ", model[end, 2], " | T12 Exp: ", exp[end, 2]); println("T3 Model: ", model[end, 6], " | T3 Exp: ", exp[end, 6])
