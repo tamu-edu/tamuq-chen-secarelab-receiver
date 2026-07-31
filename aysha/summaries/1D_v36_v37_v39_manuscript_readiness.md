@@ -69,7 +69,7 @@ on five of the ten gates.
 | Inversion threshold, ε at I_vol sign change | 0.66 ± 0.03, flux-independent | — | **0.72–0.78, flux-dependent, no crossing at 256 — fail** | 0.73 (456 only), no crossing at 304/256 — fail | no crossing — fail |
 | Λ₁₀₇ | 0.038 + 8.3e-4·Re | wrong sign fail | **slope +5.7e-5, R² 0.083 fail** | not computed | not computed |
 | External loss K_loss | 0.10–0.16 W/K | 0.250–0.341 fail | **0.150–0.227 partial** | not computed | not computed |
-| Power convention | 456/304 elevated, 256 not collapsed | 0.636 fail | **1.369 / 1.484 / 0.629 fail** (non-monotonic) | 1.325 / 0.996 / 0.611 partial | 1.270 / 0.978 / 0.551 fail |
+| Power convention (vs R6 closure, §7) | f = 1.34 / 1.58 / 1.11 | 0.636 | **1.369 / 1.484 / 0.629 — 2 of 3 within 6%, 256 group 43% low** | 1.325 / 0.996 / 0.611 — only 456 agrees | 1.270 / 0.978 / 0.551 — none agree |
 | Parameter interiority | no edge collapse | fail | **fail** (C_perim, C_rear, flange_scale, front_dep all at bounds) | fail (C_perim, C_rear, G_rear_tube = 0) | fail (m_rec = 0, G_rear_tube = 0, C's at bounds) |
 | Heating/cooling simultaneous | no cooling-only patch | partial | **pass** (balanced, no switch) | partial | fail |
 
@@ -112,11 +112,12 @@ Heating and cooling are satisfied simultaneously with no switch.
    and `flange_scale = 0.1014` are also at edges. The capacity gate passes only
    because the bounds were placed to make it pass. A reviewer will read the
    inventory closure as imposed, not identified.
-2. **Non-monotonic power convention.** `scale_304 = 1.484 > scale_456 = 1.369`,
-   with `scale_256 = 0.629`. There is no optical or calorimetric story in which
-   the 304 kW/m² case needs *more* power correction than the 456 kW/m² case.
-   This is the clearest indication that a source term is still absorbing a
-   structural error, and it is the item most likely to be caught in review.
+2. **Power convention — criticism retracted, one group still off.** An earlier
+   draft of this file called `scale_304 = 1.484 > scale_456 = 1.369`
+   "physically incoherent." That was wrong: R6's model-free delivered-power
+   closure produces the *same* non-monotonic pattern from an independent route
+   (see §7). v36 agrees with it to 2.2% at 456 and 6.1% at 304. Only the 256
+   group remains a genuine outlier, at 43% below the R6 estimate.
 3. **Λ₁₀₇ has no trend.** The slope sign is now correct (+5.7e-5 vs +8.3e-4)
    but it is 14× too small and R² = 0.083 — i.e. the model produces no
    Re-dependence in the deep-station lag at all. Any manuscript claim built on
@@ -279,10 +280,10 @@ substituted for the other.
 2. **Re-run v39 diagnostics before citing anything from it.** Confirm whether
    the saved CSV corresponds to the optimum, and whether the v39 loss uses the
    same normalization as v35/v37. This is the highest-priority action item.
-3. **Fix v36's power convention.** Re-fit with a monotonicity constraint
-   `scale_456 ≥ scale_304 ≥ scale_256` and report the objective penalty. If v36
-   survives with the Nu exponent intact, the result becomes substantially harder
-   to attack.
+3. ~~Fix v36's power convention with a monotonicity constraint.~~ **Superseded
+   by §7** — do *not* impose monotonicity on the scale factors; R6 shows the
+   real delivered-power factors are non-monotonic. Fix the aperture fluxes to
+   the independent estimate instead and re-fit the remainder.
 4. **Re-open the capacity bounds** (`C_perim_eff`, `C_rear_eff`) by ±30% and
    re-fit. If 302.5 J/K is recovered from the interior, the inventory gate
    becomes a genuine validation rather than an imposed one.
@@ -301,6 +302,75 @@ substituted for the other.
    monolith Nu, Fend 2004/2013, Avila-Marin 2011/2019, Kribus 2014) has not been
    read into this assessment and should be used only to position the result, not
    to constrain the model.
+
+## 7. Fixing the irradiance basis instead of fitting it
+
+**Planned change:** replace the three fitted `scale_*` parameters with
+independently estimated aperture irradiances, and restrict the calibration to
+the remaining parameters. The power-scale fitting is not presented explicitly,
+on the grounds of a known experimental flux discrepancy.
+
+**This is the single best available move, and it is already supported.** R6 of
+`claude_data_analysis_sections_v2.md` derives a per-flux delivered-power factor
+with no thermal model in the loop —
+f = [Q_gas + K·(T̄_w − T_amb)]/(G₀·A_frt), with the cooling-identified K_loss
+bracket (0.096–0.164 W/K) carried as a systematic band:
+
+| G₀ [kW/m²] | f (K_cool) | f (K_heat) | **v36 fitted** | v36 vs f(K_heat) |
+|---:|---:|---:|---:|---:|
+| 456 | 1.05 | 1.34 | **1.369** | **+2.2%** |
+| 304 | 1.23 | 1.58 | **1.484** | **−6.1%** |
+| 256 | 0.84 | 1.11 | **0.629** | **−43.4%** |
+
+Two consequences:
+
+1. **The non-monotonic pattern is corroborated, not an artifact.** R6's own
+   f values peak at 304 (1.58 > 1.34 > 1.11). The optimizer independently found
+   the same ordering. Reviewer risk on this point is far lower than it appeared.
+   Checklist item 3 in the draft already commits to reporting Io·A_frt as a
+   *lower bound* — the modelling section becomes a second, independent
+   confirmation of exactly that statement.
+2. **The 256 group is the real discrepancy.** v36 wants 161 kW/m² effective
+   against R6's 215–284. Fixing the flux there adds 26–76% more power to that
+   group.
+
+**Why the validation targets are safe under this change.** ε, NTU, Nu_app,
+Λ₁₀₇, C_eff and K_loss are all constructed from temperatures, metered flow and
+gas properties — none contains an irradiance term. Changing the flux basis moves
+the *model*, not the targets. The comparison therefore stays valid, and becomes
+stricter, since three degrees of freedom are removed.
+
+**Predicted effect on the open gaps.** The 256 group is currently the weakest in
+v36: it is under-predicted (E77 T8 496 K vs 566 K; E81 714 K vs 760 K) and it is
+the one group that never inverts (max I_vol = −9.5 K against +57.8 K measured).
+Both defects point the same way, and raising that group's power is the correct
+direction for both. There is a real chance that fixing the flux basis closes
+§4b — the most consequential remaining gap — rather than costing anything. That
+prediction should be checked explicitly, not assumed.
+
+**What must still be re-verified after the refit**, since every headline number
+is conditional on the fitted source:
+
+```text
+1. Nu_app exponent (currently 1.4394 vs 1.44) — does it survive?
+2. ε envelope (0.583-0.777 vs measured 0.573-0.781) — does it survive?
+3. Inversion threshold per flux group, especially 256 — does it appear?
+4. C_total_with_rear — still 301 +/- 23 J/K without bound-locking?
+5. Whether C_perim_eff / C_rear_eff leave their lower bounds once three
+   source parameters no longer compete with them.
+```
+
+**Disclosure requirement.** Not presenting the *fitting* is fine. Not presenting
+the *values* is not. The modelling section needs one line stating the aperture
+fluxes actually used, their provenance (R6 closure, or whatever independent
+estimate replaces it) and their uncertainty band. Note that the draft's header
+currently reads "All irradiance values used in the calculations are the nominal
+measured aperture fluxes (456, 304, 256 kW/m²); no correction factors of any
+kind are applied." That statement is true and important for the *experimental*
+reduction — and it must be scoped to it, or it will read as false once the
+modelling section uses corrected fluxes. A reviewer who finds an undisclosed
+flux correction will discount everything else in the paper; a reviewer who finds
+a disclosed one, corroborated by R6, will read it as a strength.
 
 ## 6. Open items to verify
 
