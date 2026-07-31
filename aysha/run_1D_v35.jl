@@ -24,9 +24,10 @@ begin # runner configuration
 
     const RUNNER_PLOT_NODES_v35 = runner_int_v35("RECEIVER1D_v35_RUNNER_PLOT_NODES", default_nodes)
     const RUNNER_FIT_NODES_v35 = runner_int_v35("RECEIVER1D_v35_FIT_NODES", 15)
-    const RUNNER_FIT_ITERATIONS_v35 = runner_int_v35("RECEIVER1D_v35_FIT_ITERATIONS", 100)
-    const RUNNER_FIT_SECONDS_v35 = runner_float_v35("RECEIVER1D_v35_FIT_SECONDS", 360.0)
+    const RUNNER_FIT_ITERATIONS_v35 = runner_int_v35("RECEIVER1D_v35_FIT_ITERATIONS", 200)
+    const RUNNER_FIT_SECONDS_v35 = runner_float_v35("RECEIVER1D_v35_FIT_SECONDS", 600.0)
     const RUNNER_FIT_STAGE_v35 = Symbol(get(ENV, "RECEIVER1D_v35_FIT_STAGE", "full"))
+    const RUNNER_CALIBRATION_DATASET_v35 = Symbol(get(ENV, "RECEIVER1D_v35_CALIBRATION_DATASET", "heating")) #heating, cooling, or both
     const RUNNER_WRITE_PLOTS_v35 = runner_bool_v35("RECEIVER1D_v35_WRITE_PLOTS", true)
 
     const RUNNER_OUTPUT_DIR_v35 = joinpath(@__DIR__, "summaries", "1D_v35")
@@ -476,6 +477,7 @@ begin # execution & output generation
         maximum_iterations=RUNNER_FIT_ITERATIONS_v35,
         maximum_time_seconds=RUNNER_FIT_SECONDS_v35,
         stage=RUNNER_FIT_STAGE_v35,
+        dataset=RUNNER_CALIBRATION_DATASET_v35
     )
     fitted_params = fit.parameters
 

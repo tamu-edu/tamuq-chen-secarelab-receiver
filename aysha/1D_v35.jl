@@ -61,7 +61,7 @@ begin # v31 fixed constants
     const PRANDTL_EXPONENT_FIXED_v35 = 1.0 / 3.0
     const STANDARD_AIR_DENSITY_v35 = 101325.0 / (287.05 * 294.25)
     const REYNOLDS_REFERENCE_v35 = 50.0
-    const NU_FLOOR_v35 = 3.61
+    const NU_FLOOR_v35 = 0.0
     const MEASURED_ASSEMBLY_CAPACITANCE_v35 = 301.0
     const IRRADIANCE_LEVELS_v35 = (456000.0, 304000.0, 256000.0)
     const T3_SAMPLE_POSITION_v35 = 140.0e-3
@@ -183,7 +183,7 @@ begin # v31 parameter values and bounds
         150.0,              # p[11] C_perim_eff (perimeter participating capacity [J/K])
         6.782364928459565,  # p[12] k_perim_ref (perimeter axial conductivity at 900K [W/m/K])
         184.67243519237965, # p[13] beta_opt [1/m]
-        0.5,                # p[14] spill_capture FIXED at 0.5 (opaque surfaces)
+        0.5,                # p[14] spill_capture
         10.0,               # p[15] beta_perim (perimeter source attenuation [1/m])
         0.9993597380772297, # p[16] f_core_rear (receiver-rear coupling core fraction)
         0.1014799960839941, # p[17] flange_scale (rear/flange heat-removal multiplier)
@@ -200,8 +200,8 @@ begin # v31 parameter values and bounds
         0.01,
         0.0,
         pnew_v35[3],
-        pnew_v35[4],
-        pnew_v35[5],
+        0.05,
+        0.0,
         pnew_v35[6],
         0.5,
         0.5,
@@ -210,7 +210,7 @@ begin # v31 parameter values and bounds
         150.0,
         0.0,
         pnew_v35[13],
-        0.5,  # p[14] spill_capture lower bound FIXED
+        0.0,  # p[14] spill_capture lower bound
         0.5,  # p[15] beta_perim lower bound
         0.0,
         0.10,
@@ -227,8 +227,8 @@ begin # v31 parameter values and bounds
         25.00,
         0.60,
         pnew_v35[3],
-        pnew_v35[4],
-        pnew_v35[5],
+        1.0,
+        3.0,
         pnew_v35[6],
         1.5,
         1.5,
@@ -237,7 +237,7 @@ begin # v31 parameter values and bounds
         230.0,
         2000.0,
         pnew_v35[13],
-        0.5,  # p[14] spill_capture upper bound FIXED
+        1.0,  # p[14] spill_capture upper bound
         300.0, # p[15] beta_perim upper bound
         1.0,
         20.0,
@@ -253,7 +253,7 @@ begin # v31 parameter values and bounds
 
     fit_rear_stage_indices_v35 = [17, 18, 19, 22, 23, 24, 25]
     fit_transport_stage_indices_v35 = [10, 12, 17, 18, 19, 20, 22, 23, 24, 25]
-    fit_full_stage_indices_v35 = [1, 2, 7, 8, 9, 10, 12, 15, 16, 17, 18, 19, 20, 22, 23, 24, 25]
+    fit_full_stage_indices_v35 = [1, 2, 4, 5, 7, 8, 9, 10, 12, 14, 15, 16, 17, 18, 19, 20, 22, 23, 24, 25]
     fit_heat_transfer_indices_v35 = fit_rear_stage_indices_v35
     fit_source_indices_v35 = [14, 15, 16, 17, 18, 19, 20, 22, 23, 24, 25]
     fit_power_scale_indices_v35 = [7, 8, 9]
@@ -1129,13 +1129,19 @@ begin # v31 objective helpers
     end
 
     function calibrate_v35(; nodes=15, maximum_iterations=100,
-                           maximum_time_seconds=360.0, stage=:rear)
+                           maximum_time_seconds=360.0, stage=:rear, dataset=:both)
         p0 = copy(pnew_v35)
         idx_fit = fit_indices_for_stage_v35(stage)
         function obj_free(theta)
             p_full = copy(p0)
             p_full[idx_fit] .= theta
-            return loss_heating_v35(p_full; nodes=nodes) + loss_cooling_v35(p_full; nodes=nodes)
+            if dataset == :heating
+                return loss_heating_v35(p_full; nodes=nodes)
+            elseif dataset == :cooling
+                return loss_cooling_v35(p_full; nodes=nodes)
+            else
+                return loss_heating_v35(p_full; nodes=nodes) + loss_cooling_v35(p_full; nodes=nodes)
+            end
         end
         res = optimize_with_nlopt_v3(
             obj_free,

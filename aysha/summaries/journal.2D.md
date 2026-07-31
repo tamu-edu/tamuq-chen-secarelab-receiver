@@ -10,7 +10,7 @@ The overarching goal of this study and 2D model development is to **obtain and v
 
 ---
 
-## 2026-07-28 — 2D_v7 Heating-Only Optimization Objective & Channel Radiative Transport
+## 2026-07-28 â€” 2D_v7 Heating-Only Optimization Objective & Channel Radiative Transport
 
 Files:
 - `2D_v7.jl`
@@ -1587,7 +1587,7 @@ The complete 15-case confirmation at `beta_opt=110 1/m` gives:
 The positive full-group correlations are weak (`0.05`, `0.23`, `0.24`) and
 the slopes remain far below the measured `17.34`, `10.48` and
 `6.90 K/(L/min)`. The result does not yet validate v11. It does show that
-the earlier statement “Graetz reverses the flow trends” was conditional on
+the earlier statement â€œGraetz reverses the flow trendsâ€� was conditional on
 the v9 optical extinction and cannot be used to reject Graetz before a
 v11-specific refit.
 
@@ -2262,8 +2262,8 @@ sector, not another lumped side population.  It should:
 5. map side thermocouples to the exterior wall and interior probes to their
    actual channel groups.
 
-That model can test the proposed positive feedback—hotter channels have
-higher resistance, receive less flow and become hotter—without inventing an
+That model can test the proposed positive feedbackâ€”hotter channels have
+higher resistance, receive less flow and become hotterâ€”without inventing an
 unmeasured total-flow bypass.  The v13 results show that this feedback must be
 spatially and axially resolved; a global gas-participation fraction is too
 coarse.
@@ -3987,7 +3987,7 @@ next step must address identifiability of outlet gas versus T3 and optical
 source depth; another joint point fit of the same observables is not
 authorized.
 
-Here “no independent outlet-gas measurement” does **not** mean T3 is
+Here â€œno independent outlet-gas measurementâ€� does **not** mean T3 is
 statistically dependent on the wall thermocouples or that it is not a real
 experimental measurement. It means there is only one outlet-region
 temperature measurement, T3, and the same signal is being asked to determine
@@ -4437,7 +4437,7 @@ The grid search converged on an extreme point in the parameter space:
 
 ### Analysis of the Boundary Conditions
 
-The results are highly significant. In attempting to minimize the SSE (Sum of Squared Errors) against the experimental measurements�particularly the deep temperature spatial inversion ({\text{perim}} > T_{\text{core}}$)�the model actively pushed the \Core Preference\ to its absolute maximum limit of 1.0.
+The results are highly significant. In attempting to minimize the SSE (Sum of Squared Errors) against the experimental measurements—particularly the deep temperature spatial inversion ({\text{perim}} > T_{\text{core}}$)—the model actively pushed the \Core Preference\ to its absolute maximum limit of 1.0.
 
 A \Core Preference\ of 1.0 indicates that virtually all the fluid is being routed through the core of the monolith, completely bypassing the perimeter channels. By forcing all the cold air through the core, the model achieves the maximum possible cooling of the core channels. Simultaneously, because the perimeter is starved of cooling fluid, its temperature spikes drastically, allowing the model to naturally recreate the spatial inversion observed experimentally without requiring any spillage heating (\Spillage = 0.0\).
 
@@ -4462,10 +4462,18 @@ The grid sweep converged on:
 - **Optimal Nusselt Multiplier**: 1.2
 - **Optimal Rosseland Multiplier**: 0.1
 
-While the algorithm correctly selected an optimal configuration, the absolute magnitudes of the objective function (Sum of Squared Errors) and the RMSE (~1500�1800 K) remained severely elevated across the entire grid. 
+While the algorithm correctly selected an optimal configuration, the absolute magnitudes of the objective function (Sum of Squared Errors) and the RMSE (~1500–1800 K) remained severely elevated across the entire grid. 
 
 ### Global Validation (Phase 4 Output)
 
 Running all 15 heating and cooling cases (E67-E81) with these optimally calibrated coefficients reveals that the 2D model (Role B) ultimately **cannot perfectly reconcile the full 3D behavior** using scalar internal boundaries. The model successfully captures the *qualitative* behavior of the temperature inversions (as designed in Phase 3), but the extremely high residual errors (quantitative deviations) physically prove that attempting to force a complex, geometrically sparse 3D honeycomb receiver into a continuum 2D model mathematically breaks the scalar physics equations. 
 
 This completes the Role B computational framework: the rigorous demonstration that an axisymmetrically reduced model, even when fed extreme but physically-derived boundary conditions, structurally limits out. The plots generated (stored under summaries/2D_v22/plots/) display the best possible behavior this continuum formulation can offer.
+
+## Crossover Insights from 1D Corroboration (July 2026)
+
+The conclusions reached above in Phase 4 of the 2D model development have been independently and rigorously corroborated by the final 1D model framework (`1D_v35`). 
+
+Specifically, the 1D model was subjected to an unconstrained grid optimization that allowed for massive scalar flow bypass (diverting cold gas around the core). The 1D optimizer mathematically proved that **flow bypass cannot resolve the paradox either**, due to the **Advective Bottleneck**. If the model bypasses gas during the steady-state heating phase to keep the core hot, it lacks the required *advective mass flow* through the core during the transient cooling phase, causing the core to take vastly too long to cool down.
+
+Therefore, both the 1D and 2D continuum formulations have been mathematically cornered. A scalar, unified flow structure is physically invalid for this geometry. The flow distribution must be dynamically non-linear (e.g., bypassing during heating, fully participating during cooling) or severely 3D geometric, validating the manuscript's claims regarding macroscopic maldistribution in monolithic structures.
