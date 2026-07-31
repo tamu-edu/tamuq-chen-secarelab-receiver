@@ -11,13 +11,42 @@ v36/v37/v39 formulations from the journal entry, the parameter CSVs, and the
 saved diagnostics. If the v39 manual exists elsewhere in the repo, the
 formulation-level conclusions below should be re-checked against it.
 
+**Provenance of the gate targets — read this first.** None of the targets used
+below are literature values or general porous-media correlations. All are
+identified from *this* campaign and are stated in `claude_data_analysis_sections_v2.md`:
+
+| Target | Source | What it is |
+|---|---|---|
+| Nu = (3.1 ± 0.1)e-4 · Re^1.44, r² = 0.97 | R3 | Apparent global exchange, 15 runs, 23 ≤ Re ≤ 94 |
+| ε* = 0.66 ± 0.03 | R4 | Flux-independent effectiveness at which the wall peak moves inside |
+| Λ₁₀₇ = 0.038 + 8.3e-4·Re, r² = 0.90 | R5 | Deep-station gas–solid depression (a stated *lower bound*) |
+| C_eff = 301 ± 23 J/K, K_loss = 0.10–0.16 W/K | R7 / M4 | Slow-mode eigenvalue identification from cooling decays |
+| Envelope: ε = 0.57–0.78, NTU = 0.85–1.51, Nu_app = 0.028–0.212 | R1 | Measured operating range |
+
+They are therefore legitimate *validation* targets — the model should reproduce
+the receiver's own measured behaviour — but they are **not** physical bounds
+constraining the formulation, and nothing here should be read as importing an
+external correlation onto a receiver geometry that has none.
+
+**They must also be compared like-for-like.** ε and Nu_app are *reduced*
+quantities with specific definitions (M2):
+
+$$\varepsilon = \frac{T_3 - T_{amb}}{\bar T_w - T_{amb}},\qquad
+\bar T_w = 0.248\,T_8 + 0.365\,T_{12} + 0.387\,T_{11},\qquad NTU = -\ln(1-\varepsilon)$$
+
+with T9/T10 explicitly excluded (radiation-biased interior probes), and the
+inversion indicator defined on the wall chain as `I_vol = T12 − T8`. The model's
+saved `mean_effectiveness` column is a *per-cell* effectiveness and is **not**
+the same quantity; the same applies to `mean_nu` versus Nu_app. Section 4 below
+recomputes both from the model output using the manuscript definitions.
+
 ---
 
 ## 1. Headline verdict
 
 | Version | Readiness | One-line |
 |---|---|---|
-| **1D_v36** (dynamic bypass) | **3 / 5 — citable with framing** | Only branch with invariant diagnostics; reproduces the target Nu exponent to 0.04%. Blocked by bound-locked capacities and a non-monotonic power convention. |
+| **1D_v36** (dynamic bypass) | **3.5 / 5 — citable with framing** | Only branch with invariant diagnostics; reproduces the measured ε envelope (0.583–0.777 vs 0.573–0.781) and the Nu exponent to 0.04%. Blocked by bound-locked capacities, a non-monotonic power convention, and an inversion threshold shifted to ε ≈ 0.75. |
 | **1D_v37** (optical redistribution) | **2 / 5 — supporting evidence only** | Better power convention, materially worse residuals than v36, no invariants computed. Its own mechanism undercuts the volumetric framing. |
 | **1D_v39** (combined) | **1 / 5 — not citable as saved** | Saved diagnostics are ~200 K worse than the v35 baseline on every heating channel, which contradicts the reported objective of 0.629. Must be re-run before any v39 number appears in the manuscript. |
 
@@ -36,7 +65,8 @@ on five of the ten gates.
 | Apparent Nu exponent | Re^1.44 | 1.334 partial | **1.4394 pass** | not computed | not computed |
 | Apparent Nu prefactor | 3.1e-4 | 2.23e-4 | **1.74e-4 fail** (1.8× low) | not computed | not computed |
 | Nu trend quality | R² ≥ 0.97 | 0.961 | **0.935 partial** | not computed | not computed |
-| Inversion threshold | ε* = 0.66 ± 0.03 | 0.876–0.983 fail | **0.885–0.983 fail** | 0.900–0.992 fail | 0.966–0.998 fail |
+| ε envelope (0.57–0.78) | manuscript defn. | — | **0.583–0.777 pass** | 0.656–0.770 partial (range compressed) | 0.351–0.488 fail |
+| Inversion threshold, ε at I_vol sign change | 0.66 ± 0.03, flux-independent | — | **0.72–0.78, flux-dependent, no crossing at 256 — fail** | 0.73 (456 only), no crossing at 304/256 — fail | no crossing — fail |
 | Λ₁₀₇ | 0.038 + 8.3e-4·Re | wrong sign fail | **slope +5.7e-5, R² 0.083 fail** | not computed | not computed |
 | External loss K_loss | 0.10–0.16 W/K | 0.250–0.341 fail | **0.150–0.227 partial** | not computed | not computed |
 | Power convention | 456/304 elevated, 256 not collapsed | 0.636 fail | **1.369 / 1.484 / 0.629 fail** (non-monotonic) | 1.325 / 0.996 / 0.611 partial | 1.270 / 0.978 / 0.551 fail |
@@ -95,7 +125,12 @@ Heating and cooling are satisfied simultaneously with no switch.
    dT₁₁/dṁ = −22.9 K/(L/min) against −1.4 experimental; dT₁₀/dṁ = −22.0 against
    −3.5. The experimental signature that deep stations go *flat* with flow is
    not reproduced.
-5. **The crossover is still missing** (see §4).
+5. **The inversion threshold is displaced and flux-dependent** (see §4b) — v36
+   needs ε ≈ 0.72–0.78 to move the wall peak inside, against a measured
+   flux-independent 0.66, and never inverts at all in the 256 kW/m² group.
+   Since R4 is one of the paper's headline claims, this is the most
+   scientifically consequential of v36's gaps, and it is *not* an effectiveness
+   magnitude problem — v36 gets ε right (§4a).
 
 **Framing that works:** present v36 as an *inverse-identification consistency
 check* that independently recovers the experimentally-extracted Nu exponent,
@@ -158,41 +193,82 @@ inconsistency that must be resolved first.
 
 ---
 
-## 4. The result that is actually manuscript-grade
+## 4. Recomputed with the manuscript definitions
 
-Two failures are shared by v35, v36, v37 and v39 and are more valuable than any
-of the individual fits:
+An earlier draft of this assessment compared the model's per-cell
+`mean_effectiveness` (0.885–0.998) against the measured global ε* = 0.66 and
+concluded the models were nowhere near the inversion regime. **That was a
+category error** — two different quantities. Recomputing ε from the model output
+using M2's definition, ε = (T3 − T_amb)/(T̄_w − T_amb) with the trapezoid wall
+weights, gives a very different and much more interesting picture.
 
-**(a) The high-flow thermal crossover is never reproduced.**
+### (a) v36 reproduces the measured ε envelope almost exactly
 
-| Case | I (kW/m²) | ṁ (L/min) | T9−T8 model | T9−T8 exp |
-|---|---:|---:|---:|---:|
-| E67 | 456 | 15.28 | −9 (v36) / −26 (v39) | **+35** |
-| E72 | 304 | 18.71 | −13 (v36) / −19 (v39) | **+33** |
-| E77 | 256 | 13.85 | −12 (v36) / −16 (v39) | **+37** |
-| E71 | 456 | 7.13 | −74 (v36) | −108 |
-| E76 | 304 | 4.53 | −176 (v36) | −120 |
+| | ε range | NTU range |
+|---|---|---|
+| **Experiment (R1)** | 0.57–0.78 | 0.85–1.51 |
+| Experiment (recomputed here) | 0.573–0.781 | 0.85–1.52 |
+| **v36** | **0.583–0.777** | **0.88–1.50** |
+| v37 | 0.656–0.770 | 1.07–1.47 |
+| v35 | 0.520–0.732 | 0.73–1.32 |
+| v39 | 0.351–0.488 | 0.43–0.67 |
 
-Every formulation gets the low-flow ordering roughly right and the high-flow
-sign wrong. No scalar closure — empirical Nu, developing-flow Nu, exchange-area
-fraction, static bypass, dynamic bypass, two-stream gas, or front-loaded optics
-— produces an internal station hotter than the front face at high flow.
+v36 lands inside the measured envelope on both ends and tracks it run-by-run
+(E67 0.743/0.735, E72 0.777/0.773, E77 0.775/0.781, E76 0.583/0.573). This is a
+strong, previously unreported validation result and it materially raises v36's
+standing. v37's range is compressed at the low-ε end — it cannot get down to the
+0.57 low-flow points. v39 is uniformly ~0.25 too low, consistent with its
+collapsed temperature field.
 
-**(b) Cell effectiveness never approaches the inversion threshold.**
+### (b) The real failure is the *location* of the inversion threshold
 
-Fitted ε_mean is 0.885–0.983 (v36), 0.900–0.992 (v37), 0.966–0.998 (v39),
-against the experimentally-inferred ε* = 0.66 ± 0.03. With ε = 1 − exp(−NTU),
-ε = 0.98 implies NTU ≈ 3.9 while ε* = 0.66 implies NTU ≈ 1.08 — the model needs
-roughly a **3.6× reduction in UA/(ṁ·c_p)** to reach volumetric inversion. Neither
-optical redistribution nor dynamic bypass moves this by more than a few percent,
-because both leave the *product* of exchange coefficient and swept capacity
-essentially intact. This is the quantitative statement of the "Advective
-Bottleneck" and it is the strongest physics result in the branch.
+R4's claim is that the wall peak moves inside the receiver when ε exceeds
+≈0.66, **independent of flux**. Recomputing the ε at which `I_vol = T12 − T8`
+changes sign:
 
-Together (a) and (b) constitute a clean inverted proof: the LTNE 1D continuum,
-with any closure tested here, is structurally incapable of volumetric inversion
-at the measured effectiveness. That is a defensible manuscript conclusion and
-does not depend on which of v36/v37/v39 fits best.
+| Flux (kW/m²) | Experiment | v36 | v37 |
+|---:|---|---|---|
+| 456 | 0.644–0.673 | 0.720–0.743 | 0.728–0.732 |
+| 304 | 0.625–0.668 | 0.747–0.777 | no crossing |
+| 256 | 0.628–0.679 | **no crossing** | no crossing |
+
+The experimental crossings bracket 0.66 in all three groups — the flux
+independence in R4 is clean. v36 inverts, but only at ε ≈ 0.72–0.78, and the
+threshold drifts with flux; at 256 kW/m² it never inverts at all (max I_vol
+= −9.5 K where the experiment reaches +57.8 K).
+
+So the correct statement is not "the model can't invert." It is:
+
+> The model reaches the measured effectiveness envelope but requires roughly
+> 0.08–0.10 more effectiveness than the real receiver to move the wall peak
+> inside, and its threshold is flux-dependent where the measurement's is not.
+
+That is a much sharper and more diagnosable claim. It says the deficiency is in
+how axial *source* and axial *exchange* are distributed relative to each other —
+at fixed ε the model puts too much of its wall temperature at the front face —
+rather than in the overall magnitude of gas–solid coupling, which v36 gets
+right.
+
+### (c) What this does to the "Advective Bottleneck" argument
+
+The journal's §"Final Proof" concludes that no scalar flow structure can satisfy
+heating and cooling simultaneously. v36's ε agreement weakens the strong form of
+that claim: a *dynamic* (temperature-dependent) flow structure with `m_rec` =
+0.0606 does satisfy both, and lands the effectiveness envelope. What it does not
+do is relocate the inversion threshold. The defensible version of the argument
+is therefore narrower than the journal states, and should be rewritten before it
+goes into the manuscript.
+
+### (d) Caveat on the remaining reduced quantities
+
+Given that ε required correction, the `Nu_app_prefactor` (1.74e-4 vs 3.1e-4) and
+`Nu_app_Re_exponent` (1.4394 vs 1.44) in `invariant_summary_1D_v36.csv` should
+be verified to use M2's reduction — h_app from the same ε·ṁc_p route and the
+same wetted-area convention — before either is cited. The exponent match to
+0.04% is striking enough that it deserves that check. Note that `mean_nu`
+(3.07–8.50) is a local channel Nusselt number and is three orders of magnitude
+above Nu_app (0.028–0.212); they are not comparable and neither should be
+substituted for the other.
 
 ---
 
@@ -212,9 +288,19 @@ does not depend on which of v36/v37/v39 fits best.
    becomes a genuine validation rather than an imposed one.
 5. **Compute invariants for v37 and v39.** Five gates are currently unscorable
    for two of the three versions under assessment.
-6. **Lead the modelling section with the inverted proof (§4)**, not with a fit
-   quality table. The crossover failure and the ε gap are reproducible,
-   mechanism-independent, and quantitative; the fit rankings are neither.
+6. **Lead the modelling section with §4, not with a fit-quality table.** The
+   pairing is the story: v36 matches the measured ε envelope run-by-run yet
+   needs ~0.1 more ε to invert, and loses flux independence doing it. That is a
+   quantitative, well-posed statement about axial source/exchange placement.
+7. **Rewrite the "Advective Bottleneck" conclusion** in the journal before it
+   reaches the manuscript — v36 falsifies its strong form (§4c).
+8. **Do not import external Nusselt correlations as validation targets.** The
+   receiver's apparent Nu is 15–100× below fully developed duct theory (R3); a
+   monolith-channel correlation from the literature is a *contrast*, not a
+   bound. The literature in `analysis/literature/` (Cornejo & Hayes 2020 on
+   monolith Nu, Fend 2004/2013, Avila-Marin 2011/2019, Kribus 2014) has not been
+   read into this assessment and should be used only to position the result, not
+   to constrain the model.
 
 ## 6. Open items to verify
 
@@ -223,6 +309,11 @@ does not depend on which of v36/v37/v39 fits best.
 - Confirm whether `beta_opt` was fitted or fixed in v39, and whether `front_dep`
   in v36 (= 1.0) is a bound or a project constant
   (`FRONT_DEPOSITION_FIXED_V5 = 1.0` suggests the latter).
+- Confirm that `Nu_app_*` in the invariant diagnostics uses M2's reduction
+  (§4d). One reduced-quantity mismatch has already been found in this file.
+- Check whether the model's `mean_effectiveness` diagnostic should simply be
+  replaced by the manuscript-definition ε in future runners, to prevent the
+  per-cell/global confusion recurring.
 - Reconcile the v37 objective ranking (0.2388, better than v36's 0.2173 claim
   ordering in the journal narrative) against v37's uniformly worse steady
   residuals — the loss weighting should be documented in the manuscript.
