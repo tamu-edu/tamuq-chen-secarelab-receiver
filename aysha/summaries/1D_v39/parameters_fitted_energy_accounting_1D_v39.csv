@@ -1,18 +1,18 @@
 index,name,value
-1,A_Nu,5.749259075199761
+1,A_Nu,13.966584557869847
 2,B_Re,0.5195843158854337
 3,C_Pr_fixed,0.3333333333333333
-4,phi_0,0.9969962315734214
+4,phi_0,1.0
 5,m_rec,0.0
-6,front_dep,0.4109053248359702
+6,front_dep,0.0
 7,scale_456,1.2704443482523613
-8,scale_304,0.9779199114638039
-9,scale_256,0.5506002782324512
-10,G_core_perim_W_m_K,2.680966914196594
-11,C_perim_eff_J_K,150.1268827256909
-12,k_perim_ref_W_m_K,11.020506084412858
-13,beta_opt,190.23
-14,spill_capture,0.01218438838119107
+8,scale_304,0.7514662392832507
+9,scale_256,0.5
+10,G_core_perim_W_m_K,10.58514123907342
+11,C_perim_eff_J_K,150.0
+12,k_perim_ref_W_m_K,6.782364928459565
+13,beta_opt,80.0
+14,spill_capture,0.0362
 15,beta_perim_1_m,10.0
 16,f_core_rear,0.9993597380772297
 17,flange_scale,0.1014799960839941
@@ -24,13 +24,13 @@ index,name,value
 23,G_rear_tube_W_K,0.0
 24,G_rear_cavity_W_K,1.771499352885161
 25,G_rear_axial_W_K,4.521902076815926
-# fitted,phi_0,0.9969962315734214
+# fitted,phi_0,1.0
 # fitted,m_rec,0.0
-# fitted,G_core_perim_W_m_K,2.680966914196594
-# fitted,C_perim_eff_J_K,150.1268827256909
-# fitted,k_perim_ref_W_m_K,11.020506084412858
-# fitted,spill_capture,0.01218438838119107
-# derived,f_perim_source,0.011341196391738024
+# fitted,G_core_perim_W_m_K,10.58514123907342
+# fitted,C_perim_eff_J_K,150.0
+# fitted,k_perim_ref_W_m_K,6.782364928459565
+# fitted,spill_capture,0.0362
+# derived,f_perim_source,0.03369486399618391
 # derived,flux_receiver_fraction,0.06920265203911855
 # derived,flux_spillover_fraction,0.9307973479608814
 # fitted,beta_perim_1_m,10.0
@@ -45,6 +45,6 @@ index,name,value
 # fitted,G_rear_cavity_W_K,1.771499352885161
 # fitted,G_rear_axial_W_K,4.521902076815926
 # derived,C_core_eff_J_K,72.52693256582086
-# derived,C_receiver_participating_eff_J_K,222.65381529151176
-# derived,C_total_with_rear_eff_J_K,302.65381529151176
+# derived,C_receiver_participating_eff_J_K,222.52693256582086
+# derived,C_total_with_rear_eff_J_K,302.52693256582086
 # reference,measured_C_eff_J_K,301.0

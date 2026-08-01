@@ -175,14 +175,14 @@ begin # v31 parameter values and bounds
         PRANDTL_EXPONENT_FIXED_v39, # p[3]  C_Pr (= 1/3)
         0.9982,             # p[4]  phi_0 (dynamic bypass base fraction)
         0.0606,             # p[5]  m_rec (dynamic bypass temperature exponent)
-        0.5708,             # p[6]  front_dep (optics front deposition)
+        0.20,               # p[6]  front_dep (optics front deposition)
         1.2704443482523613, # p[7]  scale_456
         1.1831938200144705, # p[8]  scale_304
         0.6362873866412013, # p[9]  scale_256
         10.58514123907342,  # p[10] G_core_perim (radial core-perimeter conductance [W/m/K])
         150.0,              # p[11] C_perim_eff (perimeter participating capacity [J/K])
         6.782364928459565,  # p[12] k_perim_ref (perimeter axial conductivity at 900K [W/m/K])
-        190.23,             # p[13] beta_opt [1/m]
+        80.0,               # p[13] beta_opt [1/m]
         0.0362,             # p[14] spill_capture
         10.0,               # p[15] beta_perim (perimeter source attenuation [1/m])
         0.9993597380772297, # p[16] f_core_rear (receiver-rear coupling core fraction)
@@ -229,14 +229,14 @@ begin # v31 parameter values and bounds
         pnew_v39[3],
         1.0,
         3.0,
-        pnew_v39[6],
+        0.25, # p[6] front_dep upper bound
         1.5,
         1.5,
         1.5,
         80.0,
         230.0,
         2000.0,
-        pnew_v39[13],
+        80.0, # p[13] beta_opt upper bound
         1.0,  # p[14] spill_capture upper bound
         300.0, # p[15] beta_perim upper bound
         1.0,
@@ -1122,8 +1122,8 @@ begin # v31 objective helpers
 
     function fit_indices_for_stage_v39(stage)
         if stage == :full
-            # Include 4,5 (Dynamic Bypass) AND 6,13,14 (Optical Redistribution)
-            return [1, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14] 
+            # Include 4,5 (Dynamic Bypass) AND 6,13 (Optical Redistribution)
+            return [1, 3, 4, 5, 6, 8, 9, 13] 
         elseif stage == :rear
             return fit_rear_stage_indices_v39
         elseif stage == :transport

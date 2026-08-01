@@ -1,0 +1,1 @@
+include("1D_v41.jl"); for sim_id in sim_key_heat; println("Testing "); model, result, exp = solve_case_v41(pnew_v41, sim_id; is_cooling=false, nodes=15); println("Is finite? ", all(isfinite, model)); end

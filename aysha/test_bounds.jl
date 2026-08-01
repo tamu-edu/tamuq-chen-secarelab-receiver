@@ -1,0 +1,1 @@
+include("1D_v41.jl"); for i in 1:length(pnew_v41); if pnew_v41[i] < lb_full_v41[i] - 1e-9 || pnew_v41[i] > ub_full_v41[i] + 1e-9; println("p[] = ", pnew_v41[i], " not in [ ", lb_full_v41[i], ", ", ub_full_v41[i], "]"); end; end
