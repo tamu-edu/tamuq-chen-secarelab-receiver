@@ -5345,7 +5345,11 @@ Based on detailed CAD cutaways and user clarification, the physical geometry of 
 - There is no 'aluminum front cover'. Any spillage light hits the alumina felt and the perimetric wall of the aluminum cavity directly.
 - Therefore, the assumption that spillage is absorbed at the front face (=0$) holds physically true because light cannot deeply penetrate the dense felt or the aluminum wall.
 
-## July 2026: The Final Proof - The Advective Bottleneck
+## July 2026: Advective Bottleneck Hypothesis
+
+> Historical interpretation. The 2026-08-28 audit at the end of this journal
+> supersedes the proof language and narrows the conclusion to the tested model
+> class.
 
 **Hypothesis**: The steady-state solid temperature underprediction and gas overprediction can be resolved by a scalar flow bypass parameter (`f_bypass` or `phi_0`), simulating a portion of the cold inlet gas bypassing the heated core to mix downstream.
 
@@ -5364,7 +5368,10 @@ The 1D continuum model is fundamentally trapped in a mathematically irresolvable
 - You **cannot** use a low Nu to keep the gas cold during heating, because it removes the heat-transfer needed for the cooling curve.
 - You **cannot** use flow bypass to keep the gas cold during heating, because it removes the advective capacity needed for the cooling curve.
 
-This proves that any scalar (constant) internal flow parameter structure is physically invalid. The flow structure *must* be wildly non-linear (e.g., dynamically bypassing the core during heating due to thermal expansion/viscosity, but returning during cooling), or the 3D optical/geometric effects are completely overriding standard continuum boundary physics. The 1D formulation's rigid failure serves as a rigorous, inverted proof of the manuscript's core conclusions regarding macroscopic maldistribution in monolithic structures.
+At this stage, the result was interpreted as evidence against the tested
+constant scalar-flow structure and as motivation for dynamic flow participation
+or more explicit spatial physics. Later results show that it does not establish
+the necessity or uniqueness of either mechanism.
 
 ## July 2026: Multiphysics Branch Exploration (v36, v37, v38)
 
@@ -5378,16 +5385,113 @@ Three independent subagents were deployed to build and calibrate these three bra
 
 ### Results of the Hypothesis Testing
 
-*   **Hypothesis 3: Two-Stream Gas (`1D_v38`) FAILED**: The optimizer settled on a final objective score of **5.701**, which is significantly worse than the original 1.866. The optimizer actively pushed the core bypass fraction (`p[4]`) to exactly 1.0 (meaning it explicitly chose to route *all* the cooling flow through the core channels and actively rejected sending any air to the perimeter). This physically proves that providing the model with a separate perimeter cooling path does not yield any tangible improvement in error across the sensors. 
+*   **Hypothesis 3: Two-Stream Gas (`1D_v38`) REJECTED IN THIS PARAMETERIZATION**: The optimizer settled on a final objective score of **5.701**, which is significantly worse than the original 1.866. The optimizer pushed the core bypass fraction (`p[4]`) to exactly 1.0, so the tested perimeter cooling branch did not improve the fitted sensor errors.
 
-*   **Hypothesis 2: Optical Redistribution (`1D_v37`) MASSIVE SUCCESS**: The optimization reached a final objective score of **0.2388**. By unfreezing the optical redistribution, the optimizer mathematically proved that **spatial heat deposition was a major bottleneck**. It dropped 57% of the energy exactly on the front face (`front_dep` = 0.57) and rapidly absorbed the rest (`beta_opt` = 190.2 m⁻¹). This intensely front-loaded heat deposition resolved the `T8/T9_pair` underpredictions.
+*   **Hypothesis 2: Optical Redistribution (`1D_v37`) STRONG OBJECTIVE IMPROVEMENT**: The optimization reached a final objective score of **0.2388**. Unfreezing the optical redistribution showed that the objective is highly sensitive to source placement. It dropped 57% of the energy exactly on the front face (`front_dep` = 0.57) and rapidly absorbed the rest (`beta_opt` = 190.2 m⁻¹). This intensely front-loaded heat deposition reduced the `T8/T9_pair` underpredictions but did not independently identify an optical coefficient.
 
-*   **Hypothesis 1: Dynamic Bypass (`1D_v36`) MASSIVE SUCCESS**: The calibration achieved a final objective score of **0.2173**. The model preserved cold-state flow (at 295K, active fraction = 99.8%) but smoothly dropped the flow fraction as $T_{core}$ increased (resistance exponent = 0.0606). The increasing flow resistance smoothly diverted a critical fraction of the mass flow away from the central channels during the hottest phases, accurately lowering the internal heat transfer and successfully modeling the transient cooling paradox without breaking steady-state limits!
+*   **Hypothesis 1: Dynamic Bypass (`1D_v36`) BEST BALANCED SAVED FIT**: The calibration achieved a final objective score of **0.2173**. The model preserved cold-state flow (at 295K, active fraction = 99.8%) but smoothly dropped the flow fraction as $T_{core}$ increased (resistance exponent = 0.0606). This effective mechanism improved simultaneous heating and cooling, but its physical interpretation remains non-unique.
 
 ### Creating the Ultimate Formulation (`1D_v39`)
 Since Hypothesis 2 fixes the *spatial/axial profile* (via Optics), and Hypothesis 1 fixes the *temporal/transient curves* (via Dynamic Flow), and because they operate on completely independent physics domains, we combined them into a single, unified master formulation (`1D_v39`).
 
-**Result of `1D_v39` (The Degeneracy Proof)**:
+**Result of `1D_v39` (degeneracy diagnostic)**:
 Even after fixing the parameter bounds and explicitly "seeding" the optimizer with the perfect starting points from the successful subagents (`front_dep=0.57`, `flow_exp=0.06`), the combined formulation converged to a local minimum of **0.629**. In doing so, the optimizer actively pushed the temperature flow exponent (`p[5]`) exactly back to **0.0**, explicitly disabling the dynamic bypass! It relied entirely on the optics (`front_dep=0.41`, `beta_opt=190.2 m⁻¹`).
 
-This mathematical degeneracy proves that the objective function surface is relatively flat between these two physical mechanisms. Intensely front-loading the optical heat deposition (dumping 41% of the energy into the immediate front face) creates such a massive localized thermal shock that it adequately covers for *both* the spatial (axial) and temporal (transient) errors in the 1D model without needing the flow to bypass. The optimizer's strict preference for optical correction over dynamic flow correction confirms that the primary structural limitation of the 1D continuum formulation lies in its inability to physically distribute extreme front-face thermal shocks.
+This run suggested compensation between optical placement and dynamic flow in
+the chosen objective. The saved v39 residuals later proved inconsistent with
+the reported objective, so neither the flatness nor a preference for optical
+correction should be cited until the exact optimum is reproduced.
+
+## 2026-08-28 - Documentation and artifact audit of v36-v41
+
+This entry supersedes the strong "proof," "massive success," and validated
+Role-B wording in the preceding historical entries. Those entries record the
+working interpretation at the time; the saved artifacts support a narrower
+conclusion.
+
+### v36 remains the best balanced saved 1D result
+
+v36 has the lowest saved objective (`0.2173`) and the strongest balanced
+heating residuals. When effectiveness is recomputed with the manuscript
+definition, its range (`0.583--0.777`) closely matches the experimental range
+(`0.573--0.781`). Its invariant diagnostic gives an apparent-Nu exponent of
+`1.4394`, close to the measured `1.44`.
+
+These successes do not validate its fitted coefficients. The apparent-Nu
+prefactor and trend quality miss their targets, the wall-inversion threshold
+is displaced and flux-dependent, the deep flow slopes are too steep, and both
+`C_perim_eff` and `C_rear_eff` sit on imposed lower bounds. The capacity total
+is therefore not an independent recovery of the measured assembly capacity.
+
+The strong form of the earlier "Advective Bottleneck" claim is retracted.
+Dynamic flow participation can improve simultaneous heating and cooling. What
+remains unresolved is whether that parameter represents actual bypass,
+temperature-dependent channel resistance, or compensation for source and
+observation errors.
+
+### v37-v40 interpretation
+
+- v37 is evidence that the objective is highly sensitive to source placement.
+  It does not identify an optical extinction coefficient; its front-loaded
+  source also weakens a literal volumetric-absorption interpretation.
+- v38 rejects only the tested two-stream parameterization, not every possible
+  multi-stream or cross-sectional model.
+- v39 is not citable as saved. Its objective near `0.653` conflicts with saved
+  heating temperature errors roughly 200 K worse than the v35 baseline. The
+  exact optimum vector must be used to regenerate the residuals and plots.
+- v40 reopened the capacity bounds. Its objective degraded to `1.476`, its
+  apparent-Nu exponent moved to `2.223`, and it did not produce a new accepted
+  coefficient basin.
+
+All of these optimization summaries ended at `MaxTime` or `MaxIters`; their
+objective values are checkpoints rather than demonstrated converged minima.
+
+### v41 energy-basis failure
+
+v41 attempted the recommended fixed-power test by setting the R6 heating-side
+factors to `1.34/1.58/1.11`. However, it also fixes `spill_capture = 0.5` and
+adds perimeter input by multiplying the corrected face input by the
+spillover-to-receiver flux ratio. `spill_capture` is not in the v41 full fitted
+index set.
+
+For E67, the saved output reports:
+
+```text
+scaled receiver-face input = 220.6 W
+participating absorbed input = 1704.1 W
+```
+
+This cumulative treatment double-counts the delivered-power correction unless
+the R6 factor is explicitly redefined as a receiver-only quantity. The saved
+v41 objective (`5780.6`), 800--1100 K heating errors, Morris sensitivities, and
+fitted parameters are therefore invalid for scientific interpretation.
+
+The comparable total multiplier is
+
+```text
+M = scale * (1 + 13.45 * spill_capture).
+```
+
+For v36 this gives approximately `1.88/2.04/0.87`, not its raw
+`scale_* = 1.369/1.484/0.629`. For v41 it gives
+`10.35/12.21/8.57`. The raw scales and R6 factors are different quantities.
+The pair `(scale, spill_capture)` is consequently non-identifiable from
+temperature data when only their total-power product is constrained.
+
+The saved Morris screen also reports exactly zero effect for
+`spill_capture`, `beta_perim`, `C_rear_eff`, and `G_rear_axial`. The v36-to-v41
+source change proves that `spill_capture` cannot have zero leverage. Those
+zeros indicate that the parameters were not perturbed correctly; do not use
+the screen for parameter pruning until its index routing is repaired.
+
+### Required next check
+
+Before another fit, replace `(scale, spill_capture)` with a total multiplier M
+and a core/perimeter partition chi, then conservatively partition the source:
+
+```text
+Q_core + Q_perimeter = Q_delivered.
+```
+
+Verify that identity in forward simulations at all three flux levels. Only
+after the ledger passes should the v36 fixed-power hypothesis be retested.

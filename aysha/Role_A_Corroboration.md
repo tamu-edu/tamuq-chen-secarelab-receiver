@@ -1,42 +1,101 @@
 # Supplementary Note: Model Corroboration
 
-This note outlines the external corroboration provided by the 1D and 2D modeling efforts, consistent with "Role A" of the modeling strategy. The purpose of these models at this stage is to support the delivered-power accounting and qualitative structural claims of the manuscript, without reporting fitted coefficients as physical values.
+## Scope
 
-## 1. Energy Conservation and Structural Support
+The 1D two-zone and 2D axisymmetric LTNE models are used here as Role-A
+mechanistic and identifiability studies. They test whether candidate source,
+flow, observation, and thermal-inventory closures can reproduce the measured
+behavior while conserving energy.
 
-Both the 1D (two-zone effective transport) and 2D (axisymmetric continuum local thermal nonequilibrium) models rigorously conserve energy. Their *inability* to fit the experimental data under standard modeling assumptions (such as a centered incident beam or a strict no-spillage condition) is a significant result. 
+They do not currently provide validated Role-B convective, radiative, or
+conductive coefficients. Fitted values are model-dependent effective
+parameters and must not be reported as transferable material or channel
+properties.
 
-Because these models enforce strict energy closure, their failure to reproduce the measured temperature fields with idealized boundary conditions serves as a mathematical proof supporting the manuscript's hypotheses. Specifically, the model behaviors independently corroborate:
-- **Assembly-Scale Limitation:** Massive flow maldistribution or significant peripheral bypass is required to explain the measurements, thereby reducing the apparent Nusselt number at the assembly scale (supporting Section 5.1).
-- **Spillage and Peripheral Heating:** Substantial spillage heating the perimeter and housing is mathematically necessary to explain the spatial temperature profiles and the overall energy balance.
-- **Local Thermal Nonequilibrium:** The necessity of two-zone and LTNE structures within the models independently supports the nonequilibrium claims and measured gas deficits deep within the receiver (supporting Section 5.3).
+## Findings supported by the model studies
 
-### 1.1 The Steady-State vs. Transient Heat Transfer Contradiction
-A fundamental mathematical paradox repeatedly arose throughout the 1D and 2D modeling histories, cementing the necessity of flow maldistribution. In the experimental data, the core solid reaches elevated temperatures (~750-1000 K), while the exiting gas remains remarkably cool (~320 K). Simultaneously, the cooling curves following lamp shutoff demonstrate rapid thermal decay (~20 minutes).
+The model history supports the following limited conclusions:
 
-When standard continuum models enforce the theoretical minimum Nusselt number for fully developed laminar flow in square channels ($Nu \ge 3.61$), the models encounter an irreconcilable conflict:
-1. **Steady-State Heating**: To keep the gas cold while the solid becomes hot, the *apparent* steady-state heat transfer coefficient must be extremely poor. If standard high heat transfer is enforced, the optimizer is forced to drop the input power entirely to prevent the gas from overheating, resulting in severe solid temperature underprediction.
-2. **Transient Cooling**: To match the fast experimental cooling rates, the model requires a strong thermal coupling between the solid and the gas. If the heat transfer coefficient is dropped to near-zero to satisfy the heating phase, the receiver artificially retains heat for hours during cooldown.
+- A uniform single-temperature or single-channel description is inconsistent
+  with the measured cross-sectional and gas-solid temperature differences.
+- Source placement, peripheral heating, flow distribution, rear hardware, and
+  the T3 observation relation materially affect inferred transport parameters.
+- Heating and cooling jointly constrain the model more strongly than either
+  phase alone. Parameters that improve steady heating often degrade transient
+  cooling, exposing compensation among exchange, active flow, and thermal
+  inventory.
+- Exact energy and enthalpy closure do not by themselves make an inverse result
+  identifiable. The v20 2D study conserves energy but retains a boundary ridge
+  in `UA(Re)` and an unidentified T3 observer.
+- The model-based power factors and the T3-based algebraic closure show a
+  similar lamp-group ordering. They use the same campaign and are not
+  independent; the factors are provisional configuration-level corrections,
+  not validated optical constants.
 
-The journals reveal a history of failed solid-phase workarounds (axial radiosity, deposition adjustments, external mass additions) attempting to resolve this mismatch. The failure of all such unified-flow assumptions mathematically proves that a standard 1D/2D model with uniform gas participation cannot satisfy both heating and cooling constraints simultaneously. This directly corroborates the manuscript's conclusion: the physics are governed by a severe flow bypass mechanism, where the gas circumvents the active core during heating but successfully quenches it during cooling.
+These results are consistent with assembly-scale nonuniformity and
+maldistribution as plausible mechanisms. They do not uniquely determine the
+relative contributions of flow bypass, cross-sectional solid-temperature
+variation, optical deposition, or downstream probe bias.
 
-## 2. Reconciled Delivered-Power Factors
+## 1D status
 
-The modeling efforts independently corroborate the manuscript's energy closure assessment. Both models agree that the nominal aperture-power accounting underestimates the power reaching the receiver system at the higher irradiances. The models require delivered-power calibration factors that are consistent with those derived from the experimental algebraic closure:
-- $f_{456} \approx 1.34$
-- $f_{304} \approx 1.37$
-- $f_{256} \approx 0.79$
+v36 is the strongest saved 1D Role-A result. It reproduces the
+manuscript-definition effectiveness envelope and approximately recovers the
+measured apparent-Nu exponent. It nevertheless misses the measured inversion
+threshold and deep flow-slope behavior, and important thermal-capacity
+parameters sit on imposed bounds. Its capacitance total is therefore not an
+independent confirmation of the experimentally identified `301 +/- 23 J/K`.
 
-These reconciled factors confirm that spillage significantly contributes to the overall energy input at the 456 and 304 kW m⁻² levels.
+v37 is an optical/source-placement sensitivity, v38 is a rejected two-stream
+variant within its tested parameterization, and v39 is not citable because its
+saved objective and residual artifacts disagree. The current v41 output is
+invalid for interpretation because corrected delivered-power factors and
+recovered spillover power are applied cumulatively.
 
-## 3. Explicit Disclaimer on Validation
+The 1D source parameters `scale` and `spill_capture` enter the total absorbed
+power mainly through a product. They are not separately identified by the
+temperature data. Future work should use one conserved total-power multiplier
+and a separate core/perimeter partition rather than interpreting either fitted
+source parameter alone.
 
-We explicitly state that the fitted transport coefficients from both the 1D and 2D models are currently effective parameters and are **not yet validated**. They must not be interpreted as physical constants. 
+## 2D status
 
-Furthermore, the effective thermal capacitance ($C_{\rm eff} = 301$ J K⁻¹) identified in the manuscript's cooling transient analysis is currently ingested as a prior (model input) in both the 1D and 2D simulations. Therefore, the models' utilization of this value does not constitute an independent confirmation of the capacitance.
+v20 is the current trustworthy 2D endpoint. It establishes structural
+non-identifiability under the available measurements and tested model class:
+the T3 observation operator is not identified, the T3-free `UA(Re)` surface is
+a boundary ridge, and bounded nuisance parameters do not pass the declared
+heating and cooling gates.
 
-## 4. Formal Falsification of Continuum Models (Role B)
+The later v22 Phase-4 grid cannot be used as formal falsification evidence. Its
+Rosseland coordinate is inactive in the saved sweep, and its fixed macroscopic
+settings do not inherit the Phase-3 optimum. The resulting 1500--1800 K errors
+primarily diagnose that configuration and wiring, not the limits of every
+continuum formulation.
 
-An extensive Phase 4 calibration grid search attempted to extract effective macroscopic heat transfer and optical coefficients (Role B) using the 2D continuum local thermal nonequilibrium model. The grid sweep over internal Nusselt multipliers ($0.2\times$ to $1.2\times$) and Rosseland extinction multipliers ($0.1\times$ to $10.0\times$) yielded an optimal mathematical configuration. However, even with the imposition of extreme physically-derived boundary conditions (e.g. 100% core flow preference mimicking massive maldistribution), the absolute error (RMSE ~ 1500 K) remained severely elevated across all 15 operational heating/cooling profiles. 
+## Manuscript language
 
-Because the model strictly enforces energy closure, this quantitative failure acts as a formal falsification of 2D continuum approximations for this receiver. It proves mathematically that scalar internal boundary conditions and continuum formulations are structurally incapable of resolving the massive, deeply geometrically-coupled 3D thermal gradients inherent to the monolithic honeycomb. Consequently, the quantitative parameter identification attempt (Role B) structurally limits out, which conversely cements the fundamental experimental conclusion (Role A): the physics governing the receiver are irreducibly three-dimensional, dominated by extreme flow maldistribution and highly localized optical spillage.
+The safe manuscript statement is:
+
+> Energy-conserving reduced-order models reproduce selected qualitative
+> signatures and expose strong compensation among source placement, flow
+> participation, thermal inventory, and outlet-probe physics. Under the
+> available observations, the fitted transport coefficients are not uniquely
+> identifiable and are retained only as model-dependent effective parameters.
+
+Avoid claims that the models "prove" severe bypass, irreducible
+three-dimensionality, or the impossibility of all continuum models. Avoid
+claiming that the models independently confirm a capacitance that was imposed
+through bounds or priors.
+
+## Measurements needed for Role B
+
+The most valuable additional constraints are:
+
+- an independently shielded or calorimetric bulk outlet-enthalpy measurement;
+- an integrated receiver-face flux and spillage map;
+- a characterized T3/tube/probe transfer function; and
+- pressure-drop or channel-flow-distribution measurements.
+
+Without these data, the experimental apparent correlations remain publishable
+assembly-level results, while intrinsic coefficient extraction should remain
+an open objective.

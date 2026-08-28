@@ -4448,6 +4448,10 @@ This firmly concludes Phase 3 and transitions us to Phase 4, where we will use t
 
 ## Phase 4: Heat Transfer Parameter Calibration (Quantitative Tuning)
 
+> Historical interpretation. The 2026-08-28 audit at the end of this journal
+> identifies an inactive Rosseland coordinate and a mismatch with the Phase-3
+> settings; it supersedes the validation claims in this section.
+
 After establishing that extreme flow maldistribution (Core Preference = 1.0, Spillage = 0.0) provides the necessary macroscopic mechanism to induce the deep spatial temperature inversions seen experimentally, we transitioned to calibrating the fundamental microscopic coefficients to optimize the quantitative fit.
 
 In Phase 4, we performed a 36-point grid sweep across:
@@ -4468,7 +4472,10 @@ While the algorithm correctly selected an optimal configuration, the absolute ma
 
 Running all 15 heating and cooling cases (E67-E81) with these optimally calibrated coefficients reveals that the 2D model (Role B) ultimately **cannot perfectly reconcile the full 3D behavior** using scalar internal boundaries. The model successfully captures the *qualitative* behavior of the temperature inversions (as designed in Phase 3), but the extremely high residual errors (quantitative deviations) physically prove that attempting to force a complex, geometrically sparse 3D honeycomb receiver into a continuum 2D model mathematically breaks the scalar physics equations. 
 
-This completes the Role B computational framework: the rigorous demonstration that an axisymmetrically reduced model, even when fed extreme but physically-derived boundary conditions, structurally limits out. The plots generated (stored under summaries/2D_v22/plots/) display the best possible behavior this continuum formulation can offer.
+At the time, this was interpreted as the limit of the tested axisymmetric
+formulation. The later audit shows that the Phase-4 grid did not propagate all
+intended parameters and did not inherit the Phase-3 selected macroscopic
+settings, so it cannot establish a best-possible continuum result.
 
 ## Crossover Insights from 1D Corroboration (July 2026)
 
@@ -4476,4 +4483,66 @@ The conclusions reached above in Phase 4 of the 2D model development have been i
 
 Specifically, the 1D model was subjected to an unconstrained grid optimization that allowed for massive scalar flow bypass (diverting cold gas around the core). The 1D optimizer mathematically proved that **flow bypass cannot resolve the paradox either**, due to the **Advective Bottleneck**. If the model bypasses gas during the steady-state heating phase to keep the core hot, it lacks the required *advective mass flow* through the core during the transient cooling phase, causing the core to take vastly too long to cool down.
 
-Therefore, both the 1D and 2D continuum formulations have been mathematically cornered. A scalar, unified flow structure is physically invalid for this geometry. The flow distribution must be dynamically non-linear (e.g., bypassing during heating, fully participating during cooling) or severely 3D geometric, validating the manuscript's claims regarding macroscopic maldistribution in monolithic structures.
+Together, these runs motivated dynamic flow participation and more explicit
+spatial modeling as hypotheses. They did not uniquely identify those mechanisms
+or invalidate every scalar or continuum formulation.
+
+## 2026-08-28 - Documentation and v21/v22 implementation audit
+
+This entry supersedes the Phase-4 "formal falsification" and "mathematically
+cornered" language above. The earlier text remains as a historical record of
+the interpretation at the time, but the saved v22 sweep does not support that
+strength of conclusion.
+
+### Trustworthy endpoint
+
+v20 remains the current trustworthy 2D endpoint. It verifies numerical energy
+and enthalpy closure and shows that, under the available measurements and
+tested model class, receiver `UA(Re)` is structurally non-identifiable. The T3
+observer is not identified, the T3-free coefficient profile is a boundary
+ridge, and bounded nuisance parameters fail the declared heating and cooling
+gates. This supports a Role-A diagnostic use of the model and rejects Role-B
+coefficient extraction from the present inverse formulation.
+
+### v21 naming and interpretation
+
+The Phase-2/Phase-3 journal narrative mixes the v21 and v22 implementation
+layers. The repository contains an earlier `2D_v21.jl` hot-front model and a
+later `2D_v22.jl` property-injection and macroscopic-parameter model. Future
+documentation must cite the exact source and runner rather than referring only
+to "Phase 2."
+
+The Phase-3 grid selected zero spillage and `core_preference = 1.0`, but its
+best side-temperature RMSE remained about 211 K. This is a boundary result and
+does not identify a true physical flow distribution.
+
+### v22 Phase-4 sweep is not a valid falsification test
+
+Three implementation/configuration facts invalidate the strong Phase-4
+interpretation:
+
+1. `calibrate_2D_v22_phase4.jl` uses `spillage_power_W = 0.05 * 10500 = 525 W`
+   and `core_preference = 0.6`, rather than inheriting the Phase-3 selected
+   zero-spillage/1.0 combination described in the journal.
+2. For each Nusselt multiplier, all six Rosseland multipliers produce exactly
+   the same objective and RMSE. The Rosseland coordinate is therefore inactive
+   in the saved sweep.
+3. The v22 property patch replaces `V11.felt_conductivity_temp`, while the
+   inherited v12/v14 assembly paths call `V12.felt_conductivity_v12`. The
+   intended Rosseland perturbation does not reach those active paths.
+
+The 1458--1835 K Phase-4 RMSE values diagnose this configuration and wiring.
+They are not the best possible result of the v20 architecture, and they do not
+prove that every axisymmetric or continuum representation is invalid.
+
+### Corrected publication decision
+
+- Retain the v20 non-identifiability result and exact-enthalpy correction.
+- Do not cite v22 optical/Rosseland sensitivity values or its nominal optimum.
+- Describe failures as applying to the tested model class under the available
+  observations.
+- Do not claim uniquely identified extreme maldistribution or irreducible 3D
+  physics from the present inverse results.
+- If v22 work resumes, first demonstrate that isolated Nu and Rosseland
+  perturbations change the intended conductances and outputs, then repeat a
+  small no-fit sensitivity matrix before any calibration grid.

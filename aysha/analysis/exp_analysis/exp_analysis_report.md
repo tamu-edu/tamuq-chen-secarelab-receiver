@@ -1,5 +1,13 @@
 # Experimental Data Analysis: SiC Honeycomb Solar Receiver (rev. 2)
 
+> Historical note (2026-08-28): this report records an early reduction. Its
+> approximate `K_loss = 0.06 W/K` statement is superseded by the later
+> heating/cooling eigenvalue analysis in
+> `analysis/manuscript/data_analysis_sections.md`: `0.096 +/- 0.011 W/K` for
+> cooling decays and `0.164 +/- 0.028 W/K` for heating approaches. The two later
+> values are interpreted as a temperature-dependent bracket, not competing
+> estimates of one constant.
+
 Analysis of the 18 heating and 3 cooling runs in `RAW/`, using the corrected thermocouple topology: the side-wall axial chain is **T8 (11 mm) – T12 (58 mm) – T11 (107 mm)**; **T9 (58 mm) and T10 (107 mm) are interior probes exposed to the channel flow**, so they are biased toward the local gas temperature. Radial transfer is read from the pairs T9–T12 and T10–T11 combined with T2 (40 mm into the insulation). Companion files: `steady_state_metrics.csv`, `flow_slopes.csv`, `cooling_time_constants.csv`, `fig1`–`fig5`, and `exp_analysis.py`.
 
 ## 1. System comprehension (from background/)

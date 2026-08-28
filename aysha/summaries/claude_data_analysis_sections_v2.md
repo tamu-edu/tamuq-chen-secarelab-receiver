@@ -1,5 +1,11 @@
 # Dimensionless Characterization of a Structured SiC Volumetric Receiver from Transient and Steady Thermocouple Data
 
+> **Archived draft.** Superseded by
+> `analysis/manuscript/data_analysis_sections.md` and
+> `summaries/PROJECT_STATUS_2026-08-28.md` revision 3. In particular, this file's
+> claims that T3 provides bias-free bulk outlet enthalpy and that the 1D power
+> factors independently validate delivered power are no longer current.
+
 *Draft manuscript sections (Methods, Results, Discussion). Reproducible pipeline: `../exp_analysis/exp_analysis.py`, `../exp_analysis/dimensionless_analysis.py`, `../exp_analysis/uncertainty_analysis.py`; data products `dimensionless_groups.csv`, `eigenvalue_verification.csv`, `uncertainty_per_run.csv`; figures fig1–fig7. All irradiance values used in the calculations are the nominal measured aperture fluxes (456, 304, 256 kW/m²); no correction factors of any kind are applied.*
 
 ---

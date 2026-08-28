@@ -1,17 +1,19 @@
 # Project status and forward plan — 28 August 2026
 
-**Revision 2** (rev. 1 written earlier the same day, before the 1D_v41 full run
-appeared). Restart briefing after a ~4 week pause. Reconstructed from
+**Revision 3** (rev. 1 preceded the 1D_v41 full run; rev. 2 documented its
+source-scale failure; rev. 3 incorporates the documentation and implementation
+audit). Restart briefing after a ~4 week pause. Reconstructed from
 `journal.1D.md`, `journal.2D.md`, `1D_v36_v37_v39_manuscript_readiness.md`
 (1 Aug), `manuscript_2D_readiness_strategy.md`, `1D_manuscript_gap_strategy.md`,
 `analysis/manuscript/manuscript_full_draft.md`, and the saved CSVs under
 `summaries/1D_v3{5,6,7,8,9}/`, `1D_v4{0,1}/` and `2D_v2{0,1,2}/`.
 
-**What changed since rev. 1:** a complete `1D_v41` run has appeared — the
-fixed-flux refit. It is a failed optimisation but a very informative
-diagnostic, and it overturns two conclusions in rev. 1. Both retractions are
-marked below. `journal.2D.md` shows a timestamp change with no content change.
-No other file has moved since 5 Aug.
+**What changed in rev. 3:** the manuscript addendum was removed from after the
+table captions, conservative Role-A language was moved into the Discussion,
+both journals received superseding audit entries, and the v22 Phase-4 wiring
+was checked against its saved grid. The experimental power discussion now
+treats the T3-based closure and model-derived factors as provisional rather
+than independent validation. Temperature-only results are unchanged.
 
 ---
 
@@ -22,9 +24,9 @@ No other file has moved since 5 Aug.
 | Version | Mechanism | Objective | Verdict |
 |---|---|---:|---|
 | v35 | baseline, scalar bypass | 1.866 | superseded; "Advective Bottleneck" argument comes from here |
-| **v36** | **dynamic bypass, phi(T_core)** | **0.2173** | **best model in the family — manuscript candidate** |
-| v37 | optical redistribution | 0.2388 | falsified as a formulation (surface receiver); keep as sensitivity test |
-| v38 | two-stream gas | 5.701 | falsified |
+| **v36** | **dynamic bypass, phi(T_core)** | **0.2173** | **best balanced saved fit; Role-A manuscript candidate** |
+| v37 | optical redistribution | 0.2388 | source-placement sensitivity; no identified optical coefficient |
+| v38 | two-stream gas | 5.701 | rejected within the tested parameterization |
 | v39 | v36+v37 combined | 0.629 reported | **not citable** — saved residuals contradict the objective |
 | v40 | v39 variant, m_rec active | 1.476 | undocumented; worse than v36 on nearly every gate |
 | **v41** | **R6 fluxes frozen, no dynamic bypass** | **5780.6** | **did not converge; see §2 — the most useful failure so far** |
@@ -51,45 +53,50 @@ errors of −180 to −243 K on every channel, contradicting its reported object
 of 0.629. v40 flips the sign (+236 K at T8) with no journal entry and no theory
 manual. Neither is documented.
 
-### 2D — closed out, deliberately
+### 2D — v20 closed for Role B; v22 result invalid pending wiring repair
 
-Phases 2–4 (v21/v22) finished 31 Jul. The grid searches drove core preference
-to 1.0 and spillage to 0.0, reproducing the temperature inversion
-*qualitatively* while leaving side RMSE ~210 K; the Nu/Rosseland sweep left
-RMSE at 1500–1800 K. The v20 gate-free stress test independently confirmed the
-failure is structural, not a gate or solver problem (max enthalpy residual
-6e-11). Standing decision (`manuscript_2D_readiness_strategy.md` §12): **stop
-coefficient extraction from the 2D inverse model**, report it as a
-structural-limit (Role A) demonstration, and state that receiver UA(Re) is not
-uniquely identifiable without an independent bulk outlet-enthalpy measurement
-or a verified T3 transfer function. Nothing to re-open — it needs writing up.
+The v20 gate-free stress test is the trustworthy endpoint. It confirms that
+its rejection is not caused by solver failure or acceptance penalties (maximum
+enthalpy residual about 6e-11). Receiver `UA(Re)` remains non-identifiable
+without an independent bulk outlet-enthalpy measurement or verified T3
+transfer function. The standing v20 decision is to stop Role-B coefficient
+extraction from that inverse formulation and retain it as a Role-A diagnostic.
 
-### Manuscript — complete draft, unmerged addendum, three contradictions
+The later v21/v22 record does not strengthen that conclusion as previously
+claimed. Phase 3 selected `core_preference = 1.0` and zero spillage with side
+RMSE near 211 K. Phase 4 then used `core_preference = 0.6` and 525 W spillage,
+so it did not inherit the selected macroscopic point. More importantly, every
+Rosseland multiplier at a fixed Nusselt multiplier produces exactly identical
+output. The patch changes `V11.felt_conductivity_temp`, while inherited v12/v14
+paths call `V12.felt_conductivity_v12`. The 1500--1800 K v22 result therefore
+diagnoses a configuration/wiring failure and cannot be called a formal
+falsification or best-possible continuum result.
 
-`manuscript_full_draft.md` runs from abstract through Section 6 conclusions with
-figure and table captions. Outstanding:
+### Manuscript — model contradictions removed; bibliography still open
 
-- **References not finalised** (bracketed placeholders against the v5
-  bibliography); **acknowledgments empty**.
-- **An addendum block sits after the table captions, unmerged** into the body.
-- **Three internal contradictions in that block, in order of reviewer risk:**
-  1. §5.5 claims the model "organically identifies 302.5 J/K" under "a
-     completely uninformative prior", calling it independent verification of
-     C_eff. §3 of the same block states C_eff is ingested as a prior, and the
-     capacities sit on their bounds. A reviewer can falsify this from the
-     parameter file.
-  2. §5.5 quotes v34 numbers (prefactor 3.6e-4, exponent 1.11) as the model
-     corroboration. v36 gives 1.74e-4 and 1.4394 — the exponent match is far
-     *better* than what is written, the prefactor worse.
-  3. Three different delivered-power factor sets are in circulation: §2 of the
-     block (1.34 / 1.37 / 0.79), the R6 closure (1.34 / 1.58 / 1.11 on K_heat;
-     1.05 / 1.23 / 0.84 on K_cool), and the models' fitted `scale_*`. §2 below
-     shows the last of these was never the right comparison quantity.
-- Encoding damage in the appended text ("3.6A-10^-4", "301 A 23 J/K").
-- The 21 literature PDFs are cited nowhere. The four added 5 Aug matter for the
-  2D write-up: Cui & Kaer (2018) and Schlereth & Hinrichsen (2014) are
-  precedent for 2D continuum monolith reduction and its limits; Cornejo & Hayes
-  (2020) is the monolith-Nu *contrast* for §5.1.
+`manuscript_full_draft.md` runs from abstract through Section 6 conclusions
+with figure and table captions. The orphaned model addendum and its capacity,
+v34/v36, run-count, and encoding contradictions have been removed. Section 5.6
+now states that the model coefficients are not validated. The standalone
+`Role_A_Corroboration.md` has been rewritten to match the v20/v36 evidence.
+
+The power-dependent discussion is now explicitly conditional: T3 is a local
+outlet-region probe with an unidentified transfer relation, the R6 closure and
+1D fit use the same campaign, and neither provides an independent optical power
+calibration. This does not affect Nu, epsilon, Lambda, C_eff, K_loss, or the
+master curves.
+
+Outstanding manuscript work:
+
+- finalise the references against the v5 bibliography;
+- write the acknowledgments;
+- incorporate the literature set for positioning only. Cui & Kaer (2018) and
+  Schlereth & Hinrichsen (2014) provide precedent for 2D continuum monolith
+  reduction and its limitations; Cornejo & Hayes (2020) is a channel-Nu
+  contrast, not a validation bound; and
+- decide whether provisional delivered-basis efficiency belongs in the main
+  text or supplementary material pending direct flux/spillage and outlet
+  enthalpy measurements.
 
 ---
 
@@ -127,7 +134,7 @@ the arithmetically expected consequence. The optimizer then did what it could to
 shed it — `k_perim_ref` 7.5 → 48.4 W/m/K (aluminium-like), `G_core_perim`
 10.6 → 27.1, K_loss to 3–5x the measured band — and still could not.
 
-Two consequences, both correcting rev. 1 of this note and §7 of the Aug-1
+Two consequences, both correcting rev. 1 of this note and §6 of the Aug-1
 readiness assessment:
 
 1. **RETRACTION — `scale_456` was never comparable to R6's f.** The readiness
@@ -136,8 +143,8 @@ readiness assessment:
    quantity is M. On that basis v36 sits at 1.88 / 2.04 / 0.87 against R6's
    1.34 / 1.58 / 1.11 — roughly +40% / +29% / −22%, not +2% / −6% / −43%. The
    qualitative story survives (non-monotonic, 256 low) but every number in that
-   table needs restating before it goes near the manuscript, and the third
-   delivered-power set in circulation should be dropped rather than reconciled.
+   table needs restating before it goes near the manuscript. R6 is itself a
+   T3-based provisional closure, not an independent optical measurement.
 2. **RETRACTION — the "five dead parameters" finding is a screening artifact.**
    Rev. 1 reported that the Morris screen gives exactly zero elementary effects
    for `spill_capture`, `beta_perim`, `C_rear_eff` and `G_rear_axial`. v41 shows
@@ -158,21 +165,22 @@ far attached to the 256 group.
 
 ## 3. Recommended sequence
 
-### A. Freeze the story, then write the three missing entries (half a day)
+### A. Freeze the story and document the audits — completed 2026-08-28
 
-Adopt: **v36 = the manuscript 1D model**; v37 and v38 = the two falsified
-alternative hypotheses; v39/v40 = the non-additivity test; v41 = the
-power-bookkeeping diagnostic; 2D = the structural-limit demonstration. Write
-journal entries for v40, v41 and the M-reparametrisation finding now. This is
-the piece that decays fastest and three of the last four runs are undocumented.
+The journals now record v40, v41, the source-product degeneracy, the v22 wiring
+failure, and the narrowed Role-A conclusions. Adopt v36 as the best balanced 1D
+diagnostic, v37/v38 as tested alternatives, v39/v40 as unresolved or rejected
+combinations, v41 as the power-bookkeeping diagnostic, and v20 as the
+trustworthy 2D non-identifiability endpoint.
 
 ### B. Reparametrise the source, then redo the fixed-flux test (v42)
 
 Replace `(scale, spill_capture)` with `(M, chi)`, where M is the total
 delivered-to-aperture ratio and chi is the core/perimeter partition of it. Then:
 
-- fix M per flux group to the R6 closure, carrying the K_cool–K_heat spread as
-  a declared systematic band, and let chi and the transport parameters fit;
+- initially fix M per flux group to the R6 closure as a provisional sensitivity
+  band, carrying the K_cool–K_heat spread and the unresolved T3 transfer
+  relation explicitly, and let chi and the transport parameters fit;
 - state explicitly what M excludes (front-face reradiation, flange cooling)
   when comparing to R6, since R6's f counts only gas enthalpy plus assembly
   loss;
@@ -223,16 +231,15 @@ for the discussion.
 
 ### E. Manuscript work (parallel, independent of B–D)
 
-1. Merge the addendum into §5.5/§5.6 and fix the three contradictions.
-2. Restate the capacitance claim according to whatever C returns in C.
-3. Report **one** delivered-power set, on the M basis, with provenance and band.
-4. Lead the modelling subsection with the eps-envelope / inversion-threshold
+1. Keep the corrected limitations language and do not restore the removed
+   addendum claims.
+2. Restate any future capacitance claim according to whatever step C returns.
+3. If a delivered-power set is retained, report one provisional M basis with
+   provenance, structural uncertainty, and the T3 caveat.
+4. Lead any modelling subsection with the eps-envelope / inversion-threshold
    pairing, not a fit-quality table.
-5. Rewrite the "Advective Bottleneck" conclusion in `journal.1D.md` before it
-   migrates into the manuscript: v36 falsifies its strong form, since a
-   *dynamic* flow structure does satisfy heating and cooling simultaneously.
-   The defensible claim is narrower — no *scalar* structure works, and nothing
-   tried so far relocates the inversion threshold.
+5. Preserve the revised "Advective Bottleneck" wording: v36 weakens its strong
+   form, and the data do not uniquely identify bypass as the mechanism.
 6. Read the literature set for positioning only. The receiver's apparent Nu is
    15–100x below duct theory; a monolith correlation is a contrast, not a bound.
 7. Finalise references against the v5 bibliography; write acknowledgments.
@@ -241,8 +248,8 @@ for the discussion.
 
 ## 4. Suggested immediate next step
 
-A, then B. The v41 post-mortem and the M reparametrisation are the same piece of
-work, and writing it down is what converts a failed run into the campaign's
-cleanest structural finding: the source magnitude and the spillage capture have
-never been separately identifiable, and every power-convention anomaly from v31
-onward is consistent with that single degeneracy.
+A is complete. Next is B: implement the conserved `(M, chi)` source basis and
+verify it with forward energy-ledger tests before optimization. The v41
+post-mortem converts a failed run into a clean structural finding: source
+magnitude and spill capture have not been separately identifiable, and the
+power-convention anomalies from v31 onward are consistent with that degeneracy.
