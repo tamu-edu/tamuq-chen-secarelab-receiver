@@ -41,7 +41,9 @@
               "type": "file-explorer",
               "state": {
                 "sortOrder": "alphabetical",
-                "autoReveal": false
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
               },
               "icon": "lucide-folder-closed",
               "title": "Files"
@@ -162,7 +164,7 @@
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of journal.2D"
+              "title": "Outline"
             }
           }
         ],
@@ -180,8 +182,7 @@
       "daily-notes:Open today's daily note": false,
       "templates:Insert template": false,
       "command-palette:Open command palette": false,
-      "bases:Create new base": false,
-      "fix-math:Current file": false
+      "bases:Create new base": false
     }
   },
   "active": "5c706a574f57aab2",
