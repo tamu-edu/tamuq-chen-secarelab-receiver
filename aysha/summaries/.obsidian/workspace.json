@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "journal.2D.md",
+                "file": "PROJECT_STATUS_2026-08-28.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "journal.2D"
+              "title": "PROJECT_STATUS_2026-08-28"
             }
           }
         ]
@@ -41,7 +41,9 @@
               "type": "file-explorer",
               "state": {
                 "sortOrder": "alphabetical",
-                "autoReveal": false
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
               },
               "icon": "lucide-folder-closed",
               "title": "Files"
@@ -156,13 +158,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "journal.2D.md",
+                "file": "PROJECT_STATUS_2026-08-28.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of journal.2D"
+              "title": "Outline"
             }
           }
         ],
@@ -186,6 +188,7 @@
   },
   "active": "5c706a574f57aab2",
   "lastOpenFiles": [
+    "journal.2D.md",
     "2D_v20/plots/gatefree_full/transients/Thumbs.db",
     "2D_v20/plots/gatefree_full/Thumbs.db",
     "2D_v20/plots/gatefree_full/plot_manifest_2D_v20_gatefree.txt",
@@ -206,7 +209,6 @@
     "2D_v20/gatefree_validation_cases_alltrain_power_2D_v20.csv",
     "2D_v20/stress_power_group_256_2D_v20.csv",
     "2D_v20/stress_power_group_304_2D_v20.csv",
-    "2D_v20/stress_power_group_456_2D_v20.csv",
     "2D_v20_theory_manual.md",
     "2D_v16_theory_manual.md",
     "2D_v17_theory_manual.md",
@@ -218,7 +220,6 @@
     "2D_v2_theory_manual.md",
     "1D_v27_theory_manual.md",
     "1D_v28_theory_manual.md",
-    "journal.2D.md",
     "1D_v17_geminicomments.md",
     "claude_manuscript_full_draft.md",
     "manuscript_full_draft.md",
