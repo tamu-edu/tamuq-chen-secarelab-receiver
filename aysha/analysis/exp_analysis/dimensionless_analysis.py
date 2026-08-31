@@ -9,10 +9,11 @@ import matplotlib.pyplot as plt
 from scipy.stats import linregress
 from scipy.optimize import curve_fit
 import os, sys
-sys.path.insert(0,"/sessions/cool-awesome-babbage/mnt/outputs")
+_HERE=os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0,_HERE)
 from exp_analysis import load, ss, heating, cooling, A_frt, L, z8, z9, z10, cp_air, F_DEL
 
-OUT="/sessions/cool-awesome-babbage/mnt/outputs/exp_analysis/"
+OUT=_HERE+os.sep
 RHO_STD=101325/(287.05*294.25)          # Aalborg std: 21.1 C, 1 atm
 w_ch=1.5e-3; Dh=w_ch; n_ch=100; A_ch=w_ch**2; P_ch=4*w_ch
 k_SiC=48.8; t_wall=0.4e-3

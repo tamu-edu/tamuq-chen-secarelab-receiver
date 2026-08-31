@@ -11,8 +11,9 @@ from scipy.optimize import curve_fit
 from scipy.stats import linregress
 import os, json
 
-RAW = "/sessions/cool-awesome-babbage/mnt/analysis/RAW/"
-OUT = "/sessions/cool-awesome-babbage/mnt/outputs/exp_analysis/"
+_HERE = os.path.dirname(os.path.abspath(__file__))
+RAW = os.path.join(_HERE, "..", "RAW") + os.sep
+OUT = _HERE + os.sep
 os.makedirs(OUT, exist_ok=True)
 
 heating = {
@@ -38,7 +39,16 @@ A_frt = 0.019**2
 # delivered-power calibration factors (ad hoc, per lamp configuration):
 # fitted per-irradiance scales from the independent 1D calibration (v14),
 # corroborated by the steady energy closure of this analysis.
-F_DEL = {456e3: 1.336, 304e3: 1.374, 256e3: 0.786}
+# Delivered-power factors, model-free steady energy closure (Section 3.5):
+#   f = [Q_gas + K_loss*(Tw_bar - Tamb)] / (G0*A_frt),  group means.
+# The closure is a steady balance and needs the SECANT loss conductance
+# Q_loss/theta at the hot steady state. That quantity is bracketed by the
+# cooling eigenvalue (secant conductance at lower temperature, 0.096 W/K) and
+# the heating eigenvalue (tangent conductance dQ_loss/dT at the steady state,
+# 0.119 W/K). The upper end is applied and the lower carried as a one-sided
+# systematic band of about -9%. Values from eigenvalues_and_power.py; that
+# script prints them and this constant must be kept consistent with it.
+F_DEL = {456e3: 1.147, 304e3: 1.345, 256e3: 0.932}
 L = 0.137
 z8, z9, z10 = 0.011, 0.058, 0.107
 

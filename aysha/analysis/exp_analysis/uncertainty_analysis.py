@@ -9,14 +9,15 @@ Sources (all systematic per run, independent between sensors/instruments):
 N = 4000 draws. Outputs per-run sigma for Re, eps, NTU, Nu, Lambda107, Q_gas,
 and Monte Carlo CIs for the Nu-law (a, b), eps*, and C_eff / K_loss.
 """
-import numpy as np, pandas as pd, sys
+import numpy as np, pandas as pd, sys, os
 from scipy.stats import linregress
-sys.path.insert(0,"/sessions/cool-awesome-babbage/mnt/outputs")
+_HERE=os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0,_HERE)
 from exp_analysis import load, ss, heating, cooling, A_frt, L, cp_air, F_DEL
 
 rng=np.random.default_rng(1)
 N=4000
-OUT="/sessions/cool-awesome-babbage/mnt/outputs/exp_analysis/"
+OUT=_HERE+os.sep
 RHO_STD=101325/(287.05*294.25)
 w=1.5e-3; Dh=w; A_ch=w*w; P=4*w; n_ch=100
 WTS=np.array([0.248,0.365,0.387])
@@ -41,7 +42,11 @@ for n in range(N):
     fmu=1+rng.normal(0,0.02); fk=1+rng.normal(0,0.02); fcp=1+rng.normal(0,0.01)
     dq=rng.normal(0,sq,4).sum()
     fIo=1+rng.normal(0,0.03)
-    fdel=1+rng.normal(0,0.08)   # delivered-power factor: per-case scatter of calibration
+    # Delivered-power factor uncertainty: the K_loss bracket dominates. The
+    # applied f uses the tangent conductance (0.119 W/K); the secant value
+    # from cooling (0.096) lowers f by about 9%. One-sided systematic sampled
+    # uniformly across the bracket, plus 3% for the closure's flow residual.
+    fdel=(1-0.09*rng.random())*(1+rng.normal(0,0.03))
     X={"Re":[],"Nu":[],"eps":[],"q":[],"Io":[],"Iv":[]}
     for ID,r in runs.items():
         T3=r["T3"]+bTC["T3"]; Ta=r["Ta"]+bTC["Ta"]
@@ -110,3 +115,32 @@ for tag,sub in [("cool",ev[ev.phase=="cool"]),("heat",ev[ev.phase=="heat"]),("al
 m_meas=0.040
 for T,cpS in [(300,680),(600,1050),(900,1170)]:
     print(f"C_monolith(40 g, cp_SiC({T} K)={cpS}) = {m_meas*cpS:.1f} J/K")
+
+# ---- persist the identified constants ------------------------------------
+# These are the values quoted in manuscript Table 2. They were previously
+# printed only; make_tables.py reads this file so the table cannot drift.
+rows=[]
+label={"a":"Nu_app prefactor a  (Nu = a Re^b)",
+       "b":"Nu_app exponent b",
+       "eps456":"eps* at 456 kW/m2",
+       "eps304":"eps* at 304 kW/m2",
+       "eps256":"eps* at 256 kW/m2"}
+for k in ["a","b","eps456","eps304","eps256"]:
+    v=np.array(fits[k])
+    rows.append(dict(quantity=label[k], value=v.mean(), sd=v.std(),
+                     ci_lo=np.percentile(v,2.5), ci_hi=np.percentile(v,97.5),
+                     n_draws=len(v), source="uncertainty_analysis.py"))
+for tag,name in [("cool","cooling"),("heat","heating"),("all","cooling+heating")]:
+    Cm,Cs,Km,Ks=res[tag]
+    rows.append(dict(quantity=f"C_eff from {name} [J/K]", value=Cm, sd=Cs,
+                     ci_lo=Cm-1.96*Cs, ci_hi=Cm+1.96*Cs, n_draws=N,
+                     source="uncertainty_analysis.py"))
+    rows.append(dict(quantity=f"K_loss from {name} [W/K]", value=Km, sd=Ks,
+                     ci_lo=Km-1.96*Ks, ci_hi=Km+1.96*Ks, n_draws=N,
+                     source="uncertainty_analysis.py"))
+for T,cpS in [(600,1050),(900,1170)]:
+    rows.append(dict(quantity=f"Monolith capacitance at {T} K [J/K]",
+                     value=m_meas*cpS, sd=np.nan, ci_lo=np.nan, ci_hi=np.nan,
+                     n_draws=np.nan, source="measured mass 40 g x cp_SiC"))
+pd.DataFrame(rows).to_csv(OUT+"identified_constants_mc.csv", index=False)
+print("\nwrote identified_constants_mc.csv")

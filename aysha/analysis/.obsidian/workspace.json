@@ -1,24 +1,24 @@
 {
   "main": {
-    "id": "0b610fec5c544b9c",
+    "id": "b7d41244bd0a9e5b",
     "type": "split",
     "children": [
       {
-        "id": "d5e6a5056360d7f7",
+        "id": "8278d93e69b64557",
         "type": "tabs",
         "children": [
           {
-            "id": "5c706a574f57aab2",
+            "id": "18cf12ebd3219e3e",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "PROJECT_STATUS_2026-08-28.md",
+                "file": "manuscript/manuscript_full_draft.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "PROJECT_STATUS_2026-08-28"
+              "title": "manuscript_full_draft"
             }
           }
         ]
@@ -27,15 +27,15 @@
     "direction": "vertical"
   },
   "left": {
-    "id": "47820f14cfea2a2a",
+    "id": "2de0a9ef1773ce63",
     "type": "split",
     "children": [
       {
-        "id": "aabaee5a50a61ff6",
+        "id": "f22b2b27d05c1366",
         "type": "tabs",
         "children": [
           {
-            "id": "6bedc788872dd8bf",
+            "id": "563c52aa2581ead3",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -50,7 +50,7 @@
             }
           },
           {
-            "id": "4c2b31cbc9eca105",
+            "id": "798c41baba8e999d",
             "type": "leaf",
             "state": {
               "type": "search",
@@ -67,11 +67,14 @@
             }
           },
           {
-            "id": "acc2a0e6e027b5f2",
+            "id": "301498b784a20589",
             "type": "leaf",
             "state": {
               "type": "bookmarks",
-              "state": {},
+              "state": {
+                "showSearch": false,
+                "searchQuery": ""
+              },
               "icon": "lucide-bookmark",
               "title": "Bookmarks"
             }
@@ -83,21 +86,21 @@
     "width": 300
   },
   "right": {
-    "id": "7d3d80c77e8ffa69",
+    "id": "9ad4e84d4f29c2a6",
     "type": "split",
     "children": [
       {
-        "id": "6fa5d4d3a0e4805c",
+        "id": "c6cd1e820e361806",
         "type": "tabs",
         "children": [
           {
-            "id": "5593c5cbf774a534",
+            "id": "8571dfd8b5cb319f",
             "type": "leaf",
             "state": {
               "type": "backlink",
               "state": {
-                "file": "journal.1D.md",
-                "collapseAll": true,
+                "file": "manuscript/manuscript_full_draft.md",
+                "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
                 "showSearch": false,
@@ -106,25 +109,25 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for journal.1D"
+              "title": "Backlinks"
             }
           },
           {
-            "id": "3f98db6c7e5a3253",
+            "id": "54cbb4cf39ebdd5f",
             "type": "leaf",
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "journal.1D.md",
+                "file": "manuscript/manuscript_full_draft.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from journal.1D"
+              "title": "Outgoing links"
             }
           },
           {
-            "id": "498f77d6f3f18fab",
+            "id": "32a12a3d897cf684",
             "type": "leaf",
             "state": {
               "type": "tag",
@@ -139,7 +142,7 @@
             }
           },
           {
-            "id": "0d309edbff9e9c32",
+            "id": "34cf84a9ee1fc166",
             "type": "leaf",
             "state": {
               "type": "all-properties",
@@ -153,12 +156,12 @@
             }
           },
           {
-            "id": "11c2bd74752e7f6a",
+            "id": "5715413b94824daf",
             "type": "leaf",
             "state": {
               "type": "outline",
               "state": {
-                "file": "PROJECT_STATUS_2026-08-28.md",
+                "file": "manuscript/manuscript_full_draft.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
@@ -167,12 +170,12 @@
               "title": "Outline"
             }
           }
-        ],
-        "currentTab": 4
+        ]
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -182,57 +185,28 @@
       "daily-notes:Open today's daily note": false,
       "templates:Insert template": false,
       "command-palette:Open command palette": false,
-      "bases:Create new base": false,
-      "fix-math:Current file": false
+      "bases:Create new base": false
     }
   },
-  "active": "5c706a574f57aab2",
+  "active": "18cf12ebd3219e3e",
   "lastOpenFiles": [
-    "manuscript_closure_options.md",
-    "1D_v41/steady_results_fitted_energy_accounting_1D_v41.csv",
-    "1D_v41/plots/transients/transient_E81_fitted_energy_accounting_1D_v41.png",
-    "1D_v41/plots/transients/transient_E80_fitted_energy_accounting_1D_v41.png",
-    "1D_v41/plots/transients/transient_E79_fitted_energy_accounting_1D_v41.png",
-    "1D_v41/plots/transients/transient_E78_fitted_energy_accounting_1D_v41.png",
-    "1D_v41/plots/transients/transient_E77_fitted_energy_accounting_1D_v41.png",
-    "1D_v41/plots/transients/transient_E76_fitted_energy_accounting_1D_v41.png",
-    "1D_v41/plots/transients/transient_E75_fitted_energy_accounting_1D_v41.png",
-    "1D_v41/plots/transients/transient_E74_fitted_energy_accounting_1D_v41.png",
-    "1D_v41/plots/transients/transient_E73_fitted_energy_accounting_1D_v41.png",
-    "1D_v41/plots/transients/transient_E72_fitted_energy_accounting_1D_v41.png",
-    "1D_v41/plots/transients",
-    "1D_v41/plots/axial_profiles",
-    "1D_v41/plots",
-    "1D_v41/parameters_fitted_energy_accounting_1D_v41.csv",
-    "1D_v41/optimization_summary_1D_v41.txt",
-    "1D_v41/invariants_1D_v41.csv",
-    "1D_v41/invariant_summary_1D_v41.csv",
-    "1D_v41/flow_slopes_fitted_energy_accounting_1D_v41.csv",
-    "1D_v41/diagnostics/cell_diagnostics_E72_fitted_energy_accounting_1D_v41.csv",
-    "journal.2D.md",
-    "2D_v20_theory_manual.md",
-    "2D_v16_theory_manual.md",
-    "2D_v17_theory_manual.md",
-    "2D_v18_theory_manual.md",
-    "2D_v19_theory_manual.md",
-    "journal.1D.md",
-    "manuscript_incorporation_strategy.md",
-    "1D_v29_strategy_forward.md",
-    "2D_v2_theory_manual.md",
-    "1D_v27_theory_manual.md",
-    "1D_v28_theory_manual.md",
-    "1D_v17_geminicomments.md",
-    "claude_manuscript_full_draft.md",
-    "manuscript_full_draft.md",
-    "claude_data_analysis_sections_v2.md",
-    "data_analysis_sections.md",
-    "1D_v10_geminicomments.md",
-    "1D_v8b_notes.md",
-    "1D_v10notes.md",
-    "1D_v8b_geminicomments.md",
-    "1D_v8_theory_manual.md",
-    "1D_theory.md",
-    "1D_v8a_notes.md",
-    "1D_v7_geminicomments.md"
+    "manuscript/manuscript_full_draft_2026-07-31_before_edits.md",
+    "manuscript/_session_backups_2026-08/manuscript_pre_eigenrule.md",
+    "exp_analysis/__pycache__/exp_analysis.cpython-310.pyc.138077823022096",
+    "exp_analysis/eigenvalue_verification_recomputed.csv",
+    "exp_analysis/README.md",
+    "exp_analysis/eigenvalues_and_power.py",
+    "manuscript/manuscript_full_draft.md",
+    "manuscript/manuscript_full_draft_pre_modelling_backup.md",
+    "manuscript/README.md",
+    "manuscript/_session_backups_2026-08/manuscript_full_draft_pre_audit_backup.md",
+    "manuscript/_session_backups_2026-08/manuscript_full_draft_pre_bc_backup.md",
+    "manuscript/_session_backups_2026-08/manuscript_full_draft_pre_intro_backup.md",
+    "manuscript/_session_backups_2026-08",
+    "manuscript/manuscript_full_draft_pre_audit_backup.md",
+    "manuscript/manuscript_full_draft_pre_bc_backup.md",
+    "manuscript/manuscript_full_draft_pre_intro_backup.md",
+    "manuscript/literature_positioning.md",
+    "exp_analysis/identified_constants_mc.csv"
   ]
 }
