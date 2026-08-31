@@ -5495,3 +5495,23 @@ Q_core + Q_perimeter = Q_delivered.
 
 Verify that identity in forward simulations at all three flux levels. Only
 after the ledger passes should the v36 fixed-power hypothesis be retested.
+
+### v42 Source Reparametrization and Calibration
+
+Following the bookkeeping discovery in v41, v42 introduced a physically decoupled continuum source model:
+- The mathematically degenerate (scale, spill_capture) pairing was replaced by M (total delivered-to-aperture ratio) and chi (core source partition fraction).
+- The absorbed irradiance is explicitly forced into the balance: Q_core + Q_perim = Q_delivered, where Q_delivered = M * Q_aperture.
+- To respect the R6 full-model volumetric closure, the M values were pinned explicitly at 1.34 (456 kW/m²), 1.58 (304 kW/m²), and 1.11 (256 kW/m²).
+
+To give the network more freedom in establishing accurate transient thermal masses under this new source constraint, the parameter bounds for the participating capacities were broadened by 30%:
+- C_perim_eff lower limit dropped from 150.0 to 105.0 J/K.
+- C_rear_eff lower limit dropped from 80.0 to 50.0 J/K.
+
+**Calibration Outcomes**:
+The un_1D_v42.jl fit safely navigated the expanded budget (1000 iterations over 30 minutes) and converged to an objective cost of  .2270 (a massive reduction from v41). 
+- chi settled at  .5255 (52.5% of the gross optical power is intercepting the active flow core).
+- C_rear_eff relaxed down to 75.7 J/K (proving the expanded 50.0 J/K floor was active and necessary).
+- C_perim_eff resolved to 149.2 J/K.
+
+**Morris Sensitivity Correction**:
+The false "five dead parameters" logged in the v41 screen were traced back to a bounds collision. The script was sampling tight ranges (e.g. C_rear_eff at 40.0 J/K) that strictly violated the differential solver's internal clamp (> 80.0 J/K at the time). This triggered widespread ArgumentErrors which the objective function lazily handled by returning 1e6 uniformly. This flat penalty landscape resulted in exactly zero sensitivity gradients. sensitivity_1D_v42.jl was repaired to dynamically query its bounds from the solver's lb_full and ub_full arrays, successfully restoring standard global gradient propagation (e.g. C_rear_eff is now the 2nd most active parameter overall).
