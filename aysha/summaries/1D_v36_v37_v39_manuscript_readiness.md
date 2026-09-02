@@ -4,12 +4,20 @@ Assessed 2026-08-01 against the gate table in `1D_manuscript_gap_strategy.md`,
 using the saved artifacts in `summaries/1D_v3{5,6,7,8,9}/` and the branch
 narrative in `journal.1D.md` (§ "Multiphysics Branch Exploration").
 
-**Note on sources:** a *Theory Manual v39* is not present in either connected
-folder (`aysha/analysis`, `aysha/summaries`). The latest 1D theory manual on
-disk is `1D_v28_theory_manual.md`. This assessment therefore reconstructs the
-v36/v37/v39 formulations from the journal entry, the parameter CSVs, and the
-saved diagnostics. If the v39 manual exists elsewhere in the repo, the
-formulation-level conclusions below should be re-checked against it.
+**Source update (2026-08-28):** `summaries/1D_v39_theory_manual.md` is now
+present. It is consistent with the broad formulation described here, but it
+does not resolve the mismatch between the v39 objective and saved temperature
+diagnostics. The saved v39 result remains non-citable pending a reproducible
+rerun from the exact optimum vector.
+
+**Post-assessment update:** v40 reopened the capacity bounds but degraded the
+fit and invariant agreement. v41 fixed the R6 power factors, but its current
+source convention also fixes 50% spill capture and adds recovered spillover
+power on top of the corrected face input. The saved v41 result therefore
+contains about 1704 W participating input for 220.6 W scaled face input in E67
+and is invalid for calibration interpretation. See
+`PROJECT_STATUS_2026-08-28.md` and the
+latest entry in `journal.1D.md`.
 
 **Provenance of the gate targets — read this first.** None of the targets used
 below are literature values or general porous-media correlations. All are
@@ -69,7 +77,7 @@ on five of the ten gates.
 | Inversion threshold, ε at I_vol sign change | 0.66 ± 0.03, flux-independent | — | **0.72–0.78, flux-dependent, no crossing at 256 — fail** | 0.73 (456 only), no crossing at 304/256 — fail | no crossing — fail |
 | Λ₁₀₇ | 0.038 + 8.3e-4·Re | wrong sign fail | **slope +5.7e-5, R² 0.083 fail** | not computed | not computed |
 | External loss K_loss | 0.10–0.16 W/K | 0.250–0.341 fail | **0.150–0.227 partial** | not computed | not computed |
-| Power convention (vs R6 closure, §7) | f = 1.34 / 1.58 / 1.11 | 0.636 | **1.369 / 1.484 / 0.629 — 2 of 3 within 6%, 256 group 43% low** | 1.325 / 0.996 / 0.611 — only 456 agrees | 1.270 / 0.978 / 0.551 — none agree |
+| Power convention (vs R6 closure, §6) | f = 1.34 / 1.58 / 1.11 | 0.636 | **1.369 / 1.484 / 0.629 — 2 of 3 within 6%, 256 group 43% low** | 1.325 / 0.996 / 0.611 — only 456 agrees | 1.270 / 0.978 / 0.551 — none agree |
 | Parameter interiority | no edge collapse | fail | **fail** (C_perim, C_rear, flange_scale, front_dep all at bounds) | fail (C_perim, C_rear, G_rear_tube = 0) | fail (m_rec = 0, G_rear_tube = 0, C's at bounds) |
 | Heating/cooling simultaneous | no cooling-only patch | partial | **pass** (balanced, no switch) | partial | fail |
 
@@ -116,7 +124,7 @@ Heating and cooling are satisfied simultaneously with no switch.
    draft of this file called `scale_304 = 1.484 > scale_456 = 1.369`
    "physically incoherent." That was wrong: R6's model-free delivered-power
    closure produces the *same* non-monotonic pattern from an independent route
-   (see §7). v36 agrees with it to 2.2% at 456 and 6.1% at 304. Only the 256
+   (see §6). v36 agrees with it to 2.2% at 456 and 6.1% at 304. Only the 256
    group remains a genuine outlier, at 43% below the R6 estimate.
 3. **Λ₁₀₇ has no trend.** The slope sign is now correct (+5.7e-5 vs +8.3e-4)
    but it is 14× too small and R² = 0.083 — i.e. the model produces no
@@ -281,7 +289,7 @@ substituted for the other.
    the saved CSV corresponds to the optimum, and whether the v39 loss uses the
    same normalization as v35/v37. This is the highest-priority action item.
 3. ~~Fix v36's power convention with a monotonicity constraint.~~ **Superseded
-   by §7** — do *not* impose monotonicity on the scale factors; R6 shows the
+   by §6** — do *not* impose monotonicity on the scale factors; R6 shows the
    real delivered-power factors are non-monotonic. Fix the aperture fluxes to
    the independent estimate instead and re-fit the remainder.
 4. **Re-open the capacity bounds** (`C_perim_eff`, `C_rear_eff`) by ±30% and
@@ -303,36 +311,35 @@ substituted for the other.
    read into this assessment and should be used only to position the result, not
    to constrain the model.
 
-## 7. Fixing the irradiance basis instead of fitting it
+## 6. Fixing the irradiance basis instead of fitting it
 
-**Planned change:** replace the three fitted `scale_*` parameters with
-independently estimated aperture irradiances, and restrict the calibration to
-the remaining parameters. The power-scale fitting is not presented explicitly,
-on the grounds of a known experimental flux discrepancy.
+**Correction after v41:** `scale_*` is not the total delivered-to-nominal power
+ratio used by R6. In this source formulation,
 
-**This is the single best available move, and it is already supported.** R6 of
-`claude_data_analysis_sections_v2.md` derives a per-flux delivered-power factor
-with no thermal model in the loop —
-f = [Q_gas + K·(T̄_w − T_amb)]/(G₀·A_frt), with the cooling-identified K_loss
-bracket (0.096–0.164 W/K) carried as a systematic band:
+```text
+M = scale * (1 + spill_capture * f_spill / f_receiver)
+  = scale * (1 + 13.45 * spill_capture),
+```
 
-| G₀ [kW/m²] | f (K_cool) | f (K_heat) | **v36 fitted** | v36 vs f(K_heat) |
-|---:|---:|---:|---:|---:|
-| 456 | 1.05 | 1.34 | **1.369** | **+2.2%** |
-| 304 | 1.23 | 1.58 | **1.484** | **−6.1%** |
-| 256 | 0.84 | 1.11 | **0.629** | **−43.4%** |
+where `M` is the comparable total participating-power multiplier. The previous
+table comparing v36 `scale_*` directly with R6 is retracted.
 
-Two consequences:
+| G₀ [kW/m²] | R6 f (K_cool) | R6 f (K_heat) | v36 total M |
+|---:|---:|---:|---:|
+| 456 | 1.05 | 1.34 | 1.88 |
+| 304 | 1.23 | 1.58 | 2.04 |
+| 256 | 0.84 | 1.11 | 0.87 |
 
-1. **The non-monotonic pattern is corroborated, not an artifact.** R6's own
-   f values peak at 304 (1.58 > 1.34 > 1.11). The optimizer independently found
-   the same ordering. Reviewer risk on this point is far lower than it appeared.
-   Checklist item 3 in the draft already commits to reporting Io·A_frt as a
-   *lower bound* — the modelling section becomes a second, independent
-   confirmation of exactly that statement.
-2. **The 256 group is the real discrepancy.** v36 wants 161 kW/m² effective
-   against R6's 215–284. Fixing the flux there adds 26–76% more power to that
-   group.
+The source magnitude and spill capture enter temperature predictions mainly
+through their product and are not separately identifiable from the current
+temperature data. v41 fixed `scale_*` to R6 while also fixing
+`spill_capture = 0.5`, producing total multipliers `10.35/12.21/8.57` and an
+invalid overpowered run. It does not test the fixed-total-power hypothesis.
+
+The next formulation should replace `(scale, spill_capture)` with `(M, chi)`,
+where `M` is one conserved total delivered-power multiplier and `chi` partitions
+that total between core and perimeter. R6 can define a provisional sensitivity
+band for M, but it is T3-based and is not an independent optical calibration.
 
 **Why the validation targets are safe under this change.** ε, NTU, Nu_app,
 Λ₁₀₇, C_eff and K_loss are all constructed from temperatures, metered flow and
@@ -340,13 +347,12 @@ gas properties — none contains an irradiance term. Changing the flux basis mov
 the *model*, not the targets. The comparison therefore stays valid, and becomes
 stricter, since three degrees of freedom are removed.
 
-**Predicted effect on the open gaps.** The 256 group is currently the weakest in
-v36: it is under-predicted (E77 T8 496 K vs 566 K; E81 714 K vs 760 K) and it is
-the one group that never inverts (max I_vol = −9.5 K against +57.8 K measured).
-Both defects point the same way, and raising that group's power is the correct
-direction for both. There is a real chance that fixing the flux basis closes
-§4b — the most consequential remaining gap — rather than costing anything. That
-prediction should be checked explicitly, not assumed.
+**Predicted effect on the open gaps.** The corrected M basis removes a source
+degeneracy but does not guarantee a better inversion threshold. The 256 group
+is under-predicted and never inverts in v36, yet its v36 total M already lies
+inside the R6 bracket. Any improvement must therefore come from the conservative
+core/perimeter partition or axial exchange distribution, not simply from
+raising `scale_256`.
 
 **What must still be re-verified after the refit**, since every headline number
 is conditional on the fitted source:
@@ -360,22 +366,15 @@ is conditional on the fitted source:
    source parameters no longer compete with them.
 ```
 
-**Disclosure requirement.** Not presenting the *fitting* is fine. Not presenting
-the *values* is not. The modelling section needs one line stating the aperture
-fluxes actually used, their provenance (R6 closure, or whatever independent
-estimate replaces it) and their uncertainty band. Note that the draft's header
-currently reads "All irradiance values used in the calculations are the nominal
-measured aperture fluxes (456, 304, 256 kW/m²); no correction factors of any
-kind are applied." That statement is true and important for the *experimental*
-reduction — and it must be scoped to it, or it will read as false once the
-modelling section uses corrected fluxes. A reviewer who finds an undisclosed
-flux correction will discount everything else in the paper; a reviewer who finds
-a disclosed one, corroborated by R6, will read it as a strength.
+**Disclosure requirement.** State the exact M values, partition definition,
+provenance, and uncertainty band used by the model. Keep those model inputs
+separate from the nominal irradiances used by the temperature-only experimental
+reduction. R6 is a provisional T3-based closure, not independent validation.
 
-## 6. Open items to verify
+## 7. Open items to verify
 
-- Locate or regenerate the *Theory Manual v39*; the formulation-level statements
-  above are inferred from parameter CSVs and the journal, not from the manual.
+- Re-run v39 from its exact saved optimum vector and confirm that the objective,
+  residual CSV, and plots are produced from the same parameter vector.
 - Confirm whether `beta_opt` was fitted or fixed in v39, and whether `front_dep`
   in v36 (= 1.0) is a bound or a project constant
   (`FRONT_DEPOSITION_FIXED_V5 = 1.0` suggests the latter).
@@ -384,6 +383,10 @@ a disclosed one, corroborated by R6, will read it as a strength.
 - Check whether the model's `mean_effectiveness` diagnostic should simply be
   replaced by the manuscript-definition ε in future runners, to prevent the
   per-cell/global confusion recurring.
-- Reconcile the v37 objective ranking (0.2388, better than v36's 0.2173 claim
-  ordering in the journal narrative) against v37's uniformly worse steady
-  residuals — the loss weighting should be documented in the manuscript.
+- Reconcile v37's low aggregate objective (`0.2388`) with its uniformly worse
+  steady residuals relative to v36; document the loss weighting before using
+  objective values to rank physical fidelity.
+- Repair v41 so a single conserved delivered-power total is partitioned between
+  the core and perimeter rather than applying the R6 correction and a recovered
+  spillover source cumulatively; use the `(M, chi)` reparameterization described
+  in `PROJECT_STATUS_2026-08-28.md`.

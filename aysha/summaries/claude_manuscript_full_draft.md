@@ -1,5 +1,11 @@
 # Transient Thermal Characterization and Dimensionless Correlations for a Structured Silicon Carbide Volumetric Solar Receiver
 
+> **Archived draft.** Superseded by
+> `analysis/manuscript/manuscript_full_draft.md` and
+> `summaries/PROJECT_STATUS_2026-08-28.md` revision 3. In particular, this file's
+> claims that T3 provides bias-free bulk outlet enthalpy and that the 1D power
+> factors independently validate delivered power are no longer current.
+
 Aysha Melhim¹, Athanasios G. Konstandopoulos²,³, Konstantinos Kakosimos¹,*
 
 ¹ Chemical Engineering Program, Texas A&M University at Qatar, Doha, Qatar

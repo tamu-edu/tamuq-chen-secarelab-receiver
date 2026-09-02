@@ -1,0 +1,50 @@
+index,name,value
+1,A_Nu,4.769369777096782
+2,B_Re,0.5077254723518304
+3,C_Pr_fixed,0.3333333333333333
+4,phi_0,0.8871981598945774
+5,m_rec,0.25266767084924596
+6,front_dep,1.0
+7,scale_456,1.34
+8,scale_304,1.58
+9,scale_256,1.11
+10,G_core_perim_W_m_K,11.19209858303142
+11,C_perim_eff_J_K,149.20677151501903
+12,k_perim_ref_W_m_K,7.776612836177155
+13,beta_opt,184.67243519237965
+14,spill_capture,0.5255284238640396
+15,beta_perim_1_m,10.321167836006982
+16,f_core_rear,0.9991163261940268
+17,flange_scale,0.10135199357669243
+18,flange_cool_gain,5.562339305507399
+19,flange_cool_tau_s,111.44556469839742
+20,k_core_axial_scale,0.046575364097268326
+21,C_rear_eff_J_K,75.70539150878902
+22,G_receiver_rear_W_K,0.14465675413356385
+23,G_rear_tube_W_K,0.0
+24,G_rear_cavity_W_K,1.1219039999733935
+25,G_rear_axial_W_K,5.432771816330569
+# fitted,phi_0,0.8871981598945774
+# fitted,m_rec,0.25266767084924596
+# fitted,G_core_perim_W_m_K,11.19209858303142
+# fitted,C_perim_eff_J_K,149.20677151501903
+# fitted,k_perim_ref_W_m_K,7.776612836177155
+# fitted,spill_capture,0.5255284238640396
+# derived,f_perim_source,0.4891604632107101
+# derived,flux_receiver_fraction,0.06920265203911855
+# derived,flux_spillover_fraction,0.9307973479608814
+# fitted,beta_perim_1_m,10.321167836006982
+# fitted,f_core_rear,0.9991163261940268
+# fitted,flange_scale,0.10135199357669243
+# fitted,flange_cool_gain,5.562339305507399
+# fitted,flange_cool_tau_s,111.44556469839742
+# fitted,k_core_axial_scale,0.046575364097268326
+# fitted,C_rear_eff_J_K,75.70539150878902
+# fitted,G_receiver_rear_W_K,0.14465675413356385
+# fitted,G_rear_tube_W_K,0.5
+# fitted,G_rear_cavity_W_K,1.1219039999733935
+# fitted,G_rear_axial_W_K,5.432771816330569
+# derived,C_core_eff_J_K,72.52693256582086
+# derived,C_receiver_participating_eff_J_K,221.73370408083989
+# derived,C_total_with_rear_eff_J_K,297.4390955896289
+# reference,measured_C_eff_J_K,301.0
