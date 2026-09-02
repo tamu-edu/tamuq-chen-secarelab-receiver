@@ -2,19 +2,19 @@
 
 | Quantity | Value | 95% interval | Note | Independent recheck | Source |
 |---|---|---|---|---|---|
-| Nu_app prefactor a  (Nu = a Re^b) | 3.08e-04 | [2.84e-04, 3.32e-04] | log-log r2 = 0.971, n = 15 | 3.13e-04 | identified_constants_mc.csv |
-| Nu_app exponent b | 1.444 | [1.436, 1.451] | n = 15 | 1.440 | identified_constants_mc.csv |
-| eps* at 456 kW/m2 | 0.671 | [0.666, 0.676] |  | 0.671 (q* = 11.08 sL/min) | identified_constants_mc.csv |
-| eps* at 304 kW/m2 | 0.671 | [0.665, 0.678] |  | 0.671 (q* = 10.32 sL/min) | identified_constants_mc.csv |
-| eps* at 256 kW/m2 | 0.626 | [0.616, 0.636] |  | 0.626 (q* = 3.69 sL/min) | identified_constants_mc.csv |
-| C_eff from cooling [J/K] | 301 | [254, 348] |  | 300 | identified_constants_mc.csv |
+| Nu_app prefactor a  (Nu = a Re^b) | 3.11e-04 | [2.87e-04, 3.35e-04] | log-log r2 = 0.971, n = 15 | 3.16e-04 | identified_constants_mc.csv |
+| Nu_app exponent b | 1.443 | [1.436, 1.450] | n = 15 | 1.440 | identified_constants_mc.csv |
+| eps* at 523 kW/m2 | 0.673 | [0.668, 0.678] |  | 0.673 (q* = 11.08 sL/min) | identified_constants_mc.csv |
+| eps* at 408 kW/m2 | 0.673 | [0.667, 0.680] |  | 0.673 (q* = 10.32 sL/min) | identified_constants_mc.csv |
+| eps* at 238 kW/m2 | 0.628 | [0.618, 0.638] |  | 0.628 (q* = 3.69 sL/min) | identified_constants_mc.csv |
+| C_eff from cooling [J/K] | 301 | [254, 348] |  | 301 | identified_constants_mc.csv |
 | K_loss from cooling [W/K] | 0.097 | [0.074, 0.119] |  | 0.096 | identified_constants_mc.csv |
-| C_eff from heating [J/K] | 288 | [236, 340] |  | 287 | identified_constants_mc.csv |
-| K_loss from heating [W/K] | 0.120 | [0.085, 0.155] |  | 0.119 | identified_constants_mc.csv |
+| C_eff from heating [J/K] | 287 | [235, 340] |  | 287 | identified_constants_mc.csv |
+| K_loss from heating [W/K] | 0.119 | [0.084, 0.155] |  | 0.119 | identified_constants_mc.csv |
 | Monolith capacitance at 600 K [J/K] | 42.000 | - |  | - | identified_constants_mc.csv |
 | Monolith capacitance at 900 K [J/K] | 46.800 | - |  | - | identified_constants_mc.csv |
-| Lambda_107 intercept | 0.0379 | [0.0319, 0.0438] | r2 = 0.897 | - | dimensionless_groups.csv |
-| Lambda_107 slope [1/Re] | 8.23e-04 | [7.13e-04, 9.35e-04] | reported as a lower bound | - | dimensionless_groups.csv |
-| delivered-power factor f at 256 kW/m2 | 0.84-0.93 | - | secant-to-tangent K bracket, systematic band | - | delivered_power_check.csv |
-| delivered-power factor f at 304 kW/m2 | 1.23-1.34 | - | secant-to-tangent K bracket, systematic band | - | delivered_power_check.csv |
-| delivered-power factor f at 456 kW/m2 | 1.05-1.15 | - | secant-to-tangent K bracket, systematic band | - | delivered_power_check.csv |
+| Lambda_107 intercept | 0.0379 | [0.0319, 0.0439] | r2 = 0.897 | - | dimensionless_groups.csv |
+| Lambda_107 slope [1/Re] | 8.23e-04 | [7.12e-04, 9.36e-04] | reported as a lower bound | - | dimensionless_groups.csv |
+| aperture irradiance G [kW/m2], 523 configuration | 523 | [480, 523] | secant-to-tangent K bracket, one-sided systematic | - | delivered_power_check.csv |
+| aperture irradiance G [kW/m2], 408 configuration | 408 | [374, 408] | secant-to-tangent K bracket, one-sided systematic | - | delivered_power_check.csv |
+| aperture irradiance G [kW/m2], 238 configuration | 238 | [216, 238] | secant-to-tangent K bracket, one-sided systematic | - | delivered_power_check.csv |

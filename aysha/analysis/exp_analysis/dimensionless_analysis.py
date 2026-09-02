@@ -11,13 +11,13 @@ from scipy.optimize import curve_fit
 import os, sys
 _HERE=os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0,_HERE)
-from exp_analysis import load, ss, heating, cooling, A_frt, L, z8, z9, z10, cp_air, F_DEL
+from exp_analysis import load, ss, heating, cooling, A_frt, L, z8, z9, z10, cp_air, F_DEL, G_DEL, GLAB, WTS as _WTS
 
 OUT=_HERE+os.sep
 RHO_STD=101325/(287.05*294.25)          # Aalborg std: 21.1 C, 1 atm
 w_ch=1.5e-3; Dh=w_ch; n_ch=100; A_ch=w_ch**2; P_ch=4*w_ch
 k_SiC=48.8; t_wall=0.4e-3
-WTS=np.array([0.248,0.365,0.387])       # trapezoid weights z=11,58,107 on 0-137
+WTS=np.array(_WTS)   # wall quadrature, computed in exp_analysis from z8/z9/z10
 
 Ttab=[300,400,500,600,700,800,900,1000,1100,1200]
 mu_air=lambda T: np.interp(T,Ttab,[1.846e-5,2.301e-5,2.701e-5,3.058e-5,3.388e-5,3.698e-5,3.981e-5,4.244e-5,4.490e-5,4.730e-5])
@@ -70,7 +70,7 @@ for Io in [456,304,256]:
     re_=linregress(g.q_slpm,g.eps); eps0=re_.intercept+re_.slope*q0
     rr=linregress(g.q_slpm,g.Re);  Re0=rr.intercept+rr.slope*q0
     PR0=(Io*1e3)*F_DEL[Io*1e3]*A_frt/(RHO_STD*q0/60000)/1e3  # exact at q0
-    print(f"  {Io} kW/m2: q0={q0:5.2f} slpm  eps*={eps0:.3f}  Re*={Re0:.1f}  PR_del*={PR0:.0f} kJ/kg")
+    print(f"  G_del={G_DEL[Io*1e3]} kW/m2 (nominal {Io}): q0={q0:5.2f} slpm  eps*={eps0:.3f}  Re*={Re0:.1f}  PR_del*={PR0:.0f} kJ/kg")
 
 # ---- LTNE vs Re ---------------------------------------------------------
 r107=linregress(main.Re,main.LTNE107); r58=linregress(main.Re,main.LTNE58)
@@ -93,9 +93,15 @@ for ID,fn in cooling.items():
             lam.append(-rl.slope)
     cool_late[ID]=dict(q=q,mdotcp=mdotcp,lam=np.mean(lam),lam_sd=np.std(lam))
 cl=pd.DataFrame(cool_late).T
-rC=linregress(cl.mdotcp,cl.lam)
+# The slow mode is lam = (eps*mdot*cp + K)/C, so the abscissa carries eps.
+# eps for a cooling run is taken from the pooled steady correlation eps(q),
+# the same convention as eigenvalues_and_power.py, so the two scripts return
+# the same constants and the master-curve time scale below is the reciprocal
+# of the identified eigenvalue rather than an unrelated scaling.
+_re=linregress(main.q_slpm,main.eps)
+cl["x"]=cl.mdotcp*(_re.intercept+_re.slope*cl.q)
+rC=linregress(cl.x,cl.lam)
 C_eff=1/rC.slope; K=rC.intercept*C_eff
-# stderr propagation
 dC=C_eff*rC.stderr/rC.slope
 print(f"\nslow mode: lam = (eps*mdotcp+K)/C ; C_eff={C_eff:.0f}+-{abs(dC):.0f} J/K, K_loss={K:.3f} W/K, r2={rC.rvalue**2:.4f}")
 print(cl.round(6).to_string())
@@ -122,7 +128,8 @@ for i,(ID,(fn,Io)) in enumerate([x for x in heating.items() if np.isfinite(x[1][
     d=store[ID]; t=d["t"]
     q=ss(d["flow"],t); Tamb=ss(d["Tamb"],t)
     mdotcp=RHO_STD*q/60000*cp_air(0.5*(ss(d["T3"],t)+Tamb))
-    tstar=t*(mdotcp+K)/C_eff
+    eps_run=_re.intercept+_re.slope*q          # pooled steady correlation eps(q)
+    tstar=t*(eps_run*mdotcp+K)/C_eff           # = t*lambda, the identified slow mode
     for j,sig in enumerate(["Tw","T3"]):
         y=(WTS[0]*d["T8"]+WTS[1]*d["T12"]+WTS[2]*d["T11"]) if sig=="Tw" else d["T3"]
         y0,yss=np.mean(y[:10]),ss(y,t)
@@ -146,12 +153,12 @@ fig,axs=plt.subplots(1,3,figsize=(15,4.2))
 gc={456:"tab:red",304:"tab:orange",256:"tab:blue"}
 for Io in [456,304,256]:
     g=main[np.isclose(main.Io_kWm2,Io)]
-    axs[0].loglog(g.Re,g.Nu,"o",c=gc[Io],label=f"{Io} kW/m2")
+    axs[0].loglog(g.Re,g.Nu,"o",c=gc[Io],label=GLAB(Io))
     axs[1].plot(g.Re,g.LTNE107,"s",c=gc[Io])
     axs[1].plot(g.Re,g.LTNE58,"o",c=gc[Io],mfc="none")
     axs[2].plot(g.q_slpm,g.eps,"o",c=gc[Io])
 Rex=np.linspace(main.Re.min(),main.Re.max(),50)
-axs[0].loglog(Rex,a*Rex**b,"k-",label=f"fit {a:.3f}Re^{{{b:.2f}}}")
+axs[0].loglog(Rex,a*Rex**b,"k-",label=f"fit {a:.2e} Re$^{{{b:.2f}}}$")
 axs[0].loglog(Rex,3.66+0.0668*(Dh/L*Rex*0.69)/(1+0.04*(Dh/L*Rex*0.69)**(2/3)),
               "k--",label="Hausen")
 axs[0].set_xlabel("Re"); axs[0].set_ylabel("Nu"); axs[0].legend(fontsize=8)

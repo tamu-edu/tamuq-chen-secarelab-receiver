@@ -190,13 +190,19 @@
   },
   "active": "18cf12ebd3219e3e",
   "lastOpenFiles": [
+    "manuscript/data_analysis_sections.md",
+    "manuscript/manuscript_full_draft.md",
+    "manuscript/literature_positioning.md",
+    "exp_analysis/__pycache__/exp_analysis.cpython-310.pyc.127469333247312",
+    "exp_analysis/__pycache__/exp_analysis.cpython-310.pyc.140504680068272",
+    "manuscript/_session_backups_2026-08/manuscript_pre_singlebasis.md",
+    "exp_analysis/__pycache__/exp_analysis.cpython-310.pyc.137530631369904",
     "manuscript/manuscript_full_draft_2026-07-31_before_edits.md",
     "manuscript/_session_backups_2026-08/manuscript_pre_eigenrule.md",
     "exp_analysis/__pycache__/exp_analysis.cpython-310.pyc.138077823022096",
     "exp_analysis/eigenvalue_verification_recomputed.csv",
     "exp_analysis/README.md",
     "exp_analysis/eigenvalues_and_power.py",
-    "manuscript/manuscript_full_draft.md",
     "manuscript/manuscript_full_draft_pre_modelling_backup.md",
     "manuscript/README.md",
     "manuscript/_session_backups_2026-08/manuscript_full_draft_pre_audit_backup.md",
@@ -206,7 +212,6 @@
     "manuscript/manuscript_full_draft_pre_audit_backup.md",
     "manuscript/manuscript_full_draft_pre_bc_backup.md",
     "manuscript/manuscript_full_draft_pre_intro_backup.md",
-    "manuscript/literature_positioning.md",
     "exp_analysis/identified_constants_mc.csv"
   ]
 }

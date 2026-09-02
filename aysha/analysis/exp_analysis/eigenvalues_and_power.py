@@ -43,15 +43,15 @@ from scipy.stats import linregress
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, _HERE)
-from exp_analysis import load, ss, heating, cooling, A_frt, cp_air, F_DEL
+from exp_analysis import load, ss, heating, cooling, A_frt, cp_air, F_DEL, WTS as _WTS
 from scipy.stats import linregress as _lr
 
 P = lambda f: os.path.join(_HERE, f)
 RHO_STD = 101325 / (287.05 * 294.25)          # Aalborg standard: 21.1 C, 1 atm
-WTS = dict(T8=0.248, T12=0.365, T11=0.387)    # trapezoid wall quadrature
+WTS = dict(zip(("T8", "T12", "T11"), _WTS))   # wall quadrature from exp_analysis
 SENS = ["T8", "T12", "T11", "T9", "T10", "T3"]        # cooling: all six
 SENS_SLOW = ["T11", "T10", "T3"]                      # heating: deep + outlet
-K_BRACKET = (0.096, 0.119)   # secant (cooling) and tangent (heating) conductance
+K_BRACKET = (0.097, 0.119)   # secant (cooling) and tangent (heating) conductance
 PARENT = {"C69": "E69", "C80": "E80", "C81": "E81"}
 
 

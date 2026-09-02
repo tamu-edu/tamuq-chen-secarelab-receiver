@@ -45,6 +45,16 @@ The column contract follows `import_exp_1D_v2.jl`: time = 1, MFC actual flows =
 6:9, T2 = 35, T3 = 36, T8 = 41, T9 = 42, T10 = 43, T11 = 44, T12 = 45. All four
 controllers carry air and the flow is their sum.
 
+> **`WTS` is the wall quadrature and is also owned here.** It is computed from
+> the probe coordinates z8/z9/z10 and L rather than hardcoded, giving
+> 0.2518 / 0.3504 / 0.3978 — the length-average weights for a piecewise-linear
+> wall profile through probes at 11/58/107 mm with constant extrapolation to
+> the end faces. Every other script imports it. It was previously hardcoded in
+> five places as 0.248/0.365/0.387, which are the weights for probes at
+> 10/58/110 mm and did not match the stated positions; correcting it shifted
+> ε, Nu, ε*, the irradiances and everything downstream by a few tenths of a
+> per cent.
+
 *Defines*, and therefore owns for every downstream script: the run dictionaries
 `heating` and `cooling`, the frontal area `A_frt`, the length `L`, the sensor
 coordinates `z8/z9/z10`, the air property functions `cp_air` and `rho_air`, the
@@ -61,9 +71,9 @@ exponential fits, full and late window), and `fig1_transients.png`,
 > **`F_DEL` is the delivered-power basis and is the one number in this directory
 > a reader must understand.** It is the group means of the model-free energy
 > closure evaluated with the tangent loss conductance from the heating
-> eigenvalue (0.119 W/K): `{456: 1.147, 304: 1.345, 256: 0.932}`. The secant
-> conductance from cooling (0.096 W/K) gives `{456: 1.049, 304: 1.226,
-> 256: 0.842}`, carried as a one-sided systematic band of about −9%. The closure
+> eigenvalue (0.119 W/K): `{456: 1.146, 304: 1.343, 256: 0.931}`. The secant
+> conductance from cooling (0.097 W/K) gives `{456: 1.052, 304: 1.230,
+> 256: 0.845}`, carried as a one-sided systematic band of about −9%. The closure
 > is a steady balance and needs the secant conductance at the hot steady state,
 > which those two values bracket. No thermal model enters.
 >
@@ -72,6 +82,13 @@ exponential fits, full and late window), and `fig1_transients.png`,
 > That script prints the factors on each run; keep the constant consistent with
 > what it prints. Changing `F_DEL` changes `eta_del` and `PR_del` everywhere and
 > requires re-running the whole chain.
+>
+> `G_DEL` is derived from it: `G_del = f * G0 = {456: 523, 304: 409, 256: 239}`
+> kW/m2, the delivered aperture irradiance. **All results are labelled by
+> G_del**, and the helper `GLAB(Io)` emits those legend strings; every figure
+> and both tables use it. The nominal G0 survives only in the simulator
+> characterization, the nominal column of Table 1, the energy closure that
+> identifies f, and the statement of the delivered-power discrepancy.
 
 ### `dimensionless_analysis.py` — dimensionless groups and correlations
 *Imports* `exp_analysis` (which re-runs it, since it has no `__main__` guard).

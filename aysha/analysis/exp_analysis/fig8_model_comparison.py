@@ -9,7 +9,7 @@ Inputs
   analysis/exp_analysis/dimensionless_groups.csv   (Tamb per run)
 
 Manuscript definitions (M2):
-  Tw_bar = 0.248 T8 + 0.365 T12 + 0.387 T11
+  Tw_bar = 0.2518 T8 + 0.3504 T12 + 0.3978 T11
   eps    = (T3 - Tamb) / (Tw_bar - Tamb)
   I_vol  = T12 - T8
 Model eps uses the identical reduction applied to the model output.
@@ -28,7 +28,7 @@ MODEL = os.path.join(ROOT, "summaries", "1D_v36",
 DIMLESS = os.path.join(HERE, "dimensionless_groups.csv")
 OUT = os.path.join(HERE, "fig8_model_comparison.png")
 
-W = dict(T8=0.248, T12=0.365, T11=0.387)
+W = dict(T8=0.2518, T12=0.3504, T11=0.3978)   # matches exp_analysis.WTS
 
 
 def wall_mean(t8, t12, t11):
@@ -49,6 +49,9 @@ def main():
         df[f"Ivol_{tag}"] = df[f"T12_perim_{tag}"] - df[f"T8_{tag}"]
 
     df["flux"] = (df["irradiance"] / 1000.0).round().astype(int)
+    # label groups by the delivered aperture irradiance G_del (Section 3.5)
+    G_DEL = {456: 523, 304: 408, 256: 238}
+    df["gdel"] = df["flux"].map(G_DEL)
 
     # consistency check against the published reduction
     resid = (df["eps_experiment"] - df["eps"]).abs()
@@ -60,6 +63,7 @@ def main():
 
     colors = {456: "#B3202E", 304: "#1F6FB4", 256: "#2E8B57"}
     marks = {456: "o", 304: "s", 256: "^"}
+    GL = {456: 523, 304: 408, 256: 238}
 
     fig, ax = plt.subplots(1, 2, figsize=(11.0, 4.6))
 
@@ -72,7 +76,7 @@ def main():
     for f, g in df.groupby("flux"):
         a.scatter(g.eps_experiment, g.eps_model, s=46, marker=marks[f],
                   facecolor=colors[f], edgecolor="k", linewidth=0.5,
-                  zorder=3, label=f"{f} kW m$^{{-2}}$")
+                  zorder=3, label=f"{GL[f]} kW m$^{{-2}}$")
     a.set_xlim(lo, hi); a.set_ylim(lo, hi)
     a.set_xlabel(r"measured effectiveness $\varepsilon$")
     a.set_ylabel(r"modelled effectiveness $\varepsilon$")
@@ -88,11 +92,11 @@ def main():
         g = g.sort_values("eps_experiment")
         b.plot(g.eps_experiment, g.Ivol_experiment, marks[f] + "-",
                color=colors[f], ms=6, lw=1.2, mec="k", mew=0.4, zorder=3,
-               label=f"{f} measured")
+               label=f"{GL[f]} measured")
         g = g.sort_values("eps_model")
         b.plot(g.eps_model, g.Ivol_model, marks[f] + "--",
                color=colors[f], ms=6, lw=1.2, mfc="white", mec=colors[f],
-               zorder=2, label=f"{f} model")
+               zorder=2, label=f"{GL[f]} model")
     b.set_xlabel(r"effectiveness $\varepsilon$")
     b.set_ylabel(r"inversion indicator $I_{\rm vol}=T_{12}-T_{8}$  [K]")
     b.set_title(r"(b) inversion displaced in $\varepsilon$ and an order of "
@@ -128,7 +132,7 @@ def main():
                          Ivol_max_meas=g.Ivol_experiment.max(),
                          Ivol_max_model=g.Ivol_model.max(),
                          q_range_max=q.max()))
-        print(f"  {f} kW/m2   measured q*={qe:5.2f} sL/min eps*={ee:.3f}"
+        print(f"  G_del={GL[f]} kW/m2 measured q*={qe:5.2f} sL/min eps*={ee:.3f}"
               f"   model q*={qm:5.2f} eps*={em:.3f}"
               f"   deps*={em - ee:+.3f}"
               f"   max I_vol {g.Ivol_model.max():+6.1f} K model /"
