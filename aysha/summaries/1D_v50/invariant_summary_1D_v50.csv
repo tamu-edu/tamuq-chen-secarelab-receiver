@@ -1,0 +1,5 @@
+metric,value,target,status
+C_total_with_rear,301.11174847143747,301 +/- 23,pass
+max_instantaneous_residual_W,5.684341886080802e-14,< 0.0001 W,pass
+flow_slope_MAE_K_per_LPM,7.356976823791321,diagnostic; lower is better,diagnostic
+active_flow_slope_loss,8.219941147405434,> 0 at unreconciled seed,pass

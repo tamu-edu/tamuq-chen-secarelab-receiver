@@ -1,0 +1,26 @@
+index,name,value
+1,A_Nu,1.0
+2,B_Re,0.9283026938833806
+3,C_Pr_fixed,0.3333
+4,front_dep,0.4551200986314161
+5,scale_456,1.34
+6,scale_304,1.58
+7,scale_256,1.11
+8,G_core_perim_W_m_K,24.872039140594868
+9,C_perim_eff_J_K,137.70432244158707
+10,k_perim_ref_W_m_K,9.10064389265549
+11,beta_opt,193.77838332109653
+12,chi,0.7958715381834904
+13,f_core_rear,0.9728454436569068
+14,flange_scale,0.19925163375662922
+15,k_core_axial_scale,0.26501771319320255
+16,C_rear_eff_J_K,102.20711085813221
+17,G_receiver_rear_W_K,0.8312024110892697
+18,G_rear_tube_W_K,6.9838677475793896
+19,G_rear_cavity_W_K,0.01
+20,G_rear_axial_W_K,8.658389709221446
+21,delta_web,8.736702133267356e-5
+22,C_z,1.529840450127574
+23,h_suction,150.0
+# derived,C_total_with_rear_eff_J_K,302.735227359423
+# reference,measured_C_eff_J_K,301.0

@@ -1,0 +1,13 @@
+metric,value,target,status
+Nu_app_prefactor,2.4044998717224374e-5,3.1e-4,diagnostic
+Nu_app_Re_exponent,1.8415589082029227,1.44,diagnostic
+Nu_app_log_r2,0.9702585781363805,0.97,diagnostic
+Lambda107_intercept,-0.06090624510515612,0.038,diagnostic
+Lambda107_slope,7.223710048373618e-5,8.3e-4,diagnostic
+Lambda107_r2,0.06772582188128973,linear trend,diagnostic
+K_loss_min,0.13922718434870318,0.10-0.16,diagnostic
+K_loss_max,0.19998606370178157,0.10-0.16,diagnostic
+epsilon_mean_min,0.6365499067886566,epsilon*=0.66,diagnostic
+epsilon_mean_max,0.9318745115406201,epsilon*=0.66,diagnostic
+C_receiver_participating,253.23993118130633,301 +/- 23,below assembly target
+C_total_with_rear,340.4661695822084,301 +/- 23,failed

@@ -1,0 +1,3 @@
+metric,value,target,status
+C_total_with_rear,270.52693256582086,301 +/- 23,diagnostic
+max_steady_residual_W,5.684341886080802e-14,< 0.01 W,pass

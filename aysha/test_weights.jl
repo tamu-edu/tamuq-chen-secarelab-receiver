@@ -1,0 +1,5 @@
+﻿include("1D_v44.jl")
+cw = solar_weights_v5(184.67, 1.0, 15)
+println("core_weights = ", round.(cw, digits=4))
+pw = axial_exponential_weights_v44(22.33, 15, L/15)
+println("perim_weights = ", round.(pw, digits=4))

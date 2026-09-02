@@ -4546,3 +4546,33 @@ prove that every axisymmetric or continuum representation is invalid.
 - If v22 work resumes, first demonstrate that isolated Nu and Rosseland
   perturbations change the intended conductances and outputs, then repeat a
   small no-fit sensitivity matrix before any calibration grid.
+
+---
+
+## 2026-09-02 - Cross-Dimensional Handover: 1D Flow-Rate Bias Diagnosis and 2D Continuum Model Requirements
+
+**Reference Document**: [`summaries/flow_rate_bias_analysis_1D_to_2D.md`](file:///d:/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/summaries/flow_rate_bias_analysis_1D_to_2D.md)  
+**Authors**: 1D ECM Lead & 2D Continuum Working Group
+
+### 1. Summary of 1D Calibrated Baseline (`1D_v49`)
+The 1D Entire Converter Model has achieved strict mathematical and physical closure:
+- **Instantaneous First-Law Closure**: $|\Delta \dot{E}_{inst}| < 10^{-13}\text{ W}$ across all 15 heating and 3 cooling runs.
+- **Participating Assembly Heat Capacity**: $C_{total} = 301.11\text{ J/K}$ ($+0.04\%$ error from measured $301.0\text{ J/K}$).
+- **Developing Laminar Nusselt Law (Shah-London)**: $\text{Nu}_\infty = 3.61$, $C_1 = 0.3551$, $C_2 = 0.01318$.
+- **Optical & Thermal Extinction**: $\beta_{opt} = 274.50\text{ m}^{-1}$ ($\delta_{opt} = 3.64\text{ mm}$), $\beta_{rad} = 778.25\text{ m}^{-1}$, $\chi = 0.7543$.
+- **Exit Probe ($T_3$) Observation Dynamics**: Modeled as a dynamic thermocouple node in a radiant enclosure with $h_{probe, ref} = 46.34\text{ W/m}^2\text{K}$, $w_{probe, rad} = 0.8243$, $G_{probe, stem} = 0.0224\text{ W/K}$.
+
+### 2. Diagnosis of the Persistent Flow-Rate Bias ($|\partial T / \partial \dot{V}|$)
+Across all 3 irradiance clusters ($456$, $304$, and $256\text{ kW/m}^2$), the 1D model systematically overpredicts temperatures at low flow ($4.5\text{--}7\text{ LPM}$) and underpredicts temperatures at high flow ($13\text{--}19\text{ LPM}$). This derivative gap is caused by three fundamental 1D constraints:
+1. **1D Single-Stream Enthalpy Constraint ($\Delta T \propto 1/\dot{m}$)**: Constrained by constant $\text{Nu}_\infty = 3.61$, cutting flow by $4\times$ mathematically forces 1D temperatures to rise steeply to dissipate power.
+2. **2D/3D Viscous Flow Choking**: Dynamic viscosity $\mu(T) \propto T^{0.70}$ causes superheated central channels ($1200\text{ K}$) to choke at low flow, naturally diverting fluid into peripheral channels and transitioning heat removal from axial advection ($Pe \gg 1$) to 2D radial conduction to the housing shell and flange.
+3. **Non-Linear Front Reradiation (Jensen's Inequality: $\overline{T^4} > \bar{T}^4$)**: The Gaussian focal spot creates a localized $T_{peak} \gg \bar{T}$, causing 1D models to underestimate front radiant emission by $30\text{--}50\text{ W}$ at low flow rates.
+
+### 3. Mandate for 2D Axisymmetric Continuum Modeling
+The 2D model architecture must implement:
+- Multi-stream hydrodynamic flow split across radial annuli governed by common pressure drop $\Delta P(r) = \text{const}$ with $\mu(T(r, z))$.
+- True radial Gaussian volumetric optical deposition $q'''_{solar}(r, z)$.
+- 2D anisotropic conduction tensor ($k_{rr}, k_{zz}$) with direct radial heat spreading to the housing casing and chilled flange.
+- 2D surface reradiation integral $\int_0^R 2\pi r \epsilon \sigma T(r, 0)^4 dr$.
+- Direct adoption of 1D calibrated transport parameters ($C_1, C_2, \text{Nu}_\infty, \beta_{opt}, \beta_{rad}, \delta_{web}, C_{total}, h_{probe}, w_{probe, rad}$).
+

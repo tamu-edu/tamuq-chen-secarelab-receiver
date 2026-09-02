@@ -1,0 +1,3 @@
+metric,value,target,status
+C_total_with_rear,302.735227359423,301 +/- 23,pass
+max_instantaneous_residual_W,8.526512829121202e-14,< 0.0001 W,pass
