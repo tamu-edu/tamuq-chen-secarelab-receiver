@@ -11,8 +11,9 @@ from scipy.optimize import curve_fit
 from scipy.stats import linregress
 import os, json
 
-RAW = "/sessions/cool-awesome-babbage/mnt/analysis/RAW/"
-OUT = "/sessions/cool-awesome-babbage/mnt/outputs/exp_analysis/"
+_HERE = os.path.dirname(os.path.abspath(__file__))
+RAW = os.path.join(_HERE, "..", "RAW") + os.sep
+OUT = _HERE + os.sep
 os.makedirs(OUT, exist_ok=True)
 
 heating = {
@@ -38,9 +39,34 @@ A_frt = 0.019**2
 # delivered-power calibration factors (ad hoc, per lamp configuration):
 # fitted per-irradiance scales from the independent 1D calibration (v14),
 # corroborated by the steady energy closure of this analysis.
-F_DEL = {456e3: 1.336, 304e3: 1.374, 256e3: 0.786}
+# Delivered-power factors, model-free steady energy closure (Section 3.5):
+#   f = [Q_gas + K_loss*(Tw_bar - Tamb)] / (G0*A_frt),  group means.
+# The closure is a steady balance and needs the SECANT loss conductance
+# Q_loss/theta at the hot steady state. That quantity is bracketed by the
+# cooling eigenvalue (secant conductance at lower temperature, 0.096 W/K) and
+# the heating eigenvalue (tangent conductance dQ_loss/dT at the steady state,
+# 0.119 W/K). The upper end is applied and the lower carried as a one-sided
+# systematic band of about -9%. Values from eigenvalues_and_power.py; that
+# script prints them and this constant must be kept consistent with it.
+F_DEL = {456e3: 1.146, 304e3: 1.343, 256e3: 0.931}
+
+# Delivered aperture irradiance, G_del = f * G0. Results are reported on this
+# basis; the nominal G0 is retained only where the measurement itself is at
+# issue (apparatus characterization and the energy closure of Section 4.6).
+G_DEL = {Io: round(Io/1e3*f) for Io, f in F_DEL.items()}   # {456e3:523, 304e3:408, 256e3:238}
+GLAB  = lambda Io: str(G_DEL[Io if Io > 1e3 else Io*1e3]) + " kW/m2"
 L = 0.137
 z8, z9, z10 = 0.011, 0.058, 0.107
+
+# Wall quadrature. The side-wall probes sit at z8, z9, z10; the energy-weighted
+# wall temperature is the length average of a piecewise-linear profile through
+# them with constant extrapolation to the end faces, which is equivalent to
+# midpoint segment boundaries. Computed from the coordinates rather than
+# hardcoded, and imported by every other script, so the weights cannot drift
+# from the stated probe positions.
+_zw = [z8, z9, z10]
+_bnd = [0.0] + [0.5*(_zw[i]+_zw[i+1]) for i in range(len(_zw)-1)] + [L]
+WTS = [(_bnd[i+1]-_bnd[i])/L for i in range(len(_zw))]   # -> 0.2518, 0.3504, 0.3978
 
 cp_air = lambda T: np.interp(T,[300,400,500,600,700,800,900,1000,1100,1200],
                              [1007,1014,1030,1051,1075,1099,1121,1141,1159,1175])
@@ -158,7 +184,7 @@ for ax,s,ttl in zip(axs,["T8_ss","T12_ss","T11_ss","T3_ss"],
                      "T11 wall (z=107mm)","T3 gas out"]):
     for Io in [456,304,256]:
         g=ss_df[np.isclose(ss_df.Io_kWm2,Io)].sort_values("q_lpm")
-        ax.plot(g.q_lpm,g[s]-273.15,"o-",c=grp_colors[Io],label=f"{Io} kW/m2")
+        ax.plot(g.q_lpm,g[s]-273.15,"o-",c=grp_colors[Io],label=GLAB(Io))
     ax.set_title(ttl); ax.set_xlabel("flow [L/min]"); ax.grid(alpha=.3)
 axs[0].set_ylabel("steady T [degC]"); axs[0].legend(fontsize=8)
 fig.tight_layout(); fig.savefig(OUT+"fig2_ss_vs_flow.png",dpi=140); plt.close(fig)
@@ -167,16 +193,15 @@ fig.tight_layout(); fig.savefig(OUT+"fig2_ss_vs_flow.png",dpi=140); plt.close(fi
 fig,axs=plt.subplots(1,3,figsize=(14,4))
 for Io in [456,304,256]:
     g=ss_df[np.isclose(ss_df.Io_kWm2,Io)].sort_values("q_lpm")
-    axs[0].plot(g.q_lpm,g.I_vol_wall,"o-",c=grp_colors[Io],label=f"{Io}")
+    axs[0].plot(g.q_lpm,g.I_vol_wall,"o-",c=grp_colors[Io],label=GLAB(Io).replace(" kW/m2",""))
     axs[1].plot(g.q_lpm,g.gapC58,"o-",c=grp_colors[Io])
     axs[1].plot(g.q_lpm,g.gapC107,"s--",c=grp_colors[Io])
     axs[2].plot(g.q_lpm,g.eta_del*100,"o-",c=grp_colors[Io])
-    axs[2].plot(g.q_lpm,g.eta_gas*100,"o--",c=grp_colors[Io],mfc="none",alpha=.5)
 axs[0].axhline(0,c="k",lw=.8); axs[0].set_title("wall I_vol = T12-T8 [K]")
 axs[1].axhline(0,c="k",lw=.8)
 axs[1].set_title("interior-wall: o T9-T12 (58mm), s T10-T11 (107mm)")
 axs[2].axhline(100,c="k",lw=.8)
-axs[2].set_title("gas eff. [%]: solid=delivered, hollow=nominal")
+axs[2].set_title("thermal efficiency [%]")
 for ax in axs: ax.set_xlabel("flow [L/min]"); ax.grid(alpha=.3)
 axs[0].legend(title="kW/m2",fontsize=8)
 fig.tight_layout(); fig.savefig(OUT+"fig3_inversion_gaps_eta.png",dpi=140); plt.close(fig)
@@ -197,8 +222,8 @@ fig.tight_layout(); fig.savefig(OUT+"fig4_cooling_lin.png",dpi=140); plt.close(f
 fig,ax=plt.subplots(figsize=(7,4))
 for Io in [456,304,256]:
     g=ss_df[np.isclose(ss_df.Io_kWm2,Io)].sort_values("q_lpm")
-    ax.plot(g.q_lpm,g.t90_T9/60,"o-",c=grp_colors[Io],label=f"{Io} T9")
-    ax.plot(g.q_lpm,g.t90_T3/60,"s--",c=grp_colors[Io],label=f"{Io} T3")
+    ax.plot(g.q_lpm,g.t90_T9/60,"o-",c=grp_colors[Io],label=GLAB(Io).replace(" kW/m2","")+" T9")
+    ax.plot(g.q_lpm,g.t90_T3/60,"s--",c=grp_colors[Io],label=GLAB(Io).replace(" kW/m2","")+" T3")
 ax.set_xlabel("flow [L/min]"); ax.set_ylabel("t90 [min]"); ax.grid(alpha=.3)
 ax.legend(fontsize=7,ncol=3); ax.set_title("heating t90: solid core vs gas outlet")
 fig.tight_layout(); fig.savefig(OUT+"fig5_t90.png",dpi=140); plt.close(fig)
