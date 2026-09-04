@@ -94,3 +94,21 @@ different from the one its header documented; both are archived rather than one 
 silently. The installed differential-pressure channel is retained in the outputs although §4.7
 shows it cannot resolve the monolith pressure drop, because the null result is what motivates the
 measurement recommended in §5.3.
+
+## Supplementary tables
+
+`receiver_reduction.py` also writes the three supplementary tables, which
+`supplementary_material.md` reproduces unaltered:
+
+| file | supports |
+|---|---|
+| `tableS3_heating_conditionality.md` | S3, heating fit-window sweep and sensor-selection swing |
+| `tableS4_wall_and_falsification.md` | S4, wall-extrapolation sensitivity and the three fixed-conductance families |
+| `tableS5_auxiliary_groups.md` | S5, per-run auxiliary dimensionless groups |
+
+## Software stack of the archived run
+
+Python 3.11.16, NumPy 2.4.6, SciPy 1.17.1, pandas 2.3.3, Matplotlib 3.11.1.
+Both scripts are seeded. The multi-start optimizer in `fixed_profile_test`
+is the one step whose last digits may differ across BLAS builds; its
+reported statistics are stable well beyond the digits quoted.

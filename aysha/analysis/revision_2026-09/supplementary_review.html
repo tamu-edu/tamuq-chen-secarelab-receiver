@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Supplementary material — SiC volumetric receiver</title>
+<style>
+:root{--ink:#111;--muted:#555;--rule:#bbb}
+html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{font-family:"Charter","Palatino Linotype",Palatino,Georgia,serif;color:var(--ink);
+     max-width:44em;margin:2.2em auto;padding:0 1.4em;line-height:1.55;font-size:11.5pt;
+     text-align:justify;hyphens:auto}
+h1{font-size:17pt;line-height:1.25;text-align:left;margin-bottom:.2em}
+h2{font-size:13pt;margin-top:1.9em;text-align:left;border-bottom:1px solid var(--rule);padding-bottom:.15em}
+h3{font-size:11.8pt;margin-top:1.5em;text-align:left}
+h2,h3{page-break-after:avoid;break-after:avoid}
+img{display:block;max-width:100%;margin:1.4em auto .5em;page-break-inside:avoid;break-inside:avoid}
+p{margin:.55em 0}
+p>strong:first-child{font-variant:normal}
+table{border-collapse:collapse;width:100%;font-size:8.2pt;margin:1.1em 0;
+      page-break-inside:avoid;break-inside:avoid;font-family:"Helvetica Neue",Arial,sans-serif}
+th,td{border:0;padding:.28em .45em;text-align:right}
+th:first-child,td:first-child{text-align:left}
+thead th{border-top:1.1px solid var(--ink);border-bottom:.6px solid var(--ink);font-weight:600;vertical-align:bottom}
+tbody tr:last-child td{border-bottom:1.1px solid var(--ink)}
+blockquote{border-left:3px solid var(--rule);margin:1.4em 0;padding:.5em .9em;color:var(--muted);
+           background:#f7f7f7;page-break-inside:avoid}
+code{font-family:"SF Mono",Consolas,monospace;font-size:.88em;background:#f2f2f2;padding:.06em .25em;border-radius:2px}
+hr{border:0;border-top:1px solid var(--rule);margin:2em 0}
+.missing{color:#a00;font-style:italic;text-align:center;border:1px dashed #a00;padding:1.6em;margin:1.4em 0}
+@page{size:A4;margin:19mm 17mm}
+@media print{body{margin:0;max-width:none;font-size:10pt}h1{font-size:15pt}}
+
+.cap{font-size:9.6pt;line-height:1.4;color:#222;text-align:justify;margin:.15em 0 1.8em;
+      page-break-before:avoid;break-before:avoid}
+</style>
+<script>window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$']]},
+ options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head><body>
+<h1>Supplementary Material</h1>
+<h2>Transient Thermal Characterization and Dimensionless Correlations for a Structured Silicon Carbide Volumetric Solar Receiver, with Consequences for Reduced-Order Model Validation</h2>
+<p>A. Melhim, A. G. Konstandopoulos, K. J. Kakosimos</p>
+<p>This document holds the campaign-by-campaign literature detail, the full uncertainty propagation, and the sensitivity and per-run tables supporting the main text. Section numbers S1 to S8 are those cited in the manuscript. The tables in sections S3, S4 and S5 are written by <code>receiver_reduction.py</code> as <code>tableS3_heating_conditionality.md</code>, <code>tableS4_wall_and_falsification.md</code> and <code>tableS5_auxiliary_groups.md</code> and are reproduced here unaltered; no measured value in this document is hand-entered.</p>
+<hr />
+<h2>S1 Experimental campaigns on porous and structured volumetric absorbers</h2>
+<p>The response has largely been to build better absorbers. Fend and co-workers measured thermophysical and heat transfer properties of cordierite, SSiC and CBSiC foams, SiC fibre meshes and catalyst carriers, obtaining efficiencies of 75–92% at 300–550 °C for combined material systems and showing that 45 ppi foams transfer far more heat than 10–20 ppi foams by virtue of specific surface areas of up to 2500 m² m⁻³ [4]; they also reported double-layer SiC foams reaching 98% efficiency at 672 °C outlet [5]. Ávila-Marín and colleagues built and tested twenty-six graded-porosity wire-mesh absorbers against the TSA and SOLAIR baselines [6], and later five periodic and non-periodic SiC morphologies including Voronoi structures that outperformed a conventional SiC honeycomb [7]. Zaversky and co-workers optimized single- against multi-layer ceramic foams and concluded that only the first layer's properties matter thermally, with a broad efficiency plateau between 30 and 50 PPI [8]. Wang and co-workers tested four porous SiC absorbers and found that reducing pore diameter from 5.83 to 2.22 mm at fixed porosity raised efficiency by nearly three points [9]. The pattern continues in the most recent work. Patil and co-workers built and tested a 5 kW reticulated-porous-ceramic cavity receiver for process heat above 1000 °C, comparing SiSiC, alumina and ceria structures across mean pore sizes [31], and Broeske and co-workers tested screen-printed ceramic and metallic-foil three-dimensionally shaped absorbers in a sixteen-module matrix at DLR's Synlight facility, reaching air exit temperatures to 735 °C and thermal efficiencies up to 91.8% at 650 °C against 84.6 to 85.3% for the 80 cpsi HiTRec SiSiC honeycomb benchmark [29]. D'Souza and co-workers took the complementary route of a calorimetric test bench, measuring the heat transfer to pressurised gas in absorbers of varying rectangular channel geometry under a high-flux solar simulator [32]. The recurring output of this family of work is a design recommendation — a porosity, a cell density, a layering, a channel aspect ratio — obtained from steady-state efficiency measurements.</p>
+<p>The recurring output of these campaigns is a design recommendation — porosity, cell density, layering, channel aspect ratio — inferred from steady-state efficiency and outlet-temperature measurements. Section 5.1 of the manuscript quantifies what such a dataset constrains.</p>
+<hr />
+<h2>S2 Uncertainty propagation</h2>
+<p>Three kinds of uncertainty are propagated and reported separately, because they behave differently.</p>
+<p><strong>Random and calibration error</strong> is propagated by Monte Carlo over 4000 realizations. Reported ± values are Monte Carlo standard deviations and bracketed ranges are 95% percentile intervals. The type N tolerance of IEC 60584 class 1 — the greater of 1.5 K and 0.004|t| — is a maximum permissible error rather than a standard deviation, so it is read as a 95% bound and halved to a 1σ term. That term is a per-sensor calibration offset, so it is drawn once per sensor per realization and shared across all runs, scaled by each run's temperature-dependent tolerance, with an independent 0.5 K steady-window drift term per run. Viscosity and conductivity carry 2% and 1% perturbations. The abscissa of the transient identification, x = ε ṁ c_p, is rebuilt in every realization from that realization's perturbed flow and temperatures, with the controller factor shared between the steady frame and the abscissa because it is one physical error.</p>
+<p><strong>The controller model is two-term.</strong> The four Aalborg GFC17 units carry roughly 25, 33, 28 and 14% of the total flow, and two independent pieces of information constrain their error. The manufacturer specification is ±1.0% of full scale over the whole 0 to 100% range with ±0.5% full-scale repeatability — an additive bound in absolute flow, not a percent of reading — and the factory calibration is gas-specific. Because the receiver runs air rather than the calibration gas, each unit was calibrated in place against a bubble flowmeter; that substitution removes the gas-conversion factor, which is a percent-of-reading systematic, and replaces it with the residual uncertainty of the measured characteristic, which is also proportional to reading. What it cannot remove is the unit's own zero, linearity and repeatability floor, which remains additive. Both terms are therefore carried,</p>
+<p>$$\sigma_u = \left[(a_{\rm FS} F)^2 + (b_{\rm rel}\, q_u)^2\right]^{1/2},\qquad a_{\rm FS} = 0.0025,\ b_{\rm rel} = 0.025,\ F = 10\ {\rm sL\,min^{-1}},$$</p>
+<p>with the additive coefficient the full-scale repeatability read as a 95% bound and the proportional coefficient the calibration residual. One standard-normal draw per unit per realization is combined with each record's own measured shares, so a single physical unit error reaches every steady and transient record at the magnitude its own reading implies.</p>
+<p>The two terms have opposite flow dependence, and in this campaign neither is negligible: per-unit readings run 0.69 to 5.72 sL min⁻¹, that is 7 to 57% of full scale, and the additive term exceeds the proportional one for 48% of the per-unit readings. On the summed flow the relative 1σ falls from 3.4% at the lowest campaign flow to 2.6% at the highest for fully correlated units, and from 1.7% to 1.3% for independent ones. A purely proportional model would give a flow-independent 2.5% and would therefore, by construction, be unable to reach a fitted exponent at all; the correct model is predominantly systematic, so it displaces a prefactor, but retains a weak gradient that does reach an exponent. Because the manufacturer states no correlation between units, every instrumental term is computed in both limits: they agree to within 0.0007 on every exponent and within 0.5 J K⁻¹ on every capacitance, so the larger is quoted and both are archived in <code>uncertainty.csv</code> under <code>rho_mfc</code>.</p>
+<p>Where a quantity is a fitted slope, its regression standard error is reported alongside and labelled as such, because the two measure different things: the Monte Carlo term is what the instruments contribute and the regression term is the scatter of the runs about the fitted law. For the pooled Nusselt correlation the regression term is larger by a factor of 16.8 and for the profile-corrected transfer-unit count by 11.2, so in both cases it is the one to read as the uncertainty of the correlation; for the grouped Nusselt correlation, which is much better determined, the ratio is only 2.6 and the instrumental term is not negligible.</p>
+<p><strong>Systematic bias in the outlet gas probe</strong> is propagated as a declared band, because it is not a calibration error and is much larger than one. T3 sits in the exit plenum at a convective–radiative equilibrium between the gas and the surrounding hardware and reads neither bulk gas nor wall temperature; the bias is of order tens of kelvin and is not characterized, a difficulty identified as a principal source of the model–experiment gap in this field [10] and demonstrated for thermocouples in monolith channels specifically [19]. Since ε, NTU, h_app, Nu, ε*, η and — through ε — C_eff and K_loss all derive from T3, each is reported with a δT3 = ±25 K band alongside its Monte Carlo interval. The band is carried through the identification as well as through the steady groups, by recomputing the abscissa at each offset with the same estimator the archived value uses, so that the zero-offset case reproduces the archived point estimate exactly:</p>
+<table>
+<thead>
+<tr>
+<th>quantity</th>
+<th style="text-align: right;">δT3 = −25 K</th>
+<th style="text-align: right;">δT3 = 0</th>
+<th style="text-align: right;">δT3 = +25 K</th>
+<th>band</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$C_{\rm eff}$, cooling matched-ε (primary) [J K⁻¹]</td>
+<td style="text-align: right;">271.7</td>
+<td style="text-align: right;">275.9</td>
+<td style="text-align: right;">280.5</td>
+<td>271.7 – 280.5</td>
+</tr>
+<tr>
+<td>$K_{\rm loss}$, cooling matched-ε (primary) [W K⁻¹]</td>
+<td style="text-align: right;">0.0844</td>
+<td style="text-align: right;">0.0798</td>
+<td style="text-align: right;">0.0754</td>
+<td>0.0754 – 0.0844</td>
+</tr>
+<tr>
+<td>$C_{\rm eff}$, heating deep probes [J K⁻¹]</td>
+<td style="text-align: right;">262.2</td>
+<td style="text-align: right;">280.7</td>
+<td style="text-align: right;">299.4</td>
+<td>262.2 – 299.4</td>
+</tr>
+<tr>
+<td>$K_{\rm loss}$, heating deep probes [W K⁻¹]</td>
+<td style="text-align: right;">0.1073</td>
+<td style="text-align: right;">0.1137</td>
+<td style="text-align: right;">0.1200</td>
+<td>0.1073 – 0.1200</td>
+</tr>
+</tbody>
+</table>
+<p>The identified capacitance is thus the quantity least sensitive to the outlet-probe systematic — the primary determination moves by 1.6% over the whole band, against the 11% spread among estimators and the ±37 J K⁻¹ Monte Carlo standard deviation — while the loss bracket widens from 0.080–0.114 to 0.075–0.120 W K⁻¹. The structural result of section 5.2 is deliberately constructed to survive the band. Source: <code>results.json</code>, key <code>T3_sensitivity</code>.</p>
+<p><strong>Estimator choice</strong> is propagated for the inversion threshold, where it dominates: section 4.1 reports ε* located both by interpolation between the bracketing runs and by a global linear regression, and carries the difference as a systematic.</p>
+<hr />
+<h2>S3 Conditionality of the heating identification</h2>
+<p>The heating approach to steady state decays with the same eigenvalue in principle, and log(T_ss − T) is regressed over a deficit window in u = (T_ss − T)/(T_ss − T₀). Two choices are unresolvable within this dataset.</p>
+<p>Sensor selection. With the lamps on, the front probes are held by a local balance between absorbed flux and aperture reradiation with its own short time constant, so their approach to steady state is bi-exponential and does not carry the assembly-scale mode. Using all six receiver probes gives C_eff = 121.6 J K⁻¹; using the three deep and outlet probes gives 280.7 J K⁻¹, a ratio of 2.31.</p>
+<p>Fit window. Sweeping the deficit window moves the identified capacitance monotonically while the coefficient of determination improves, so goodness of fit does not select the window.</p>
+<table>
+<thead>
+<tr>
+<th>deficit window $u$</th>
+<th style="text-align: right;">$C_{\rm eff}$ [J K$^{-1}$]</th>
+<th style="text-align: right;">$K_{\rm loss}$ [W K$^{-1}$]</th>
+<th style="text-align: right;">$r^2$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(0.05, 0.35)</td>
+<td style="text-align: right;">294.9</td>
+<td style="text-align: right;">0.1274</td>
+<td style="text-align: right;">0.8405</td>
+</tr>
+<tr>
+<td>(0.07, 0.45)</td>
+<td style="text-align: right;">280.7</td>
+<td style="text-align: right;">0.1137</td>
+<td style="text-align: right;">0.9033</td>
+</tr>
+<tr>
+<td>(0.10, 0.50)</td>
+<td style="text-align: right;">263.9</td>
+<td style="text-align: right;">0.0999</td>
+<td style="text-align: right;">0.9358</td>
+</tr>
+<tr>
+<td>(0.15, 0.60)</td>
+<td style="text-align: right;">228.1</td>
+<td style="text-align: right;">0.0740</td>
+<td style="text-align: right;">0.9621</td>
+</tr>
+<tr>
+<td>(0.20, 0.70)</td>
+<td style="text-align: right;">199.6</td>
+<td style="text-align: right;">0.0564</td>
+<td style="text-align: right;">0.9666</td>
+</tr>
+</tbody>
+</table>
+<p>Sensor selection: all six receiver probes give 121.6 J K$^{-1}$, the three deep and outlet probes 280.7 J K$^{-1}$, a ratio of 2.31.</p>
+<p>Source: <code>results.json</code>, keys <code>sensor_selection_swing</code> and <code>heating_window_sensitivity</code>.</p>
+<hr />
+<h2>S4 Wall-profile reconstruction and the fixed-conductance falsification</h2>
+<p>The length-averaged wall temperature and the profile-corrected transfer-unit count both use a piecewise-linear axial wall profile through the probes at 11, 58 and 107 mm over a 137 mm receiver. The front 11 mm and rear 30 mm are unmeasured. Four admissible extrapolation combinations give exponents within 0.013 of one another; a full linear continuation of the rear gradient is inadmissible, because for five of the fifteen runs it places the exit wall below the measured outlet gas temperature, which no single-stream model can produce.</p>
+<table>
+<thead>
+<tr>
+<th>Rear / front extrapolation</th>
+<th style="text-align: right;">exponent</th>
+<th style="text-align: right;">s.e.</th>
+<th style="text-align: right;">runs</th>
+<th>infeasible</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>constant / constant</td>
+<td style="text-align: right;">+0.3407</td>
+<td style="text-align: right;">0.0405</td>
+<td style="text-align: right;">15</td>
+<td>none</td>
+</tr>
+<tr>
+<td>constant / linear</td>
+<td style="text-align: right;">+0.3429</td>
+<td style="text-align: right;">0.0409</td>
+<td style="text-align: right;">15</td>
+<td>none</td>
+</tr>
+<tr>
+<td>half / constant</td>
+<td style="text-align: right;">+0.3306</td>
+<td style="text-align: right;">0.0410</td>
+<td style="text-align: right;">15</td>
+<td>none</td>
+</tr>
+<tr>
+<td>half / linear</td>
+<td style="text-align: right;">+0.3328</td>
+<td style="text-align: right;">0.0414</td>
+<td style="text-align: right;">15</td>
+<td>none</td>
+</tr>
+<tr>
+<td>linear / constant</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">10</td>
+<td>E71, E75, E76, E80, E81</td>
+</tr>
+<tr>
+<td>linear / linear</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">10</td>
+<td>E71, E75, E76, E80, E81</td>
+</tr>
+</tbody>
+</table>
+<p>The primary value is the constant/constant case, +0.3407 ± 0.0405, against the single-stream requirement of -1.00. Under the common-slope grouping used for the Nusselt correlation the exponent is +0.3560 ± 0.0099 with r² = 0.9922.</p>
+<p>The fixed-conductance falsification of section 5.2 fits a piecewise-linear non-negative h(z) by multi-start least squares in log h and asks whether one flow-independent profile reproduces the fifteen measured outlet temperatures. It does not, in any family or at any node count, and the discriminating statistic is the ordering of the residual in flow rather than its magnitude.</p>
+<table>
+<thead>
+<tr>
+<th>Family</th>
+<th style="text-align: right;">nodes</th>
+<th style="text-align: right;">RMS residual [K]</th>
+<th style="text-align: right;">max abs [K]</th>
+<th style="text-align: right;">$r$ vs $\ln Re$</th>
+<th style="text-align: right;">slope [K per e-fold]</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>shared dimensional $h(z)$</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">64.2</td>
+<td style="text-align: right;">111.3</td>
+<td style="text-align: right;">-0.943</td>
+<td style="text-align: right;">-148</td>
+</tr>
+<tr>
+<td>shared dimensional $h(z)$</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">55.4</td>
+<td style="text-align: right;">96.4</td>
+<td style="text-align: right;">-0.946</td>
+<td style="text-align: right;">-128</td>
+</tr>
+<tr>
+<td>shared dimensional $h(z)$</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">54.2</td>
+<td style="text-align: right;">95.0</td>
+<td style="text-align: right;">-0.947</td>
+<td style="text-align: right;">-126</td>
+</tr>
+<tr>
+<td>shared dimensional $h(z)$</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">54.2</td>
+<td style="text-align: right;">95.0</td>
+<td style="text-align: right;">-0.947</td>
+<td style="text-align: right;">-126</td>
+</tr>
+<tr>
+<td>shared $Nu(z)$</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">55.8</td>
+<td style="text-align: right;">96.0</td>
+<td style="text-align: right;">-0.945</td>
+<td style="text-align: right;">-132</td>
+</tr>
+<tr>
+<td>shared $Nu(z)$</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">54.6</td>
+<td style="text-align: right;">94.4</td>
+<td style="text-align: right;">-0.947</td>
+<td style="text-align: right;">-129</td>
+</tr>
+<tr>
+<td>per-configuration, 256 kW m$^{-2}$</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">36.0</td>
+<td style="text-align: right;">56.9</td>
+<td style="text-align: right;">-0.996</td>
+<td style="text-align: right;">-90</td>
+</tr>
+<tr>
+<td>per-configuration, 304 kW m$^{-2}$</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">67.7</td>
+<td style="text-align: right;">97.3</td>
+<td style="text-align: right;">-0.982</td>
+<td style="text-align: right;">-128</td>
+</tr>
+<tr>
+<td>per-configuration, 456 kW m$^{-2}$</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">52.1</td>
+<td style="text-align: right;">79.1</td>
+<td style="text-align: right;">-0.997</td>
+<td style="text-align: right;">-197</td>
+</tr>
+</tbody>
+</table>
+<p>Source: <code>results.json</code>, keys <code>wall_extrapolation</code>, <code>ntu_profile</code> and <code>fixed_profile_test</code>; the latter also holds the fitted nodes and per-run residuals with run identifiers.</p>
+<hr />
+<h2>S5 Auxiliary dimensionless groups, per run</h2>
+<p>The four auxiliary groups close off the local explanations for the assembly-scale exchange deficit of section 4.2: the web Biot number, the Graetz number with its reciprocal x* = 1/Gz_L (the dimensionless axial coordinate of the thermal-entrance problem at the channel exit), the axial Péclet group, and the radiation–conduction number.</p>
+<table>
+<thead>
+<tr>
+<th>Run</th>
+<th style="text-align: right;">$G_0$ [kW m$^{-2}$]</th>
+<th style="text-align: right;">$q$ [sL min$^{-1}$]</th>
+<th style="text-align: right;">$Re_{\rm nom}$</th>
+<th style="text-align: right;">$Pr$</th>
+<th style="text-align: right;">$Gz_L$</th>
+<th style="text-align: right;">$x^*=1/Gz_L$</th>
+<th style="text-align: right;">$Re\,Pr\,L/D_h$</th>
+<th style="text-align: right;">$Bi$</th>
+<th style="text-align: right;">$N_{rc}$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E67</td>
+<td style="text-align: right;">456</td>
+<td style="text-align: right;">15.28</td>
+<td style="text-align: right;">72.6</td>
+<td style="text-align: right;">0.6837</td>
+<td style="text-align: right;">0.543</td>
+<td style="text-align: right;">1.84</td>
+<td style="text-align: right;">4531</td>
+<td style="text-align: right;">2.53e-05</td>
+<td style="text-align: right;">4.37</td>
+</tr>
+<tr>
+<td>E68</td>
+<td style="text-align: right;">456</td>
+<td style="text-align: right;">12.50</td>
+<td style="text-align: right;">58.9</td>
+<td style="text-align: right;">0.6838</td>
+<td style="text-align: right;">0.441</td>
+<td style="text-align: right;">2.27</td>
+<td style="text-align: right;">3680</td>
+<td style="text-align: right;">1.88e-05</td>
+<td style="text-align: right;">4.86</td>
+</tr>
+<tr>
+<td>E69</td>
+<td style="text-align: right;">456</td>
+<td style="text-align: right;">10.50</td>
+<td style="text-align: right;">49.6</td>
+<td style="text-align: right;">0.6838</td>
+<td style="text-align: right;">0.372</td>
+<td style="text-align: right;">2.69</td>
+<td style="text-align: right;">3100</td>
+<td style="text-align: right;">1.48e-05</td>
+<td style="text-align: right;">5.09</td>
+</tr>
+<tr>
+<td>E70</td>
+<td style="text-align: right;">456</td>
+<td style="text-align: right;">9.11</td>
+<td style="text-align: right;">42.7</td>
+<td style="text-align: right;">0.6839</td>
+<td style="text-align: right;">0.320</td>
+<td style="text-align: right;">3.12</td>
+<td style="text-align: right;">2670</td>
+<td style="text-align: right;">1.19e-05</td>
+<td style="text-align: right;">5.64</td>
+</tr>
+<tr>
+<td>E71</td>
+<td style="text-align: right;">456</td>
+<td style="text-align: right;">7.13</td>
+<td style="text-align: right;">34.0</td>
+<td style="text-align: right;">0.6837</td>
+<td style="text-align: right;">0.254</td>
+<td style="text-align: right;">3.93</td>
+<td style="text-align: right;">2122</td>
+<td style="text-align: right;">8.38e-06</td>
+<td style="text-align: right;">5.66</td>
+</tr>
+<tr>
+<td>E72</td>
+<td style="text-align: right;">304</td>
+<td style="text-align: right;">18.32</td>
+<td style="text-align: right;">94.0</td>
+<td style="text-align: right;">0.6845</td>
+<td style="text-align: right;">0.704</td>
+<td style="text-align: right;">1.42</td>
+<td style="text-align: right;">5876</td>
+<td style="text-align: right;">3.39e-05</td>
+<td style="text-align: right;">2.68</td>
+</tr>
+<tr>
+<td>E73</td>
+<td style="text-align: right;">304</td>
+<td style="text-align: right;">13.17</td>
+<td style="text-align: right;">65.5</td>
+<td style="text-align: right;">0.6835</td>
+<td style="text-align: right;">0.490</td>
+<td style="text-align: right;">2.04</td>
+<td style="text-align: right;">4086</td>
+<td style="text-align: right;">2.17e-05</td>
+<td style="text-align: right;">3.41</td>
+</tr>
+<tr>
+<td>E74</td>
+<td style="text-align: right;">304</td>
+<td style="text-align: right;">9.03</td>
+<td style="text-align: right;">44.8</td>
+<td style="text-align: right;">0.6834</td>
+<td style="text-align: right;">0.335</td>
+<td style="text-align: right;">2.99</td>
+<td style="text-align: right;">2794</td>
+<td style="text-align: right;">1.25e-05</td>
+<td style="text-align: right;">3.96</td>
+</tr>
+<tr>
+<td>E75</td>
+<td style="text-align: right;">304</td>
+<td style="text-align: right;">6.95</td>
+<td style="text-align: right;">34.9</td>
+<td style="text-align: right;">0.6838</td>
+<td style="text-align: right;">0.261</td>
+<td style="text-align: right;">3.83</td>
+<td style="text-align: right;">2179</td>
+<td style="text-align: right;">8.53e-06</td>
+<td style="text-align: right;">4.11</td>
+</tr>
+<tr>
+<td>E76</td>
+<td style="text-align: right;">304</td>
+<td style="text-align: right;">4.53</td>
+<td style="text-align: right;">23.3</td>
+<td style="text-align: right;">0.6846</td>
+<td style="text-align: right;">0.175</td>
+<td style="text-align: right;">5.71</td>
+<td style="text-align: right;">1460</td>
+<td style="text-align: right;">4.81e-06</td>
+<td style="text-align: right;">4.08</td>
+</tr>
+<tr>
+<td>E77</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">13.85</td>
+<td style="text-align: right;">78.8</td>
+<td style="text-align: right;">0.6889</td>
+<td style="text-align: right;">0.594</td>
+<td style="text-align: right;">1.68</td>
+<td style="text-align: right;">4956</td>
+<td style="text-align: right;">2.60e-05</td>
+<td style="text-align: right;">1.50</td>
+</tr>
+<tr>
+<td>E78</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">10.01</td>
+<td style="text-align: right;">55.5</td>
+<td style="text-align: right;">0.6876</td>
+<td style="text-align: right;">0.418</td>
+<td style="text-align: right;">2.39</td>
+<td style="text-align: right;">3486</td>
+<td style="text-align: right;">1.68e-05</td>
+<td style="text-align: right;">1.84</td>
+</tr>
+<tr>
+<td>E79</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">8.04</td>
+<td style="text-align: right;">44.4</td>
+<td style="text-align: right;">0.6875</td>
+<td style="text-align: right;">0.334</td>
+<td style="text-align: right;">2.99</td>
+<td style="text-align: right;">2788</td>
+<td style="text-align: right;">1.22e-05</td>
+<td style="text-align: right;">2.01</td>
+</tr>
+<tr>
+<td>E80</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">6.61</td>
+<td style="text-align: right;">36.5</td>
+<td style="text-align: right;">0.6874</td>
+<td style="text-align: right;">0.274</td>
+<td style="text-align: right;">3.64</td>
+<td style="text-align: right;">2289</td>
+<td style="text-align: right;">9.31e-06</td>
+<td style="text-align: right;">2.12</td>
+</tr>
+<tr>
+<td>E81</td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">4.53</td>
+<td style="text-align: right;">25.2</td>
+<td style="text-align: right;">0.6878</td>
+<td style="text-align: right;">0.190</td>
+<td style="text-align: right;">5.27</td>
+<td style="text-align: right;">1582</td>
+<td style="text-align: right;">5.54e-06</td>
+<td style="text-align: right;">2.23</td>
+</tr>
+</tbody>
+</table>
+<p>Source: <code>groups.csv</code>. Properties are evaluated as stated in section 3.1 of the manuscript.</p>
+<hr />
+<h2>S6 Delivered aperture irradiance: the two determinations in full</h2>
+<p>The aperture irradiance is determined two ways, and they disagree.</p>
+<p>The first is radiometric flux mapping, using the three-step characterization procedure established for this simulator [22,23]: an alumina-coated Lambertian target on a precision three-axis slider, a Gardon-type circular foil radiometer traversed across the focal region on a graded grid with NIST-traceable calibration and calorimetric correction for spectral mismatch, and a parallel high-dynamic-range CCD reconstruction whose grayscale-to-flux transfer fits a power law with a = 1117.5 W m⁻² and exponent 0.903. Gaussian fits to the resulting profiles validate the focal distribution with normalized RMSE of about 0.07 and 0.12 on the two axes [22]. Integrating the calibrated map over the receiver face gives nominal values of 456, 304 and 256 kW m⁻² for the three configurations.</p>
+<p>The second is an apparent steady energy closure, not model-free: it takes K_loss from the lumped identification of section 4.4 and omits storage by assuming the assembly is stationary at run end. Neither assumption is safe: insulation probe T2 rises monotonically as flow falls and run duration lengthens, from 308 to 356 K across the campaign, with decay far slower than any run window, so insulation is still charging when runs end, leaving a residual storage term of unknown sign. Nor need a K_loss from a cooling secant equal the steady loss under irradiation, since part of the path is radiative and insulation temperature differs between states. At steady state:</p>
+<p>$$f = \frac{Q_{\rm gas} + K_{\rm loss}(\bar T_w - T_{\rm amb})}{G_0 A_{\rm frt}}$$</p>
+<p>which should equal unity if the radiometric flux is correct. Evaluated at both ends of the identified K_loss bracket and averaged per configuration, it does not: f runs 0.989–1.134 at 456 kW m⁻², 1.149–1.324 at 304 and 0.784–0.916 at 256, giving closure estimates of 451–517, 349–402 and 201–234 kW m⁻², with reported spans 451–517, 304–402 and 201–256 kW m⁻².</p>
+<p>We report both estimates, with every power-normalized quantity spanning them. This is not a bounding interval: closure omits storage, inherits a lumped loss model, and carries T3 bias directly into Q_gas, so neither determination is an established bound and the disagreement cannot be assigned to one cause. Apparent efficiency on the nominal basis ranges 0.252–1.224, exceeding unity in the 304 kW m⁻² group.</p>
+<p>One contributor is geometric. The Gardon gauge reports flux over its 12.6 mm-radius exposed area [22], 499 mm² against the receiver's 361 mm² face, a ratio of 1.38. In a focused Gaussian spot the gauge averages a larger, more peripheral region than the receiver intercepts, under-reading the face flux: the face-to-gauge ratio for a centred Gaussian is 1.28, 1.17, 1.11 and 1.04 for 1/e² radii of 10, 14, 18 and 30 mm, bracketing the 1.13 required at 456 kW m⁻² and covering roughly half the 1.32 required at 304. This is structural to characterizing a 19 mm receiver with a 25 mm gauge, not execution error, but it does not explain 256 kW m⁻², where closure sits 8–16% below nominal and a broader spot pushes the factor toward unity, so aperture spillage dominates oppositely. Comparably, optical modelling of a directly irradiated reactor on the same simulator found only 1–6% of aperture-incident power reaching the catalytic bed [23]. Supplementary section S6 gives the gauge-averaging calculation and remaining instrument contributions.</p>
+<p>Outlet-probe bias alone cannot explain the discrepancy: the uniform T3 shift bringing closure to f = 1 is −75 K at 456 kW m⁻², −126 K at 304 and +75 K at 256 — sign-varying and varying 250 K within a configuration across flow, so no uniform correction reconciles the two determinations. A flow-dependent energy-budget term is required, without identifying which: bypass around the monolith periphery and flow maldistribution among channel groups are candidates consistent with section 4.2, but non-stationarity or flow-dependent probe response are not excluded. Convergence with section 5.2 is a consistency, not independent confirmation.</p>
+<p>No temperature-based result depends on this choice: effectiveness, transfer units, the Nusselt correlation, the inversion criterion, disequilibrium indices, eigenvalue identification and similarity collapse are all ratios of measured temperatures and flows. Only efficiency and delivered-power-per-unit-mass figures shift, reported as spans rather than intervals containing the true value.</p>
+<p>Source: <code>results.json</code>, key <code>delivered_power</code>; <code>flux_geometry.json</code> for the gauge-averaging calculation.</p>
+<hr />
+<h2>S7 What a flow-dependent split requires: three destabilising agents</h2>
+<p>That prescription has been carried out elsewhere, which makes the recommendation concrete rather than aspirational. Nagarajan, Ström and Sjöblom build a reduced-order pseudochannel model of a catalytic converter precisely because single-channel models cannot predict accurately under flow maldistribution in realistic geometries [35] — the remedy being a few representative channels carrying different flows rather than one channel with a better closure. The same group whose channel-scale Nusselt work anchors section 4.2 has developed flow-distribution models for dual-cell-density monoliths [36] and dual-zone packed beds [43]. Within the solar field the step has been taken at panel and module scale: Schwager and co-workers resolve the mass-flow distribution among the parallel tubes of a molten-salt receiver panel under flux gradients [37], and the multi-zone unsteady model of Kumar and co-workers resolves exchange between absorbers, casing and return air rather than treating the receiver as one stream [34].</p>
+<p>Those two flow-distribution studies do more than set a precedent: they identify what a flow-dependent split requires. Reinao and Cornejo model a dual-cell-density monolith as two concentric regions of differing apparent permeability with a Darcy momentum sink, isothermal, and find the flow fraction through each region depends only on relative permeability and core size, not on flow rate, across several flow rates [36]. That invariance is exact: when every parallel path has a resistance linear in velocity and shares one viscosity, flow rate cancels from the equal-pressure-drop condition. Díaz and co-workers repeat the exercise for a dual-zone packed bed, where the Ergun equation adds an inertial term, and there the split does depend on Reynolds number — strongly sensitive to the resistance contrast at low Re where the viscous term dominates, converging as inertia takes over [43]. A split that changes with flow rate therefore cannot arise in parallel linear-viscous paths of common viscosity; it requires an inertial contribution or a path-to-path viscosity difference. This receiver's participation does change with flow, as Re_nom^+0.341, and both admissible causes are present: the heated absorber carries a non-uniform viscosity field [9], and the viscous-to-inertial transition is the same axis as the linear-versus-quadratic stability criterion of section 4.7 [27,28]. The direction matches too, the packed-bed split growing more uniform as flow rises.</p>
+<p>A third agent gives the same structure. In Schwager's molten-salt panels the destabilizing force is buoyancy rather than inertia or viscosity — hotter, less dense salt gains flow in an upward-flowing panel but loses it in a downward-flowing one, where the effect is self-reinforcing and can drive tubes to zero flow — and what arrests it is friction, so reducing overall flow intensifies the maldistribution: below 20% of nominal flow mild flux spreads suffice to trigger reversal, and at 10% no spread is needed [37]. That mechanism is not this receiver's, but in all three cases a driving force for maldistribution competes with a frictional resistance whose relative weight grows with flow, so the split is most differentiated at low flow and most uniform at high flow. The flow-rate dependence of participation is therefore a general property of heated parallel-path arrays rather than an artefact of one geometry.</p>
+<hr />
+<h2>S8 Pressure drop as installed</h2>
+<p>Steady-window means of the differential pressure channel compare poorly with the laminar square-duct prediction, computed with a Poiseuille number of 56.91, all metered flow through 100 channels, and properties at T̄_g. The measured signal exceeds the monolith-only prediction by 1.4 to 2.8 times at high flow (2.74 against 0.99 mbar at 15.3 sL min⁻¹), falls below it at low flow, and goes negative at the lowest flow (−0.02 against 0.20 mbar at 4.5 sL min⁻¹) — the signature of a zero offset on a transducer whose ±0.2 mbar accuracy floor, 0.1% of its ±200 mbar span, is the same order as the entire expected monolith drop of 0.20 to 1.0 mbar. The taps evidently span more than the monolith faces, and the second differential channel reads a flat −0.26 to −0.30 mbar in every run and appears unconnected.</p>
+<p>This matters because pressure drop is how the volumetric-receiver literature diagnoses honeycomb flow behaviour: absorbers with linear velocity dependence tend inherently towards flow instability [27]; high-thermal-conductivity materials with a quadratic characteristic are stable [28]; instability becomes possible when one pressure-drop level maps to more than one outlet temperature, letting a region drift and fail if temperature exceeds material limits [26]. Ávila-Marín's review extends this to honeycombs, identifying a critical flux above which highly porous honeycombs become unstable while wire meshes and low-porosity foams stay stable via their quadratic characteristic [1]; permeability and Forchheimer coefficients from pressure-drop data feed homogeneous equivalent models [13]. Recent unheated monolith measurements show a linear Re–pressure-drop relationship throughout, with progressive underestimation as Re rises through entrance/exit effects [45], large enough at channel Re 50–320 to need a spacing-dependent correction factor increased by misalignment [44]. Our isothermal honeycomb sits on the instability-prone, linear side, but our transducer, spanning monolith plus plumbing, cannot separate the absorber's characteristic from comparable entrance, exit and fitting losses. We report this because the fix is inexpensive, and section 5.3 shows this measurement would discriminate between the two candidate mechanisms above.</p>
+<p>Source: <code>pressure_drop.csv</code>, which carries the per-run measured differential pressure on both channels alongside the laminar square-duct prediction.</p>
+<hr />
+<h2>Reproduction</h2>
+<p>Two commands regenerate every table, scalar and figure in the manuscript and in this document from the raw logger files: <code>python receiver_reduction.py</code> writes the archived outputs, and <code>python make_figures.py</code> draws Figures 2 to 6 from them. Both are seeded and deterministic. Figure 1 is a schematic of the apparatus and sensor positions, drawn rather than computed, and is the only figure not produced by the pipeline. The accompanying <code>README_reproduction.md</code> documents the runtime, the seeds, what each archived file supports, and the nominal and apparent conventions a reader needs before using any number.</p>
+<h2>References</h2>
+<p>References are numbered as in the manuscript.</p>
+</body></html>

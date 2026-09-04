@@ -760,11 +760,16 @@ def wall_extrapolation_sensitivity(dg):
 def write_tables(rep, dg, mc, P):
     m = mc.set_index("quantity")
     g = lambda k, c="value": float(m.loc[k, c])
-    T1 = ["| Run | $G_0$ | $q$ | $Re_{\\rm nom}$ | $Gz_L$ | $\\bar T_w$ | $T_3$ | $\\varepsilon$ "
-          "| $NTU_{\\rm app}$ | $N_{\\rm prof}$ | $Nu_{\\rm app}$ | $\\Lambda_{58}$ | $\\Lambda_{107}$ "
-          "| $T_{12}-T_8$ | $\\eta_{\\rm nom}$ |",
-          "| | kW m$^{-2}$ | sL min$^{-1}$ | \u2013 | \u2013 | K | K | \u2013 | \u2013 | \u2013 | \u2013 | \u2013 | \u2013 | K | \u2013 |",
-          "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
+    # units are carried in the header cells rather than on a second header row:
+    # a table may have only ONE header line before the delimiter row, and the
+    # delimiter must have exactly as many cells as the header (2026-09-04).
+    _t1cols = ["Run", "$G_0$ [kW m$^{-2}$]", "$q$ [sL min$^{-1}$]", "$Re_{\\rm nom}$",
+               "$Gz_L$", "$\\bar T_w$ [K]", "$T_3$ [K]", "$\\varepsilon$",
+               "$NTU_{\\rm app}$", "$N_{\\rm prof}$", "$Nu_{\\rm app}$",
+               "$\\Lambda_{58}$", "$\\Lambda_{107}$", "$T_{12}-T_8$ [K]",
+               "$\\eta_{\\rm nom}$"]
+    T1 = ["| " + " | ".join(_t1cols) + " |",
+          "|" + "|".join(["---"] + ["---:"] * (len(_t1cols) - 1)) + "|"]
     npf = rep["ntu_profile"]["NTU_corr"]
     for (_, r), nv in zip(dg.sort_values(["Io_kWm2", "q_slpm"]).iterrows(),
                           [npf[i] for i in dg.sort_values(["Io_kWm2", "q_slpm"]).index]):
@@ -861,9 +866,11 @@ def write_supplementary_tables(rep, dg, P):
         v = we[k]
         e = v.get("exponent")
         lab = k.replace("_", " / ").replace("const", "constant")
-        T.append(f"| {lab} | {'—' if e is None else f'{e:+.4f}'} | "
-                 f"{'—' if v.get('stderr') is None else f'{v[chr(115)+chr(116)+chr(101)+chr(114)+chr(114)]:.4f}'} | "
-                 f"{v['n']} | {', '.join(v.get('infeasible') or []) or 'none'} |")
+        se = v.get("stderr")
+        e_txt = "—" if e is None else format(e, "+.4f")
+        se_txt = "—" if se is None else format(se, ".4f")
+        inf_txt = ", ".join(v.get("infeasible") or []) or "none"
+        T.append(f"| {lab} | {e_txt} | {se_txt} | {v['n']} | {inf_txt} |")
     fp = rep["fixed_profile_test"]
     T += ["", "| Family | nodes | RMS residual [K] | max abs [K] | "
               "$r$ vs $\\ln Re$ | slope [K per e-fold] |",
