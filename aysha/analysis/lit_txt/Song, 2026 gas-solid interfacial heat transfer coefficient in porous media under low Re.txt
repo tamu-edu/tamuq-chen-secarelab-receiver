@@ -1,0 +1,632 @@
+Technical Note
+Data integrity resolving gas-solid interfacial heat transfer coefficient in 
+porous media under low Reynolds number
+Zeyang Song a,*
+, Jian Wang a
+, Shaotang Hui a,b
+, Renkun Dai a
+a College of Safety Science and Engineering, Xi’an University of Science and Technology, Xi’an 710054, Shaanxi, China b China Energy Engineering Group Tianjin Electric Power Design Institute Co. Ltd., Tianjin 300171, China
+ARTICLE INFO
+Keywords:
+Local thermal nonequilibrium
+Data integrity
+Inverse computation
+Nusselt number
+ABSTRACT
+Inverse computation of gas-solid interfacial heat transfer coefficient (hsg) in porous media has remained a 
+challenging issue. This work proposes a method using data integrity of both solid (Ts) and gas (Tg) temperatures 
+in porous media to resolve this issue. The data integrity is accomplished by simultaneous measurement of Ts and 
+Tg developed in our previous work. hsg is approximately solved by the discretized gas energy conservation 
+equation in a central difference scheme implemented with data integrity of Ts and Tg. This solution takes ad￾vantages in reducing both computation cost and numerical uncertainty since only one unknown parameter is 
+directly calculated from one equation. An empirical correlation of Nu = 0.001(Re1.66Pr1/3) (R2 = 0.93) is 
+established for low-Re gas flow in porous media (5 mm ≤ dp ≤ 15 mm and 13 ≤ Re ≤ 133) based on in total 54 
+studied cases considering four variables of Darcy flux, particle size, porous medium, and heating temperature. 
+The proposed method is validated by the consistent Nu correlations in the literature. This work gives a new 
+perspective of data integrity to resolve the challenging inverse models for heat transfer in porous media.
+1. Introduction
+Gas-solid heat transfer in porous media under low Reynolds (Re) 
+number (≤ O(102
+)) conditions is an important transport phenomenon 
+across energy, environmental and chemical engineering applications 
+[1–3]. Gas flow in porous media under low-Re conditions exhibits a 
+viscosity-dominated regime, in which the flow boundary layer could be 
+significant thickened [4]. In this regime, the convective heat transfer 
+reduces due to small flow velocities, while the conductive heat transfer 
+becomes relatively more significant, particularly in the gas phase, which 
+dominates the overall thermal resistance. The low thermal conductivity 
+of gas phase leads to slower thermal response compared to the solid 
+phase, resulting in temperature gradients at the gas-solid interface. This 
+phenomenon renders the local thermal non-equilibrium (LTNE) model 
+more suitable to describe the heat transfer behavior than the local 
+thermal equilibrium (LTE) model [5,6]. For instance, experimental ob￾servations by Zheng et al. [7] and Song et al. [8] confirmed the LTNE 
+mechanism for porous methane combustion and biomass combustion 
+due to the significant differences between gas temperatures (Tg) and 
+solid temperatures (Ts). Zanoni et al. [9] demonstrated that the LTNE 
+model was essential for the accurate prediction of low-Re smoldering 
+combustion inside porous media. In the LTNE model, the gas-solid 
+interfacial heat transfer coefficient (hsg) is a critical parameter 
+coupling the gas-and-solid energy conservation equations, as shown in 
+Eqs. (1) and (2). 
+ε
+(
+ρgCpg) ∂Tg
+∂t
++ ρgCpgug
+∂Tg
+∂x = ε ∂
+∂x
+(
+kg
+∂Tg
+∂x
+)
++ hsg(As,sp
+Vsp )(
+Ts − Tg
+) (1) 
+(1 − ε)
+(
+ρsCps) ∂Ts
+∂t = (1 − ε) ∂
+∂x
+(
+(ks + krad)
+∂Ts
+∂x
+)
+− U
+(As,c
+Vc
+)
+(Ts − T∞)
++ hsg(As,sp
+Vsp )(
+Tg − Ts
+) (2) 
+An empirical correlation proposed by Wakao et al. [10] (Nu = 2+1.1 
+(Re0.6Pr1/3), 15 ≤ Re ≤ 8500) has be often employed to estimate hsg in 
+porous media. However, it has been revealed that this correlation would 
+tend to overestimate hsg under low-Re condition (Re ≤ O(102
+)) [11–14]. 
+Pioneering work has been undertaken to estimate hsg for porous media 
+[13–21]. Empirical correlations for Nusselt (Nu) number with respect to 
+Re and Pr numbers are summarized in Table 1.
+Since experimental temperature data inside porous media was not 
+integrity and only Ts was available, there were two unknown variables, 
+i.e. hsg and Tg and then two energy conservation equations i.e. the LTNE 
+* Corresponding author.
+E-mail address: zeyang.song@xust.edu.cn (Z. Song). 
+Contents lists available at ScienceDirect
+International Journal of Heat and Mass Transfer
+journal homepage: www.elsevier.com/locate/ijhmt
+https://doi.org/10.1016/j.ijheatmasstransfer.2025.127803
+Received 19 May 2025; Received in revised form 18 August 2025; Accepted 2 September 2025 
+International Journal of Heat and Mass Transfer 255 (2026) 127803
+Available online 9 September 2025
+0017-9310/© 2025 Elsevier Ltd. All rights are reserved, including those for text and data mining, AI training, and similar technologies.
+
+model shown in Eqs. (1) and (2) had to be solved. It is an ill-posed 
+problem for solving hsg from the LTNE model and no analytical solu￾tion exists. The sole solution in the literature as shown in Table 1, was to 
+develop the inverse computation algorithms for optimizing hsg while the 
+differences between experimental and numerical temperatures were 
+minimized [7,13–16,18–21], in which the most typical approach was 
+called a ‘transient single-blow technique’ [13,18,19,22,23]. This tech￾nique measured Ts inside porous media and inlet and outlet ambient 
+temperature (Ta) of porous media, and then hsg was optimized by 
+minimizing the experimental and numerical outlet Ta. However, the 
+radial heat loss for the transient single-blow technique was ignored. It 
+was a critical issue that could lead to a considerable error to the estimate 
+of hsg because the radial heat loss was remarkable as elucidated in recent 
+work [24–26]. This critical issue has been recently addressed by Zanoni 
+et al. [15], in which the radial heat loss was incorporated in the solid 
+energy conservation equation (i.e. U in Eq. (2)) and estimated by the 
+global energy balance.
+There are two critical issues faced by the inverse computation for hsg: 
+(i) high computation cost and (ii) numerical uncertainty resulting from 
+both numerical computation of the governing equations and inverse 
+optimization. These issues are mainly caused by the inaccessible integ￾rity data of both Ts and Tg inside porous media. Supposing data is 
+integrity and both Ts and Tg can be accessible from experiments, then hsg 
+becomes the sole unknown parameter and it could be analytically solved 
+from only one energy conservation equation. Thus, the data integrity 
+could be a novel solution to determine hsg and very promising to address 
+these issues by reducing the computation cost and numerical 
+uncertainty.
+This work aims to resolve hsg under low-Re conditions (13 ≤ Re ≤
+133) using the data integrity of both Ts and Tg measured by our newly 
+developed experimental measuring technique [8]. The experimental 
+setup for simultaneous measurement of Ts and Tg is firstly introduced. 
+Four variables including Darcy flux (volume per unit cross sectional area 
+per unit time [15], also named the filtration velocity), particle size, 
+porous medium and heating temperature are considered in experiments. 
+With the data integrity of both Ts and Tg available from experiments, hsg 
+is directly solved from the gas energy conservation equation and 
+approximated with the central difference scheme. An empirical corre￾lation of Nu with respect to Re and Pr is established based on 54 studied 
+cases. Sensitivity analysis for the analytical solution of hsg with the data 
+integrity is conducted. Comparisons to other empirical correlations in 
+the literature and limitations of this study are discussed. This work de￾velops a promising approach from a new perspective of data integrity to 
+resolve the challenges faced by the inverse computation for hsg in porous 
+media.
+2. Methodology
+2.1. Experiment setup
+The schematic diagram of the experimental setup was depicted in 
+Fig. 1. The geometric parameter of the reactor was with the radius of 12 
+cm and the height of 60 cm. The air supply system delivered constant￾pressure gas via an air compressor, with flow rates controlled through 
+the mass flow controller (MFC-700, DESIGN TECH, China). A 3 cm layer 
+of coarse rock particles was placed at the bottom to ensure uniform gas 
+flow. A heating coil was placed at the bottom of reactor to heat porous 
+media to a programmed temperature. Two sets of K-type TCs were 
+inserted with 2.6 cm intervals into the central axis of the reactor. TC data 
+was recorded by a data acquisition instrument (U2331, KEYSIGHT 
+TECHNOLOGIES, USA) with a 4 second time resolution. As can be seen 
+in Fig. 1, the coated TCs at the left-hand side of the reactor were used to 
+measure Ts at the central axis of the reactor, whereas the coated TCs 
+embedded inside porous tubes at the opposite side were employed to 
+measure Tg at the central axis of the reactor. A hollowed space inside a 
+porous tube was created for measuring Tg. To alleviate the perturbance 
+induced by invasive measurement, the hollowed porous tube mimicked 
+the porous property of porous media in the reactor through peripherally 
+opening several holes in the tube (see Fig. 1), which allowed gas flow 
+through the tube and meanwhile controlled the porosity of the tube 
+Nomenclatures
+Latin Letters
+Cp specific heat capacity, J kg− 1 K− 1
+d particle size, mm
+hsg gas-solid interfacial heat transfer coefficient, W m− 2 K− 1
+k thermal conductivity, W m− 1 K− 1
+krad radiative thermal conductivity, W m− 1 K− 1
+NRMSD Normalized Root Mean Square Deviation, -
+t time, h
+T temperature, K
+u Darcy flux, m s
+− 1
+U global energy loss coefficient, W m− 2 K− 1
+V volume, m3
+x axial height, m
+Greek Symbols
+ε porosity
+ρ density, kg m− 3
+Δ increment
+Subscripts
+a ambient
+c composite
+g gas phase
+i time
+j space
+s solid phase
+p particle
+∞ environment
+Table 1 
+Summary of Nu empirical correlations for porous media under Re ≤ O(102
+) conditions.
+Nu correlations Re Porous medium Porosity Data Method Ref.
+Nu = 0.001Re1.97Pr1/3 0.5-31 Quartz sand 0.36-0.39 Ts Inverse computation [15]
+Nu = 0.004Re1.35Pr1/3 0.5-10 Powder metal 0.054 Ts, Ta Inverse computation [27]
+Nu = 0.025Re0.97Pr1/3 20-200 Powder metal 0.26-0.653 Ts, Ta Inverse computation [27]
+Nu = 0.048Re0.7Pr1/3 20-100 Granular potash - Ts, Ta Inverse computation [28]
+Nu = 0.057Re0.96Pr1/3 20-500 Low carbon steel 0.23-0.39 Ta Inverse computation [29]
+Nu = 2.74+3.08Re0.2Pr1/3 17-57 Metal 0.32 Ts, Ta Approximate solution [30]
+Nu = 0.049Re0.857Pr1/3 5-280 Spherical glass 0.58-0.67 Ts, Ta Approximate solution [17]
+Nu = 0.001Re1.66Pr1/3 13-133 Stainless steel and Quartz sand 0.41-0.49 Ts, Tg Approximate solution This work
+Z. Song et al. International Journal of Heat and Mass Transfer 255 (2026) 127803
+2
+
+approximate to that of porous media in the reactor. Details in terms of 
+simultaneous measurement of its uncertainty can be found in [8].
+Four variables, including the porous media (quartz sand and stainless 
+steel), particle size (5, 10 and 15 mm), Darcy flux (1.47, 2.95 and 5.89 
+cm⋅s
+− 1
+) and heating temperature (300, 400 and 500◦C), were consid￾ered in the experiments. Therefore, 54 tests in total were conducted in 
+this study, as listed in Table 2. Each experiment was conducted at least 
+twice to verify experimental repeatability.
+2.2. Approximate solution
+Since both Ts and Tg were obtained, the hsg became the only un￾known parameter in the energy conservation equations. Consequently, 
+hsg can be directly solved using just one energy conservation equation. In 
+this study, the gas phase energy conservation equation shown in Eq. (2)
+was considered, as it included ug, enabling comprehensive evaluation of 
+the hsg, and excluded the extra parameter U in Eq. (1) reducing 
+uncertainty.
+The gas energy conservation equation was discretized using the 
+central difference scheme. It was assumed that solid particles were 
+spherical, and their surface area per unit volume was 6(1-ε)/dp [31]. 
+Then, hsg was approximately solved as follows. 
+hsg =
+(
+ερgCpg
+Tg(x, t + Δt) − Tg (x, t)
+Δt
++ ρgCpgug
+Tg (x + Δx, t) − Tg (x, t)
+Δx
+− εkg
+Tg (x + Δx, t) − 2Tg (x, t) + Tg (x − Δx, t)
+Δx2
+) dp
+6(1 − ε)
+(
+Ts(x, t) − Tg (x, t)
+)
+(3) 
+where Δx = 2.6 cm denoting the vertical interval between adjacent 
+thermocouple pairs as shown in Fig. 1, and Δt = 4 s that was the data 
+acquisition resolution of the thermocouples.
+2.3. Mean value calculation
+The gas-solid interfacial heat transfer coefficient, hsg, was a param￾eter varying with heat transfer process. As can be seen from Eq. (3), it 
+varied with time and in space. Harmonic mean was a type of numerical 
+average that was usually used in situations when the average rate or rate 
+of change needed to be calculated. It was usually used to find the 
+average of rates as it assigned equal weight to all data points in a sample. 
+hsg can be considered as a rate-type parameter since [W] = [J s
+− 1
+]. Thus, 
+the harmonic mean as shown in Eq. (4) was calculated to represent the 
+characteristic value for establishing the empirical correlation of Nu. 
+hsg = N
+∑N
+i=1
+1
+hsg,i
+(4) 
+2.4. Local sensitivity analysis
+It was reported in our previous work that the measurement of Tg was 
+the key uncertainty for the determination of hsg [8]. The sensitivity of hsg 
+with regarding to Tg measurement uncertainty was calculated by the 
+following logarithmic sensitivity coefficient. 
+S =
+⃒
+⃒
+⃒
+⃒
+⃒
+⃒
+⃒
+⃒
+⃒
+M
+∑− 2
+j=1
+∑N
+i=1
+(
+loghʹ
+sg,ij − loghexp
+sg,ij)
+∑M
+j=1
+∑N
+i=1
+(
+logTʹ
+g,ij − logTexp
+g,ij )
+⃒
+⃒
+⃒
+⃒
+⃒
+⃒
+⃒
+⃒
+⃒
+(5) 
+Fig. 1. Schematic diagram of experimental setup.
+Table 2 
+Summaries of studied cases and approximate solution of hsg.
+dp/ 
+mm
+ug/ 
+cm⋅s
+− 1
+Heating 
+temperature/℃
+Quartz sand 304 stainless 
+steel
+hsg 
+/W⋅m− 2⋅
+K− 1
+hsg /W⋅m− 2⋅
+K− 1
+5 1.47 300 0.030 
+0.032 
+0.019 
+0.527 
+0.265 
+0.274 
+2.013 
+1.968 
+2.524 
+0.240 
+0.015 
+0.054 
+0.830 
+0.437 
+0.301 
+6.304 
+6.177 
+4.169 
+0.127 
+0.397 
+0.378 
+1.452 
+1.797 
+1.574 
+5.683 
+6.480 
+5.266
+0.029 
+0.110 
+0.089 
+0.232 
+0.130 
+0.213 
+2.794 
+1.943 
+1.481 
+0.278 
+0.266 
+0.128 
+0.632 
+1.068 
+0.717 
+3.493 
+5.734 
+4.823 
+0.848 
+0.793 
+0.703 
+1.122 
+0.373 
+0.653 
+6.058 
+5.689 
+5.714
+400
+500
+2.95 300
+400
+500
+5.89 300
+400
+500
+10 1.47 300
+400
+500
+2.95 300
+400
+500
+5.89 300
+400
+500
+15 1.47 300
+400
+500
+2.95 300
+400
+500
+5.89 300
+400
+500
+Z. Song et al. International Journal of Heat and Mass Transfer 255 (2026) 127803
+3
+
+where the superscript ’ standed for the terms with uncertainty, and the 
+subscripts i and j denoted time and space, respectively. The uncertainty 
+of Tg measurement was quantified with NRMSD as illustrated in our 
+previous work [8]. Both quartz sand and stainless steel studied porous 
+media were considered and their NRMSD varied 1.56% - 1.69% and 
+1.28% - 2.32%, respectively. The plots of Tg history data with mea￾surement uncertainty comparing to experimental data were presented in 
+Fig. 2.
+3. Results and discussion
+The harmonic mean hsg under varied experimental conditions are 
+obtained as shown in Table 2. The Nu number of the convective heat 
+transfer inside the porous media is obtained by Eq. (6) in the following 
+with hsg listed in Table 2. 
+Nu = hsgdp
+kg
+(6) 
+Reynolds number (Re = ρgugdp/εμg) and Prandtl number (Pr = μgCpg/ 
+kg) are calculated for all studied cases with kg = 0.028 W m− 1 K− 1
+, ρg =
+1.29 kg m− 3
+, μg =1.75×10− 5 kg m− 1 s
+− 1
+, Cpg = 1050 J kg− 1 K− 1
+, and ε =
+0.41 - 0.49 depending on particle size [8]. Then, the 
+Levenberg-Marquardt (LM) algorithm is used to establish an empirical 
+correlation of Nu with respect to Re and Pr, as shown in Eq. (7). 
+Nu = 0.001Re1.66Pr1/3 (
+R2 = 0.93) (7) 
+Figure 3 compares the correlation in this work to three Nu empirical 
+correlations by Zanoni et al. [15], Nie et al. [16], and Wakao et al. [10]. 
+Other Nu empirical correlations under low-Re condition (Re ≤ 102
+) are 
+summarized in Table 1. The magnitude of Nu resolved by data integrity 
+of Ts and Tg in this work is close to Nie et al. [17] and Zanoni et al. [11], 
+which is much lower than that extrapolated by Wakao et al. [8]. It 
+confirms the research findings in [7,11] that the gas-solid interfacial 
+heat transfer mechanism changes significantly and local thermal 
+nonequilibrium would emerge while Re decreases to below 100. Com￾parisons of Nu empirical correlations shown in Fig. 3 indicates that the 
+correlation established in this work is in in line with previous work such 
+as Nie et al. [17] and Zanoni et al. [11]. It demonstrates the proposed 
+approach with the data integrity of both Ts and Tg owns a good capa￾bility for the determination of hsg. Furthermore, taking advantages of the 
+analytical solution of hsg from the gas energy conservation equation, this 
+approach is more efficient by saving enormous numerical computations 
+and inverse optimizations. Besides, the proposed approach avoids the 
+inverse computation errors because it does not involve any numerical 
+computations and inverse optimizations.
+The approximate solution of hsg in this work is slightly smaller (O 
+(10− 1
+)) than the approximate solution of hsg in [17] and inverse 
+computation for hsg with the radial heat loss in [15]. Such slight diverges 
+could be attributed to measurement noises of Tg in this work, especially 
+for quartz sand [8], and also associated with errors of approximate so￾lution in [17] and inverse computation in [15]. For instance, in [17], 
+only one solid energy conservation equation was solved for hsg, in which 
+the other unknown variable Tg inside porous media was replaced by the 
+ambient temperature (Ta). Nevertheless, the Nu empirical correlation in 
+this work extrapolated towards larger Re number and lower Re number 
+could merge with the correlations by Nie et al. [17] and Zanoni et al. 
+[15]. Note that the Darcy flux in practice such as the filtration com￾bustion could be high to ~ 0.24 m s
+− 1 [15,16]. The main reason for the 
+small velocities was attributed to the comparisons with the previous 
+work [15,17] validating the proposed approach in this work. The 
+applicability of the established correlation in this work extending to 
+larger Darcy flux will be examined in the future.
+The proposed approach is mainly limited by two uncertainties: 
+experimental uncertainty and numerical uncertainty. As for the exper￾imental uncertainty, Fig. 4 shows the sensitivity of hsg to the Tg mea￾surement uncertainty. The Tg measurement error resulting from the 
+porous tubes could lead to significant bias of the estimate of hsg. It in￾dicates that attention must be paid to reduce the Tg measurement error, 
+for instance, optimizing experimental operations and improving 
+Fig. 2. Plots of Tg history data with measurement uncertainty comparing to experimental data (a) stainless steel, and (b) quartz sand.
+Fig. 3. Comparisons of Nu empirical correlation in this work with Zanoni et al. 
+[15], Nie et al. [17], and Wakao et al. [10].
+Z. Song et al. International Journal of Heat and Mass Transfer 255 (2026) 127803
+4
+
+measuring techniques for Tg. hsg is more sensitive to quartz sand than 
+stainless steel. This could be mainly attributed to the thermal hetero￾geneity among the porous stainless-steel tubes and quartz sand medium 
+[8]. It suggests that the confidence of hsg solved by Eq. (3) for quartz 
+sand could be lower than stainless steel. hsg for quartz sand could bring 
+more noise to the established Nu empirical correlation.
+The numerical uncertainty is associated with the discretization errors 
+of the central difference scheme, which depends on the measuring in￾tervals at the central axis of reactor. It is expected that a finer interval in 
+experiments could decrease the discretization errors. Besides, the dis￾cretization issue could be solved by mesh-free numerical algorithms, 
+such as physics-informed neural networks (PINNs) [32] that incorporate 
+fundamental physical principles as soft constraints in model training, 
+thereby ensuring that all solutions rigorously adhere to the underlying 
+governing equations. The advantage of PINNs over the finite difference 
+methods lies in the mesh free, which does not require a predefined grid, 
+potentially providing a continuous solution field even with sparse or 
+irregularly spaced data points. Then, the numerical uncertainty associ￾ated with the discretization errors of the central difference scheme could 
+be avoided. This hybrid data-physics framework demonstrates superior 
+capability in characterizing complex heat transfer phenomena [33], 
+which might be helpful toeleminate the numerical uncertainty of the 
+proposed method using data integrity to resolve hsg in the future.
+4. Conclusions
+Data integrity achieved by simultaneous measurements of Ts and Tg 
+in porous media is implemented in a discretized gas energy conservation 
+equation to approximately solve hsg in porous media for 5 mm ≤ dp ≤ 15 
+mm and 13 ≤ Re ≤ 133. This solution takes advantages in simplifying 
+computation with only one equation instead of two energy conservation 
+equations, and reducing uncertainty with direct heat-transfer informa￾tion from local Ts and Tg data rather than deduction of hsg only from Ts 
+data. An empirical correlation of Nu = 0.001(Re1.66Pr1/3) is derived, 
+which is in accordance with other correlations developed in the litera￾ture. It demonstrates that the data integrity provides a new perspective 
+to resolve challenges in the inverse models of heat transfer in porous 
+media.
+CRediT authorship contribution statement
+Zeyang Song: Writing – review & editing, Writing – original draft, 
+Supervision, Project administration, Methodology, Funding acquisition, 
+Formal analysis, Conceptualization. Jian Wang: Writing – original 
+draft, Investigation, Formal analysis. Shaotang Hui: Methodology, 
+Investigation, Formal analysis, Data curation. Renkun Dai: Writing – 
+review & editing, Formal analysis.
+Declaration of competing interest
+The authors declare that they have no known competing financial 
+interests or personal relationships that could have appeared to influence 
+the work reported in this paper.
+Acknowledgments
+This work was funded by National Natural Science Foundation of 
+China (No. 52474247), the Youth Talent Program of Shaan’xi Province, 
+Natural Science Foundation of Shaan’xi Province (No. 2023-JC-YB-432 
+and No. 2024JC-YBQN-0422), Shaanxi Postdoctoral Foundation (No. 
+2023BSHYDZZ155), and Key Research and Development Plan of Xin￾jiang Uygur Autonomous Region (No. 2022B03025-2 and No. 
+2022B03031-1). Authors appreciate Dr. Marco A.B. Zanoni from Cana￾dian Nuclear Laboratories and Dr. Minggang Luo from Institut d’Optique 
+Graduate School Talence in France for their valuable comments.
+Data availability
+Data will be made available on request.
+References
+[1] J.L. Torero, J.I. Gerhard, M.F. Martins, M.A.B. Zanoni, T.L. Rashwan, J.K. Brown, 
+Processes defining smouldering combustion: integrated review and synthesis, Prog. 
+Energ. Combust. 81 (2020) 100869.
+[2] H. Wang, Convective heat transfer characteristics of LiNO3–NH3 solution with low 
+re in a chevron plate solution cooler, Appl. Therm. Eng. 89 (2015) 291–298.
+[3] J. Fu, S. Zhang, L. Ji, X. Xu, W. Jiao, T. Chen, X. Li, M. Zhan, State of the art in self￾sustaining smoldering for remediation of contaminated soil and disposal of organic 
+waste, J. Hazard. Mater. 474 (2024) 134667.
+[4] G.S. Shashi Prabha, M.C. Bharathi, R.B. Kudenatti, Heat transfer through mixed 
+convection boundary layer in a porous medium: LTNE analysis, Appl. Therm. Eng. 
+179 (2020) 115705.
+[5] S. Pati, A. Borah, M.P. Boruah, P.R. Randive, Critical review on local thermal 
+equilibrium and local thermal non-equilibrium approaches for the analysis of 
+forced convective flow through porous media, Int. Commun. Heat Mass 132 (2022) 
+105889.
+[6] W. Lin, G. Xie, J. Yuan, B. Sund´en, Comparison and analysis of heat transfer in 
+aluminum foam using local thermal equilibrium or nonequilibrium model, Heat 
+Transf. Eng. 37 (3-4) (2016) 314–322.
+[7] C. Zheng, L. Cheng, A. Saveliev, Z. Luo, K. Cen, Gas and solid phase temperature 
+measurements of porous media combustion, P. Combust. Inst. 33 (2) (2011) 
+3301–3308.
+[8] Z. Song, J. Wang, S. Hui, M. Luo, B. Dang, R. Dai, Simultaneous measurement of 
+gas and solid temperatures in porous media, Int. J. Heat Mass Transf. 229 (2024) 
+125767.
+[9] M.A.B. Zanoni, J.L. Torero, J.I. Gerhard, The role of local thermal non-equilibrium 
+in modelling smouldering combustion of organic liquids, P. Combust. Inst. 37 (3) 
+(2019) 3109–3117.
+[10] N. Wakao, S. Kaguei, T. Funazkri, Effect of fluid dispersion coefficients on particle￾to-fluid heat transfer coefficients in packed beds: correlation of nusselt numbers, 
+Chem. Eng. Sci. 34 (3) (1979) 325–336.
+[11] T.L. Rashwan, J.I. Gerhard, G.P. Grant, Application of self-sustaining smouldering 
+combustion for the destruction of wastewater biosolids, Waste Manage. 50 (2016) 
+201–212.
+[12] M.F. Martins, S. Salvador, J.F. Thovert, G. Debenest, Co-current combustion of oil 
+shale – Part 2: structure of the combustion front, Fuel 89 (1) (2010) 133–143.
+[13] J. Yang, J. Wang, S. Bu, M. Zeng, Q. Wang, A. Nakayama, Experimental analysis of 
+forced convective heat transfer in novel structured packed beds of particles, Chem. 
+Eng. Sci. 71 (2012) 126–137.
+[14] J. Feng, H. Dong, J. Gao, J. Liu, K. Liang, Experimental study of gas–solid overall 
+heat transfer coefficient in vertical tank for sinter waste heat recovery, Appl. 
+Therm. Eng. 95 (2016) 136–142.
+[15] M.A.B. Zanoni, J.L. Torero, J.I. Gerhard, Determination of the interfacial heat 
+transfer coefficient between forced air and sand at Reynold’s numbers relevant to 
+smouldering combustion, Int. J. Heat Mass Transf. 114 (2017) 90–104.
+[16] X.D. Nie, R.W. Besant, R.W. Evitts, Heat transfer between gas-solid phases within 
+packed particle beds, Particul. Sci. Technol. 29 (2) (2011) 151–162.
+[17] X. Nie, R. Evitts, R. Besant, J. Bolster, A new technique to determine convection 
+coefficients with flow through particle beds, J. Heat. Transfer. 133 (4) (2011).
+Fig. 4. Sensitivity analysis for Tg measurement uncertainty.
+Z. Song et al. International Journal of Heat and Mass Transfer 255 (2026) 127803
+5
+
+[18] L.B. Younis, R. Viskanta, Experimental determination of the volumetric heat 
+transfer coefficient between stream of air and ceramic foam, Int. J. Heat Mass 
+Transf. 36 (6) (1993) 1425–1434.
+[19] P.-X. Jiang, R.-N. Xu, W. Gong, Particle-to-fluid heat transfer coefficients in 
+miniporous media, Chem. Eng. Sci. 61 (22) (2006) 7213–7222.
+[20] E.C. Nsofor, G.A. Adebiyi, Measurements of the gas-particle convective heat 
+transfer coefficient in a packed bed for high-temperature energy storage, Exp. 
+Therm. Fluid. Sci. 24 (1) (2001) 1–9.
+[21] M.K. Das, A. Tariq, P.K. Panigrahi, K. Muralidhar, Estimation of convective heat 
+transfer coefficient from transient liquid crystal data using an inverse technique, 
+Inverse. Probl. Sci. 13 (2) (2005) 133–155.
+[22] J.J. Hwang, G.J. Hwang, R.H. Yeh, C.H. Chao, Measurement of interstitial 
+convective heat transfer and frictional drag for flow across metal foams, J. Heat. 
+Transfer. 124 (1) (2001) 120–129.
+[23] P.F. Pucci, C.P. Howard, C.H. Piersall Jr., The single-blow transient testing 
+technique for compact heat exchanger surfaces, J. Eng. Power. 89 (1) (1967) 
+29–38.
+[24] V. Pozzobon, G. Baud, S. Salvador, G. Debenest, Darcy scale modeling of 
+smoldering: impact of heat loss, Combust. Sci. Technol. 189 (2) (2017) 340–365.
+[25] T.L. Rashwan, J.L. Torero, J.I. Gerhard, Heat losses in a smouldering system: the 
+key role of non-uniform air flux, Combust. Flame 227 (2021) 309–321.
+[26] T.L. Rashwan, J.L. Torero, J.I. Gerhard, Heat losses in applied smouldering 
+systems: sensitivity analysis via analytical modelling, Int. J. Heat Mass Transf. 172 
+(2021) 121150.
+[27] K. Kar, A. Dybbs, Internal heat transfer coefficients of porous metals, NASA STI/ 
+Recon Technical Report A 84 (1982) 81–91.
+[28] S.-W. Peng, R.W. Besant, G. Strathdee, Heat and mass transfer in granular potash 
+fertilizer with a surface dissolution reaction. ASME international mechanical 
+engineering congress and exposition, American Society of Mechanical Engineers, 
+1999, pp. 133–140.
+[29] D. Geb, F. Zhou, I. Catton, Internal heat transfer coefficient determination in a 
+packed bed from the transient response due to solid phase induction heating, 
+J. Heat. Transfer. 134 (4) (2012).
+[30] E.C. Nsofor, G.A. Adebiyi, Measurements of the gas-particle convective heat 
+transfer coefficient in a packed bed for high-temperature energy storage, Exp. 
+Therm. Fluid. Sci. 24 (1-2) (2001) 1–9.
+[31] M. Fatehi, M. Kaviany, Adiabatic reverse combustion in a packed bed, Combust. 
+Flame 99 (1) (1994) 1–17.
+[32] M. Raissi, P. Perdikaris, G.E. Karniadakis, Physics-informed neural networks: A 
+deep learning framework for solving forward and inverse problems involving 
+nonlinear partial differential equations, J. Comput. Phys. 378 (2019) 686–707.
+[33] Y. Li, D. Wan, R. Wang, B. Ni, Z. Wang, D. Hu, A novel PINNs based surrogate 
+model for multi-objective reliability-based design optimization of airfoil-shaped 
+printed circuit heat exchangers, Int. Commun. Heat Mass Transf. 164 (2025) 
+108954.
+Z. Song et al. International Journal of Heat and Mass Transfer 255 (2026) 127803
+6

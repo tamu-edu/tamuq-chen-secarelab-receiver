@@ -1,0 +1,738 @@
+International Journal of Heat and Mass Transfer 227 (2024) 125564
+Available online 23 April 2024
+0017-9310/© 2024 Elsevier Ltd. All rights reserved.
+An entropic understanding of flow maldistribution in thermally isolated 
+parallel channels 
+Toochukwu Aka , Shankar Narayan * 
+Department of Mechanical, Aerospace, and Nuclear Engineering, Rensselaer Polytechnic Institute, 110 8th Street, Troy, NY 12180, USA 
+ARTICLE INFO 
+Keywords: 
+Parallel channels 
+Flow distribution 
+Entropy analysis 
+Maldistribution 
+Flow boiling 
+ABSTRACT 
+Flow across heated parallel channel systems exists in many applications. The performance of such systems 
+experiencing multiphase flow could suffer from the deleterious effects of flow non-uniformity or maldistribution. 
+Modeling the behavior of such systems is challenging due to the inherent non-linearity associated with the 
+multiphase flow and the difficulty in determining the actual flow among several possible flow distributions. This 
+study addresses the challenge by analyzing the entropy production in such systems. Using experiments on two 
+thermally isolated, nominally identical, and externally heated parallel channels, we quantify irreversibility in the 
+resulting multiphase flow by evaluating the entropy generation rate. Our experiments reveal that certain flow 
+conditions result in severe maldistribution (flow ratio > 10) in the channels, associated with a sharp rise in 
+entropy production. Such an increase is not predicted for uniform flow distribution across parallel channels, 
+making maldistributed flow a thermodynamically favored state over equally distributed flow. We extend this 
+understanding to non-identical parallel channels as well. With entropy analysis providing additional insight 
+besides the fundamental equations governing mass, momentum, and energy conservation, this approach is 
+valuable in predicting and controlling flow distribution in parallel channel systems. 
+1. Introduction 
+Parallel channels can scale performance in several engineering sys￾tems and devices, such as heat exchangers, chemical reactors, electronic 
+cooling and power generation systems, fluidized beds, microfluidic de￾vices, and fuel cells [1–6]. Under certain operating conditions, such 
+systems face the risk of instability, wherein flow distribution between 
+parallel channels becomes severely non-uniform. This phenomenon 
+could occur even for parallel channels that are nominally identical. It is 
+undesirable since it can reduce the system’s performance and sometimes 
+cause irreversible damage [1,2]. Therefore, prior efforts have focused on 
+the prediction and characterization of flow maldistribution in parallel 
+channels, especially where multiple phases (liquid and vapor) coexist [2, 
+3,7–11]. Taitel et al. [10] showed that symmetrical heating of a 
+multi-channel system can be unstable and established a control pro￾cedure against flow maldistribution. Minzer et al. [12] used linear sta￾bility analysis to differentiate between stable and unstable flow 
+solutions. Results from Minzer’s study show that flow distribution may 
+depend on history. Yang et al. [13] developed a 3D computational model 
+of a nine parallel-channel system and showed that under the same 
+conditions, the flow tends to be more equally distributed in parallel 
+channels with a circular cross-section when compared to a triangular 
+cross-section. With the aid of a model, Zhang et al. [7] showed that flow 
+distribution in a parallel channel can be controlled by manipulating the 
+total flow rate if the parallel channels are distinct. Natan et al. [14] 
+showed up to five obtained for a single flow rate through a two 
+parallel-channel system and speculated that the most feasible solution is 
+the one with the least pressure drop. 
+In these studies, the methodology employed in predicting the sta￾bility of different flow distributions involves the perturbation of the 
+Navier Stokes’ equations [7,10,12], which establishes a criterion to 
+ascertain if maldistribution can occur or not. While this approach dis￾tinguishes between stable and unstable flows [9,12] it is unclear why a 
+particular flow distribution is bound to occur over other mechanically 
+feasible possibilities. We address this gap in knowledge by introducing 
+thermodynamic considerations to flow distribution in parallel channels. 
+Entropy analysis, based on the second law of thermodynamics, is a 
+valuable tool for analyzing the directionality of processes in physical 
+systems. Entropy analysis evaluates and optimizes thermal-hydraulic 
+systems by quantifying the degree of irreversibility associated with 
+* Corresponding author. 
+E-mail address: narays5@rpi.edu (S. Narayan). 
+Contents lists available at ScienceDirect 
+International Journal of Heat and Mass Transfer 
+journal homepage: www.elsevier.com/locate/ijhmt 
+https://doi.org/10.1016/j.ijheatmasstransfer.2024.125564 
+Received 23 October 2023; Received in revised form 21 January 2024; Accepted 11 April 2024 
+
+International Journal of Heat and Mass Transfer 227 (2024) 125564
+2
+flow and energy transfer in systems. A recent study applied multiscale 
+entropy analysis in identifying flow regimes and dynamic characteristics 
+of gas-liquid two-phase flows in horizontal channels [15]. Several 
+studies have also focused on optimizing heat exchangers via entropy 
+generation minimization [16–19]. Applying entropy analysis to a known 
+phenomenon, Zupanovic et al. [20] showed that Kirchoff’s loop law can 
+be derived from the maximum entropy principle. Concerning stationary 
+two-phase flow distribution, Giannetti et al. [21] developed a varia￾tional formulation of two-phase flow distribution at a fluid junction. 
+They showed that the predicted flow distribution can correspond to 
+different entropy production rates depending on the chosen two-phase 
+flow model. For example, their study showed that the homogeneous 
+model leads to a higher entropy production rate than the separated flow 
+model. The study showed that the extremisation of the entropy gener￾ation rate provides the additional conditions necessary for closing the 
+problem formulation to model flow distribution in fluid networks. This 
+study uses entropy analysis to show the relationship between entropy 
+generation and flow distribution in a system consisting of two thermally 
+isolated parallel channels. In this case, externally heated channels cause 
+vaporization and multiphase (liquid-vapor) flow. This study provides, 
+for the first time, a thermodynamic perspective on flow distribution in 
+parallel channels in such conditions. We demonstrate how the entropy 
+analysis can be applied to distinguish between stable and unstable flow 
+states corresponding to the same system operating conditions. 
+2. Flow Distribution in Parallel Channels 
+The changes in flow properties like pressure and temperature across 
+parallel channels are useful in quantifying the flow performance. For 
+given inlet conditions, such as inlet pressure Pi and temperature Ti, the 
+exit properties like pressure Pe and enthalpy he can be calculated using 
+the equations for conservation of mass, momentum balance, and the first 
+law of thermodynamics. These fundamental equations take the 
+following form for two thermally isolated parallel channels sharing a 
+common inlet and exit (Fig. 1) and operating at steady-state. 
+∫
+CS
+ρv⋅dA = 0 (1) 
+∫
+CS
+vρv⋅dA =
+∫
+CS
+− p dA +
+∫
+CS
+τ dA +
+∫
+CS
+g dV (2) 
+Here v, p, τ, and g denote velocity, pressure, tangential stress, and 
+body force per unit volume, respectively. In addition, the first law of 
+thermodynamics gives 
+∫
+CS
+hρv⋅dA =
+∫
+CS
+dQ˙ (3) 
+Application of these fundamental equations to flow in individual 
+channels allows predicting the pressure change, ΔP = Pi − Pe for 
+different flow rates, m˙ . The model outcome could suggest multiple 
+possible flow distributions for a simple case involving two nominally 
+identical channels (Fig. 1), where the flow is heated as it passes through 
+them. For example, one possible model prediction can be equally 
+distributed flow for all possible channel flow rates, irrespective of the 
+exit quality (Fig. 2, distribution 1). Another possibility is that the flow is 
+liquid and equally distributed at high flow rates, whereas it becomes 
+unequally distributed or maldistributed with flow boiling at low flow 
+rates (Fig. 2, distribution 2). A fundamental aspect that is still unclear is 
+which of the two distributions is likely to occur and why. 
+Previous studies have used a criterion based on the perturbation of 
+the momentum balance equation to distinguish between stable (feasible) 
+and unstable (infeasible) flow distributions. For example, based on this 
+criterion, the stable distribution for the above system has been predicted 
+as a maldistributed flow rather than a uniformly distributed one for flow 
+rates below 7 × 10-4 kg/s. While this prediction may be accurate, the 
+criterion provides no reason why a maldistributed state is more stable 
+than equally distributed flow when both distributions satisfy the basic 
+equations governing mass, momentum, and energy conservation. 
+Moreover, the number of viable flow distributions increases with the 
+number of parallel channels, making the traditional modeling approach 
+more challenging – hence, a clearer understanding of the maldistribu￾tion phenomenon is necessary. 
+The challenge introduced by non-unique solutions can be addressed 
+by considering the entropic aspects of flow, which is often overlooked. 
+Internal flow with energy transfer is associated with entropy generation 
+as flows occur from the inlet i to the exit e of a channel. For steady flow 
+through boundary-heated channels, the total entropy generation rate, 
+S˙
+gen can be calculated using the entropy balance equation for an open 
+system. 
+∫
+CS
+sρv⋅dA =
+∫
+CS
+dQ˙
+Tw
++ S˙
+gen (4) 
+Here Q ˙ denotes net heat transferred from the boundary into each 
+channel maintained at a uniform temperature of Tw. The increase in 
+entropy is also caused by the irreversibility associated with flow in the 
+channels, S˙
+gen. Irreversibility occurs in this pressure-driven flow due to 
+many reasons, including heat transfer across a finite temperature dif￾ference, friction between the fluid and the channel wall, sudden changes 
+in configuration and direction of flow, and the mixing of thermally 
+dissimilar fluids from parallel channels at the flow junctions or headers 
+[22]. The second law of thermodynamics requires that the rate of en￾tropy generation, S˙
+gen ≥ 0, wherein equality holds only if the process is 
+internally reversible. We believe that the flow distribution in a 
+multi-channel network is governed by the maximization of S˙
+gen. This 
+study investigates entropy production in model-predicted flow distri￾butions in parallel channels. With the help of experiments involving 
+thermally isolated parallel channels, we show how the entropy analysis 
+determines the thermodynamically preferred flow distribution, which 
+matches our observations. 
+Fig. 1. Two thermally isolated parallel channels sharing a common inlet 
+and exit. 
+Fig. 2. Possible flow distribution predictions in two parallel channels (fluid: 
+water, diameter: 1.4 mm, length: 0.3 m). 
+T. Aka and S. Narayan 
+
+International Journal of Heat and Mass Transfer 227 (2024) 125564
+3
+3. Experimental Procedure 
+The test section (Fig. 3) comprises two parallel channels with a 
+shared inlet and exit. Each channel consists of a valve to control flow, a 
+flowmeter (Omega FLR-1008ST, ±3.3 × 10− 5kg /s), and channels made 
+of stainless steel capillary tubes of internal diameter 1.4 mm, outer 
+diameter 3.18 mm and length 305 mm, circumferentially interfaced 
+with heaters (125 W) and fiberglass insulation. Also, pressure sensors 
+(Omega PX309-030A5V, ±0.52 kPa and thermocouples (Omega T-type, 
+±1 ◦C) were positioned at the inlet and exit of the test section to monitor 
+flow. Four additional temperature sensors were attached to each chan￾nel wall at equidistant positions to keep track of the channel wall tem￾perature. Other components in the testbed include a temperature￾controlled heated tank as a liquid reservoir, a chiller to extract heat 
+from the working fluid, an electronic valve, and a gear pump (Micro￾pump, GA-X21.CFS.E, 0 – 65 Hz) to maintain stable two-phase flow in 
+the channels. The parallel channels are independently heated using 
+programmable DC power supply modules (BK Precision, XLN 15010, 
+±0.01%). The testbed uses water, and the system was maintained within 
+a pressure range of 8 to 33 kPa. In addition to the flowmeters keeping 
+track of the flow rate in each channel of the test section, a flow meter is 
+positioned after the pump to monitor the total flow rate. Including this 
+flow meter also allows for estimating the flow rate in the channel with 
+minimal flow during severe flow maldistribution. 
+In order to improve baseline stability, ensure consistency, and 
+maintain the required pressure at the start of an experiment, the setup is 
+initially de-aerated, and the fluid tank is heated before turning on the 
+pump. This step ensures that the working fluid instantaneously gets to 
+the pump at startup, preventing cavitation and potential damage to the 
+pump. Experiments typically involve liquid flow in sequence from the 
+pump to the test section, storage tank, and chiller. Within the test sec￾tion, fluid may split between two parallel channels, or flow might be 
+limited to a single channel if the valve on the other branch is fully shut. 
+Experiments typically involve liquid entering the test section below 
+saturation conditions and exiting as liquid, liquid vapor mixture, or 
+super-heated vapor. 
+Initial experiments involve thermal characterization of each channel 
+to determine the relationship between readily available physical quan￾tities (mass flow rate m˙ , channel surface area As and temperature dif￾ference between the channel wall and ambient Tw − T∞) and heat loss 
+Q˙
+loss to the surroundings, as shown in Fig. 4. Therefore, for a given 
+electrical heat load Q˙
+h = IV, the net heat transfer to the fluid Q ˙ = Q˙
+h −
+Q˙
+loss, where Q˙
+loss = Q˙
+loss(m˙ , As, Tw − T∞) can be estimated from Fig. 4. 
+This step is useful, especially when Q ˙ cannot be directly obtained using 
+mass, temperature, and pressure measurements of the liquid-vapor 
+mixture flow. An interface designed with LABVIEW and MATLAB is 
+used for automated actuator control besides recording, compiling and 
+plotting the experimental data from the testbed. 
+The uncertainty in a parameter f is determined by applying the 
+propagation of error [23–25], as shown in Eq. (5), 
+Δf =
+̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅ ( ∂f
+∂x1
+Δx1
+)2
++
+( ∂f
+∂x2
+Δx2
+)2
++ ... +
+( ∂f
+∂xn
+Δxn
+)2
+√
+(5) 
+where Δx1…Δxn are the errors associated with the measurement of n 
+independent variables, x1…xn to calculate the parameter f. 
+4. Entropy generation and sources of irreversibility 
+The following equations describe the first and second laws of ther￾modynamics for the N-channel system, which allow for determining S˙
+gen. 
+m˙(hi − he) = ∑N
+j=1
+Q˙
+h,j − Q˙
+loss,j (6) 
+S˙
+gen = m˙(se(Pe, he) − si(Pi, Ti)) − ∑N
+j=1
+Q˙
+h,j − Q˙
+loss,j
+Tw,j
+(7) 
+The specific entropies at the inlet (si) and outlet (se) of the channel 
+assembly are functions of inlet pressure Pi and temperature Ti, and exit 
+pressure Pe and specific enthalpy, he, respectively. Here Q ˙ is obtained 
+from the difference between the electrical heat load Q˙
+h,j and heat loss 
+Q˙
+loss,j in each channel j. In a system of parallel channels, the total rate of 
+entropy generated consists of the rate of entropy generated within each 
+channel member S˙
+gen,j, the rate of entropy generated from the splitting of 
+flow at the common inlet S˙
+gen,split and the rate of entropy generated at the 
+common exit from irreversible heat transfer within mixing fluid streams 
+Fig. 3. (a) Experimental pumped liquid cooling cycle. (b) Illustration of flow in a single channel. 
+Fig. 4. Heat loss characterization of a single channel. 
+T. Aka and S. Narayan 
+
+International Journal of Heat and Mass Transfer 227 (2024) 125564
+4
+S˙
+gen,mix. Compared with other contributions, S˙
+gen,split is negligible because 
+of the insignificant change in the thermodynamic properties of the fluid 
+during the splitting process. As a result, S˙
+gen is expressed as 
+S˙
+gen = S˙
+gen,mix +∑N
+j=1
+S˙
+gen,j (8) 
+Since the channel assembly is thermally insulated and the mixing 
+process is relatively fast, adiabatic conditions are assumed in deter￾mining S˙
+gen,mix. 
+S˙
+gen,mix = ms˙ mix(Pmix, hmix) − ∑N
+j=1
+m˙ jse,j (9) 
+Here, the specific entropy of the fluid mixture at the exit (smix) is a 
+function of the mixture pressure Pmix and enthalpy hmix. In parallel 
+channel experiments, Pmix and hmix are typically Pe and he, respectively. 
+However, in cases where single-channel experiments are used to esti￾mate the properties of flow in parallel channels, Pmix and hmix are eval￾uated in terms of the mass flow fractions as 
+hmix = ∑N
+j=1
+m˙
+∗
+j he,j, (10) 
+Pmix = ∑N
+j=1
+m˙
+∗
+j Pe,j. (11) 
+4.1. Sources of Irreversibility in a Single Channel 
+Besides other sources, the hydraulic and thermal resistance affecting 
+the flow and heat transfer in the two channels contribute significantly to 
+irreversibility. The pressure drop ΔP = Pi − Pe across the channel de￾pends on the flow rate and the hydraulic resistance to flow, which de￾pends on fluid friction. Hence, ΔP indicates how certain flow aspects (e. 
+g., friction) introduce irreversibility in the system. Similarly, heat 
+transfer from the wall at Tw to the fluid at Tf is an irreversible process 
+requiring a temperature differential (Tw − Tf). However, for an 
+internally-reversible heat transfer process (S˙
+gen = 0), the hypothetical 
+temperature (Trev) of the control volume boundary, which in this case is 
+the channel wall, can be calculated using the following equation. 
+Trev = Q˙
+h − Q˙
+loss
+m˙(s(Pi, he) − s(Pi, Ti)) (12) 
+In practice, the channel wall temperature (Tw) is much larger than 
+Trev due to irreversibilities. Hence, ΔTw = Tw − Trev is used as an indirect 
+measure of deviation from an ideal heat transfer process. Fig. 5a shows 
+ΔP, ΔTw, the exit vapor quality xe, and the entropy generation rate S˙
+gen 
+for a single channel heated at Q˙
+h = 70 W. 
+Starting from a large flow rate, a continuous decrease in m ˙ results in 
+liquid-to-vapor phase change. Consequently, the fluid phase at the exit 
+changes from liquid (xe= 0) to a liquid-vapor mixture (xe> 0). With 
+boiling and an increase in vapor production, heat transfer characteristics 
+within the channel change to become more efficient, which can be seen 
+in the lowering of ΔTw with an increasing xe. Correspondingly, the rate 
+of entropy generation also decreases. This decrease in S˙
+gen occurs despite 
+increasing ΔP, which indicates the more significant role of heat transfer 
+irreversibility over flow non-idealities. At large flow rates, when ΔTw 
+does not change much with an increase in m˙ , S˙
+gen increases mainly due 
+to rising ΔP – a regime where flow non-idealities dominate. 
+To further investigate the contribution of flow and heat transfer ir￾reversibilities to the total entropy production, we also varied channel 
+heating rates (Q˙
+h) while keeping the flow rate (m˙) constant. Fig. 5b 
+shows the variation of ΔP, ΔTw, the exit vapor quality (xe), and the 
+entropy generation rate S˙
+gen for a single channel with Q˙
+h at a constant m ˙
+= 3.48 × 10− 4 kg/s. Starting from a small heat load, a continuous in￾crease in Q˙
+h results in the phase change from liquid (xe= 0) to liquid￾vapor mixture (xe> 0), a jump in ΔP and an increase in both ΔTw and 
+S˙
+gen. The sudden increase in ΔP is due to vapor production (phase 
+change) in the channel at the threshold value of the heating rate around 
+80 W. The increase in ΔTw and S˙
+gen with no significant change in ΔP 
+before and after phase change indicates that the irreversibilities asso￾ciated with heat transfer contribute more to S˙
+gen than the flow 
+irreversibilities. 
+4.2. Irreversibility in two thermally isolated Parallel Channels 
+Unlike flow in a single channel, entropy generation rates in two 
+parallel channels are also influenced by the nature of the flow distri￾bution. Flow distribution is quantified in terms of m˙ ∗ which denotes the 
+flow fraction in a channel relative to the total flow rate. Flow distribu￾tion is obtained based on measured flow rates, m˙ ∗
+1 = m˙ 1/(m˙ 1 +m˙ 2) and 
+m˙ ∗
+2 = m˙ 2/(m˙ 1 + m˙ 2). For instance m˙ ∗ = 0.5 denotes equally distributed 
+flow in a two-channel system. Fig. 6 shows the observed flow fraction 
+m˙ ∗
+, total entropy generation S˙
+gen, pressure drop ΔP, and the temperature 
+difference ΔTw for different total flow rates m ˙ in two nominally-identical 
+thermally-isolated parallel channels under a constant heat load of 70 W 
+each. 
+At high flow rates in the two parallel identical channels, the pressure 
+difference (ΔP) decreases as the total flow rate (m˙) decreases. For a large 
+m˙ , the fluid emerges as a liquid at the exit. Since the characteristics of 
+heat transfer do not change much under these conditions, there is no 
+significant change in the temperature difference, ΔTw. Hence, like flow 
+in a single channel, the S˙
+gen in each channel, and the ΔP across the 
+channel decreases as m ˙ decreases and ΔTw is expectedly uniform. 
+As m ˙ decreases further, the fluid at the exit transitions from liquid to 
+a liquid-vapor mixture due to heat-induced boiling. Phase-change 
+characteristics now initiate severe flow maldistribution, as indicated 
+by the departure in m˙ ∗ for the channels. This uneven distribution occurs 
+with a sudden decrease in m˙ ∗ for channel 1 and an increase in m˙ ∗ for 
+channel 2. A sudden rise in ΔP across the channels is also observed. The 
+decrease in m ˙ also results in a sharp rise in ΔTw and S˙
+gen in channel 1. In 
+Fig. 5. Variation of single-channel pressure drop ΔP, the wall temperature 
+difference ΔTw, exit quality xe, and entropy generation S˙
+gen, as a function of (a) 
+flow rate m ˙ at Q˙
+h= 70 W. (b) external heat load Q˙
+h at m˙ = 3.48 × 10− 4 kg/s.
+T. Aka and S. Narayan 
+
+International Journal of Heat and Mass Transfer 227 (2024) 125564
+5
+comparison, the change in S˙
+gen is not that significant and ΔTw is mostly 
+invariant in channel 2. 
+The relative effects of flow and heat transfer irreversibilities on S˙
+gen 
+depend on the system. In this case, when the flow was equally distrib￾uted or when it remained maldistributed, the variation in S˙
+gen is due to 
+hydraulic irreversibilities. However, in this case, the transition from 
+uniform to non-uniform flow distribution was mainly due to thermal 
+irreversibilities. Considering both channels collectively, there is an in￾crease in the total S˙
+gen. Hence, an important conclusion from this 
+observation is that severe flow maldistribution is associated with a sharp 
+rise in entropy production. The following section describes why severe 
+maldistributed flows prevail over uniform and moderately non-uniform 
+flows. 
+5. Entropy Generation and Flow Distribution in Thermally 
+Isolated Parallel Channels 
+Although the flow rate in a single channel can be predicted based on 
+the pressure drop and the channel geometry [1], the possible flow dis￾tributions in parallel channels are multiple and not easily predictable. 
+This section shows why severely maldistributed flow prevails over uni￾form and moderately non-uniform distribution by considering the two 
+parallel channels. Here, we compare the entropy generation in an actual 
+flow distribution with the entropy generation if the flow were to have an 
+unstable flow distribution. The “coupled” experiments involving 
+simultaneous flow in both channels determine the flow distribution in 
+the parallel channel assembly (Fig. 7a). However, estimating the char￾acteristics of unstable flow distributions for the same conditions used for 
+the “coupled” experiments is not as straightforward since they do not 
+occur naturally. Therefore, each channel is tested individually by dis￾connecting the other channel from the system, which is achieved by 
+shutting off the corresponding upstream valve, as illustrated in Fig. 7b. 
+Hence, such experiments are called “uncoupled.” The unstable flow 
+characteristics of the parallel channel system, such as flow distribution, 
+are determined using the characteristics observed in the uncoupled ex￾periments. For instance, if flow rates m˙ 1 and m˙ 2 were observed in 
+channels 1 and 2 for a pressure drop ΔP in the uncoupled experiments, 
+we estimate the flow distribution in an equivalent parallel channel 
+system (with pressure drop ΔP) as m˙ ∗
+1 = m˙ 1
+m˙ 1+m˙ 2 and m˙ ∗
+2 = m˙ 2
+m˙ 1+m˙ 2
+. 
+5.1. Flow in Parallel Channels under Uniform Operating Conditions 
+Fig. 8 compares the entropy generation rates for severely maldis￾tributed and uniformly distributed flows. In order to calculate the en￾tropy production rates for maldistributed flow, the two channels are 
+equally heated (Q˙
+h,1 = Q˙
+h,2 = 70 W), and the total flow rate, m ˙ is 
+gradually reduced (Fig. 8a). Alternatively, the total flow rate can be held 
+fixed (m˙ = 6.96 × 10− 4 kg/s), and the heating rates, although uniform 
+(Q˙
+h,1 = Q˙
+h,2 = Q˙
+h/2), can be gradually increased (Fig. 8b). Then Eq. (7) 
+is used to determine S˙
+gen using the measured inlet and exit flow prop￾erties and wall temperatures. The entropy generation rate and flow 
+distributions from these experiments are indicated as “coupled” chan￾nels in Fig. 8. 
+Uniformly distributed flow at all flow rates or heat loads may be 
+expected because of the uniformity of physical conditions across both 
+channels. To estimate the entropy generation rate for uniformly 
+distributed flow in parallel channels, we individually test each channel 
+in the testbed by isolating the other channel from the system using the 
+valves shown in Fig. 7b. Due to similar geometry and heating conditions, 
+the total rate of entropy generation is obtained from Eq. 8 based on a 
+common experimental input variable such as flow rate (m˙ 1 = m˙ 2 =
+m˙ /2) (Fig. 8a) or heat load (Q˙
+h,1 = Q˙
+h,2) (Fig. 8b), yielding S˙
+gen corre￾sponding to the hypothetical case of uniformly distributed flow (m∗ =
+0.5) in the parallel channel assembly. These results are shown as 
+“uncoupled” channels in Fig. 8. 
+Fig. 8 compares S˙
+gen for maldistributed and uniformly distributed 
+flow in the parallel channels. Fig. 8a shows flow distribution and 
+Fig. 6. Variation of parallel channel pressure drop ΔP, wall temperature dif￾ference ΔTw, entropy generation S˙
+gen, and flow fraction m˙ ∗ as a function of the 
+flow rate m ˙ at Q˙
+h= 70 W 
+Fig. 7. Illustration of (a) coupled and (b) uncoupled channels 1 and 2. 
+Fig. 8. Variation of m˙ ∗ and S˙
+gen with m ˙ for severely maldistributed and uni￾formly distributed flow for (a) varying m ˙ with Q˙
+h1 = Q˙
+h2 = 70 W, and (b) 
+varying Q˙
+h at m˙ = 6.96 × 10− 4 kg/s. 
+T. Aka and S. Narayan 
+
+International Journal of Heat and Mass Transfer 227 (2024) 125564
+6
+entropy generation when the flow rate m ˙ is gradually decreased, while a 
+steady heating power of 70 W is applied to both channels. Likewise, 
+Fig. 8b shows the flow distribution and entropy production when the 
+heating load, although the same for both channels, is gradually 
+increased with a total flow rate fixed at m˙ = 6.96 × 10− 4 kg/s. In case of 
+single channel experiments, the flow rate in each channel is halved with 
+m˙ = 3.48 × 10− 4 kg/s. 
+When m ˙ is large or Q˙
+h is low, the flow is equally distributed between 
+the channels. For these conditions, S˙
+gen decreases with m ˙ (Fig. 8a) and 
+increases with Q˙
+h (Fig. 8b). However, as m ˙ decreases or Q˙
+h increases, the 
+flow eventually becomes severely maldistributed. Evidently, this mal￾distribution corresponds to a sudden jump in S˙
+gen. However, if the 
+channels experience uniform flow, then S˙
+gen does not show any dramatic 
+variation. For these conditions representing a hypothetical uniform flow 
+case, S˙
+gen continues to decrease with m ˙ and increase with Q˙
+h. Fig. 8 
+shows that the entropy generation rate of severely maldistributed flow is 
+much greater than equally distributed flow under similar conditions. 
+Hence, flow maldistribution seen here is thermodynamically more 
+favorable over equally distributed flow. It is due to this reason that non￾uniform flows are sustained unless conditions are significantly altered to 
+enable uniform flow distribution. 
+5.2. Flow in Parallel Channels under Non-uniform Conditions 
+Severe maldistribution also occurs in parallel channels under non￾uniform or dissimilar conditions, which can be explained using en￾tropy analysis. To understand the effects of channel dissimilarity, we use 
+different heat loads and valve openings associated with each channel to 
+compare the entropy production rates. Fig. 9 shows the flow behavior 
+with Q˙
+h,1 = 80 W and Q˙
+h,2 = 70 W, with the channel 1 valve fully open 
+and the channel 2 valve half-opened. Since the channel conditions are 
+inherently different, flow distribution is never uniform. Still, model 
+predictions could indicate multiple possibilities. For example, in this 
+case, the predictions can indicate either marginal or significant mal￾distributions in these channels. 
+When flow occurs in both channels simultaneously, the distribution 
+(m˙ ∗
+) is directly measured, and Eq. (7) is used to obtain S˙
+gen using the 
+measured flow properties as described earlier. These results shown in 
+Fig. 9 (right) are indicated as coupled channels. In order to estimate 
+other possible distributions, we use flow characteristics in individual 
+(uncoupled) channels, with heating and valve settings similar to the 
+coupled channels experiment. The flow characteristics, given by ΔP 
+versus m ˙ for the uncoupled and coupled channels, are shown in Fig. 9 
+(left). For a total flow rate m ˙ observed in the experiments, the flow 
+distributions in uncoupled channels 1 (m˙ 1) and 2 (m˙ 2) are obtained such 
+that m˙ 1 + m˙ 2 = m˙ , with flow rates m˙ 1 and m˙ 2 corresponding to the same 
+pressure drop ΔP for the specific m ˙ in the coupled experiments. To do 
+this we find the intersection of a constant ΔP line with the ΔP versus m ˙
+characteristic curves for each channel, resulting in flow distribution 
+m˙ ∗
+1 and m˙ ∗
+2 whose sum is unity. Mathematically, this can be expressed as 
+a minimization problem with m˙ ∗
+1as the argument. 
+m˙
+∗
+1 = arg min
+m˙
+∗
+1∈[0,1]
+⃒
+⃒ΔP1
+(
+m˙
+∗
+1
+)
+− ΔP2
+(
+1 − m˙
+∗
+1
+)⃒
+⃒ (13) 
+This procedure allows calculating m˙ ∗
+1, m˙ ∗
+2 = 1 − m˙ ∗
+1 and the entropy 
+generation, S˙
+gen using S˙
+gen,1 and S˙
+gen,2 from single-channel experiments 
+and S˙
+gen,mix to account for the adiabatic mixing of the two fluid streams in 
+Eq. (8). In conclusion, the resulting flow distribution for uncoupled 
+channels indicates a moderate maldistribution and the corresponding 
+S˙
+gen is less than the coupled experiment. 
+Due to dissimilar valve openings and heating of the two channels, 
+flow characteristics are expected to differ. For large values of m˙ , both 
+uncoupled and coupled channel results indicate that the flow is slightly 
+maldistributed mainly due to differences in channel valve opening and 
+S˙
+gen decreases with m˙ . But as the total flow rate m ˙ decreases further, both 
+coupled and uncoupled channel results indicate larger flow maldistri￾bution. Typical static modeling approaches could indicate that moderate 
+maldistribution distribution is viable even for low total flow rates. 
+However, an entropy analysis shows that the S˙
+gen corresponding to 
+severely maldistributed flow is greater than the S˙
+gen corresponding to the 
+moderately maldistributed flow. Consequently, the significantly mal￾distributed state is thermodynamically favored over moderately non￾uniform flow, as seen in the experiments. 
+6. Conclusion 
+This study analyzes entropy production and its relationship with 
+flow distribution in thermally isolated parallel channels with multiphase 
+flow. Parallel channels with multiphase flow, even if nominally iden￾tical, can experience maldistribution or unequal flow distribution, 
+which is undesirable in many applications. Since such systems are 
+inherently nonlinear due to multiphase flow characteristics, modeling 
+and predicting this phenomenon is challenging and often results in 
+multiple viable solutions. This study shows how an entropy analysis of 
+flow in channels can overcome this modeling challenge. We hypothesize 
+that flow maldistribution is governed by a thermodynamically favored 
+state with maximum possible entropy production among the several 
+flow possibilities identified by solving the fundamental equations gov￾erning mass, momentum, and energy conservation. 
+Using experiments, we identify two primary sources of irreversibil￾ities associated with heat transfer and flow. Although both sources are 
+present under all conditions, experiments show that flow irreversibil￾ities, such as flow friction, affect entropy generation at higher flow rates. 
+In contrast, thermal irreversibilities, such as non-isothermal heat 
+Fig. 9. Variation of m˙ ∗ and S˙
+gen with m ˙ for severely maldistributed and moderately maldistributed flow. 
+T. Aka and S. Narayan 
+
+International Journal of Heat and Mass Transfer 227 (2024) 125564
+7
+transfer, tend to affect entropy generation more at lower flow rates and 
+higher heat rates. 
+The flow distribution in parallel nominally identical channels is 
+uniform for high flow rates, corresponding to little to no phase change. 
+However, a transition to maldistribution occurs when the flow rate is 
+reduced, or the heating rate is increased. The transition from uniform to 
+non-uniform flow distribution corresponds to a sharp rise in entropy 
+production. Such an increase is not predicted for uniform flow distri￾bution across parallel channels, making maldistributed flow a thermo￾dynamically favored state over equally distributed flow. Maldistributed 
+flow corresponds to the highest entropy production rate compared to 
+other steady two-phase flow distributions for similar system constraints. 
+Such flow behavior also exists in non-identical channels, wherein 
+moderately non-uniform flow distributions could be predicted. How￾ever, in practice, the flow distribution is more significantly non-uniform 
+since it is thermodynamically favored and corresponds to a higher en￾tropy production rate. 
+Entropy analysis is often omitted from the modeling and perfor￾mance prediction of systems with multiphase flow and liquid-vapor 
+phase change. This study shows how entropic considerations provide 
+an additional perspective to understand and predict the behavior of 
+nonlinear systems with several possible outcomes. This study analyzes 
+stable and unstable flow distribution in two thermally isolated parallel 
+channels and is therefore unsuitable for application to parallel channels 
+with significant thermal coupling, such as a system of parallel channels 
+constructed on a metallic substrate. Nevertheless, the principle of 
+maximum entropy production may be extended to analyzing a larger 
+system of parallel channels experiencing heating and multiphase flow or 
+even thermally coupled channels. 
+CRediT authorship contribution statement 
+Toochukwu Aka: Conceptualization, Formal analysis, Investigation, 
+Methodology, Writing – original draft, Writing – review & editing. 
+Shankar Narayan: Conceptualization, Funding acquisition, Project 
+administration, Supervision, Writing – review & editing. 
+Declaration of competing interest 
+The authors declare that they have no known competing financial 
+interests or personal relationships that could have appeared to influence 
+the work reported in this paper. 
+Data availability 
+Data will be made available on request. 
+Acknowledgments 
+The work was supported by the National Science Foundation’s Di￾vision of Chemical, Bioengineering, Environmental, and Transport Sys￾tems in the Directorate for Engineering under Grant No. 1944323. 
+References 
+[1] T. Aka, S. Narayan, Transient behavior and maldistribution of two-phase flow in 
+parallel channels, IEEE Transact. Compon. Packag. Manufact. Techn. 12 (2) (2022) 
+270–279. 
+[2] E. Manavela Chiapero, M. Fernandino, C.A. Dorao, Numerical analysis of pressure 
+drop oscillations in parallel channels, Internat. J. Multiphase Flow 56 (2013) 
+15–24. 
+[3] T. Van Oevelen, J.A. Weibel, S.V. Garimella, Predicting two-phase flow distribution 
+and stability in systems with many parallel heated channels, Int. J. Heat. Mass 
+Transf. 107 (2017) 557–571. 
+[4] C. Guermonprez, S. Michelin, C.N. Baroud, Flow distribution in parallel 
+microfluidic networks and its effect on concentration gradient, Biomicrofluidics. 9 
+(5) (Sep. 2015). 
+[5] B.H. Lim, E.H. Majlan, W.R.W. Daud, M.I. Rosli, T. Husaini, Numerical analysis of 
+flow distribution behavior in a proton exchange membrane fuel cell, Heliyon. 4 
+(2018) 845. 
+[6] J.C. Pacio, C.A. Dorao, A study of the effect of flow maldistribution on heat transfer 
+performance in evaporators, Nuclear Eng. Design 240 (11) (Nov. 2010) 
+3868–3877. 
+[7] T. Zhang, J.T. Wen, A. Julius, Y. Peles, M.K. Jensen, Stability analysis and 
+maldistribution control of two-phase flow in parallel evaporating channels, Int. J. 
+Heat. Mass Transf. 54 (25–26) (2011) 5298–5305. 
+[8] G. Patankar, T.R. Salamon, Maldistribution of two-phase flow in parallel channel 
+heat sinks: effects of thermal connection between channels, in: Proceedings of the 
+17th InterSociety Conference on Thermal and Thermomechanical Phenomena in 
+Electronic Systems, ITherm 2018, 2018, pp. 653–663. 
+[9] U. Minzer, D. Barnea, Y. Taitel, Evaporation in parallel pipes - Splitting 
+characteristics, Internat. J. Multiph. Flow 30 (7-8) (2004) 763–777. SPEC. ISS. 
+[10] Y. Taitel, U. Minzer, D. Barnea, A control procedure for the elimination of mal flow 
+rate distribution in evaporating flow in parallel pipes, Solar Energy 82 (4) (2008) 
+329–335. 
+[11] V. Manoj Siva, A. Pattamatta, S.K. Das, Effect of flow maldistribution on the 
+thermal performance of parallel microchannel cooling systems, Int. J. Heat. Mass 
+Transf. 73 (2014) 424–428. 
+[12] U. Minzer, D. Barnea, Y. Taitel, Flow rate distribution in evaporating parallel pipes￾modeling and experimental, Chem. Eng. Sci. 61 (22) (2006) 7249–7259. 
+[13] P. Yang, K. Tian, Z. Tang, N. Li, M. Zeng, Q. Wang, Flow distribution and heat 
+transfer performance of two-phase flow in parallel channels with different cross 
+section, Chem. Eng. Trans. 94 (2022) 703–708. 
+[14] S. Natan, D. Barnea, Y. Taitel, Direct steam generation in parallel pipes, Internat. J. 
+Multiphase Flow 29 (11) (2003) 1669–1683. 
+[15] B. Sun, H. Chang, Y.L. Zhou, Flow regime recognition and dynamic characteristics 
+analysis of air-water flow in horizontal channel under nonlinear oscillation based 
+on multiscale entropy, Entropy 21 (7) (Jul. 2019). 
+[16] J.C. Ordo´nez, ˜ A. Bejan, Entropy generation minimization in parallel-plates 
+counterflow heat exchangers, Int. J. Energy Res. 24 (10) (Aug. 2000) 843–864. 
+[17] O. S. Ezeora and O. Ezeora, “Purdue e-pubs entropy generation analysis and 
+optimum tube length of two-phase flow evaporator tube entropy generation 
+analysis and optimum tube length of two-phase flow evaporator tube.” [Online]. 
+Available: http://docs.lib.purdue.edu/iracc/961. 
+[18] M.N. Hossain, K. Ghosh, Entropy generation minimization for boiling flow inside 
+evaporator tube with R32 and R410A refrigerants: a comparison of different two￾phase flow models, J. Therm. Sci. Eng. Appl. (Feb. 2023) 1–38. 
+[19] L.S. Maganti, P. Dhar, Consequences of flow configuration and nanofluid transport 
+on entropy generation in parallel microchannel cooling systems, Int. J. Heat. Mass 
+Transf. 109 (2017) 555–563. 
+[20] P. Zupanovi ˇ ´c, D. Jureti´c, S. Botri´c, Kirchhoff’s loop law and the maximum entropy 
+production principle, Phys. Rev. e Stat. Phys. Plasmas. Fluids. Relat. Interdiscip. 
+Topics. 70 (5) (2004) 5. 
+[21] N. Giannetti, M.A.B. Redo, K. Saito, H. Yoshimura, Variational formulation of 
+stationary two-phase flow distribution, Case Stud. Thermal Eng. 26 (Aug. 2021). 
+[22] A. Sahoo, R. Nandkeolyar, Entropy generation and dissipative heat transfer 
+analysis of mixed convective hydromagnetic flow of a Casson nanofluid with 
+thermal radiation and Hall current, Sci. Rep. 11 (1) (Dec. 2021). 
+[23] D. B. Pengra, “Notes on data analysis and experimental uncertainty.” Accessed: 
+Oct. 10, 2023. [Online]. Available: https://courses.washington.edu/phys431/un 
+certainty_notes.pdf. 
+[24] T. Aka, Uncertainty_Prop, MATLAB Central File Exchange, Aug. 12 (2023). 
+[25] I. Novikova, “Analysis of experimental data,” 2008. Accessed: Oct. 10, 2023. 
+[Online]. Available: https://courses.washington.edu/phys431/uncertainty_notes. 
+pdf. 
+T. Aka and S. Narayan 

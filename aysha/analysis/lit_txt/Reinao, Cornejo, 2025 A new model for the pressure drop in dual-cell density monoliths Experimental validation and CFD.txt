@@ -1,0 +1,1043 @@
+Contents lists available at ScienceDirect
+Chemical Engineering Journal
+journal homepage: www.elsevier.com/locate/cej
+A new model for the pressure drop in dual-cell density monoliths:
+Experimental validation and CFD
+Consuelo Reinao, Pablo Diaz , Ivan Cornejo ∗
+Departamento de Ingenieria Quimica y Ambiental, Universidad Tecnica Federico Santa Maria, Vicuña Mackenna 3939, Santiago, 8940897, Chile
+A R T I C L E I N F O
+Keywords:
+Dual-cell density monolith
+Pressure drop model
+CFD
+3D-printing monolith
+Experimental validation
+A B S T R A C T
+This study presents the first experimental validation of a theoretical model for predicting pressure drop in dual￾cell density monoliths, a configuration aimed at optimizing flow distribution in industrial catalytic reactors.
+3D-printed monoliths, featuring two concentric regions — core and ring — were employed to systematically
+investigate variations in core size and relative permeability between regions. The monoliths were tested
+over a wide range of Reynolds numbers using a custom-built experimental rig. The results demonstrate
+strong agreement with the model’s predictions and confirm its accuracy in estimating pressure drop under
+different configurations. Complementary CFD simulations further support the experimental results and provide
+additional insights into the effects of model assumptions on pressure drop predictions. The study validates the
+model as a useful tool for engineering applications, offering valuable insights for the design and optimization
+of non-homogeneous monolith substrates in industrial catalytic systems.
+1. Introduction
+Catalytic processes are important to numerous industrial applica￾tions, ranging from chemical manufacturing to environmental protec￾tion. These processes play a critical role in improving the efficiency
+and sustainability of chemical plants by optimizing throughput and
+reducing energy consumption [1]. While packed bed reactors have
+been the traditional choice, they suffer from high pressure drop, poor
+flow distribution, and challenges in thermal gradient management [2].
+These limitations, especially in large-scale operations, have led to the
+development of structured reactors, where the geometry, ranging from
+particle size to reactor scale, is precisely defined by design [3].
+Among the structured substrates, monolith reactors have emerged as
+a promising alternative to traditional packed beds, particularly in high￾flow applications. These reactors consist of a structured, honeycomb￾like array of parallel channels, which serve as catalyst supports [4].
+In packed beds, the pressure drop is typically modeled using the
+Ergun equation, which accounts for the interactions between the fluid
+phase and the pellets, leading to both viscous and inertial losses [5]
+which explains greater pressure drop while increasing flow. However,
+studies have shown that polydisperse pellet beds, common in indus￾trial reactors, can increase flow resistance, affecting pressure drop,
+and Ergun predictions underestimate it [6,7]. Moreover, poor flow
+distribution can create hot spots, particularly in exothermic reactions,
+as low flow areas concentrate reactants, accelerating conversion rate
+∗ Corresponding author.
+E-mail address: ivan.cornejo@usm.cl (I. Cornejo).
+and causing localized temperature spikes [8–10]. Maintaining a consis￾tent temperature profile in catalytic reactors is crucial for optimizing
+efficiency and prolonging catalyst life, as temperature imbalances can
+degrade catalysts, lower selectivity, and increase undesired by-products
+formation [11–13].
+The use of monoliths as catalytic support offers several improve￾ments, including a significantly lower pressure drop and a higher
+surface-to-volume ratio compared to packed beds, making them es￾pecially suitable for processes requiring high throughput with low
+pressure drop [14]. Moreover, heat and mass transfer for heterogeneous
+reactions in monolith reactors is improved by the higher specific area
+and more even flow distribution, leading to an increased catalyst
+usage [15,16]. Consequently, monoliths are now widely used in auto￾motive catalytic converters for automobile exhaust treatment and are
+increasingly considered in various chemical synthesis systems [17,18];
+Some examples are CO2 methanation [19,20], methanol synthesis [21–
+23], methane reforming [24–26] and destruction of volatile organic
+compounds (VOC) [27].
+Monolith channels can be manufactured in different shapes, such
+as circular, square, triangular, hexagonal, and sinusoidal, among oth￾ers [28]. The catalyst is dispersed within the washcoat that is coated
+onto the inner surface of the channels [29], so the washcoat is a
+secondary support that provides for better adherence and improved
+dispersion of the active phase [30]. Some geometric parameters deter￾mine the monolith design. In particular, for square-shaped monolith
+https://doi.org/10.1016/j.cej.2025.163599
+Chemical Engineering Journal 516 (2025) 163599
+Available online 26 May 2025
+1385-8947/© 2025 Elsevier B.V. All rights are reserved, including those for text and data mining, AI training, and similar technologies.
+
+C. Reinao et al.
+channels, there is cell spacing, which refers to the distance from the
+center of one cell to the center of the adjacent one, and wall thickness
+(𝑤𝑡
+), which denotes the width of the walls separating each channel.
+Typically, monoliths are also characterized by their cell density (𝑁),
+which indicates the number of cells per unit cross-section area. It is ex￾pressed in cells per square inch (CPSI) [30,31]. All of these parameters
+together impact the pressure drop and catalytic performance.
+Despite the stated benefits, there is still room for improvement
+in monolith design, particularly in optimizing flow distribution. In
+catalytic converters, the primary application of monoliths, flow dis￾tribution has been extensively studied because the flow that comes
+from the inlet diffuser tends to concentrate at the center, leading
+to maldistribution [32]. For an homogeneous monolith with constant
+cell density, any poor distribution of the incoming flow will tend to
+persist, as there is no internal characteristic capable of redistributing
+the flow more efficiently. This results in uncontrolled variations in
+flow rates and residence times. It has been reported that in such
+cases, the catalyst within traditional monoliths is only partially utilized,
+resulting in reduced conversion efficiency and a shortened operational
+lifespan [33–35]. Important variables, such as pressure drop, are also
+affected [36,37]. These points could be addressed by manipulating
+the flow distribution within the monolith geometry. Another factor to
+consider is temperature control, crucial in monolith applications involv￾ing exothermic reactions, which often require external cooling [21].
+Despite the manufacturing challenges, highly thermally conductive
+ceramic and metallic substrates have become commercially available in
+recent years, which mitigates this restriction. Examples include silicon
+carbide and titanium aluminate honeycombs used in DPF/SCR filters
+and corrugated Fe-Cr-Al foil metallic monoliths used in Fischer–Tropsch
+reactors and high-flux methanation [38]. Recent trials with 3D-printed
+Ni/SiC monoliths demonstrate thermal stability and low pressure drop
+in methane reforming at 900 ◦C [26] supporting the possibility of
+manufacturing conductive structures on an industrial scale. A viable
+alternative involves controlling the flow distribution, directing more
+flow through the outer region of the monolith, convection is enhanced
+in that area, improving heat transfer and reducing the risk of hot
+spots and thermal gradients. In that line, the work from Kane and
+Northrop [39] reports experiments demonstrating improved heat trans￾fer without compromising conversion efficiency in a non-homogeneous
+concentric substrate, highlighting the advantages of such designs.
+Other researchers have also highlighted the potential to manipulate
+reactor performance using non-homogeneous substrates, particularly
+dual-cell density monoliths, where the cell density varies radially to
+form two concentric zones with distinct geometric characteristics [40].
+This approach has since been further developed by results from our
+group [41]. As shown in Fig. 1, the inner zone is referred to as the core,
+while the outer one is called the ring. The difference in cell density
+between these zones varies the viscous resistance to flow, resulting
+in higher flow through the more permeable region. This distribution
+can be particularly suitable for temperature control in exothermic,
+externally cooled systems.
+Early models for homogeneous monolith reactors, such as those
+based on the Hagen–Poiseuille equation, assumed fully developed lam￾inar flow within uniform channels and provided reliable predictions
+for homogeneous monoliths under idealized conditions. Due to com￾putational constraints, an extensively used approach is to model the
+monolith as a continuous medium. This allows for studying fluid dy￾namics at a larger scale, eliminating the need to explicitly solve the
+equations governing phenomena at the channel scale and within the
+washcoat, which is computationally expensive, even when only a single
+channel is considered [42,43]. To accurately represent the substrate,
+the continuum model must include source terms in the governing equa￾tions, that emulate the actual phenomena of a fluid passing through
+physical channels [37,44]. To derive the source term in the momentum
+equation representing the pressure drop, Darcy’s Law is equated with
+the Hagen–Poiseuille equation [45], obtaining an apparent permeabil￾ity for the porous medium that accounts for the energy losses produced
+in a fluid in channels. Eq. (1) shows this Darcy and Hagen–Poiseuille
+equivalence for pressure drop 𝛥𝑝∕𝐿.
+𝛥𝑃
+𝐿
+=
+𝜇𝑄
+𝛼𝑎𝑥𝑖𝑎𝑙𝐴
+=
+𝐶
+2
+𝜇𝑢𝑐ℎ
+𝐷2
+ℎ
+(1)
+thus, the apparent permeability is:
+𝛼𝑎𝑥𝑖𝑎𝑙 =
+𝜙𝐷2
+ℎ
+𝐶∕2 (2)
+while the void fraction is:
+𝜙 =
+𝐷2
+ℎ
+(𝐷ℎ + 𝑤𝑡
+)
+2
+(3)
+It can be seen from Eq. (2) that the permeability is determined by
+the channel hydraulic diameter (𝐷ℎ
+), void fraction (𝜙) and a factor
+that depends on the shape of the channel transversal area (𝐶). These
+models, while effective for uniform configurations, fail to capture the
+complexities introduced by dual-cell density monoliths, where the core
+and ring zones differ in geometrical parameters such as cell density,
+channel size, or other characteristics to achieve a specific flow dis￾tribution. These variations, designed to modulate local flow, result in
+two distinct permeabilities. Consequently, existing models for homo￾geneous systems cannot accurately represent the flow dynamics and
+resistance in these heterogeneous structures, raising the question of
+how to accurately predict the pressure drop in such substrates.
+Recent research utilizing CFD simulation [46] suggests that a back￾pressure equilibrium exists between the two concentric zones of the
+monolith, leading to a theoretical model for predicting the flow distri￾bution in the dual-cell monolith. More specifically, Eq. (4) predicts the
+fraction of the flow passing through the core region (𝑓𝑐
+), as a function
+of the fraction of the volume of the substrate belonging to the core
+(𝜆𝑐
+) and the ratio between the apparent permeability of the core (𝛼𝑐
+)
+and the ring (𝛼𝑟
+). The latter is referred to as the relative permeability
+(𝛼𝑐∕𝛼𝑟
+). This model assumes fully developed laminar flow.
+𝑓𝑐 =
+𝜆𝑐
+𝜆𝑐 + (𝛼𝑟∕𝛼𝑐
+)(1 − 𝜆𝑐
+)
+(4)
+Provided the backpressure equilibrium, the pressure drop through
+a dual-cell density monolith can be computed either by using the core
+or the ring, as shown in Eq. (5).
+𝛥𝑝𝑟
+𝐿
+=
+𝛥𝑝𝑐
+𝐿
+=
+𝜇
+𝛼𝑐
+𝑢𝑐
+(5)
+It is known from previous work that 𝑢𝑐
+is [46]:
+𝑢𝑐 =
+𝑢𝑖𝑛
+𝜆𝑐 + (𝛼𝑟∕𝛼𝑐
+)(1 − 𝜆𝑐
+)
+(6)
+Substituting Eq. (6) into Eq. (5) yields the explicit pressure drop
+expression for dual-cell density monoliths:
+𝛥𝑝 =
+𝑢𝑖𝑛𝜇𝐿
+𝛼𝑐𝜆𝑐 + 𝛼𝑟
+(1 − 𝜆𝑐
+)
+(7)
+Although this model has been developed to account for the complex
+flow patterns in non-homogeneous monoliths, it lacks experimental
+validation. This study fills that gap by experimentally validating the
+theoretical model for predicting pressure drop in dual-cell density
+monoliths. In contrast to previous research, which are focused on ho￾mogeneous monoliths and factors such as turbulence and entrance/exit
+effects, this work investigates laminar flow conditions in a single dual￾cell monolith. By experimentally validating this theoretical model,
+this study looks to provide the first comprehensive assessment of its
+predictive accuracy, adding robustness to a useful tool for accurate
+pressure drop prediction in these novel systems.
+Chemical Engineering Journal 516 (2025) 163599
+2
+
+C. Reinao et al.
+Fig. 1. Monolith with zones of different cell densities.
+Table 1
+Geometrical parameters of the monoliths used. For all cases 𝛼𝑐 = 1.88 × 10−7m2 and
+𝑁𝑐 = 42.
+Ring 𝛼𝑐∕𝛼𝑟 𝜆𝑐 = 𝐴𝑐∕𝐴𝑇
+𝐷ℎ
+, mm 𝑤𝑡
+, mm 𝑁, CPSI 𝛼𝑟
+, m2
+2.0 0.45 107 9.39 × 10−8 2.0 0.25
+2.0 0.45 107 9.39 × 10−8 2.0 0.50
+2.5 0.80 59 1.26 × 10−7 1.5 0.25
+2.5 0.80 59 1.26 × 10−7 1.5 0.50
+2. Experimental setup
+2.1. Monolith manufacture
+Dual-cell density monoliths were digitally modeled using Autodesk
+Inventor Professional 2023 [47]. For all the cases, the channels were
+square-shaped due to their ease of design, simplified modeling, and
+manufacturability through 3D printing, which ensures a more accurate
+reproduction of geometric parameters. Changes in channel shape would
+adjust the permeability through the shape factor 𝐶, with the model re￾maining applicable. The core geometric parameters, namely hydraulic
+diameter and wall thickness, were kept constant across all experiments.
+That is, the inner zone apparent permeability remained constant. It
+was calculated by using Eq. (2). Variations were introduced only in
+the core size, which ranged from 0.25 to 0.50, and in the apparent
+permeability of the ring zone. As a result, the permeability ratio (𝛼𝑐∕𝛼𝑟
+)
+moved from 1.5 to 2.0. These values correspond to the ones observed
+in typical monoliths, as axial permeabilities range between 1.2×10−8 to
+3.1 × 10−8 m2
+, [37]. The selected flow area ratios (0.25, 0.50) represent
+feasible design configurations for dual-zone monoliths, allowing for
+a representative analysis of flow behavior. Four different monolith
+configurations were designed for experimentation. Their details are
+provided in Table 1.
+The monoliths were 3D-printed in water-washable resin (Anycubic,
+grey) with a DLP 3D printer (Creality, Halot-Sky) producing structures
+150 mm in length and 68 mm in outer diameter. This material was
+selected for its ease of fabrication and precision in reproducing complex
+geometries. Given that the model focuses on flow behavior governed
+by geometry, monoliths 3D-printed in resin were considered suitable
+for this study. After printing, the models were washed with water to
+remove excess resin, air-dried at ambient temperature, and cured under
+UV light for 20 min. Fig. 2 shows an example of a digital dual-cell
+density monolith and its 3D-printed counterpart.
+2.2. Determination of apparent permeability for the 3D- printed monoliths
+The actual hydraulic diameter and wall thickness of the 3D-printed
+monoliths may differ from the design parameters due to inaccura￾cies inherent in the manufacturing process. As a result, the apparent
+Table 2
+Monolith permeability for ring (𝐷ℎ=2.0-2.5 mm) and core zones (𝐷ℎ=3.0 mm).
+𝐷ℎ
+, mm 𝑤𝑡
+, mm 𝛼 design, m2 𝜙 physical 𝛼 physical, m2 Variation, %
+2.0 0.45 9.39 × 10−8 0.57 6.90 × 10−8 26%
+2.5 0.80 1.26 × 10−7 0.55 1.15 × 10−7 9%
+3.0 0.90 1.88 × 10−7 0.54 1.60 × 10−7 15%
+permeability of the monoliths may deviate from the intended design.
+Additionally, although the design specifies a uniform hydraulic diam￾eter, the 3D printing process can introduce slight deviations, resulting
+in variability in both 𝐷ℎ and 𝑤𝑡 across different cells. Those changes
+are typically minor when using DLP, but still might be present. To
+address these potential deviations, the lengths of two sets of cells
+were measured from the physical monoliths using a Vernier caliper.
+Each set contained a different number of cells, allowing the mea￾surements to capture both the hydraulic diameter and wall thickness.
+The measurements were then used to set up a system of equations,
+which was solved to determine the average values of 𝐷ℎ and 𝑤𝑡
+. This
+procedure was carried out separately for the core and ring zones of
+the monolith. To account for possible variations in printing across the
+structure, these measurements were repeated in multiple directions
+of the monolith. This dimensional verification showed uniform wall
+thickness and channel width variations across the monolith, with no
+systematic defects at core or edges. Surface roughness, while higher
+due to resin printing, had no impact on flow as laminar conditions pre￾vailed. Printing artifacts were minimized by optimizing resin exposure
+parameters, as usual in resin 3D-printing.
+For each measurement, the apparent permeability was calculated
+using Eq. (2), and the void fraction was determined using Eq. (3). It
+should be noted that the presence of washcoat would reduce both the
+hydraulic diameter and the void fraction, affecting the permeability.
+However, the model remains applicable if the effective geometry after
+washcoating is used. These calculations were performed for both the
+core and ring zones, ensuring accurate characterization of the monolith
+properties.
+Fig. 3 presents the four 3D-printed dual-cell density monoliths used
+in the experiments, while Table 2 summarizes their key physical char￾acteristics, including measured hydraulic diameters, wall thicknesses,
+calculated permeabilities, and their variations between that of the
+digital and the physical monolith.
+2.3. Pressure drop experiments
+The experimental rig setup is illustrated in Fig. 4, which outlines
+the arrangement of components used to measure the pressure drop
+across the monolith substrate. In the setup, a stream of compressed
+air, controlled by valve V-1, flows through a hose and two parallel
+flow meters (GFM37, Alborg Instruments). The selection of compressed
+Chemical Engineering Journal 516 (2025) 163599
+3
+
+C. Reinao et al.
+Fig. 2. Design and final structure of a dual-cell density monolith.
+Fig. 3. Four 3D-printed dual-cell density monoliths.
+air as the operating fluid was due to its safe handling and well-known
+properties. The parallel arrangement of flow meters provides accurate
+measurement across a range of flow rates. The air stream then enters
+an acrylic pipe, at the end of which the monolith is mounted within a
+specially designed monolith holder. The monolith discharges directly
+into the environment, ensuring an open system configuration. The
+differential pressure transmitter PT-1 (GL42, Ashcroft) was used to
+measure the pressure drop across the substrate, capturing the difference
+in pressure before and after the monolith.
+For each experimental run, the pressure drop across the substrate,
+airflow rate, and temperature were recorded to ensure precise mon￾itoring of the system conditions. Ambient temperature was recorded
+during each run to correct the physical properties of the fluid, namely,
+density and viscosity. Both the compensated flow (adjusted for tem￾perature variations) and pressure drop were measured in duplicates
+to ensure statistically representative values. Confidence intervals were
+determined as ±one standard deviation from the mean pressure drop
+value of duplicate measurements and were used to estimate the sta￾tistical significance and derive the error bars. The detailed parameters
+for each experimental run, including flow rates and pressure drops are
+summarized in Table 3.
+3. Computational model
+3.1. Description of the domain
+The computational domain was made to closely replicate the ex￾perimental setup, ensuring an accurate comparison between simulated
+Table 3
+List of experimental runs. Reynolds number was calculated as Rein = 𝜌𝑢𝐷𝑡∕𝜇 and
+reported values Re𝑖𝑛 correspond to the average of the duplicates in each run.
+n Rein 𝛼𝑐∕𝛼𝑟 𝜆𝑐 = 𝐴𝑐∕𝐴𝑇 n Rein 𝛼𝑐∕𝛼𝑟 𝜆𝑐 = 𝐴𝑐∕𝐴𝑇
+1 85 1.39 0.25 25 133 1.39 0.50
+2 211 1.39 0.25 26 218 1.39 0.50
+3 315 1.39 0.25 27 322 1.39 0.50
+4 427 1.39 0.25 28 440 1.39 0.50
+5 538 1.39 0.25 29 540 1.39 0.50
+6 638 1.39 0.25 30 635 1.39 0.50
+7 749 1.39 0.25 31 753 1.39 0.50
+8 856 1.39 0.25 32 860 1.39 0.50
+9 956 1.39 0.25 33 954 1.39 0.50
+10 1075 1.39 0.25 34 1085 1.39 0.50
+11 1173 1.39 0.25 35 1182 1.39 0.50
+12 1277 1.39 0.25 36 1293 2.32 0.50
+13 83 2.32 0.25 37 84 2.32 0.50
+14 210 2.32 0.25 38 208 2.32 0.50
+15 317 2.32 0.25 39 312 2.32 0.50
+16 430 2.32 0.25 40 431 2.32 0.50
+17 536 2.32 0.25 41 539 2.32 0.50
+18 631 2.32 0.25 42 649 2.32 0.50
+19 746 2.32 0.25 43 755 2.32 0.50
+20 847 2.32 0.25 44 862 2.32 0.50
+21 946 2.32 0.25 45 963 2.32 0.50
+22 1073 2.32 0.25 46 1077 2.32 0.50
+23 1167 2.32 0.25 47 1175 2.32 0.50
+24 1277 2.32 0.25 48 1283 2.32 0.50
+Chemical Engineering Journal 516 (2025) 163599
+4
+
+C. Reinao et al.
+Fig. 4. Experimental rig. The tube length and internal diameter were 𝐿𝑡=1550 mm and 𝐷𝑡 = 69 mm, respectively.
+Fig. 5. Computational domain. 𝐿𝑖=1550 mm, 𝐿=150, 𝐿𝑜=30 mm, and 𝑅=34.5 mm.
+and laboratory results. The geometry consisted of an axisymmetric tube
+with a dual-cell density monolith placed within it, as depicted in Fig. 5.
+The monolith length (𝐿) was 150 mm, with a radius (𝑅) of 34.5 mm.
+To capture the full development of the flow, two additional sections
+were included: an upstream section with a length 𝐿𝑖 of 1550 mm and a
+downstream one with a length 𝐿𝑜 of 30 mm. These lengths are sufficient
+to avoid boundary effects.
+The monolith itself contained two distinct regions, the core and the
+ring, which differed in cell density and geometric properties. These
+structural variations led to differences in apparent permeability. Both
+regions feature unwashcoated channels with square cross-sections. The
+permeability variations were introduced to simulate realistic changes
+in channel diameter and wall thickness between the core and ring
+sections.
+The monolith was modeled as a continuum porous medium. This
+approach significantly reduced the computational cost by treating the
+monolith as a homogeneous material where the flow experiences equiv￾alent heat, mass and momentum transfer as it would in discrete chan￾nels [48,49]. The permeability in each region was tailored to reflect the
+dual-cell density structure, capturing the essence of flow distribution
+without requiring the resolution of individual channel details.
+3.2. Flow model
+The flow regime at the inlet was assumed to be turbulent, and it was
+modeled using the Reynolds-Averaged Navier–Stokes (RANS) equations
+with a two-equation turbulence model. The continuity and momentum
+conservation equations were applied as described by [50]:
+𝜕
+(
+𝜌𝑢𝑖
+)
+𝜕𝑥𝑖
+= 0 (8)
+𝜕
+(
+𝜌𝑢𝑖
+𝑢𝑗
+)
+𝜕𝑥𝑗
+= −
+𝜕𝑝
+𝜕𝑥𝑖
++
+𝜕
+𝜕𝑥𝑗
+[
+𝜇
+(
+𝜕𝑢𝑖
+𝜕𝑥𝑗
++
+𝜕𝑢𝑗
+𝜕𝑥𝑖
+)
+−
+2
+3
+𝜕𝑢𝑖
+𝜕𝑥𝑖
+𝛿𝑖𝑗]
+−
+𝜕𝜏𝑖𝑗
+𝜕𝑥𝑗
++ 𝑆𝑢𝑖
+(9)
+The Boussinesq hypothesis was employed to close the system [51].
+The Reynolds stress tensor, 𝜏𝑖𝑗, was modeled as:
+−𝜏𝑖𝑗 = −𝑢
+′
+𝑖
+𝑢
+′
+𝑗
+= 𝜇𝑡
+(
+𝜕𝑢𝑖
+𝜕𝑥𝑗
++
+𝜕𝑢𝑗
+𝜕𝑥𝑖
+)
+−
+2
+3
+(
+𝜕𝑢𝑖
+𝜕𝑥𝑖
+)
+𝛿𝑖𝑗 (10)
+Turbulence viscosity, 𝜇𝑡
+, was calculated using the Shear Stress
+Transport (SST) model [52], which combines the advantages of both
+the 𝑘 − 𝜖 and 𝑘 − 𝜔 models. The turbulence viscosity is expressed as:
+𝜇𝑡 = 𝜌
+𝑘
+𝜔
+1
+Max (
+1
+𝛼
+∗
+,
+𝑆𝐹2
+𝑎1𝜔
+) (11)
+The transport equations for the turbulence kinetic energy and spe￾cific dissipation rate were [52]:
+𝜕
+(
+𝜌𝑘𝑢𝑖
+)
+𝜕𝑥𝑗
+=
+[(𝜇 +
+𝜇𝑡
+𝜎𝑘
+)
+𝜕𝑘
+𝜕𝑥𝑗
+]
++ 𝜇𝑡𝑆
+2 − 𝜌𝛽∗𝑘𝜔 + 𝑆
+𝑠𝑖𝑛𝑘
+𝑘
++ 𝑆
+𝑔𝑒𝑛
+𝑘
+(12)
+𝜕
+(
+𝜌𝜔𝑢𝑖
+)
+𝜕𝑥𝑗
+=
+[(𝜇 +
+𝜇𝑡
+𝜎𝜔
+)
+𝜕𝜔
+𝜕𝑥𝑗
+]
++ 𝛼𝜔𝛼
+∗
+𝜌𝜇𝑡𝑆
+2 − 𝜌𝛽∗𝜔
+2+
+2
+(
+1 − 𝐹1
+)
+𝜌
+1
+𝜔𝜎𝜔2
+𝜕𝑘
+𝜕𝑥𝑗
+𝜕𝜔
+𝑥𝑗
++ 𝑆
+𝑠𝑖𝑛𝑘
+𝜔
++ 𝑆
+𝑔𝑒𝑛
+𝜔
+(13)
+There is substantial evidence in the literature that once turbulent
+flow enters the monolith, and there is a sub-critical Reynolds number
+inside of the channels, then turbulence quickly decays [53]. Based
+on that, inside of the monolith, both turbulence kinetic energy and
+specific dissipation ratio were set to zero. Despite that, the flow does
+not become steady; instead, it becomes laminar unsteady in a sort of
+pulsatile regime. Such a phenomenon has been previously investigated
+by our group, reporting that it does not significantly affect the pressure
+drop [54]. Therefore, assuming a steady laminar flow friction factor
+still recognizes pulsating flow without violating mass conservation. It
+is also known that turbulence can arise because of the flow leaving the
+substrate [55]. However, this has only a minor effect on total pressure
+drop and can be neglected for most of the cases [56,57].
+The monolith itself was modeled as a continuous porous medium,
+with a source term in the momentum equation representing the extra
+pressure drop because of the flow inside the channels. Darcy law was
+used in conjunction with the Hagen–Poiseuille equation to derive the
+source term, which is valid for fully developed laminar flow. That term
+appears in the momentum equation as [58,59]:
+𝑆𝑢𝑖
+= −
+𝜇
+𝛼𝑖
+𝑢𝑖
+(14)
+Chemical Engineering Journal 516 (2025) 163599
+5
+
+C. Reinao et al.
+Fig. 6. Pressure drop through the monolith for different grid sizes.
+In the monolith, the flow is confined primarily to the axial direction
+of the channels. Therefore, to correctly represent this in the compu￾tational domain, the axial permeability was set to be three orders of
+magnitude larger than the radial one, as shown below:
+𝛼𝑎𝑥𝑖𝑎𝑙𝑛
+=
+𝜙𝑛𝐷2
+𝑛
+𝐶𝑛∕2 ; 𝛼𝑟𝑎𝑑𝑖𝑎𝑙𝑛
+=
+𝛼𝑎𝑥𝑖𝑎𝑙𝑛
+1000
+(15)
+In Eq. (15), the 𝑛 subscript refers to the core (𝑛 = 𝑐) or ring (𝑛 = 𝑟).
+For the boundary conditions, a velocity inlet was prescribed, which var￾ied according to the Reynolds number for each computational run. At
+the outlet, a pressure boundary condition of 1 bar was imposed. The top
+boundary of the domain was set as a solid wall, with no-slip condition
+in the monolith zone, as the Darcy term accounted for all frictional
+effects inside the substrate. The bottom boundary represented the axis
+of rotational symmetry, consistent with the axisymmetric geometry of
+the domain. The fluid used for all simulations was atmospheric air, with
+its properties evaluated at the experimentally measured temperature in
+the respective run. The simulations were performed using ANSYS Fluent
+2023 R2 [50], which employs the finite volume method for numerical
+solutions.
+3.3. Grid study and model validation
+A grid independence test was performed to ensure the mesh quality
+and validate that the results were independent of the grid size [60,61].
+The pressure drop across the monolith was monitored for six different
+grid sizes, as this variable is both sensitive to the grid resolution and
+critical to the study objectives. The grid, fully composed of rectangular
+elements, was progressively refined, with the number of control vol￾umes ranging from 680 000 to 2 400 000. All simulations were performed
+under the same conditions, with Re𝑖𝑛 = 630 and 𝛼=1.15 × 10−7 m2
+. The
+results in Fig. 6, indicate that, beyond the fourth grid size (correspond￾ing to 607 250 control volumes), the difference in the pressure drop is
+negligible. Therefore, further refinement of the grid would not yield
+significant improvements, and the study continued with this mesh size.
+In addition to the grid study, a validation of the results was con￾ducted. The pressure drop across a monolith with homogeneous per￾meability (or uniform cell density) was compared against a well￾established theoretical prediction—the Hagen–Poiseuille equation. This
+expression is highly validated for laminar flow through channels and is
+given by [58,59]:
+𝛥𝑝 =
+𝐷ℎ
+𝐿
+56.8
+Re𝑐ℎ
+1
+2
+𝜌𝑢2
+𝑐ℎ (16)
+In the simulation, the pressure drop was determined by calculating
+the energy loss between the inlet and outlet faces of the monolith
+Fig. 7. Comparison between the pressure drop from the computational model and that
+from Hagen–Poiseuille equation.
+Table 4
+List of computational runs.
+n Rein 𝛼𝑐∕𝛼𝑟 𝜆𝑐 = 𝐴𝑐∕𝐴𝑇 n Rein 𝛼𝑐∕𝛼𝑟 𝜆𝑐 = 𝐴𝑐∕𝐴𝑇
+1 80 1.39 0.25 25 80 1.39 0.50
+2 190 1.39 0.25 26 190 1.39 0.50
+3 300 1.39 0.25 27 300 1.39 0.50
+4 410 1.39 0.25 28 410 1.39 0.50
+5 520 1.39 0.25 29 520 1.39 0.50
+6 630 1.39 0.25 30 630 1.39 0.50
+7 740 1.39 0.25 31 740 1.39 0.50
+8 850 1.39 0.25 32 850 1.39 0.50
+9 960 1.39 0.25 33 960 1.39 0.50
+10 1070 1.39 0.25 34 1070 1.39 0.50
+11 1180 1.39 0.25 35 1180 1.39 0.50
+12 1290 1.39 0.25 36 1290 2.32 0.50
+13 80 2.32 0.25 37 80 2.32 0.50
+14 190 2.32 0.25 38 190 2.32 0.50
+15 300 2.32 0.25 39 300 2.32 0.50
+16 410 2.32 0.25 40 410 2.32 0.50
+17 520 2.32 0.25 41 520 2.32 0.50
+18 630 2.32 0.25 42 630 2.32 0.50
+19 740 2.32 0.25 43 740 2.32 0.50
+20 850 2.32 0.25 44 850 2.32 0.50
+21 960 2.32 0.25 45 960 2.32 0.50
+22 1070 2.32 0.25 46 1070 2.32 0.50
+23 1180 2.32 0.25 47 1180 2.32 0.50
+24 1290 2.32 0.25 48 1290 2.32 0.50
+substrate. The total pressure at each face was averaged using a mass￾weighted approach, as described by Eq. (17). This method ensures
+consistency with the momentum conservation principle and represents
+the pressure behavior across the monolith.
+𝑝|𝑥 =
+∫𝐴
+𝑝𝑢𝑑𝐴
+∫𝐴
+𝑢𝑑𝐴
+(17)
+Fig. 7 presents the pressure drop results for three different per￾meability values and a range of inlet Reynolds numbers (from 80
+to 1290). The computational model shows close agreement with the
+Hagen–Poiseuille equation across all cases, validating the accuracy of
+the simulation for predicting pressure drop behavior in monoliths.
+The list of computational runs is detailed in Table 4, which shows
+the variations in core size (ranging from 0.25 to 0.50) and relative
+permeability values (𝛼𝑐∕𝛼𝑟
+) between 1.39 and 2.32. These conditions
+were selected to match those used in the physical experiments, ensuring
+that the simulations match real-world behavior.
+Chemical Engineering Journal 516 (2025) 163599
+6
+
+C. Reinao et al.
+Fig. 8. Pressure drop distribution for different apparent permeabilities and core sizes. The 𝑥-axis is scaled as 𝑥∕(𝐿𝑖+𝐿+𝐿𝑜
+).
+4. Results and discussion
+This section presents the main results obtained from the experimen￾tal trials and the corresponding simulation runs. The analysis is divided
+into two parts: pressure drop behavior and flow distribution through
+the dual-cell density monolith. Both experimental and computational
+findings are compared to assess the accuracy of the computational
+model and its potential for practical applications.
+4.1. Backpressure and flow distribution
+Fig. 8 shows the pressure distribution for the section of the domain
+close to the substrate for an inlet Reynolds number of 650. The figure
+covers all the core sizes and apparent permeabilities under study.
+Notably, in the monolith area, the pressure is mostly uniform in the
+radial direction across the whole monolith, confirming the backpressure
+equilibrium assumption between the core and ring zones. In addition,
+it is observed from comparing Fig. 8(a) and (b) that the pressure drop
+increases with a smaller core size due to the reduction of the size
+of the more permeable region. Regarding the effect of the relative
+permeability, the differences between Fig. 8(a) and (c) show that a
+higher ratio or disparity leads to a higher pressure drop as well.
+Similarly, the velocity profile within the same zone of tube is
+displayed in Fig. 9. It is observed that in the monolith region, the
+velocity magnitude profile seems constant at their own core and ring
+values. At smaller core size values, the variation in flow distribution be￾comes more significant, increasing the velocity value through the core.
+Likewise, at larger relative permeabilities, the flow tends to increase
+through the more permeable region as the difference in resistance to
+flow between the core and ring becomes more significant.
+To further analyze the flow distribution, Fig. 10 reports the axial
+velocity profile at the outlet of the substrate for a homogeneous mono￾lith (𝛼𝑐∕𝛼𝑟 = 1.00). It is compared to that from a dual-cell density
+monolith with the core region being more permeable (𝛼𝑐∕𝛼𝑟 = 2.32) and
+one with the ring being more permeable (𝛼𝑟∕𝛼𝑐 = 2.32), interchanging
+their local permeabilities. The axial velocity profiles of the dual-cell
+density monoliths mirror each other symmetrically, indicating that
+the permeability distribution significantly affects the flow field at the
+monolith exit. The more permeable region consistently drives more
+flow, leading to significantly different outlet velocity profiles compared
+to the homogeneous case.
+4.2. Pressure drop model
+As previously mentioned, the pressure drop through the monolith,
+by equals the ring and core, can be modeled by using Eq. (7), which
+depends on the geometrical parameters of the core and ring, flow rate
+and the properties of the operating fluid. The equation was tested
+against experimental and CFD data for different relative permeabilities,
+core sizes and Rein. The results are summarized in Fig. 11.
+The results in Fig. 11 show that the theoretical model closely follows
+the trends observed in both the experimental and CFD data, particularly
+at lower Reynolds numbers. This agreement evidences that the model
+effectively captures the main factors influencing pressure drop, even in
+configurations with varying core sizes and apparent permeabilities.
+For the case of 𝜆𝑐=0.25 and 𝛼𝑐
+/𝛼𝑟=1.39 (Fig. 11(a)), the experi￾mental and CFD results are in strong agreement, and the theoretical
+model closely matches both datasets. Minor deviations appear when
+increasing Reynolds numbers, where the theoretical model slightly
+underestimates the pressure drop. A similar trend is observed for
+𝜆𝑐=0.50 and 𝛼𝑐
+/𝛼𝑟=2.32 (Fig. 11(c)), where the theoretical model again
+performs well, but shows small discrepancies at higher Re. These results
+suggest that the theoretical model is robust in predicting pressure
+drop for small-core configurations, with only slight underestimations
+at higher flow rates.
+In the case of a larger core with lower apparent permeability
+(Fig. 11(b)), the theoretical model also performs well, closely aligning
+with both the experimental and CFD data across the full range of
+Reynolds numbers. However, as the apparent permeability increases in
+the larger-core configuration (Fig. 11(d)), the discrepancies between
+the theoretical model and the experimental/CFD results become more
+pronounced at higher Re. While the model still provides a reasonable
+approximation, it tends to underestimate the pressure drop more visibly
+as Reynolds numbers increase. The underestimation of the pressure
+drop in the mentioned cases suggests that additional factors, such as
+entrance and exit effects or more complex flow resistance mechanisms,
+may become important in higher flow rate conditions.
+All cases show a linear relationship between Reynolds number and
+pressure drop, confirming that the structure of the proposed theo￾retical model is fundamentally correct. This linearity supports a core
+assumption of the model that pressure drop is dominated by fully
+Chemical Engineering Journal 516 (2025) 163599
+7
+
+C. Reinao et al.
+Fig. 9. Velocity distribution for different apparent permeabilities and core sizes. The 𝑥-axis is scaled as 𝑥∕(𝐿𝑖+𝐿+𝐿𝑜
+).
+Fig. 10. Velocity profile at the outlet of the monolith for different relative permeabil￾ities (𝛼𝑐
+/𝛼𝑟
+). 𝑈 is the area-weighted average velocity.
+developed laminar flow inside the parallel channels of the monolith.
+However, slight variations in the slope between the experimental, CFD,
+and theoretical results suggest differences in the actual permeability of
+the physical monolith and the values assumed in both the theoretical
+and computational models. These discrepancies might be attributed
+to minor manufacturing imperfections, which are typical in extruded
+monoliths but less pronounced in 3D-printed models. In this study,
+DPL (Digital Light Processing) 3D printing was used, which is known
+for its superior precision compared to traditional extrusion methods.
+Nevertheless, despite this fact, small manufacturing irregularities in
+the monolith were still observed. Variations in channel sizes and wall
+thicknesses, even within the same region, were detected when mea￾suring the physical 3D-printed monoliths. These imperfections may
+have affected the permeability and contributed to the observed de￾viations. Additionally, the theoretical and CFD models assumed that
+all channels were perfectly square. Meanwhile, some real channels are
+partially truncated by the boundaries of the core region and the shell
+of the monolith. Those boundary channels have a smaller hydraulic
+diameter compared to regular square channels. This leads to a lower
+local apparent permeability, which in turn increases the slope of the
+pressure drop versus Reynolds number trend, while maintaining its
+linear character. This does not affect the backpressure equilibrium
+assumption; however, it may become more significant as the fraction
+of channels with non-regular shapes increases.
+Overall, the differences between the model and the experiments
+remained small. The marked alignment between the experimental and
+CFD results with the theoretical model across all cases suggests the
+reliability of both the experimental setup and the CFD approach, further
+validating the proposed model for pressure drop in dual-cell density
+monoliths.
+As an additional analysis, the results presented in Fig. 12 further
+emphasize the usefulness of the proposed model for predicting pressure
+drop in dual-cell density monoliths. As shown in both plots, the pres￾sure drop for dual-cell configurations may significantly deviate from
+that of homogeneous monoliths, whether assuming the permeability
+of the core (black dashed line) or the ring (red dashed line). This
+discrepancy is particularly pronounced in cases of high apparent perme￾ability (Fig. 12(b)), where the experimentally measured pressure drop
+(red squares and black circles) may lie substantially distant from the
+predictions for homogeneous monoliths. In both low and high apparent
+relative permeability cases, neither the core nor the ring permeability
+alone is sufficient to capture the pressure drop behavior of the dual-cell
+structure, as the pressure drop for dual-cell monoliths results from the
+complex interaction between the core and ring regions together with
+the backpressure equilibrium. These findings highlight the limitations
+of existing models that assume a single permeability and emphasize
+the proposed model’s reliability, specifically designed to account for
+the non-homogeneous nature of dual-cell density monoliths. Therefore,
+this model can accurately predict pressure drop in such configurations,
+which opens opportunities for further monolith shape optimization.
+5. Conclusions
+This study provides the first experimental validation of a theoretical
+model designed to predict pressure drop in dual-cell density monoliths.
+Using 3D-printed monoliths with varying core sizes and relative per￾meabilities, the experimental results strongly correlate with the model
+Chemical Engineering Journal 516 (2025) 163599
+8
+
+C. Reinao et al.
+Fig. 11. Pressure drop from the experiments, CFD and theoretical model for different dual-cell density monoliths.
+Fig. 12. Comparison of pressure drop between dual-cell density and homogeneous monoliths.
+predictions, confirming its robustness across a range of conditions. The
+model effectively captures the pressure drop behavior of dual-cell den￾sity monoliths, where pressure drop increases with higher permeability
+ratios and smaller core sizes, consistent with the model formulation.
+Moreover, the findings also confirm the existence of a backpres￾sure equilibrium between the core and ring zones, supporting a key
+assumption of the theoretical formulation. Complementary CFD simu￾lations further validate these observations, supporting that the model
+accurately predicts flow dynamics and resistance in non-homogeneous
+monolith structures. While minor deviations in pressure drop are ob￾served at higher Reynolds numbers — likely due to entrance and exit
+effects — these factors do not significantly impact the overall accuracy
+of the model.
+Compared to homogeneous substrate configurations, dual-cell den￾sity monoliths exhibit different pressure drop characteristics, under￾scoring requiring specialized models like the one validated in this study
+to predict the behavior of non-homogeneous substrates accurately. The
+results confirm the reliability of the analyzed model, making it a useful
+tool for optimizing monolith designs in industrial catalytic applications.
+Future work could extend the experimental validation of the model
+to a broader range of monolith configurations, including, for example,
+different cell geometries. This would help assess the model robustness
+Chemical Engineering Journal 516 (2025) 163599
+9
+
+C. Reinao et al.
+across more diverse applications. Additionally, investigating the impact
+of entrance and exit effects more thoroughly, especially at higher
+Reynolds numbers and low void fractions, could provide deeper insights
+into flow dynamics and further refine the model predictive capabilities.
+Additionally, optimizing dual-cell density monoliths for specific cat￾alytic reactions, including those involving highly exothermic reactions,
+could open new opportunities for improving reactor performance.
+Nomenclature
+𝐴𝑐 Core cross-sectional area, m2
+𝐴𝑟 Ring cross-sectional area, m2
+𝐴𝑇 Total cross-sectional area, m2
+𝐶 Shape factor, -
+𝐷ℎ Hydraulic diameter, m
+𝐷𝑡 Tube internal diameter, m
+𝑓𝑐 Fraction of flow passing through the core, m
+𝑘 Turbulence kinetic energy, m2/𝑠
+2
+𝐿 Monolith length, m
+𝐿𝑖
+Inlet tube length, m
+𝐿𝑜 Outlet tube length, m
+𝐿𝑡 Tube length, m
+𝑁 Cell density, CPSI
+𝑝 Pressure, Pa
+𝛥𝑝 Pressure drop, Pa
+𝛥𝑝𝑐 Core pressure drop, Pa
+𝛥𝑝𝑟 Ring pressure drop, Pa
+𝑅 Total or tube radius, m
+𝑅𝑐 Core radius, m
+Re𝑐ℎ Channel Reynolds number, = 𝜌𝑢𝐷𝑐ℎ∕𝜇
+Re𝑖𝑛 Inlet or tube Reynolds number, = 𝜌𝑢𝐷𝑡∕𝜇
+𝑢 Velocity magnitude, m/s
+𝑢𝑐ℎ Channel velocity, m/s
+𝑤𝑡 Wall thickness, m
+𝛼 Apparent permeability, m2
+𝛼𝑐 Core apparent permeability, m2
+𝛼𝑟 Ring apparent permeability, m2
+𝛿𝑖𝑗 Kronecker delta, -
+𝜙 Void fraction, -
+𝜌 Fluid density, kg/m3
+𝜇 Fluid viscosity, Pa⋅s
+𝜇𝑡 Turbulence viscosity, Pa⋅s
+𝜔 Specific turbulence dissipation rate, 1∕s
+CRediT authorship contribution statement
+Consuelo Reinao: Writing – review & editing, Writing – original
+draft, Visualization, Validation, Software, Methodology, Investigation,
+Formal analysis, Conceptualization. Pablo Diaz: Writing – review &
+editing, Validation, Methodology, Investigation, Formal analysis. Ivan
+Cornejo: Writing – review & editing, Writing – original draft, Su￾pervision, Resources, Project administration, Methodology, Funding
+acquisition, Conceptualization.
+Declaration of competing interest
+The authors declare that they have no known competing finan￾cial interests or personal relationships that could have appeared to
+influence the work reported in this paper.
+Acknowledgments
+Financial support provided by ANID through the IDeA project No.
+ID24I10307 is acknowledged.
+Data availability
+Data will be made available on request.
+References
+[1] P.T. Anastas, M.M. Kirchhoff, T.C. Williamson, Catalysis as a foundational pillar
+of green chemistry, Appl. Catal. A: Gen. 221 (1–2) (2001) 3–13.
+[2] O. Laguna, M. Domínguez, M. Centeno, J. Odriozola, Catalysts on metallic
+surfaces: Monoliths and microreactors, New Mater. Catal. Appl. (2016) 81–120.
+[3] M.T. Kreutzer, F. Kapteijn, J.A. Moulijn, Shouldn’t catalysts shape up?: Structured
+reactors in general and gas–liquid monolith reactors in particular, Catal. Today
+111 (1–2) (2006) 111–118.
+[4] I.M.V. Mesquida, I. Cornejo, P. Nikrityuk, R. Greiner, M. Votsmeier, R.E. Hayes,
+Towards a fully predictive multi-scale pressure drop model for a wall-flow filter,
+Chem. Eng. Res. Des. 164 (2020) 261–280.
+[5] S. Ergun, Fluid flow through packed columns, Chem. Eng. Prog. (1952) 89.
+[6] R. Beetstra, M.A. van der Hoef, J. Kuipers, Numerical study of segregation
+using a new drag force correlation for polydisperse systems derived from
+lattice-Boltzmann simulations, Chem. Eng. Sci. 62 (1–2) (2007) 246–255.
+[7] S. Gao, J. Theuerkauf, P. Pakseresht, K. Kellogg, Y. Fan, A modified ergun equa￾tion for application in packed beds with bidisperse and polydisperse spherical
+particles, Powder Technol. 445 (2024) 120035.
+[8] S.B. Jaffe, Hot spot simulation in commercial hydrogenation processes, Ind. Eng.
+Chem. Process. Des. Dev. 15 (3) (1976) 410–416.
+[9] M. Shah, D. West, V. Balakotaiah, Analysis of thermoflow instabilities in
+adiabatic packed-bed catalytic reactors, Chem. Eng. J. 452 (2023) 139365.
+[10] W. Zhang, Y. Lin, Y. Zhang, T. Li, J. Li, Z. Chen, K. Norinaga, Regulation
+of temperature distribution in fixed bed reactor for CO2 methanation through
+‘‘CHESS’’ monolith structure catalyst, Appl. Therm. Eng. 236 (2024) 121826.
+[11] P. Forzatti, L. Lietti, Catalyst deactivation, Catal. Today 52 (2–3) (1999)
+165–181.
+[12] C.H. Bartholomew, Mechanisms of catalyst deactivation, Appl. Catal. A: Gen. 212
+(1–2) (2001) 17–60.
+[13] G.A. Tafete, N.G. Habtu, Reactor configuration, operations and structural catalyst
+design in process intensification of catalytic reactors: A review, Chem. Eng.
+Processing- Process. Intensif. 184 (2023) 109290.
+[14] R.M. Heck, S. Gulati, R.J. Farrauto, The application of monoliths for gas phase
+catalytic reactions, Chem. Eng. J. 82 (1–3) (2001) 149–156.
+[15] L. Baharudin, M.J. Watson, A.C. Yip, et al., Process intensification in multifunc￾tional reactors: A review of multi-functionality by catalytic structures, internals,
+operating modes, and unit integrations, Chem. Eng. Processing- Process. Intensif.
+168 (2021) 108561.
+[16] A. Zamaniyan, A.A. Khodadadi, Y. Mortazavi, H. Manafi, Comparative model
+analysis of the performance of tube fitted bulk monolithic catalyst with conven￾tional pellet shapes for natural gas reforming, J. Ind. Eng. Chem. 17 (4) (2011)
+767–776.
+[17] P. Avila, M. Montes, E.E. Miró, Monolithic reactors for environmental applica￾tions: A review on preparation technologies, Chem. Eng. J. 109 (1–3) (2005)
+11–36.
+[18] R.E. Hayes, I. Cornejo, Multi-scale modelling of monolith reactors: A 30-year
+perspective from 1990 to 2020, Can. J. Chem. Eng. 99 (12) (2021) 2589–2606.
+[19] J. Liu, X. Zou, M. Chen, X. Zhu, S. Kang, Q. Xia, Y. Cao, S. Zhang, Z. Ge, Z. Shen,
+et al., Construction of multi-porous Ni-based monolithic catalyst by combining
+wood carbon and SBA-15 for strengthening CO2 methanation, Chem. Eng. Sci.
+293 (2024) 120070.
+[20] A. Bustinza, M. Frías, Y. Liu, E. García-Bordejé, Mono-and bimetallic metal
+catalysts based on Ni and Ru supported on alumina-coated monoliths for CO2
+methanation, Catal. Sci. Technol. 10 (12) (2020) 4061–4071.
+[21] S. Arab, J.-M. Commenge, J.-F. Portha, L. Falk, Methanol synthesis from CO2
+and H2 in multi-tubular fixed-bed reactor and multi-tubular reactor filled with
+monoliths, Chem. Eng. Res. Des. 92 (11) (2014) 2598–2608.
+[22] A. Montebelli, C.G. Visconti, G. Groppi, E. Tronconi, C. Ferreira, S. Kohler,
+Enabling small-scale methanol synthesis reactors through the adoption of highly
+conductive structured catalysts, Catal. Today 215 (2013) 176–185.
+[23] X.K. Phan, H. Bakhtiary-Davijany, R. Myrstad, P. Pfeifer, H.J. Venvik, A. Holmen,
+Preparation and performance of Cu-based monoliths for methanol synthesis,
+Appl. Catal. A: Gen. 405 (1–2) (2011) 1–7.
+[24] L. Baharudin, M.J. Watson, Monolithic substrate support catalyst design consid￾erations for steam methane reforming operation, Rev. Chem. Eng. 34 (4) (2018)
+481–501.
+[25] F. Agueniou, H. Vidal, J. de Dios López, J.C. Hernández-Garrido, M.A. Cauqui,
+F.J. Botana, J.J. Calvino, V.V. Galvita, J.M. Gatica, 3D-printing of metallic
+honeycomb monoliths as a doorway to a new generation of catalytic devices:
+the Ni-based catalysts in methane dry reforming showcase, Catal. Commun. 148
+(2021) 106181.
+[26] Z. Shen, S.A. Nabavi, P.T. Clough, Design and performance testing of a mono￾lithic nickel-based SiC catalyst for steam methane reforming, Appl. Catal. A: Gen.
+670 (2024) 119529.
+Chemical Engineering Journal 516 (2025) 163599
+10
+
+C. Reinao et al.
+[27] K. Fu, Y. Su, Y. Zheng, R. Han, Q. Liu, Novel monolithic catalysts for VOC’s
+removal: A review on preparation, carrier and energy supply, Chemosphere 308
+(2022) 136256.
+[28] C.D. Depcik, A.J. Hausmann, Review and a methodology to investigate the effects
+of monolithic channel geometry, J. Eng. Gas Turbines Power 135 (3) (2013)
+032301.
+[29] R.E. Hayes, Introduction to Catalytic Combustion, Routledge, 2021.
+[30] S. Govender, H.B. Friedrich, Monoliths: a review of the basics, preparation
+methods and their relevance to oxidation, Catalysts 7 (2) (2017) 62.
+[31] J.A. Moulijn, M.T. Kreutzer, T.A. Nijhuis, F. Kapteijn, Monolithic catalysts and
+reactors: high precision with low energy consumption, Adv. Catal. 54 (2011)
+249–327.
+[32] G. Agrawal, N.S. Kaisare, S. Pushpavanam, K. Ramanathan, Modeling the effect
+of flow mal-distribution on the performance of a catalytic converter, Chem. Eng.
+Sci. 71 (2012) 310–320.
+[33] H.A. Ibrahim, W.H. Ahmed, S. Abdou, V. Blagojevic, Experimental and numerical
+investigations of flow through catalytic converters, Int. J. Heat Mass Transfer 127
+(2018) 546–560.
+[34] E. Karvounis, D.N. Assanis, The effect of inlet flow distribution on catalytic
+conversion efficiency, Int. J. Heat Mass Transfer 36 (6) (1993) 1495–1504.
+[35] S.F. Benjamin, N. Haimad, C.A. Roberts, J. Wollin, Modelling the flow distribu￾tion through automotive catalytic converters, Proc. Inst. Mech. Eng. Part C: J.
+Mech. Eng. Sci. 215 (4) (2001) 379–383.
+[36] F. Ekström, B. Andersson, Pressure drop of monolithic catalytic converters
+experiments and modeling, SAE Trans. (2002) 425–433.
+[37] R.E. Hayes, A. Fadic, J. Mmbaga, A. Najafi, CFD modelling of the automotive
+catalytic converter, Catal. Today 188 (1) (2012) 94–105.
+[38] C.G. Visconti, E. Tronconi, G. Groppi, L. Lietti, M. Iovane, S. Rossini, R. Zennaro,
+Monolithic catalysts with high thermal conductivity for the fischer–tropsch
+synthesis in tubular reactors, Chem. Eng. J. 171 (3) (2011) 1294–1307.
+[39] S.P. Kane, W.F. Northrop, A quasi-dimensional model of heat transfer between
+multi-concentric monolith structures, Thermo 3 (4) (2023) 515–536.
+[40] J.Y. Kim, S. Son, IMproving Flow Efficiency of a Catalytic Converter Using the
+Concept of Radially Variable Cell Density-Part I, Tech. rep., SAE Technical Paper,
+1999.
+[41] I. Cornejo, A model for correcting the pressure drop between two monoliths,
+Catalysts 11 (11) (2021) 1314.
+[42] F. Bertrand, C. Devals, D. Vidal, C.S. De Preval, R.E. Hayes, Towards the
+simulation of the catalytic monolith converter using discrete channel-scale
+models, Catal. Today 188 (1) (2012) 80–86.
+[43] M. Hettel, E. Daymo, T. Schmidt, O. Deutschmann, CFD-modeling of fluid
+domains with embedded monoliths with emphasis on automotive converters,
+Chem. Eng. Processing- Process. Intensif. 147 (2020) 107728.
+[44] R. Clarkson, S.F. Benjamin, T. Jasper, N. Girgls, An Integrated Computational
+Model for the Optimisation of Monolith Catalytic Converters, Tech. rep., SAE
+Technical Paper, 1993.
+[45] F. Durst, I. Arnold, Fluid Mechanics: an Introduction to the Theory of Fluid
+Flows, vol. 675, Springer, 2008.
+[46] C. Reinao, I. Cornejo, A model for the flow distribution in dual cell density
+monoliths, Processes 11 (3) (2023) 827.
+[47] Autodesk Inventor Release 2023, Autodesk inc., san francisco, ca, usa, 2023.
+[48] I. Cornejo, P. Nikrityuk, R.E. Hayes, Pressure correction for automotive catalytic
+converters: A multi-zone permeability approach, Chem. Eng. Res. Des. 147 (2019)
+232–243.
+[49] I. Cornejo, P. Nikrityuk, R.E. Hayes, Heat and mass transfer inside of a monolith
+honeycomb: From channel to full size reactor scale, Catal. Today 383 (2022)
+110–122.
+[50] ANSYS Fluent Release 2023R2, Ansys inc., canonsburg, pa, usa, 2023.
+[51] J.O. Hinze, Turbulence, McGraw-Hill, New York, 1975.
+[52] F.R. Menter, Improved Two-Equation K-Omega Turbulence Models for
+Aerodynamic Flows, Tech. rep., NASA, 1992.
+[53] I. Cornejo, P. Nikrityuk, R.E. Hayes, Multiscale RANS-based modeling of the
+turbulence decay inside of an automotive catalytic converter, Chem. Eng. Sci.
+175 (2018) 377–386.
+[54] I. Cornejo, P. Nikrityuk, C. Lange, R.E. Hayes, Influence of upstream turbulence
+on the pressure drop inside a monolith, Chem. Eng. Processing- Process. Intensif.
+147 (2020) 107735.
+[55] I. Cornejo, P. Nikrityuk, R.E. Hayes, Turbulence generation after a monolith in
+automotive catalytic converters, Chem. Eng. Sci. 187 (2018) 107–116.
+[56] G. Garretón, L. Maxwell, I. Cornejo, Transition of the flow regime inside of
+monolith microchannel reactors fed with highly turbulent flow, Catalysts 13 (6)
+(2023) 938.
+[57] I. Cornejo, A new model for pressure drop correction for series-arranged
+misaligned monoliths, Chem. Eng. Sci. 299 (2024) 120515.
+[58] T.L. Bergman, F.P. Incropera, D.P. DeWitt, A.S. Lavine, Fundamentals of Heat
+and Mass Transfer, John Wiley & Sons, 2011.
+[59] F.M. White, Fluid Mechanics, McGraw-Hill, 2009.
+[60] O. Zikanov, Essential Computational Fluid Dynamics, John Wiley & Sons, 2010.
+[61] M. Lee, G. Park, C. Park, C. Kim, Improvement of grid independence test for
+computational fluid dynamics model of building based on grid resolution, Adv.
+Civ. Eng. 2020 (1) (2020) 8827936.
+Chemical Engineering Journal 516 (2025) 163599
+11

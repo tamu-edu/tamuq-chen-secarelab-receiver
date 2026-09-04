@@ -1,0 +1,483 @@
+SolarPACES 2023, 29th International Conference on Concentrating Solar Power, Thermal, and Chemical Energy 
+Systems
+Receivers and Heat Transfer Media and Transport: Point Focus Systems
+https://doi.org/10.52825/solarpaces.v2i.821
+© Authors. This work is licensed under a Creative Commons Attribution 4.0 International License
+Published: 24 Jul. 2024
+Flow Distribution in Molten Salt Receiver Panels at 
+High Flux Gradients
+Investigating the Risk of Stagnating Flow Due to Uneven Irradiation
+Christian Schwager1 , Jonas Schulte1,* , Matthias Binder2 , 
+Cristiano José Teixeira Boura1 , and Ulf Herrmann1 
+1 Solar-Institut Jülich of FH Aachen University of Applied Sciences, Germany
+2 MAN Energy Solutions SE, Germany
+*Correspondence: j.schulte@sij.fh-aachen.de
+Abstract. This paper presents a simulation study on critical mass flow distributions in receiver 
+panels of commercial-scale molten salt towers (MST). Despite sophisticated aimpoint optimi￾zations, the flux density distribution on an MST receiver in actual operation contains significant 
+vertical and horizontal gradients. This study investigated how the latter affects the mass flow 
+distribution among the parallel absorber tubes in each panel. A parametric study applied a 
+discretized dynamic thermohydraulic model of a commercial scale receiver design, highlighting 
+at which mass flow rates, flux density gradients and mean flux densities the flow distribution 
+can become critical. Excessive temperature developments were observed, suggesting main￾taining appropriate minimal mass flow rates to avoid damaging tube walls and the molten salt 
+chemistry. 
+Keywords: Molten Salt Tower, Dynamic Simulation, Critical Operation, Mass Flow Control 
+1. Introduction
+Molten salt towers (MST) have become a state-of-the-art technology for efficiently harnessing 
+solar energy with integrated energy storage. Developers and researchers keep pushing the 
+limits to increase efficiency and reduce the levelized cost of the produced electricity. Conse￾quently, the core components of the molten salt solar receiver must operate close to its phys￾ical limits. Besides conventional limits for material and heat transfer fluid (HTF) temperatures, 
+more sophisticated operational limitations have been introduced tailored to this technology. 
+For example, Vant-Hull [1] introduced the concept of allowable flux density (AFD) limits based 
+on maximum HTF film temperature and thermal stress limitations, which are commonly applied 
+in MST engineering. More recently, Binder et al. [2] and Hering et al. [3] developed methods 
+to predict the lifetime consumption of absorber tubes due to their uneven and transient irradi￾ation. Also, Popp et al. [4] tackled the challenging dynamic behavior of an MST receiver with 
+a model predictive controller that limits local film temperature peaks by proactively adjusting 
+the HTF mass flow rate.
+However, those approaches consider even HTF flow distribution within each receiver 
+panel. Commercial-scale MST receivers are composed of several panels connected in series, 
+which each hold a bundle of parallel absorber tubes, as illustrated in Figure 1. Hence, the 
+overall HTF flow splits into numerous tube flows in each receiver panel. Without any solar flux, 
+1
+
+Schwager et al. | SolarPACES Conf Proc 2 (2023) "SolarPACES 2023, 29th International Conference on 
+Concentrating Solar Power, Thermal, and Chemical Energy Systems"
+the flow distribution should be more or less even since the header volumes are designed ap￾propriately large so that the wall friction inside the absorber tubes dominates the pressure loss 
+and, therefore, the mass flow rates. When the tubes heat up by the concentrated solar radiation 
+and the heat is transferred to the HTF, it affects the fluid properties. Especially the HTF density 
+varies by approximately. 10 % in the operational temperature range, impacting the gravitational 
+force on the fluid column in each absorber tube. At the same time, due to the sun's position, 
+the heliostat field layout and (sometimes) partial shading, the solar flux density is not distrib￾uted homogeneously onto the receiver. Instead, the flux density distribution has horizontal (cir￾cumferential on the cylindrical receiver surface) and vertical gradients, even in clear-sky con￾ditions [5]. 
+ 
+Figure 1. The flow pattern through a receiver flow path (half of the receiver) and an exemplary (down￾stream) receiver panel.
+Consequently, the HTF in the tubes with higher flux density is heated to higher tempera￾tures and thus has a lower density compared to the HTF in less irradiated tubes. This has a 
+self-regulating effect in upstream panels (inlet at the bottom) since the lowered density causes 
+the flow in the high flux areas to increase. In contrast, this poses a self-reinforcing effect for 
+downstream panels (inlet at the top), which can significantly decrease the HTF flow in high flux 
+areas and even cause natural circulation between different tubes within one panel. This study 
+investigates with the help of dynamic process simulation in which operational regimes this 
+critical phenomenon can occur to derive potential consequences for safe control strategies.
+2. Approach
+Based on previously developed and validated dynamic models [6], a simulation setup is imple￾mented in the modeling language Modelica, representing a single receiver panel of a commer￾cial-scale (external, cylindrical) molten salt receiver. Typical for this type of solar tower, the 
+receiver is subdivided into two individually controlled parallel flow paths consisting of several 
+panels in series. To minimize computing time, each simulation only considers one of the 8 
+receiver panels (per flow path). The Panel model is parametrized for each downstream panel 
+according to the design specifications in Table 1. In this model, the absorber tube wall has 
+axial, radial and circumferential discretization to account for any significant temperature gradi￾ents. The fluid flow has only vertical discretization with additional non-differential equations for 
+determining the maximum fluid film temperature at the front side (crown) along each tube (as 
+presented by Schwager et al. [6]). For appropriate computing performance, the model only 
+solves the differential equations of one representative (simulated) tube for every four (real) 
+absorber tubes. This ratio (13 simulated tubes), as well as the level of axial discretization (16 
+axial tube wall and flow elements), is chosen based on a grid independence study, as shown 
+in Figure 2. Moreover, lumped volume models represent the top and bottom header to describe 
+the dynamic mixing of differently heated HTF. The inlet mass flow rate and temperature is 
+Panel 1 Panel 3 Panel 5 Panel 7
+2
+
+Schwager et al. | SolarPACES Conf Proc 2 (2023) "SolarPACES 2023, 29th International Conference on 
+Concentrating Solar Power, Thermal, and Chemical Energy Systems"
+prescribed either according to Table 1 (in scenario 1 and 2) or changed step-wise (in sce￾nario 0).
+Table 1. Receiver design specifications. 
+Parameter Unit. Panel 1 Panel 3 Panel 5 Panel 7
+Nom. panel inlet temperature °C 290 381 466 529
+Nom. panel outlet temperature °C 335 421 502 549
+Max. allowable film temperature °C 600
+Nom. receiver power [MWth] 2 · 350
+Nom. receiver mass flow rate [kg/s] 2 · 828.5
+Number of parallel flow paths - 2
+Number of receiver panels - 2 · 8
+Number of absorber tubes per panel - 52
+Absorber tube outer diameter mm 60.3
+Absorber tube radiated length m 19.8
+Figure 2. Grid dependence of the overheating and natural circulation delays (comp. section 3.2) for 
+the axial discretization (number of flow elements) and number of simulated tubes.
+3. Scenarios and Results
+3.1 Test – Scenario 0
+The purpose of this first test scenario is to observe the transition from even flow distribution to 
+stagnation and natural circulation caused by a specific flux gradient under different mass flow 
+rates. For this, the simulation is set up to represent panel 5 with a constant inlet temperature 
+of 466 °C starting with a 24 % mass flow rate (of nominal flow path mass flow rate) and a 
+homogeneous flux density of 238 kW/m². In this condition, the HTF flow naturally distributes 
+evenly across all absorber tubes. After 500 s, a linear horizontal flux gradient of approx. 
+75 (kW/m²)/m is applied as shading on the flux density distribution. As shown in Figure 3, the 
+last four tubes are nearly fully shaded, and the first four tubes are nearly unshaded. In between, 
+the flux density gradually increases from each to the next tube. The vertical flux gradient re￾mains zero. This flux distribution is fixed throughout the remaining simulation time. The mass 
+flow rate is reduced in two steps: first to 22 % of the nominal value at 1000 s and second to 
+15 % at 1500 s. In between, the (overall) mass flow rate through the receiver panel is constant.
+As expected, the panel outlet temperature plotted in Figure 4 drops at 500 s due to the 
+decreased solar flux and slightly increases due to the reduced mass flow rate after 1000 s. 
+However, after the second flow reduction at 1500 s, the outlet temperature becomes unstable 
+while the maximum film temperature in the panel reaches extremely high values. This can be 
+explained by the individual tube mass flow rates. As soon as the flux gradient is applied, the 
+mass flow rates drift apart and first settle in a range between 21 % and 27 %, even though the 
+1000
+1020
+1040
+1060
+1080
+0 10 20 30 40
+Simulation time [s]
+Number of flow elements [-]
+t_overheat
+t_natCirc
+0 10 20 30
+Number of modelled tubes [-]
+t_overheat
+t_natCirc
+3
+
+Schwager et al. | SolarPACES Conf Proc 2 (2023) "SolarPACES 2023, 29th International Conference on 
+Concentrating Solar Power, Thermal, and Chemical Energy Systems"
+overall mass flow rate remains constant. This is due to the more dense HTF in the less irradi￾ated, thus colder, tubes in contrast to the less dense HTF in the unshaded, thus hotter, tubes. 
+Since a decrease in the flow rate causes the HTF temperature to rise even higher, this phe￾nomenon is self-reinforcing and develops over time. It appears to stabilize as soon as the 
+increased friction pressure loss balances the increased geodetic pressure. The overall flow 
+rate reduction after 1000 s intensifies this effect since the friction pressure loss decreases, 
+making the geodetic pressure difference more significant. At 15 % relative (overall) mass flow 
+rate, the flow distribution becomes unstable so that the flow direction in the first representative 
+tube (1…4) flips, followed by the second and third (5…8 and 9…12). Whenever the flow rate 
+in a tube crosses zero, the corresponding local film temperatures peak due to insufficient cool￾ing, which explains the excessive peaks in the overall maximum film temperature trend.
+Figure 3. Flux density trends on each absorber tube.
+Figure 4. Temperature and mass flow rate trends across the entire panel in scenario 0.
+Moreover, Figure 5 reveals the bulk temperature profile in the first two simulated tubes. 
+It can be observed how the temperature profile spreads out due to the flow reduction and 
+completely flips after the panel becomes hydraulically unstable. Only in the first tube (1...4) the 
+flow flips almost instantly, whereas the second tube (5...8) is subject to a delay of approx. 80 s. 
+Also, for about 50 s before the flip, the temperature rise appears to be decelerated. This is due 
+to the drastically inhibited heat transfer in the laminar flow regime. Accordingly, the HTF re￾ceives less heat input, but the film temperature, which is linked to the tube wall, experiences a 
+steep incline, as shown in Figure 4. Approximately 200 s after the last external change, the 
+tubes then reach a new steady state, in which the flow in some tubes remains reversed, es￾tablishing natural circulation within this receiver panel. As shown in Figure 4, this steady state 
+still results in excessively high film temperatures. However, the most extreme peaks occur 
+when the HTF flow flips and nearly stagnates for a moment.
+0
+100
+200
+300
+0 500 1000 1500
+Flux [kW/m²]
+Time [s]
+Tube 1…4 Tube 5…8
+Tube 9…12 Tube 13…16
+Tube 17…20 Tube 21…24
+Tube 25…28 Tube 29…32
+Tube 33…36 Tube 37…40
+Tube 41…44 Tube 45…48
+Tube 49…52
+4
+
+Schwager et al. | SolarPACES Conf Proc 2 (2023) "SolarPACES 2023, 29th International Conference on 
+Concentrating Solar Power, Thermal, and Chemical Energy Systems"
+Figure 5. Flow-element-wise bulk temperature trends in the absorber tubes 1…4 and 5…8.
+3.2 Parametric study – Scenario 1 & Scenario 2
+To evaluate the significance of this phenomenon for daily operation, a parametric study is con￾ducted across the three impact factors: overall flux, flux gradient and HTF flow rate. Simula￾tions are performed for all downstream panels (1, 3, 5 and 7). More specifically, the panel mass 
+flow rate is varied in 2.5 percentage point increments between 10 % and 30 %. Since it would 
+be unnecessary to simulate a very high mass flow rate with a very low flux and vice versa, the 
+mean flux density is adjusted each time to achieve the panel's nominal outlet temperature. This 
+reduces the 3D parameter space to a 2D space. However, the results can only be accounted 
+relevant if these simulations comply with the allowable flux density (AFD) limits. These account 
+for local film temperatures and thermal stress limits depending on HTF temperature and flow 
+rate, as shown in Figure 6. 
+Figure 6. Considered AFD limits for relative mass flow rates from 10 % to 100 %.
+In this context, two different scenarios are considered. The simulation is initialized in 
+both with no horizontal flux gradient (zero flux density spread). The vertical flux gradient cor￾relates with the AFD at the inlet and outlet of the considered panel with a linear profile in be￾tween. In scenario 1, the entire flux distribution is scaled to achieve the nominal outlet temper￾ature (in steady state). After 2000 s, the horizontal flux gradient is added. If the resulting flux 
+density distribution exceeds the AFD then it is shifted down as far as necessary to comply with 
+the AFD limit. As shown in Figure 7 (left), this approach maintains a constant mean value as 
+long as the AFD is not exceeded. However, this scenario represents a semi-steady-state con￾trol where the controller always tries to achieve the nominal temperature lift. A sophisticated 
+(more aggressive) model predictive controller (MPC) might temporarily increase the tempera￾ture lift of a panel (by further mass flow rate reduction) to make up for previous flux deficits 
+(due to clouds). This brings the panel flux closer to the AFD limit than it is considered in sce￾nario 1. Therefore, the flux density distributions in scenario 2 are always maximized to the AFD 
+as shown in Figure 7 (right). In both scenarios, the flux density spread is defined as the relative 
+0
+250
+500
+750
+1000
+0 1 2 3 4 5 6 7 8
+Allowable flux 
+density [kW/m²]
+Panel-wise position along receiver flow path [-]
+100%
+75%
+50%
+25%
+10%
+1 2 3 4 5 6 7 8
+ 
+5
+
+Schwager et al. | SolarPACES Conf Proc 2 (2023) "SolarPACES 2023, 29th International Conference on 
+Concentrating Solar Power, Thermal, and Chemical Energy Systems"
+flux difference between the most outer tubes. It instantly switches from zero to the designated 
+value at 2000 s simulation time.
+Figure 7. Illustration of the flux density distribution depending on different spreads (relative horizontal 
+flux density gradient) in scenario 1 (left) and scenario 2 (right).
+The resulting mean flux values for scenario 1 are presented in Figure 8, as well as the minimal 
+deviation of the actual flux density from the corresponding AFD. For panels 1, 3 and 5, the flux 
+stays far below the AFD and the gap disappears with higher flux spreads. Due to higher tem￾peratures, panel 7 always operates at the AFD limit.
+Figure 8. Mean flux densities and corresponding min. flux deviation from AFD in scenario 1.
+Finally, Figure 9 reveals under which operational conditions the simulations predict crit￾ical states. The top plots show the delay between the flux spread application until any tube 
+reaches zero mass flow rate, hence the start of natural circulation. The bottom plots show the 
+highest observed local film temperature during this simulation. Delays of more than 300 s are 
+considered less critical (green shading) since this could provide sufficient time for counterac￾tions. However, the results show significant numbers of occurrences, especially in high flux 
+panels 1 and 3. At mass flow rates below 20 %, natural circulation can be triggered even by 
+very mild flux spreads, and at 10 % mass flow rate, even without any spread (see 0 s values). 
+This can be explained by the self-reinforcing buoyancy effect coupled with relatively low friction 
+forces. In some rare cases, excessive film temperatures can be observed even without any 
+natural circulation just due to the reduced flow rate on the high flux side of the panel. As ex￾pected, the higher flux densities in scenario 2 result in shorter delays, higher peak tempera￾tures and consequently an enlargement of the critical regime (see Figure 10).
+0
+50
+100
+150
+200
+250
+300
+350
+400
+0% 20% 40% 60% 80% 100%
+Flux density [kW/m²]
+Rel. panel width
+0
+50
+100
+150
+200
+250
+300
+350
+400
+0% 20% 40% 60% 80% 100%
+Flux density [kW/m²]
+Rel. panel width
+0
+50
+100
+150
+200
+250
+300
+350
+400
+0% 20% 40% 60% 80% 100%
+Flux density [kW/m²]
+Rel. panel width
+0
+50
+100
+150
+200
+250
+300
+350
+400
+0% 20% 40% 60% 80% 100%
+Flux density [kW/m²]
+Rel. position along panel width
+···
+0
+50
+00
+50
+00
+50
+00
+50
+00
+0% 20% 40% 60% 80% 100%
+Rel. panel width
+0% spread, el. 16
+0% spread, el. 13
+0% spread, el. 10
+0% spread, el. 7
+0% spread, el. 4
+0% spread, el. 1
+0
+50
+00
+50
+00
+50
+00
+50
+00
+0% 20% 40% 60% 80% 100%
+Rel. panel width
+50% spread, el. 16
+50% spread, el. 13
+50% spread, el. 10
+50% spread, el. 7
+50% spread, el. 4
+50% spread, el. 1
+0
+50
+00
+50
+00
+50
+00
+50
+00
+0% 20% 40% 60% 80% 100%
+Rel. panel width
+100% spread, el. 16
+100% spread, el. 13
+100% spread, el. 10
+100% spread, el. 7
+100% spread, el. 4
+100% spread, el. 1
+0% 20% 40% 60% 80% 100%
+Rel. position along panel width
+AFD_in
+AFD_out
+···
+100 113 138 163 181 197 212 227 242 257 98 117 136 155 174 192 211 228 243 60 72 83 94 105 116 127 138 149 35 41 48 54 60 67 73 79 85 500
+90 113 138 163 188 213 233 250 266 282 108 129 150 170 191 211 232 251 268 66 79 91 104 116 128 38 46 53 444
+80 113 138 163 188 213 239 264 289 113 138 162 186 208 231 253 274 292 72 86 100 113 126 140 42 50 57 389
+70 113 138 163 188 213 239 264 289 113 138 162 186 210 234 258 282 306 79 93 108 123 137 151 45 54 62 333
+60 113 138 163 188 213 239 264 113 138 162 186 210 234 258 282 85 100 116 132 148 49 58 67 278
+50 113 138 163 188 213 239 113 138 162 186 210 234 258 91 108 125 141 158 52 62 72 222
+40 113 138 163 188 213 239 113 138 162 186 210 234 97 115 133 151 169 56 66 167
+30 113 138 163 188 213 113 138 162 186 210 103 122 141 160 59 70 111
+20 113 138 163 188 113 138 162 186 210 105 126 146 166 63 75 56
+10 113 138 163 188 113 138 162 186 105 126 146 166 66 0
+0 113 138 163 113 138 162 105 126 146 70 no data
+100 -11% -7% -1% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 100%
+90 -19% -15% -10% -5% -1% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 75%
+80 -26% -22% -17% -13% -10% -6% -3% -1% -4% -2% -1% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 0% 50%
+70 -31% -28% -24% -20% -17% -14% -11% -8% -11% -10% -8% -8% -7% -6% -6% -5% -3% 0% 0% 0% 0% 0% 0% 0% 0% 0% 25%
+60 -36% -33% -29% -26% -22% -20% -17% -18% -16% -15% -14% -14% -13% -12% -12% 0% 0% 0% 0% 0% 0% 0% 0% 0%
+50 -40% -38% -34% -31% -28% -25% -23% -22% -21% -20% -19% -19% -18% 0% 0% 0% 0% 0% 0% 0% 0% -25%
+40 -44% -42% -38% -35% -32% -30% -28% -26% -26% -25% -24% -24% 0% 0% 0% 0% 0% 0% 0% -50%
+30 -47% -45% -42% -39% -36% -32% -31% -30% -29% -29% 0% 0% 0% 0% 0% 0% -75%
+20 -50% -48% -45% -42% -36% -35% -34% -33% -33% -3% -3% -3% -2% 0% 0% -100%
+10 -53% -51% -48% -45% -39% -38% -37% -37% -8% -8% -8% -7% 0% no data
+0 -55% -53% -50% -42% -41% -40% -13% -13% -12% 0%
+10 12.5 15 17.5 20 22.5 25 27.5 30 10 12.5 15 17.5 20 22.5 25 27.5 30 10 12.5 15 17.5 20 22.5 25 27.5 30 10 12.5 15 17.5 20 22.5 25 27.5 30
+Rel. flux dens. spread [%]
+Panel 1 Panel 3 Panel 5 Panel 7
+Mean flux density [kW/m²]
+Rel. flux dens. spread [%]
+Rel. deviation from AFD
+Rel. mass flow rate [%] Rel. mass flow rate [%] Rel. mass flow rate [%] Rel. mass flow rate [%]
+6
+
+Schwager et al. | SolarPACES Conf Proc 2 (2023) "SolarPACES 2023, 29th International Conference on 
+Concentrating Solar Power, Thermal, and Chemical Energy Systems"
+Figure 9. The resulting natural circulation delays and film temp peak values in scenario 1.
+Figure 10. The resulting natural circulation delays and film temp peak values in scenario 2.
+To put the results into perspective, simulations based on measured DNI maps are per￾formed for one exemplary day. Accordingly, the cumulative probability in Figure 11 indicates 
+how often certain flux spreads are observed. For instance, 25 % of the time, the flux spread on 
+panel 5 is higher than 20 %, underlining the significance of the above-discussed results.
+Figure 11. Cumulative distribution plot for the flux spreads based on all-sky imager-based DNI meas￾urements and raytracing simulation (from 6 Sep. 2019 in Almeria) [7].
+4. Conclusion and Outlook
+A parametric study was conducted using detailed dynamic process simulations to investigate 
+the risk of flux-gradient-induced natural circulation and resulting peak temperatures in MST 
+receiver panels. The results indicate that critical mass flow imbalances can occur under solar 
+flux values in the allowable range, at mass flow rates below 30 % and especially at high hori￾zontal flux gradients (flux spread). Below 17.5 % mass flow rate, even mild flux gradients can 
+cause the mass flow rate to diverge enough, causing critical temperature peaks. Upcoming 
+research should investigate the influence of different panel designs (height-to-width ratio and 
+100 40 49 58 61 66 74 84 116 680 0 38 47 57 57 68 72 93 196 28 42 63 85 95 161 ∞ ∞ ∞ 61 108 156 ∞ ∞ ∞ ∞ ∞ ∞ 0
+90 48 57 66 66 68 80 90 137 ∞ 0 44 50 60 59 74 77 107 444 32 49 68 89 105 212 79 113 182 38
+80 57 66 71 78 78 90 107 181 0 50 53 64 63 78 85 130 ∞ 37 60 73 88 120 372 91 122 226 75
+70 68 75 78 84 95 109 165 ∞ 0 56 61 64 75 83 112 272 ∞ 43 67 78 95 142 ∞ 101 135 320 113
+60 81 85 90 96 113 153 ∞ 0 60 70 73 86 108 203 ∞ 52 74 86 105 183 112 155 905 150
+50 96 99 107 117 145 318 0 67 75 89 105 169 ∞ 60 77 97 122 285 127 187 ∞ 188
+40 109 113 121 147 233 ∞ 0 77 86 106 150 ∞ 68 83 111 151 ∞ 149 248 225
+30 120 132 149 205 ∞ 0 93 108 141 333 78 93 122 216 168 441 263
+20 147 165 207 535 0 108 142 254 ∞ 94 117 167 >999 220 ∞ 300
+10 153 226 422 ∞ 0 154 253 ∞ 122 173 482 ∞ 424 >300
+0 152 ∞ ∞ 0 ∞ ∞ 826 ∞ ∞ ∞ no data
+100 1083 1178 1250 1294 1331 1365 1396 1426 1454 905 1140 1203 1260 1309 1356 1397 1432 1460 904 966 1021 1070 1111 1150 594 585 581 755 805 847 590 584 583 583 583 583 1400
+90 1047 1139 1210 1270 1325 1365 1397 1426 590 905 1141 1204 1260 1309 1356 1397 1432 1460 905 968 1022 1070 1111 1151 757 805 847 1300
+80 1015 1105 1173 1234 1287 1337 1381 1424 905 1134 1200 1261 1309 1357 1397 1432 615 906 969 1022 1069 1111 1151 757 804 847 1200
+70 987 1074 1140 1200 1253 1301 1345 566 905 1102 1168 1225 1279 1325 1370 1410 593 907 970 1022 1068 1111 594 757 804 847 1100
+60 961 1046 1111 1168 1222 1269 558 905 1073 1138 1194 1246 1292 1337 576 909 970 1022 1068 1111 758 804 847 1000
+50 937 1020 1085 1142 1192 1240 905 1046 1110 1166 1216 1263 562 909 970 1023 1068 1111 758 804 583 900
+40 906 997 1060 1116 1166 501 905 1022 1084 1140 1189 557 910 969 1023 1068 588 758 804 800
+30 885 974 1036 1092 490 905 1000 1061 1115 1165 910 969 1021 1068 758 805 700
+20 869 954 1016 1070 905 979 1039 1093 516 900 959 1012 1060 757 576 601
+10 843 935 996 451 905 960 1018 504 882 941 992 560 757 ≤600
+0 839 430 434 905 485 487 865 546 548 567 no data
+10 12.5 15 17.5 20 22.5 25 27.5 30 10 12.5 15 17.5 20 22.5 25 27.5 30 10 12.5 15 17.5 20 22.5 25 27.5 30 10 12.5 15 17.5 20 22.5 25 27.5 30
+Rel. flux dens. spread [%]
+Panel 1 Panel 3 Panel 5 Panel 7
+Rel. flux dens. spread [%]
+Rel. mass flow rate [%] Rel. mass flow rate [%] Rel. mass flow rate [%]
+max. T_film [°C] Delay [s]
+Rel. mass flow rate [%]
+100 0 0 0 43 60 71 81 114 679 0 0 0 37 51 65 69 91 195 0 34 60 83 94 160 ∞ ∞ ∞ 61 108 155 ∞ ∞ ∞ ∞ ∞ ∞ 0
+90 0 0 0 53 63 76 88 135 ∞ 0 0 0 42 55 71 75 106 442 0 40 65 88 104 212 79 113 182 38
+80 0 0 0 58 66 84 97 172 0 0 0 48 59 76 82 128 ∞ 0 48 70 87 119 371 91 122 226 75
+70 0 0 0 63 70 90 110 269 0 0 0 53 64 74 94 172 ∞ 0 56 77 94 141 ∞ 101 135 320 113
+60 0 0 0 68 75 92 132 ∞ 0 0 0 57 70 81 111 325 ∞ 0 65 85 104 182 112 155 904 150
+50 0 0 0 75 82 102 174 0 0 0 62 80 92 144 ∞ 0 72 96 121 284 127 187 ∞ 188
+40 0 0 0 82 94 122 311 0 0 0 69 90 110 228 ∞ 0 80 110 150 ∞ 149 248 225
+30 0 0 0 84 114 162 ∞ 0 0 0 80 98 149 ∞ 0 91 120 215 168 440 263
+20 0 0 0 98 133 305 0 0 0 99 129 289 0 110 156 628 220 ∞ 300
+10 0 0 0 134 223 ∞ 0 0 0 132 237 ∞ 0 155 282 ∞ 424 >300
+0 0 0 0 ∞ ∞ 0 0 0 ∞ ∞ 0 ∞ ∞ ∞ no data
+100 1146 1213 1256 1291 1331 1366 1396 1426 1454 1079 1147 1201 1256 1309 1356 1397 1432 1460 911 964 1021 1070 1111 1150 594 585 581 755 805 847 590 584 583 583 583 583 1400
+90 1146 1213 1256 1294 1331 1365 1396 1426 590 1079 1147 1201 1257 1309 1356 1397 1432 1460 911 965 1021 1070 1111 1151 757 805 847 1300
+80 1146 1213 1256 1295 1331 1367 1396 1426 1079 1147 1201 1259 1309 1357 1397 1432 615 911 967 1022 1069 1111 1151 757 804 847 1200
+70 1146 1213 1256 1295 1331 1367 1397 1426 1079 1147 1201 1259 1309 1355 1396 1433 603 911 968 1022 1068 1111 594 757 804 847 1100
+60 1146 1213 1256 1295 1331 1366 1397 591 1079 1147 1201 1259 1310 1355 1396 1433 595 911 969 1022 1068 1111 758 804 847 1000
+50 1146 1213 1256 1296 1331 1365 1397 1079 1147 1201 1259 1310 1354 1397 605 911 969 1023 1068 1111 758 804 583 900
+40 1146 1213 1256 1296 1332 1365 1397 1079 1147 1201 1259 1311 1354 1397 592 911 969 1023 1068 588 758 804 800
+30 1146 1213 1256 1295 1334 1365 572 1079 1147 1201 1259 1308 1354 599 911 969 1021 1068 758 805 700
+20 1146 1213 1256 1294 1332 1366 1079 1147 1201 1259 1308 1354 911 969 1021 1068 757 576 601
+10 1146 1213 1256 1295 1331 558 1079 1147 1201 1258 1308 577 911 971 1021 569 757 ≤600
+0 1146 1213 1256 552 546 1079 1147 1201 562 563 911 559 561 567 no data
+10 12.5 15 17.5 20 22.5 25 27.5 30 10 12.5 15 17.5 20 22.5 25 27.5 30 10 12.5 15 17.5 20 22.5 25 27.5 30 10 12.5 15 17.5 20 22.5 25 27.5 30
+Rel. flux dens. spread [%]
+Panel 1 Panel 3 Panel 5 Panel 7
+Rel. flux dens. spread [%]
+Rel. mass flow rate [%] Rel. mass flow rate [%] Rel. mass flow rate [%]
+max. T_film [°C] Delay [s]
+Rel. mass flow rate [%]
+0%
+25%
+50%
+75%
+100%
+0% 20% 40% 60% 80%
+Cumulative 
+probability
+Rel. flux density spread
+Panel 1
+Panel 3
+Panel 5
+Panel 7
+7
+
+Schwager et al. | SolarPACES Conf Proc 2 (2023) "SolarPACES 2023, 29th International Conference on 
+Concentrating Solar Power, Thermal, and Chemical Energy Systems"
+tube diameter) and pressure-loss-impacting features such as individual tube bends and weld￾ings. Further putting this into practical application, instead of setting conservatively high mass 
+flow rate limits, it is recommended to develop further a model predictive intelligence allowing 
+for safer and still efficient operation.
+Data availability statement
+The applied data are subject to third-party IP and unavailable to the public. 
+Author contributions
+C. Schwager: Conceptualization, Data curation, Formal Analysis, Funding acquisition, Inves￾tigation, Methodology, Project administration, Software, Visualization, Writing – original draft,
+Writing – review & editing; J. Schulte: Writing – review & editing; M. Binder: Data curation,
+Writing – review & editing; C. J. T. Boura: Funding acquisition, Supervision, Writing – review
+& editing; U. Herrmann: Funding acquisition, Supervision, Writing – review & editing
+Competing interests
+The authors declare no competing interests.
+Funding
+This work is funded by the German Federal Ministry for Economic Affairs and Climate Action.
+References
+[1] L. L. Vant-Hull, “The Role of “Allowable Flux Density” in the Design and Operation of
+Molten-Salt Solar Central Receivers,” J. Sol. Energy Eng, vol. 124, no. 2, pp. 165–169,
+2002, doi: 10.1115/1.1464124.
+[2] M. Binder, C. Schuhbauer, R. Uhlig, P. Schwarzbözl, R. Schwaiger, and R. Pitz-Paal,
+“Comparison of different safety concepts for evaluation of molten salt receivers,” Solar
+Energy, vol. 234, pp. 119–127, 2022, doi: 10.1016/j.solener.2022.01.051.
+[3] D. Hering, M. Binder, P. Schwarzbözl, R. Schwaiger, and R. Pitz-Paal, “Monitoring of
+service life consumption for tubular solar receivers: Review of contemporary thermome￾chanical and damage modeling approaches,” Solar Energy, vol. 226, pp. 427–445,
+2021, doi: 10.1016/j.solener.2021.08.022.
+[4] R. Popp, K. Iding, P. Schwarzbözl, T. Konrad, and D. Abel, “A comparison between
+model predictive and PID-based control of a molten salt solar tower receiver,” AIP Conf.
+Proc., vol. 2815, no. 1, p. 30016, 2023, doi: 10.1063/5.0148728.
+[5] C. Schwager, C. J. T. Boura, R. Flesch, S. Alexopoulos, and U. Herrmann, “Improved
+efficiency prediction of a molten salt receiver based on dynamic cloud passage simula￾tion,” AIP Conf. Proc., vol. 2126, no. 1, p. 30054, 2019, doi: 10.1063/1.5117566.
+[6] C. Schwager, R. Flesch, P. Schwarzbözl, U. Herrmann, and C. J. Teixeira Boura, “Ad￾vanced two phase flow model for transient molten salt receiver system simulation,” Solar
+Energy, vol. 232, pp. 362–375, 2022, doi: 10.1016/j.solener.2021.12.065.
+[7] C. Schwager, F. Angele, B. Nouri, P. Schwarzbözl, C. J. Teixeira Boura, and U.
+Herrmann, “Impact of DNI Forecast Quality on Performance Prediction for a Commercial
+Scale Solar Tower: Application of Nowcasting DNI Maps to Dynamic Solar Tower Simu￾lation,” in SolarPACES Conference 2022, 2022.
+8

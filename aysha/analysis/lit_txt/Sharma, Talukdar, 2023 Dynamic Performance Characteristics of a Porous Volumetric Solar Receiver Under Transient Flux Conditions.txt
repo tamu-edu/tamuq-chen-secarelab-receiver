@@ -1,0 +1,821 @@
+Sonika Sharma
+Department of Mechanical Engineering,
+Indian Institute of Technology,
+Delhi, New Delhi 110016, India
+e-mail: sonika.sharma@mech.iitd.ac.in
+Prabal Talukdar1
+Department of Mechanical Engineering,
+Indian Institute of Technology,
+Delhi, New Delhi 110016, India
+e-mail: prabal@mech.iitd.ac.in
+Dynamic Performance
+Characteristics of a Porous
+Volumetric Solar Receiver
+Under Transient Flux Conditions
+The solar flux incident on a volumetric receiver is inherently unsteady, resulting in high
+thermal stresses, fatigue failures, and reduced component life. The knowledge of transient
+response characteristics of a porous volumetric receiver used in concentrating solar tech￾nologies is cardinal for its reliable and safe working. The dynamic controlling of the
+solar-to-thermal conversion process is also possible with the prior prediction of the
+output variations. The present study aims to investigate the transient behavior of a
+porous volumetric receiver subjected to flux variations approximations occurring in real
+working scenarios with the help of a coupled transient model. The solid and fluid temper￾ature fields, output fluid temperature, and pressure drop variations are determined for tran￾sient flux conditions during start-up, shut-down, clear sky, and cloud passage. The results
+are used to analyze the thermal response of the receiver during various operating condi￾tions. In addition, the effects of structural parameters of the porous absorber are also inves￾tigated. The results indicate that the receiver transient performance is comparatively more
+affected by the variation in porosity than in pore size for all conditions. Smaller porosities
+and pore sizes show slower thermal response to transient fluctuations and less temperature
+changes during cloud passage. Conversely, higher values help in the faster restoration of
+the steady-state output conditions without dynamic control. [DOI: 10.1115/1.4056622]
+Keywords: volumetric receiver, porous media, coupled transient simulation, heat transfer,
+thermal radiation
+1 Introduction
+The rapid development of the global economy has increased
+energy demands remarkably. Efficiency improvements in energy
+production and replacing fossil fuels with renewable energy
+sources are the typical strategies for sustainable energy develop￾ment [1]. The abundant and free availability of solar energy and
+growing output efficiencies make it the best option for the future
+world [2]. Concentrated solar power (CSP) plants have the potential
+to improve the flexibility of power systems by ensuring balanced
+and reliable power generation [3]. The solar power tower is the
+most promising due to its higher theoretical maximum efficiency
+and better electrical block efficiency [4]. It consists of a heliostat
+field, receiver, block for power production, and thermal storage
+system [5]. A detailed review of various central receiver designs
+employed for high temperature power cycles was given by Ho
+and Iverson [6]. The volumetric receivers consist of absorbers
+made of porous foams or honeycomb structures [7]. More focus
+has been given to volumetric receivers due to their flexibility in
+functionality with cheaper, simpler, and more efficient design
+than tubular receivers [8]. Volumetric receivers with honeycomb
+structures have been studied in detail by [9–12].
+A considerable amount of work has been done on the steady-state
+performance of the porous volumetric receivers. Xu et al. [13]
+modeled a porous media subjected to a uniform solar flux included
+as a boundary condition and compared the results for various
+correlations of volumetric heat transfer coefficients available in the
+literature. Wu et al. [14] developed a coupled numerical model for
+fluid flow and heat transfer. The complete 3D numerical studies for
+a porous volumetric absorber were performed by Baretto et al.
+[15,16]. The optical modeling for the concentrator-receiver system
+and solar radiation absorption within the absorber were computed
+using Monte Carlo ray tracing (MCRT). Studies have shown the
+potential of graded porous media in enhancing the performance of
+porous receivers. Roldán et al. [17] simulated gradual porosity
+receiver configurations in radial and axial directions with porosity
+variations. The results for axial variation showed better performance
+in terms of efficiency. A combination of experimental and numerical
+work for graded porous media was done by Du et al. [18]. An opti￾mization study using a genetic algorithm was also included to find the
+optimum porosity distribution for best performance.
+In actual working conditions, a steady-state seldom exists. The
+receiver is exposed to cyclic working due to diurnal cycles and
+intermittent incident fluxes with interruptions caused by clouds
+[19]. Such fluctuations may result in premature failure of the
+receiver material due to excessive thermal stresses and fatigue
+damages [20]. A few authors have investigated the transient perfor￾mance of solar receivers. Xu et al. [21] numerically studied the
+unsteady behavior of an external solar receiver. The effect of
+initial conditions, direct normal irradiance (DNI) level, tube thick￾ness, and wind speed on the receiver’s performance was analyzed.
+Soo Too et al. developed a transient optical-thermal model with a
+closed loop aiming strategy for molten salt solar receivers [20].
+Concerning porous volumetric solar receivers, a transient thermal
+model was implemented by Ren et al. [22]. The effect of radiation
+heat transfer was considered by adding a radiative conductivity term
+in solid thermal conductivity. The transient response of the receiver
+was investigated under sudden supply and loss of heat flux. A
+1
+Corresponding author.
+Contributed by the Solar Energy Division of ASME for publication in the JOURNAL
+OF SOLAR ENERGY ENGINEERING:INCLUDING WIND ENERGY AND BUILDING ENERGY
+CONSERVATION. Manuscript received August 30, 2022; final manuscript received
+December 12, 2022; published online January 19, 2023. Assoc. Editor: Peiwen Li.
+Journal of Solar Energy Engineering Copyright © 2023 by ASME AUGUST 2023, Vol. 145 / 041009-1
+Downloaded from asmedigitalcollection.​asme.​org/​solarenergyengineering/​article-pdf/​145/​4/​041009/​6975671/​sol_145_4_041009.​pdf?casa_token=fNpdKC12uQ8AAAAA:mMAlialg3MOYkTc1OxRXc2QMnA2d-gJRQwLt617fHqtb90XpfeqAvHZpFsFtskmOa2o2s2Rl by Aristotle University Of Thessaloniki user on 02 September 2026
+
+similar study was performed by Reddy and Nataraj [23], and poros￾ity’s effect on thermal response was investigated for flux supply and
+cut. Wu and Wang [24] developed a fully coupled transient model
+and compared the results with experimental data. The effect of
+sudden supply, loss, and step changes in the heat flux was investi￾gated. A study to investigate the effects of thermophysical proper￾ties of fluid and solid phase of the porous volumetric receiver on
+the transient thermal response was done by Fuqiang et al. [25].
+The MCRT was implemented to obtain the heat flux distribution
+at the front of the receiver. At the same time, the P1 approximation
+was used to model radiation within the receiver. Ribeiro and de
+Lemos [26] developed an in-house code to analyze the transient
+behavior and thermal efficiency of porous volumetric receivers.
+The radiation within the receiver was modeled using the Rosseland
+approximation while the transient flux was applied as a boundary
+condition at the inlet. A parametric study by varying permeability,
+porosity, inlet velocity, and thermal conductivity ratio was carried
+out to investigate their effects on transient performance. Zoller
+et al. [27] developed a transient heat transfer model for porous
+solar receiver-reactor for thermochemical redox cycling. A few
+researchers have coupled the transient response of receivers with
+dynamic controlling to keep the fluctuations within limits [20,28].
+The literature review suggests that the transient performance of
+porous volumetric receivers is less explored as compared to
+steady-state performance. Thus, this work is motivated by the
+lack of systematic transient studies in the literature as well as an
+absence of a clear connection between flux variations considered
+in previous studies and real working conditions. In the present
+work, the transient thermal response of a porous volumetric receiver
+during the operation cycle of a CSP is investigated while incorpo￾rating incident flux fluctuations close to real scenarios. A detailed
+analysis is carried out to extend the understanding of the transient
+behavior of the receiver during the start-up and shut-down period.
+In addition, the transient response of the volumetric receiver is
+studied during a clear sky day and cloud passing. The effects of
+porosity and pore size on the time-dependent temperature fields
+during various working scenarios are also investigated.
+2 Model Description
+A porous cylindrical absorber of 5 cm in length and 2.5 cm in
+radius is selected for the present study. A homogeneous equivalent
+method is implemented to model the porous absorber. Using this
+method, the porous medium is considered as a homogeneous effec￾tive medium consisting of two continuous phases, solid and fluid
+[29]. Silicon carbide (SiC) is selected as the material of the
+porous absorber due to its superior thermal properties, including
+enhanced absorptance and high thermal conductivity [30]. The air
+is selected as the heat transfer fluid flowing through the absorber.
+Figure 1 presents the schematic of the computational domain.
+2.1 Fluid Flow Model. The flow field is considered transient,
+compressible, and laminar. The macroscopic continuity and
+momentum transport equations are solved for air flow inside a
+porous medium.
+∂
+∂t
+(ϕρf ) + ∇ · (ρf U) = 0 (1)
+1
+ϕ ρf
+∂U
+∂t
++
+1
+ϕ (ρf U · ∇)U
+1
+ϕ = −∇p + ∇
+· μ
+ϕ ∇U + (∇U)
+′ − 2
+3
+∇ · UI
+  − μ
+K +
+CF
+
+K √ ρf |U|
+U (2)
+U =ϕu denotes the superficial velocity where ϕ is the porosity
+and u is the pore velocity. The second and third terms on the right￾hand side of Eq. (2) are the Brinkman and Forchheimer terms,
+respectively. While the Brinkman term accounts for the shear
+stresses, the Forchheimer term adds a viscous drag force [31]. K =
+d2
+p
+1039 − 1002ϕ and CF = 0.5138ϕ−5.739
+dp
+
+K
+√ denote the permeabil￾ity and inertial coefficients [32]. dp is the pore size of the porous
+matrix.
+2.2 Thermal Model. The porous absorbers are subjected to
+high fluxes leading to significant variations in local fluid and
+solid temperatures. Hence, the local thermal non-equilibrium
+(LTNE) model is applied to obtain respective temperature fields
+for solid and fluid. Equations (3) and (4) give the energy equations
+for solid and fluid phases, respectively.
+(1 − φ)ρsCp,s
+∂Ts
+∂t
++ ∇ · (kes∇Ts) + hv(Tf − Ts) + Sr = 0 (3)
+φρf Cp,f
+∂Tf
+∂t
+ + ρfCpf U · ∇Tf = ∇ · (kef ∇Tf ) + hv(Ts − Tf ) (4)
+where kes = (1 − ϕ)
+3
+ks and kef =ϕkf are the effective thermal con￾ductivity for the solid and fluid phases [33]. The energy equations
+for two phases are coupled via the volumetric heat transfer coeffi￾cient hv. Several correlations are available in the literature for hv
+[13,34,35]. The correlation obtained by Wu et al. [36] has been
+widely used in the literature [16,37–40]. Equation (5) presents the
+correlation expressed in terms of porosity, pore size, fluid thermal
+conductivity, kf, and pore Reynolds number, Rep = ρf Udp
+μ .
+hvd2
+p
+kf
+=(32.504ϕ0.38−109.94ϕ1.38+166.65ϕ2.38−86.98ϕ3.38)Re0.438
+p
+(5)
+The solid porous matrix is assumed to be gray and optically thick
+media with absorption and emission. Sr in Eq. (3) is the radiative
+source term which includes the effect of radiation heat transfer in
+the solid phase energy equation. The volumetric absorption of inci￾dent solar radiation, Q is determined by Beer’s Law, given by
+Eq. (6), where q(t) represents the time varying incident solar flux
+and β=3(1−ϕ)
+dp
+is the extinction coefficient of the porous absorber.
+Q=q(t)βe−βz (6)
+In order to account for energy source due to thermal radiation
+within the solid porous matrix, the Rosseland approximation [41]
+is used in the present study. Such an approximation is valid for
+an optically thick medium where local radiation emitted by the
+porous matrix travels a very small distance before being attenuated
+[42]. This assumption allows the radiative source term Sr in Eq. (3)
+to be transformed into a diffusion equation. For a gray media with
+constant refractive index, the radiative heat flux can be evaluated by
+Fig. 1 Schematic of the computational domain Eq. (7). Rosseland approximation is used by several authors to
+041009-2 / Vol. 145, AUGUST 2023 Transactions of the ASME
+Downloaded from asmedigitalcollection.​asme.​org/​solarenergyengineering/​article-pdf/​145/​4/​041009/​6975671/​sol_145_4_041009.​pdf?casa_token=fNpdKC12uQ8AAAAA:mMAlialg3MOYkTc1OxRXc2QMnA2d-gJRQwLt617fHqtb90XpfeqAvHZpFsFtskmOa2o2s2Rl by Aristotle University Of Thessaloniki user on 02 September 2026
+
+model radiation heat transfer in porous media [18,43,44].
+G=−4σ
+3β
+∇(T4
+)=kr∇T =−16σT3
+3β ∇T (7)
+The Rosseland radiation model is implemented by adding the
+non-linear “radiation thermal conductivity” kr, to the solid effective
+thermal conductivity, kes.
+2.3 Thermophysical Properties and Boundary Conditions.
+The air is treated as a non-participating ideal gas. The temperature￾dependent thermophysical properties are used for both air and SiC.
+The specific heat, Cpf, and thermal conductivity of air, kf, are
+obtained by polynomial curve fitting to the data set for 100–
+1600 K [45]. The viscosity is computed by Sutherland Law.
+Cpf = 1.93 × 10−10T4
+f − 8 × 10−7
+T3
+f + 1.14 × 10−3
+T2
+f
+− 4.49 × 10−1
+Tf + 1.06 × 103 (8)
+kf =1.52×10−11T3
+f −4.86×10−8
+T2
+f +1.02×10−4
+Tf −3.93×10−3
+(9)
+The density of SiC, ρs, is taken as 3200 kg/m3 [46]. Temperature￾dependent specific heat capacity, Cp,s, and thermal conductivity, ks,
+of the SiC are given in Eqs. (10) and (11), respectively [47].
+Cp,s = 1110 + 0.15Ts − 425e−0.0003Ts (10)
+ks = 52000e−1.24×10−5Ts
+Ts + 437 (11)
+Adiabatic and no-slip boundary conditions are applied to the
+walls. A zero-gauge pressure is applied at the outlet. The radiation
+heat loss from the solid phase to the ambient is considered at the
+inlet (Eq. (12). ε is the emissivity of the solid matrix and Tamb is
+the ambient temperature equal to 300 K. σ is the Stefan–Boltzmann
+constant.
+kes∇Ts = εσ(T4
+s − T4
+amb) (12)
+3 Validation Studies
+The governing equations are solved using Multiphysics Software
+tool COMSOL 6.0. The LTNE model is validated by comparing the
+results of the present model with that of Khashan et al. [48]. The
+domain consisted of a tube filled with porous medium and subjected
+to a constant wall temperature. The finite volume method was applied
+to solve the non-dimensional governing equations. Figure 2 presents
+the LTNE contours for a length equal to one diameter of the tube
+and Reynolds number, Re=100, Peclet number, Pe=30, Darcy
+number, Da=10−4
+, Biot−like number, Bi=200, and thermal con￾ductivity ratio, kef
+kes
+= 10−3
+. A good match can be seen in the results
+obtained by present study with that of Khashan et al. [48].
+The validity of the radiation model and the Multiphysics coupling
+is verified by comparing the results of the present study with that of
+Wu et al. [14]. The solid and fluid temperature distributions at the
+centerline for inlet velocity of 2.16 m/s obtained from the present
+study are compared with that of Wu et al. [14] in Fig. 3.
+It is important to note here that the radiation in the present study
+is modeled by Rosseland approximation, while P1 approximation
+was used by Wu et al. to solve the radiative heat transfer inside
+porous media. Additionally, Wu et al. validated their model with
+experimental results. Hence, the good agreement of the compared
+results shows that the Rosseland approximation is suitable for mod￾eling radiation transport in porous media under the optically thick
+assumption.
+4 Results and Discussions
+The default values of porosity of 0.9, pore size of 2 mm, and inlet
+velocity of 1 m/s are considered in the present work unless men￾tioned otherwise. The various scenarios arising during receiver
+working such as start-up, shut-down, cloud pass, and clear sky oper￾ation are implemented in the coupled model by time-dependent
+incident solar fluxes, which mimic the real working scenarios. It
+is worth noting that the spatial variations of the flux at the front
+surface are neglected and only transient fluctuations are considered
+in the present study. The locations at axial distances of z =0
+(Point A), z=L/4 (Point B), z=L/2 (Point C), z =3L/4 (Point D),
+and z =L (Point E) along the centerline are selected to monitor
+the solid temperature variations within the receiver under different
+operating conditions. The fluid temperature is not monitored at
+Point A (inlet) as the temperature at the inlet is assumed to be cons￾tant and equal to Tamb.
+4.1 Cold Start-Up. The cold start-up of the receiver involves
+gradual aiming of the incident solar flux from the concentrator onto
+the receiver. The start-up is implemented in the study by increasing
+the incident flux from zero to maximum linearly in a period of 60 s
+and then keeping it constant as given in Eq. (13). A period of 5 s is
+initially provided to set the flow field. qmin and qmax are the
+minimum and maximum incident solar flux and are assumed to
+Fig. 2 Comparison of results of Khashan et al. [48] with the present
+model Re = 100, Pe = 30, Da = 10−4, Bi = 200, kef
+kes
+= 10−3
+
+Fig. 3 Comparison of fluid and solid temperature distributions
+obtained in the present study and Wu et al. [14](ϕ = 0.8, dp =
+1.5 mm, Uin = 2.16 m/s)
+Journal of Solar Energy Engineering AUGUST 2023, Vol. 145 / 041009-3
+Downloaded from asmedigitalcollection.​asme.​org/​solarenergyengineering/​article-pdf/​145/​4/​041009/​6975671/​sol_145_4_041009.​pdf?casa_token=fNpdKC12uQ8AAAAA:mMAlialg3MOYkTc1OxRXc2QMnA2d-gJRQwLt617fHqtb90XpfeqAvHZpFsFtskmOa2o2s2Rl by Aristotle University Of Thessaloniki user on 02 September 2026
+
+be 0 and 1 MW/m2
+, respectively. It equals an increase rate of
+16.67 kW/m2
+/s in applied transient solar flux.
+q(t) =
+0, t < 5
+qmin + (qmax − qmin)
+(65 − 5) (t − 5), 5 < t ≤ 65
+qmax, t ≥ 65
+⎧
+⎪⎪⎨
+⎪⎪⎩
+(13)
+The initial temperatures of both solid and fluid phases are initial￾ized at Tamb with zero inflow velocity. Figure 4(a) presents the solar
+flux variation during the start-up process. The variation of solid and
+fluid temperatures at specific locations along the centerline is
+plotted in Figs. 4(b) and 4(c), respectively. Point A responds first
+as it is directly heated by the incident flux. Most of the flux is
+absorbed within a small length of the receiver only. The other
+points are heated via conduction and radiation within the solid
+matrix of the porous receiver. The response time of the locations
+is directly proportional to their depth from the inlet. The time
+taken to reach a steady-state follows a similar trend with A reaching
+the steady-state first. The solid and fluid steady-state temperatures
+reached by C, D, and E are nearly equal, suggesting that thermal
+equilibrium is reached beyond C in a steady-state. However, a sig￾nificant temperature difference exists among different points during
+start-up, suggesting the possibility of high thermal gradients within
+the receiver. As the front surface loses heat via radiation directly to
+the atmosphere, the rate of temperature rise as well as the
+steady-state temperature of A are significantly less than at other
+points. The air outlet temperature and pressure drop are plotted in
+Fig. 5. It can be observed that their variation trend closely
+follows the incident flux variation. The receiver will start producing
+a set point outlet temperature of steady-state after about 90 s of the
+start-up. The solid temperature increases at an average rate of nearly
+9.5 K/s when the start-up is implemented in 60 s. However, start-up
+duration time decides the rate of solar heat flux rise and can signifi￾cantly affect the rate of solid temperature rise. Figure 6 shows the
+solid temperature distribution at location C for various start-up
+durations. For a start-up duration of 0 s, i.e., sudden exposure to
+maximum solar flux, the absorber reaches steady-state temperature
+in nearly 30 s. The rate of solid temperature rise is 25 K/s which
+may result in thermal shocks and can severely affect the structural
+integrity of the porous matrix.
+4.2 Clear Sky Daily Operation. The change in the sun’s posi￾tion in the sky during the daytime leads to significant variation in
+the incident solar flux. The time-dependent radiation flux variation
+obtained using ray-tracing software is used here to approximate the
+variation on a clear sky day as in Eq. (14) and Fig. 7(a).
+q(t) = qav − qacos(ωt) (14)
+where daily average, qav=0.7 MW/m2
+, amplitude of variations,
+qa =0.3 MW/m2
+, and angular frequency, ω = 2π
+8 × 3600 s
+−1 [28].
+A total duration of 8 h is taken to implement the clear sky operation.
+Fig. 4 Transient response of receiver (ϕ = 0.9, dp = 2 mm, Uin = 1 m/s) during cold start-up: (a) incident solar flux variation,
+(b) solid temperature, and (c) fluid temperature
+041009-4 / Vol. 145, AUGUST 2023 Transactions of the ASME
+Downloaded from asmedigitalcollection.​asme.​org/​solarenergyengineering/​article-pdf/​145/​4/​041009/​6975671/​sol_145_4_041009.​pdf?casa_token=fNpdKC12uQ8AAAAA:mMAlialg3MOYkTc1OxRXc2QMnA2d-gJRQwLt617fHqtb90XpfeqAvHZpFsFtskmOa2o2s2Rl by Aristotle University Of Thessaloniki user on 02 September 2026
+
+The variation of solid and fluid temperatures at different locations is
+presented in Figs. 7(b) and 7(c). It can be observed that solid and
+fluid temperatures follow the incident flux variation. A significant
+variation in solid and fluid temperatures occurs during the daily
+operation. Additionally, the variation of solid temperatures within
+the receiver indicates non-uniformity in temperature distribution
+which may induce thermal stresses. Figure 8 presents the air
+outlet temperature and corresponding pressure drop in the receiver
+during the daily operation. It can be noted that the air outlet temper￾ature varies up to 450 K during the daily operation. Such a high var￾iation during working hours might affect the downstream processes.
+It also indicates a smooth pressure drop variation from 65 Pa to
+326.8 Pa during the entire working hours with a maximum during
+mid-hours when the incident flux is maximum.
+4.3 Cloud Passing. The cloud passing phenomena may result
+in partial or complete loss of incident solar flux. Figure 9(a) shows a
+typical case of cloud passage which includes covering of concentra￾tor, fully covered duration, and subsequent uncovering of the con￾centrator [49]. The covering duration is implemented by reducing
+incident flux from maximum to zero in 5 s. The reduction of flux
+to zero represents the worst case. The flux is kept at zero for the
+next 30 s, after which uncovering of the cloud takes place. The
+uncovering duration is implemented with an increase of incident
+flux on the receiver to a maximum of 5 s after which the flux
+remains constant at maximum value. The whole variation is
+expressed in Eq. (15). qmin and qmax are the minimum
+and maximum incident solar flux and are assumed to be 0 and
+1 MW/m2
+, respectively. A rate of change of flux of 0.2 MW/m2
+/s
+occurs during the covering and uncovering time.
+q(t) =
+qmax, 0 < t ≤ 5
+qmax − (qmax − qmin)
+(10 − 5) (t − 5), 5 < t ≤ 10
+qmin, 10 < t ≤ 40
+qmin + (qmax − qmin)
+(45 − 40) (t − 40), 40 < t ≤ 45
+qmax, t > 45
+⎧
+⎪⎪⎪⎪⎪⎪⎪⎪⎨
+⎪⎪⎪⎪⎪⎪⎪⎪⎩
+(15)
+In the first stage of simulation, the receiver is allowed to reach a
+steady-state. The steady-state values are then used in the second
+transient stage of the simulation as initial conditions. A similar
+approach was used by Wu et al. [24] to perform transient simula￾tions during sudden loss of heat flux. The solid and fluid tempera￾tures at the different locations are presented in Figs. 9(b) and
+9(c), respectively. It can be observed that solid and fluid tempera￾tures at all points reach close to the ambient temperature during
+the cloud pass. Since the interior locations mostly get heated indi￾rectly via conduction and radiation and not by direct incident
+flux, their thermal response is delayed compared to Point A at the
+front. At any given instant, the solid temperature distribution
+within the receiver is extremely non-uniform. This might lead to
+very large thermal gradients. Additionally, the solid temperature
+falls from a steady-state to ambient and again rises to a steady-state
+within a short duration of 50 s which may result in thermal shock
+and failure of porous material. This observation suggests that fre￾quent cloud passing may result in severe thermal cycles and
+fatigue failure of the receiver. The air outlet temperature and pres￾sure drop in the receiver are presented in Fig. 10. The receiver will
+start producing air temperature lower than 600 K within 25 s and
+reach close to ambient temperature in about 40 s. The time required
+by the receiver to again reach the steady-state after the cloud pass is
+about 45 s. The sudden variation in air outlet temperature might
+disrupt the further operations of the plant. The study so far in this
+section considered the worst case cloud type with zero transmissiv￾ity. Cloud transmissivity determines the ratio of sunlight passing
+through it [49]. To understand the absorber behavior under different
+types of clouds, the solid temperature variation at location C for dif￾ferent cloud transmissivities is presented in Fig. 11. The various
+transmissivities are implemented in the model by varying the
+minimum flux, qmin. It can be clearly observed that for the same
+duration, the variation in solid temperatures is much higher for
+clouds with lower transmissivities and vice-versa.
+4.4 Shut-Down. The gradual shut-down of the plant is imple￾mented in the present study. Similar to the start-up period, the inci￾dent flux is linearly reduced from steady-state to a minimum value
+in 60 s. This variation is expressed by Eq. (16) and is shown in
+Fig. 12(a). qmin and qmax are the minimum and maximum incident
+solar fluxes and are assumed to be 0 and 1 MW/m2
+, respectively.
+q(t) =
+qmax, t < 5
+qmax − (qmax − qmin)
+(65 − 5) (t − 5), 5 < t ≤ 65
+qmin, t ≥ 65
+⎧
+⎪⎪⎨
+⎪⎪⎩
+(16)
+The same two-stage strategy used in Sec. 4.3 is implemented to
+obtain initial steady-state conditions and transient solutions for
+the receiver. The corresponding solid and fluid temperature varia￾tions are plotted in Figs. 12(b) and 12(c), respectively. As observed
+in earlier cases, Point A responds first, followed by other locations
+depending on their respective locations from the front. The farthest
+Fig. 6 Solid temperature variation at Point C for different
+start-up durations
+Fig. 5 Air outlet temperature and pressure drop during cold
+start-up
+Journal of Solar Energy Engineering AUGUST 2023, Vol. 145 / 041009-5
+Downloaded from asmedigitalcollection.​asme.​org/​solarenergyengineering/​article-pdf/​145/​4/​041009/​6975671/​sol_145_4_041009.​pdf?casa_token=fNpdKC12uQ8AAAAA:mMAlialg3MOYkTc1OxRXc2QMnA2d-gJRQwLt617fHqtb90XpfeqAvHZpFsFtskmOa2o2s2Rl by Aristotle University Of Thessaloniki user on 02 September 2026
+
+point, E, reaches the ambient conditions last, nearly 30 s after the
+incident flux is cut down to zero. A similar trend is observed in
+fluid temperatures as well. Figure 13 presents the air outlet temper￾ature and pressure drop in the receiver during the shut-down period.
+It can be seen that the receiver takes about 80 s to reach the ambient
+temperature. The average rate of change in solid temperature is
+about 10 K/s. In order to investigate the effect of the shut-down
+period, Fig. 14 presents the solid temperature variation for
+various shut-down periods. It can be observed that a shut-down
+duration of 0 s, i.e., a sudden drop of incident flux from the
+maximum value to zero, results in a solid temperature change rate
+of nearly 38 K/s which is extremely high and may cause thermal
+shock in the porous matrix. As the shut-down period increases,
+the rate of solid temperature change reduces, decreasing the possi￾bility of absorber failure.
+4.5 Effect of Structural Parameters. The porosity and pore
+size are two major structural parameters that determine the fluid
+flow and heat transfer and radiative properties of a porous
+medium. The variation in porosity and pore size significantly
+affects the flow field, pressure drop, and solid and fluid temperature
+distributions. Hence, it is important to understand their effect on the
+transient response of the receiver under various conditions. This
+section investigates the effect of porosity and pore size on the
+solid temperature distribution. The porosity values of 0.7, 0.8,
+and 0.9 are taken to investigate the effect of porosity. Similarly,
+pore sizes of 2, 3, and 4 mm are taken to investigate the effect of
+pore size. The solid temperature at z =L/2 (Point C) is plotted in
+cases of cold start-up, cloud pass, and shut-down.
+Fig. 7 Transient response of receiver (ϕ = 0.9, dp = 2 mm, Uin = 1 m/s) during clear sky operation: (a) incident solar flux variation,
+(b) solid temperature, and (c) fluid temperature
+Fig. 8 Pressure drop and air outlet temperature during clear sky
+operation
+041009-6 / Vol. 145, AUGUST 2023 Transactions of the ASME
+Downloaded from asmedigitalcollection.​asme.​org/​solarenergyengineering/​article-pdf/​145/​4/​041009/​6975671/​sol_145_4_041009.​pdf?casa_token=fNpdKC12uQ8AAAAA:mMAlialg3MOYkTc1OxRXc2QMnA2d-gJRQwLt617fHqtb90XpfeqAvHZpFsFtskmOa2o2s2Rl by Aristotle University Of Thessaloniki user on 02 September 2026
+
+Fig. 9 Transient response of receiver (ϕ = 0.9, dp = 2 mm, Uin = 1 m/s) during cloud passing: (a) incident solar flux variation,
+(b) solid temperature, and (c) fluid temperature
+Fig. 10 Pressure drop and air outlet temperature during cloud
+passing
+Fig. 11 Solid temperature variation at location C for various
+cloud transmissivities
+Journal of Solar Energy Engineering AUGUST 2023, Vol. 145 / 041009-7
+Downloaded from asmedigitalcollection.​asme.​org/​solarenergyengineering/​article-pdf/​145/​4/​041009/​6975671/​sol_145_4_041009.​pdf?casa_token=fNpdKC12uQ8AAAAA:mMAlialg3MOYkTc1OxRXc2QMnA2d-gJRQwLt617fHqtb90XpfeqAvHZpFsFtskmOa2o2s2Rl by Aristotle University Of Thessaloniki user on 02 September 2026
+
+Fig. 12 Transient response of receiver (ϕ = 0.9, dp = 2 mm, Uin = 1 m/s) during shut-down: (a) incident solar flux distribution,
+(b) solid temperature, and (c) fluid temperature
+Fig. 13 Air outlet temperature and pressure drop during shut￾down period
+Fig. 14 Solid temperature variation in receiver (ϕ = 0.9, dp =
+2 mm, Uin = 1 m/s) for different shut-down periods
+041009-8 / Vol. 145, AUGUST 2023 Transactions of the ASME
+Downloaded from asmedigitalcollection.​asme.​org/​solarenergyengineering/​article-pdf/​145/​4/​041009/​6975671/​sol_145_4_041009.​pdf?casa_token=fNpdKC12uQ8AAAAA:mMAlialg3MOYkTc1OxRXc2QMnA2d-gJRQwLt617fHqtb90XpfeqAvHZpFsFtskmOa2o2s2Rl by Aristotle University Of Thessaloniki user on 02 September 2026
+
+4.5.1 Effect of Porosity. The solid temperature variation with
+time under different operations for selected porosities is presented
+in Fig. 15. It can be clearly seen that the porosity of 0.9 shows a
+faster transient response to change in incident fluxes in all cases, fol￾lowed by 0.8 and 0.7, respectively. The rate of temperature change
+is greater for higher porosities, as evident from the steep rise and fall
+of temperatures with flux variations in Figs. 15(a) and 15(c). Con￾versely, smaller porosities are slower to respond to flux changes. A
+similar observation was made by [26]. Thus, the thermal shock is
+more probable in the case of higher porosities due to a greater tem￾perature change rate. It can also be noted that temperature change
+becomes more linear as the porosity increases from 0.7 to 0.9. As
+discussed in Sec. 4.3, frequent cloud passes may lead to severe
+thermal cycles. Hence, the choice of material should have a slow
+thermal response, ensuring that the temperature fluctuation rates
+are within limits. Figure 15(b) suggests that temperature fluctuation
+is highest for the porosity of 0.9 porosity while least for that of 0.7
+during a cloud pass. The solid temperature drops to ambient temper￾ature within 40 s for the porosity of 0.9 while the drop in the case of
+0.7 is only up to 467 K in about 50 s. However, the faster response
+is beneficial in quickly restoring the original steady-state working
+conditions when dynamic control is unavailable. The time taken
+to reach a steady-state in case of cold start-up and shut-down is
+about 90 s, 110 s, and 130 s for the porosity of 0.9, 0.8, and 0.7,
+respectively. Similarly, steady-state is restored in 70 s with porosity
+of 0.9 during cloud pass while 90 s and 120 s are required in case of
+porosities of 0.8 and 0.7, respectively. Since fluid temperature var￾iation follows the same trend as that of solid as observed in previous
+sections, the air outlet temperature will quickly reach the
+steady-state point. This will restore the output air temperature as
+it was prior to flux fluctuations in a shorter period.
+4.5.2 Effect of Pore Size. The solid temperature variations
+under different operating conditions are plotted in Fig. 16. It can
+be clearly observed that the effect of pore size is lesser as compared
+to porosity. In addition, a slightly steeper rise and fall of temperature
+are noted for a pore diameter of 2 mm in all cases. This suggests that
+smaller pore sizes have a faster thermal response. The temperature
+rise is linear for the start-up and shut-down period at the constant
+porosity of 0.9, as observed in Figs. 16(a) and 16(c). This suggests
+that the shape of the time-dependent temperature curve is controlled
+mostly by porosity. The time to reach the steady-state is also nearly
+the same for all the pore sizes considered in the study at a constant
+porosity. During cloud pass, the temperature drop is slightly less for
+the pore size of 4 mm as seen in Fig. 16(b). The temperature dips
+down till 40 s, after which it rises till the steady-state prior to
+cloud pass is restored at about 90 s. Since lower pore sizes
+enhance convective heat transfer, the steady-state temperature
+reached for a pore size of 2 mm is the highest during start-up and
+cloud pass. The nearly overlapping curves in Fig. 16(c) indicate
+Fig. 15 Effect of porosity on solid temperature distribution of receiver (dp = 2 mm, Uin = 1 m/s) at z = L/2 (Point C): (a) cold start-up,
+(b) cloud pass, and (c) shut-down
+Journal of Solar Energy Engineering AUGUST 2023, Vol. 145 / 041009-9
+Downloaded from asmedigitalcollection.​asme.​org/​solarenergyengineering/​article-pdf/​145/​4/​041009/​6975671/​sol_145_4_041009.​pdf?casa_token=fNpdKC12uQ8AAAAA:mMAlialg3MOYkTc1OxRXc2QMnA2d-gJRQwLt617fHqtb90XpfeqAvHZpFsFtskmOa2o2s2Rl by Aristotle University Of Thessaloniki user on 02 September 2026
+
+that the rate of drop in temperature remains nearly the same for all
+pore sizes during the shut-down period.
+5 Conclusions
+The present paper extends the understanding of the transient beha￾vior of a porous volumetric receiver under different operating condi￾tions. A coupled thermal transient model is developed, and the
+dynamic responses of the receiver during start-up, shut-down, cloud
+pass, and clear sky conditions are investigated. The effect of porosity
+and pore size on the transient working of the receiver is also studied in
+detail. It is observed that the fluid and solid temperature variations at
+different locations, air outlet temperature, and pressure drop variation
+closely follow the same trend as that of incident solar heat flux vari￾ation. The time taken by various locations within the receiver to
+respond to flux changes increases with depth. Consequently, the
+time taken to reach steady-state temperatures follows the same
+trend with the front reaching the steady-state first. Significant
+thermal gradients exist within the receiver during transient flux
+periods. The temperature change rate depends on the rate of increase
+or decrease in incident flux. Smaller start-up and shut-down periods
+result in higher temperature variation and vice-versa. The effect of
+the cloud pass phenomena on the receiver’s dynamic performance
+depends on the clouds’ transmissivity, with zero transmissivity
+clouds leading to the worst gradients. Such frequent cloud passes
+may induce thermal fatigue in the porous receiver structure. In
+addition, the outlet air temperature varies up to 450 K during a
+clear sky operation which can adversely affect the downstream pro￾cesses. It indicates the requirement of robust dynamic control for
+the receivers. Regarding the influence of porous structural parameters,
+it is observed that the effect of porosity on the transient working of the
+receiver is more significant as compared to pore size. The higher
+porosity results in a steeper rise and fall of temperature in the receiver.
+The rate of change of temperature for different pore sizes remains
+nearly the same under all conditions. The results of the study
+provide major conclusions which can be used to predict the transient
+thermal behavior for better design of receiver operations. The knowl￾edge of thermal gradients can be used to predict the thermal stresses
+induced within the receiver and to ensure its structural integrity. Addi￾tionally, the results may help in monitoring and dynamic control of
+various parameters during its operation.
+Conflict of Interest
+There are no conflicts of interest.
+Data Availability Statement
+The datasets generated and supporting the findings of this article
+are obtainable from the corresponding author upon reasonable
+request.
+Fig. 16 Effect of pore size on solid temperature distribution of receiver (ϕ = 0.9, Uin = 1 m/s) at location z = L/2 (Point C): (a) cold
+start-up, (b) cloud pass, and (c) shut-down
+041009-10 / Vol. 145, AUGUST 2023 Transactions of the ASME
+Downloaded from asmedigitalcollection.​asme.​org/​solarenergyengineering/​article-pdf/​145/​4/​041009/​6975671/​sol_145_4_041009.​pdf?casa_token=fNpdKC12uQ8AAAAA:mMAlialg3MOYkTc1OxRXc2QMnA2d-gJRQwLt617fHqtb90XpfeqAvHZpFsFtskmOa2o2s2Rl by Aristotle University Of Thessaloniki user on 02 September 2026
+
+Nomenclature
+k = thermal conductivity (W/mK)
+p = pressure (Pa)
+q = incident solar radiation (W/m2
+)
+D = diameter (m)
+G = radiative heat flux (W/m2
+)
+K = permeability (m2
+)
+L = length (m)
+Q = volumetric heat source (W/m3
+)
+T = temperature (K)
+U = Darcy velocity (m/s)
+hv = volumetric heat transfer coefficient (W/m2
+K)
+dp = pore size (m)
+CF = inertial coefficient
+Cp = specific heat (J/kgK)
+Sr = radiative source term (W/m3
+)
+r, z = radial and axial coordinates (m)
+Greek Symbols
+β = extinction coefficient (m−1
+)
+ε = emissivity
+μ = dynamic viscosity (Pa · s)
+ρ = density (kg/m3
+)
+σ = Stefan–Boltzmann constant (W/m2
+K4
+)
+ϕ = porosity
+ω = angular frequency (1/s)
+Subscripts
+c = collimated
+d = diffuse
+e = effective
+f = fluid
+r = radiation
+s = solid
+w = wall
+av = average
+in = inlet
+amb = ambient
+Abbreviations
+FVM = finite volume method
+LTNE = local thermal non-equilibrium
+MCRT = Monte Carlo ray tracing
+SiC = silicon carbide
+References
+[1] Lund, H., 2007, “Renewable Energy Strategies for Sustainable Development,”
+Energy, 32(6), pp. 912–919.
+[2] Kannan, N., and Vakeesan, D., 2016, “Solar Energy for Future World:—A
+Review,” Renewable Sustainable Energy Rev., 62, pp. 1092–1105.
+[3] He, Y.-L., Qiu, Y., Wang, K., Yuan, F., Wang, W.-Q., Li, M.-J., and Guo, J.-Q.,
+2020, “Perspective of Concentrating Solar Power,” Energy, 198, p. 117373.
+[4] Majidi, M., Behbahaninia, A., Amidpour, M., and Sadati, S. H., 2021,
+“Thermoeconomic Optimization of a Novel High-Efficiency Combined-Cycle
+Hybridization With a Solar Power Tower System,” Energy Convers. Manage.,
+244, p. 114461.
+[5] Luo, Y., Lu, T., and Du, X., 2018, “Novel Optimization Design Strategy for Solar
+Power Tower Plants,” Energy Convers. Manage., 177, pp. 682–692.
+[6] Ho, C. K., and Iverson, B. D., 2014, “Review of High-Temperature Central
+Receiver Designs for Concentrating Solar Power,” Renewable Sustainable
+Energy Rev., 29(1), pp. 835–846.
+[7] He, Y. L., Wang, K., Qiu, Y., Du, B. C., Liang, Q., and Du, S., 2019, “Review of
+the Solar Flux Distribution in Concentrated Solar Power: Non-Uniform Features,
+Challenges, and Solutions,” Appl. Therm. Eng., 149, pp. 448–474.
+[8] Ávila-Marín, A. L., 2011, “Volumetric Receivers in Solar Thermal Power Plants
+With Central Receiver System Technology: A Review,” Sol. Energy, 85(5),
+pp. 891–910.
+[9] Capuano, R., Fend, T., Schwarzbözl, P., Smirnova, O., Stadler, H., Hoffschmidt,
+B., and Pitz-Paal, R., 2016, “Numerical Models of Advanced Ceramic Absorbers
+for Volumetric Solar Receivers,” Renewable Sustainable Energy Rev., 58,
+pp. 656–665.
+[10] Ali, M., Rady, M., Attia, M. A. A., and Ewais, E. M. M., 2020, “Consistent
+Coupled Optical and Thermal Analysis of Volumetric Solar Receivers With
+Honeycomb Absorbers,” Renewable Energy, 145, pp. 1849–1861.
+[11] Nakakura, M., Bellan, S., Matsubara, K., and Kodama, T., 2018, “Conjugate
+Radiation-Convection-Conduction Simulation of Volumetric Solar Receivers
+With Cut-Back Inlets,” Sol. Energy, 170, pp. 606–617.
+[12] Nakakura, M., Matsubara, K., Bellan, S., and Kodama, T., 2020, “Direct
+Simulation of a Volumetric Solar Receiver With Different Cell Sizes at High
+Outlet Temperatures (1,000–1,500 °C),” Renewable Energy, 146, pp. 1143–1152.
+[13] Xu, C., Song, Z., Chen, L. D., and Zhen, Y., 2011, “Numerical Investigation on
+Porous Media Heat Transfer in a Solar Tower Receiver,” Renewable Energy,
+36(3), pp. 1138–1144.
+[14] Wu, Z., Caliot, C., Flamant, G., and Wang, Z., 2011, “Coupled Radiation and
+Flow Modeling in Ceramic Foam Volumetric Solar Air Receivers,” Sol.
+Energy, 85(9), pp. 2374–2385.
+[15] Barreto, G., Canhoto, P., and Collares-Pereira, M., 2018, “Three-Dimensional
+Modelling and Analysis of Solar Radiation Absorption in Porous Volumetric
+Receivers,” Appl. Energy, 215, pp. 602–614.
+[16] Barreto, G., Canhoto, P., and Collares-Pereira, M., 2020, “Parametric Analysis
+and Optimisation of Porous Volumetric Solar Receivers Made of Open-Cell
+SiC Ceramic Foam,” Energy, 200, p. 117476.
+[17] Roldán, M. I., Smirnova, O., Fend, T., Casas, J. L., and Zarza, E., 2014, “Thermal
+Analysis and Design of a Volumetric Solar Absorber Depending on the Porosity,”
+Renewable Energy, 62, pp. 116–128.
+[18] Du, S., Xia, T., He, Y. L., Li, Z. Y., Li, D., and Xie, X. Q., 2020, “Experiment and
+Optimization Study on the Radial Graded Porous Volumetric Solar Receiver
+Matching Non-Uniform Solar Flux Distribution,” Appl. Energy, 275(May),
+p. 115343.
+[19] Laporte-Azcué, M., González-Gómez, P. A., Rodríguez-Sánchez, M. R., and
+Santana, D., 2022, “A Procedure to Predict Solar Receiver Damage During
+Transient Conditions,” Renewable Sustainable Energy Rev., 154, p. 111905.
+[20] Soo Too, Y. C., García, J., Padilla, R. V., Kim, J. S., and Sanjuan, M., 2019, “A
+Transient Optical-Thermal Model With Dynamic Matrix Controller for Solar
+Central Receivers,” Appl. Therm. Eng., 154, pp. 686–698.
+[21] Xu, L., Stein, W., Kim, J. S., Too, Y. C. S., Guo, M., and Wang, Z., 2018,
+“Transient Numerical Model for the Thermal Performance of the Solar
+Receiver,” Appl. Therm. Eng., 141, pp. 1035–1047.
+[22] Ren, Y., Qi, H., Shi, J., Chen, Q., Wang, Y., and Ruan, L., 2017, “Thermal
+Performance Characteristics of Porous Media Receiver Exposed to
+Concentrated Solar Radiation,” J. Energy Eng., 143(5), p. 04017013.
+[23] Reddy, K. S., and Nataraj, S., 2019, “Thermal Analysis of Porous Volumetric
+Receivers of Concentrated Solar Dish and Tower Systems,” Renewable Energy,
+132, pp. 786–797.
+[24] Wu, Z., and Wang, Z., 2013, “Fully Coupled Transient Modeling of Ceramic
+Foam Volumetric Solar Air Receiver,” Sol. Energy, 89, pp. 122–133.
+[25] Fuqiang, W., Zhennan, G., Jianyu, T., Lanxin, M., Zhenyu, Y., and Heping, T.,
+2016, “Transient Thermal Performance Response Characteristics of
+Porous-Medium Receiver Heated by Multi-dish Concentrator,” Int. Commun.
+Heat Mass Transfer, 75, pp. 36–41.
+[26] Ribeiro, R. R., and de Lemos, M. J. S., 2020, “Transient Behavior and Thermal
+Efficiency of Volumetric Heat Receivers,” Int. J. Heat Mass Transfer, 149,
+p. 119128.
+[27] Zoller, S., Koepf, E., Roos, P., and Steinfeld, A., 2019, “Heat Transfer Model of a
+50 KW Solar Receiver-Reactor for Thermochemical Redox Cycling Using
+Cerium Dioxide,” ASME J. Sol. Energy Eng., 141(2), p. 021014.
+[28] Herrmann, B., Behzad, M., Cardemil, J. M., Calderón-Muñoz, W. R., and
+Fernández, R. M., 2020, “Conjugate Heat Transfer Model for Feedback
+Control and State Estimation in a Volumetric Solar Receiver,” Sol. Energy,
+198, pp. 343–354.
+[29] Avila-Marin, A. L., Fernandez-Reche, J., and Martinez-Tarifa, A., 2019,
+“Modelling Strategies for Porous Structures as Solar Receivers in Central
+Receiver Systems: A Review,” Renewable Sustainable Energy Rev., 111,
+pp. 15–33.
+[30] Casalegno, V., Ferrari, L., Fuentes, M. J., De Zanet, A., Gianella, S., Ferraris, M.,
+and Candelario, V. M., 2021, “High-Performance Sic–Based Solar Receivers for
+CSP: Component Manufacturing and Joining,” Materials (Basel), 14(16), pp. 1–17.
+[31] 2021, “CFD Module User’s Guide,” COMSOL Multiphysics, COMSOL 6.0,
+pp. 623–631.
+[32] Wu, Z., Caliot, C., Bai, F., Flamant, G., Wang, Z., Zhang, J., and Tian, C., 2010,
+“Experimental and Numerical Studies of the Pressure Drop in Ceramic Foams for
+Volumetric Solar Receiver Applications,” Appl. Energy, 87(2), pp. 504–513.
+[33] Schuetz, M. A., and Glicksman, L. R., 1984, “A Basic Study of Heat Transfer
+Through Foam Insulation,” J. Cell. Plast., 20(2), pp. 114–121.
+[34] Du, S., Tong, Z. X., Zhang, H. H., and He, Y. L., 2019, “Tomography-Based
+Determination of Nusselt Number Correlation for the Porous Volumetric Solar
+Receiver With Different Geometrical Parameters,” Renewable Energy, 135,
+pp. 711–718.
+[35] Wang, P., Li, J. B., Xu, R. N., and Jiang, P. X., 2021, “Non-Uniform and
+Volumetric Effect on the Hydrodynamic and Thermal Characteristic in a Unit
+Solar Absorber,” Energy, 225, p. 120130.
+[36] Wu, Z., Caliot, C., Flamant, G., and Wang, Z., 2011, “Numerical Simulation of
+Convective Heat Transfer Between Air Flow and Ceramic Foams to Optimise
+Volumetric Solar Air Receiver Performances,” Int. J. Heat Mass Transfer,
+54(7–8), pp. 1527–1537.
+[37] Li, X. L., Sun, C., Xia, X. L., Li, Z. H., and Li, Y., 2020, “Modeling of Coupled
+Heat Transfer in a Windowed Volumetric Solar Receiver,” Sol. Energy, 201, pp.
+195–208.
+Journal of Solar Energy Engineering AUGUST 2023, Vol. 145 / 041009-11
+Downloaded from asmedigitalcollection.​asme.​org/​solarenergyengineering/​article-pdf/​145/​4/​041009/​6975671/​sol_145_4_041009.​pdf?casa_token=fNpdKC12uQ8AAAAA:mMAlialg3MOYkTc1OxRXc2QMnA2d-gJRQwLt617fHqtb90XpfeqAvHZpFsFtskmOa2o2s2Rl by Aristotle University Of Thessaloniki user on 02 September 2026
+
+[38] Chen, X., Xia, X. L., Yan, X. W., and Sun, C., 2017, “Heat Transfer Analysis of a
+Volumetric Solar Receiver With Composite Porous Structure,” Energy Convers.
+Manage., 136, pp. 262–269.
+[39] Chen, X., Xia, X. L., Meng, X. L., and Dong, X. H., 2015, “Thermal Performance
+Analysis on a Volumetric Solar Receiver With Double-Layer Ceramic Foam,”
+Energy Convers. Manage., 97, pp. 282–289.
+[40] Nimvari, M. E., Jouybari, N. F., and Esmaili, Q., 2018, “A New Approach to
+Mitigate Intense Temperature Gradients in Ceramic Foam Solar Receivers,”
+Renewable Energy, 122, pp. 206–215.
+[41] Howell, J. R., Menguc, M. P., and Siegel, R., 2016, Thermal Radiation Heat
+Transfer, CRC Press, Boca Raton, FL, pp. 576–578.
+[42] Gomez-Garcia, F., González-Aguilar, J., Olalde, G., and Romero, M., 2016,
+“Thermal and Hydrodynamic Behavior of Ceramic Volumetric Absorbers for
+Central Receiver Solar Power Plants: A Review,” Renewable Sustainable
+Energy Rev., 57, pp. 648–658.
+[43] Wang, F., Shuai, Y., Tan, H., and Yu, C., 2013, “Thermal Performance Analysis
+of Porous Media Receiver With Concentrated Solar Irradiation,” Int. J. Heat Mass
+Transfer, 62, pp. 247–254.
+[44] Sano, Y., Iwase, S., and Nakayama, A., 2012, “A Local Thermal Nonequilibrium
+Analysis of Silicon Carbide Ceramic Foam as a Solar Volumetric Receiver,”
+ASME J. Sol. Energy Eng., 134(2), p. 021006.
+[45] Hurley, M. J., 2016, SFPE Handbook of Fire Protection Engineering, Springer,
+New York, p. 3426.
+[46] Chen, X., Xia, X. L., Sun, C., and Yan, X. W., 2017, “Transient Thermal
+Analysis of the Coupled Radiative and Convective Heat Transfer in a Porous
+Filled Tube Exchanger at High Temperatures,” Int. J. Heat Mass Transfer, 108,
+pp. 2472–2480.
+[47] Munro, R. G., 1997, “Material Properties of a Sintered α-SiC,” J. Phys. Chem.
+Ref. Data, 26(5), pp. 1195–1203.
+[48] Khashan, S. A., Al-Amiri, A. M., and Al-Nimr, M. A., 2005, “Assessment of the
+Local Thermal Non-Equilibrium Condition in Developing Forced Convection
+Flows Through Fluid-Saturated Porous Tubes,” Appl. Therm. Eng., 25(10),
+pp. 1429–1445.
+[49] Augsburger, G., and Favrat, D., 2013, “Modelling of the Receiver Transient Flux
+Distribution Due to Cloud Passages on a Solar Tower Thermal Power Plant,” Sol.
+Energy, 87, pp. 42–52.
+041009-12 / Vol. 145, AUGUST 2023 Transactions of the ASME
+Downloaded from asmedigitalcollection.​asme.​org/​solarenergyengineering/​article-pdf/​145/​4/​041009/​6975671/​sol_145_4_041009.​pdf?casa_token=fNpdKC12uQ8AAAAA:mMAlialg3MOYkTc1OxRXc2QMnA2d-gJRQwLt617fHqtb90XpfeqAvHZpFsFtskmOa2o2s2Rl by Aristotle University Of Thessaloniki user on 02 September 2026

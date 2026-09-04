@@ -1,0 +1,1622 @@
+International Journal of Heat and Mass Transfer 191 (2022) 122747
+Contents lists available at ScienceDirect
+International Journal of Heat and Mass Transfer
+journal homepage: www.elsevier.com/locate/hmt
+A Multi-Zone Unsteady Heat Transfer Model for an Open Volumetric
+Air Receiver: A Step Towards Scale-Up and Design Optimization
+Vishwa Deepak Kumar a
+, Gurveer Singhc
+, Laltu Chandra b,∗
+, Sudipto Mukhopadhyaya
+,
+Rajiv Shekhar d
+a Indian Institute of Technology Jodhpur, Rajasthan 342037, India b Indian Institute of Technology (BHU) Varanasi, Uttar Pradesh 221005, India c University College of Engineering and Technology Bikaner, Rajasthan 334004, India d Indian Institute of Technology (ISM) Dhanbad, Jharkhand 826004, India
+a r t i c l e i n f o
+Article history:
+Received 14 December 2021
+Revised 25 February 2022
+Accepted 26 February 2022
+Available online 5 April 2022
+Keywords:
+Solar thermal
+Open volumetric air receiver
+Multi-zone model
+Unsteady and steady-state
+Scale-up
+a b s t r a c t
+A comprehensive, multi-zone, unsteady heat transfer model is developed for a straight absorber pore￾based open volumetric air receiver. This includes heat exchange between the porous absorbers, absorbers
+and receiver casing, and absorbers and return air. The validation revealed its predictive capability within
+an uncertainty of ±7%. The model is used for the scale-up of receiver design with several intermediate
+absorber layers. The major recommendations for scale-up are a) multiple absorber layers is beneficial for
+mitigating thermal stress, b) higher flux concentration is required for non-volumetric heating, to achieve
+the desired air temperature, compared to volumetric heating, c) air return ratio should be 0.6, d) absorber
+porosity should be 0.6 for volumetric heating and higher for non-volumetric heating, e) absorber gap to
+length ratio should be 0.15 -0.25, f) the radiative heat loss is substantial for non-volumetric heating;
+therefore, the exposed surface area to ambient should be reduced, and g) absorber diameter to length
+ratio should be 1-2. The developed approach is generic and adaptable for the different open volumetric
+air receiver designs.
+© 2022 Elsevier Ltd. All rights reserved.
+1. Introduction
+Solar thermal energy (STE) is one of the promising alternatives
+for net-zero carbon emissions. Solar tower systems are emerging as
+an efficient and viable option to harness the STE. Central receiver￾based solar tower systems generate hot air at a temperature >
+700 °C using the open volumetric air receiver (OVAR) [1–3]. The
+OVAR comprises porous absorbers that are open to the atmosphere
+and are exposed to a Gaussian-type concentrated solar irradiance
+by a heliostat field. Air flowing through the OVAR is raised to a
+high temperature by the concentrated solar irradiance. The hot air
+can be used directly for an application or indirectly to heat a sep￾arate working fluid. The design of the porous absorbers affects the
+thermal efficiency of an OVAR and in turn the overall efficiency of
+the solar tower system [2]. Different absorber designs, like open￾cell type, foam-type, and monolithic honeycombs have been in-
+∗ Corresponding author: Indian Institute of Technology Banaras Hindu University:
+Indian Institute of Technology BHU Varanasi, In BHU Campus, Varanasi 221005, In￾dia
+E-mail addresses: chandra.mec@iitbhu.ac.in, dr.laltu.chandra@gmail.com (L.
+Chandra).
+vestigated [4–8]. A recent literature review reported some of the
+critical challenges associated with the absorber design e.g. flow in￾stability, thermal stress generation, and dust deposition [9,10]. A
+summary of various absorber designs is presented in Table 1. Ex￾perimental investigations [11–18] showed that the OVAR thermal
+efficiency depends on the design parameters like absorber geom￾etry, absorber porosity, the mass flow rate of air, air return ra￾tio (ARR), heat flux distribution, flux concentration, and the over￾all receiver design. However, the experimental investigations using
+large-scale solar towers are time and cost intensive, and are thus
+limited. Therefore, the mathematical or computational models, to
+improve and optimize the OVAR design, have been used exten￾sively.
+A large body of computational fluid dynamics (CFD) simulations
+can be found with varying degrees of complexity. 3D steady-state
+CFD investigations using FLUENT, including the Monte Carlo ray
+tracing (MCRT) method, are performed for volumetric and non￾volumetric heating of OVAR [21]. This demonstrated a substan￾tial impact of the heat flux distribution on the absorber temper￾ature. Experiment and CFD revealed a substantial increase in the
+ARR for cavity, semi-cavity, and secondary-concentrator-type OVAR
+[22–25]. The OVAR with gradually varying porosity is studied us￾https://doi.org/10.1016/j.ijheatmasstransfer.2022.122747
+0017-9310/© 2022 Elsevier Ltd. All rights reserved.
+
+V.D. Kumar, G. Singh, L. Chandra et al. International Journal of Heat and Mass Transfer 191 (2022) 122747
+Nomenclature
+A Area, m2
+K Loss coefficient, Pa/m
+C central absorber
+Cp Specific heat, J/kg-K
+dpr Diameter of pore, m
+dab Diameter of absorber, m
+dh Hydraulic diameter, m
+DR Diameter of a ring, m
+Dcas Diameter of the casing, m
+F View factor
+G Gap, m
+h Convective heat transfer coefficient, W/m2-K
+I Irradiance, W/m2
+k Thermal conductivity, W/m-K
+L Length, m
+M intermediate absorber
+m˙ Mass flow rate, kg/s
+np Number of pores
+Nab Total number of absorbers
+NR Number of the absorber in ring
+Nu Nusselt number
+P peripheral absorber
+Pr Prandtl number
+q˙ Power, W
+q˙
+cond Rate of heat transfer due to conduction, W
+q˙ conv Rate of heat transfer due to convection, W
+q˙
+rad Rate of heat transfer due to radiation, W
+q˙ gen Volumetric heat generation, W/m3
+q
+in Heat flux, W/m2
+Q Volume flow rate, m3/s
+r Radius, m
+Red_pr Reynolds number based on pore diameter
+Ra Rayleigh number
+T Temperature, K
+Tout Average primary air outlet temperature, K
+t Time, s
+∀ Volume, m3
+z Axial length, m
+Subscript
+a Air
+a_C primary air in the central absorber
+a_M primary air in the intermediate absorber
+a_P primary air in the peripheral absorber
+ab Absorber
+atm Ambient
+C central absorber
+cas Casing
+cas-pu casing to peripheral absorber
+dh hydraulic diameter
+front Front
+in Inlet
+M intermediate absorber
+mu-cu intermediate absorber to central absorber
+n number of layers
+nat natural
+out Outlet
+P peripheral absorber
+pr Pore
+pu-mu peripheral to intermediate
+R Ring
+r Return
+rad radiation
+rec Receiver
+rC return air through the central region
+rM return air through the intermediate region
+rP return air through the peripheral region
+st Storage
+th Thermal
+Greek
+ε Porosity
+ Emissivity
+β extinction coefficient
+σ Variance
+ρ Density
+μ dynamic viscosity
+θ azimuthal angle
+η Efficiency
+Abbreviation
+ARR Air Return Ratio
+DNI Direct Normal Irradiance
+mfr Mass Flow Rate
+OVAR Open Volumetric Air Receiver
+POA Power On Aperture
+ing the 3D steady-state CFD simulations [26], and higher thermal
+efficiency is reported as compared to a constant porosity absorber.
+This study also reported the coefficients, for estimating the pene￾tration depth, for the multi-layer absorbers. 3D CFD study for the
+performance estimation of OVAR and its comparison with exper￾imental data for solar tower Jülich is reported in [27]. The study
+used appropriate boundary conditions to reduce the computational
+mesh size. For the steady-state heat transfer, the thermal efficiency
+of 70.9% at 650 °C and thermal efficiency of 75.4% at 450 °C is re￾ported. A 3D CFD model including MCRT, for the thermal-hydraulic
+analysis of a porous absorber [28], suggested the use of high poros￾ity. The CFD simulations are also performed for the quarter model
+of an OVAR with a glass cover to study the swirling flow through
+a varying porous structure [29]. The study reported thermal effi￾ciency of 87% and recommended the use of a layered absorber de￾sign. Optical and thermal analysis of OVAR, by using 3D CFD with
+the radiation-based source term [30], found that the coated alu￾mina honeycomb absorber reduces the reflection losses. This in￾creases the outlet air temperature and thermal efficiency of an
+OVAR. Several studies have used the local thermal non-equilibrium
+(LTNE) model for investigating the heat-transfer processes inside a
+porous receiver. For example, the MCRT and LTNE -based 3D CFD
+model is used for the steady-state heat transfer analyses of OVAR
+in [31]. The work recommended an absorber with high porosity
+and small pore size for flux homogenization and high thermal effi￾ciency. A 3D LTNE-based steady-state CFD heat transfer model, in￾cluding heat-flux splitting, was validated with experiments [7,8,40].
+The simulations suggested the use of peripheral heating to recipro￾cate the volumetric-type heating effect for the absorbers with high
+thermal conductivity. The 3D CFD simulations are valuable in terms
+of the insights they provide without requiring large-scale experi￾mental setups. However, in the OVAR there is a wide separation of
+length scales, ∼1 mm for the pore size to ∼10 m for the receiver
+size, which leads to computationally challenging mesh size [27].
+Thus, the computational requirement, for 3D simulations in OVAR,
+impedes its scale-up.
+For reducing the computational cost, 2D CFD studies for OVAR,
+taking advantage of the problem symmetry and physics are also re￾ported. A 2D steady-state CFD analysis for the maximum heat flux
+2
+
+V.D. Kumar, G. Singh, L. Chandra et al. International Journal of Heat and Mass Transfer 191 (2022) 122747
+Table 1
+The porous absorber designs, material, and operating conditions for the OVARs.
+Researcher OVAR Design Material Outlet Temperature (°C)
+Böhmer et al. [11] Foil type SiSiC 800
+Hoffschmidt et al. [5] Honeycomb (Hexagonal) SiC 840
+Sharma et al. [8] Circular (straight pores) Brass 350-360
+Avila-Marin et al. [12] Wire mesh (Gradual porosity) Alloy 650
+Pabst et al. [13] Honeycomb (Hexagonal) Metal 700-800
+Avila-Marin et al. [14] Graded mesh Metal >780
+Du et al. [15,16] Radially graded (Foam) SiC >660
+Li et al. [19] Honeycomb Ceramic 550-575
+Heisel et al. [20] Various 3-D printed SiC 860
+of 2200 kW/m2, performed with a SiC absorber having a porosity
+of 49.5% and wire-mesh alloy absorbers having a porosity of 97.4%,
+showed a deviation of about 10% with experiments [33]. The alloy￾based absorber showed a greater thermal homogeneity in compar￾ison to the SiC absorber, which is attributed to the higher porosity.
+A 2D, coupled, heat transfer model with MCRT is used to study the
+windowed volumetric receiver [34]. The LTNE effects are also con￾sidered in this work, and the thermal efficiency is investigated by
+varying cell size and porosity range.
+The 1D simulations for OVARs are widely reported in the lit￾erature and are useful, as reliable results can be obtained with
+the least computational effort. Numerical investigation, including
+the 1D radiation transport equation (RTE), demonstrated the con￾ditional airflow instability in OVAR [35] and concluded that the
+volumetric heating for an absorber may be achieved with an ap￾propriate design. 1D analysis revealed the suppressed flow stability
+for the brass-based circular absorbers with straight pores [8,36,37].
+The 1D analysis also revealed that the airflow resistance increases
+substantially with temperature and limits the concentrated solar
+irradiance onto porous absorbers [38]. Ray-tracing-based solar irra￾diance and radiation-based heat loss, in the 1D approach, are also
+developed for the thermal performance assessment of OVAR [39].
+A direct positive correlation between foam-type absorber porosity
+and thermal efficiency of OVAR is developed using a 1D numeri￾cal model [40]. A coupled 1D heat transfer model was developed,
+including radiation exchange from the exposed absorber surface to
+the ambient, for the assessment of OVAR [41]. The study reported
+a high thermal efficiency for low inlet velocity and high thermal
+conductivity of the absorber material. A 1D numerical heat trans￾fer model was presented for a solar receiver with a variable aper￾ture mechanism in [42]. Various numerical models, developed at
+the German Aerospace Center (DLR), accounting for both the de￾tailed and homogeneous representation of the absorber, are pre￾sented in [43]. This study reported a discrepancy between experi￾mental and numerical results for temperature profiles in solid and
+fluid phases, as well as the efficiency. The literature survey re￾vealed the predictive capability of the 1D models and underlines
+the need for a comprehensive, unsteady, heat transfer model ben￾efitting from the insight and limitations of the unsteady state (1D)
+and steady-state (CFD) models, including all the modes of heat ex￾change a) between absorbers, b) between absorbers and return air,
+c) between absorber and receiver casing, and d) between absorbers
+and atmosphere. This is necessary for the scale-up, operation, and
+optimization of OVAR designs.
+As a first step, a peripherally and centrally located absorbers￾based two-zone, unsteady, heat transfer model was developed for
+an OVAR [44]. The novelty of the current work is the development
+of a multi-zone model for OVARs with several intermediate ab￾sorber layers, in addition to central and peripheral absorbers. To
+the best of the author’s knowledge, such a detailed model is not
+yet reported for a realistic OVAR design. The framed objectives of
+the present work are as follows:
+a. Development of a multi-zone, unsteady, heat transfer model for
+OVAR including all the modes of heat exchange between ab￾sorbers, absorbers and return air, absorbers and receiver casing.
+The model also considers the radially-axially varying heat flux
+on the porous absorbers.
+b. Parametric investigation of the OVAR designs, with several ab￾sorber layers, to identify the important parameters for scale-up.
+The paper is organized as follows: Section 2 presents the math￾ematical model, Section 3 presents results and discussions, and
+finally, the conclusions and recommendations are presented in
+Section 4.
+2. Mathematical Modeling
+In this section, a) the layout of scale-up OVAR designs with
+multiple intermediate absorber layers is presented, and b) the gov￾erning equations are deduced, for different receiver internals and
+airflow paths, along with the corresponding boundary conditions.
+The developed model will enable the scale-up of an OVAR design
+for a given operating condition.
+2.1. Problem Description
+A large field of heliostats is used to concentrate the direct so￾lar radiation onto an OVAR, which comprises several absorber lay￾ers (see Fig. 1a). In this schematic, the absorbers are identified
+as Central (C), intermediate (M), and peripheral (P). Because of
+Gaussian-type flux distribution on the OVAR aperture, the central
+absorbers are exposed to the highest heat flux, intermediate ab￾sorbers are exposed to the intermediate heat flux, and the pe￾ripheral absorbers are exposed to the lowest heat flux. Therefore,
+the reported two-zone model [44] is extended, including the in￾termediate absorber layers, and is termed the multi-zone model.
+This model assumes a) incompressible airflow, b) absorbers of
+uniform length and porosity, and c) straight absorber pores. The
+straight absorber pore design was preferred for mitigating the se￾rious problem of dust deposition in an absorber with complex
+porous structures [45,46]. The model requires, for instance, the
+absorber diameter (dab), the absorber length (L), the number of
+absorbers (NR), the ring diameter (DR), and the gap between ab￾sorbers (G) (see Fig. 1b). Here, the ring diameter for the first ab￾sorber layer is DR1 = 2dab + 2G and for the nth absorber layer
+is DRn = DRn−1 + (2dab + 2G) (see Fig. 1c). The number of ab￾sorbers for the nth layer, NRn = πDRn/(dab + G) -1, is used for the
+symmetry with an absorber azimuthal location θR = 360◦/NRn (see
+Fig. 1d and 1e). The inner diameter of the receiver casing is given
+by Dcas = DRn−1 + G + dab. All the absorbers are assumed to have
+the same number of pores (np) with diameter dpr. The developed
+model offers flexibility to these parameters, and thus adaptable for
+the different OVAR designs. The z-direction of airflow, inside and
+outside of the absorbers, is depicted using solid and dotted arrows
+3
+
+V.D. Kumar, G. Singh, L. Chandra et al. International Journal of Heat and Mass Transfer 191 (2022) 122747
+Fig. 1. The schematic showing the a) circular arrangement, b) absorbers in the first ring, c) location of the rings, d) the angle between two absorbers, e) symmetry, f and g)
+the path and direction for primary airflow inside an absorber and the return airflow around the absorber.
+(see Fig. 1f and g). These figures depict the flow path of primary
+air, which is a mixture of return air and ambient air, and return
+air around the absorbers. It may be noted that the direction of pri￾mary air and return air flow are opposite to each other. The hot
+primary air at the OVAR outlet flows through thermal energy stor￾age or an application. There, the heat from primary air is recovered
+and the relatively cooled, return air, enters the OVAR for external
+cooling and temperature redistribution of absorbers. The hot air
+from the absorber outlet flows through the nozzle-shaped mixture
+assembly to provide a uniform, high-temperature, hot air at the
+OVAR outlet [7,8,32]. The entire OVAR assembly is well-insulated,
+externally, for mitigating heat loss to the ambient.
+The literature review reveals that the porous absorbers are
+heated volumetrically or non-volumetrically. In-house experiments
+and CFD simulations revealed that the volumetric (uniform) ab￾sorption of heat in the absorbers promotes the desired volumetric
+heating for an OVAR [7,8,32]. Hence, internal heating of absorbers
+is applied for simulating volumetric heating (see Fig. 2a). This led
+4
+
+V.D. Kumar, G. Singh, L. Chandra et al. International Journal of Heat and Mass Transfer 191 (2022) 122747
+Fig. 2. Schematic showing (a) volumetric heating of an absorber, (b, c) Gaussian-type irradiance onto an absorber, and heat flux variation inside of an absorber for non￾volumetric heating.
+to the lowest absorber surface temperature at the inlet, z/L = 0
+and the highest absorber surface temperature at the outlet, z/L = 1
+[62]. The heliostat field concentrates the beam solar radiation onto
+the OVAR aperture. A part of this concentrated irradiance, falling
+onto the front surface of an absorber, follows a non-homogeneous,
+radial, Gaussian-type distribution [47,48]. The remaining part en￾ters through the absorber pore and is internally absorbed. There￾fore, the non-volumetric heating is simulated by (a) Gaussian-type
+irradiance onto the front surface of an absorber is shown in Fig. 2b,
+and (b) the decreasing flux inside of an absorber pore, along the z￾direction, is shown in Fig. 2c. This leads to the highest absorber
+temperature at the inlet, z/L = 0 and the lowest absorber surface
+temperature at the outlet, z/L=1. Therefore, non-volumetric heating
+leads to a higher heat loss from the absorber surface compared to
+volumetric heating. The radial and axial variations of irradiance are
+calculated as follows [6]:
+I(rrec ) = I0.exp−1
+2 .
+rrec2
+σ 2
+ (1)
+I(z) = Ioe−β.z (2)
+Where Io is the maximum heat flux at rrec = 0, β = 3(1-ε)/dpr
+[49] is the estimated extinction coefficient, ε is the absorber poros￾ity, and dpr is the pore diameter for an absorber. The multi-zone
+model includes several intermediate absorber layers between cen￾tral and peripheral absorbers. The absorber layouts for one, two,
+and three intermediate absorber layers are illustrated in Fig. 3. The
+total number of absorbers Nab in an OVAR is 19 for the one inter￾mediate absorber layer and 61 for the three intermediate absorber
+layers. The actual number of intermediate absorber layers will de￾pend upon the capacity of an OVAR design.
+To scale up an OVAR design, with multiple intermediate ab￾sorber layers and for a given air mass flow rate (m˙ a), the ab￾sorber diameter, the absorber porosity, and the Reynolds number
+based on pore diameter are maintained. This allows a compara￾tive assessment between the different OVAR designs for optimiza￾tion. The air mass flow rate through one absorber will be m˙ ab =
+m˙ a/Nab, the air mass flow rate through a single pore is m˙ pr =
+m˙ ab/np, where np is the total number of pores in an absorber.
+Thus, the Reynolds number based on pore diameter Red_pr is
+given by,
+Red_pr = 4 m˙ a
+πdpr μ Nab.np (3)
+Here, the pore diameter (dpr) is to be selected to obtain the de￾sired Red_pr and is given by,
+dpr = 4
+πμ Red_pr
+m˙ a
+Nab.np (4)
+Now, for a given absorber porosity (ε) the absorber diameter is
+given by,
+dab =
+
+1
+ε.np 4
+πμ Red_pr
+m˙ a
+Nab2
+1/2
+. (5)
+Eq. (5) provides the required absorber diameter for different in￾termediate absorber layers.
+2.2. Governing equations
+The differential form of the governing equations is derived for
+the receiver casing, the central absorbers, the intermediate ab￾sorbers, the peripheral absorbers, and the return air side, consid￾ering the 60 ° symmetry of an OVAR design (see Fig. 4a). A differ￾ential element (dz) along the main flow (z) direction is shown in
+Fig. 4b. Here, the absorbers are highlighted as C, M, and P depend￾ing on their relative positions in an OVAR. All the modes of heat
+transfer, including the interaction between different receiver inter￾nals, are depicted using Fig. 4c. This reveals the involved complex
+heat transfer processes, which are mathematically modeled, and
+the same is presented subsequently. In this paper, one intermedi￾ate absorber layer is used to illustrate the model development. For
+several intermediate absorber layers, the corresponding equation is
+to be solved repeatedly with appropriate view factors.
+2.2.1. Receiver casing
+The receiver casing encloses all the porous absorbers and is ex￾ternally insulated. This arrangement mitigates heat loss from the
+circumference of the absorber to the ambient. The heat transfer
+modeling of the receiver casing excludes a) the direct solar irra￾diance and b) the direct radiation exchanges with the central (C)
+and intermediate (M) absorbers on account of the small gap be￾tween absorbers. The model includes the radiative and convective
+heat exchanges with the peripheral absorbers (P) and the return air
+(see Fig. 5). The return air flows through the space between the re￾ceiver casing and P. In this figure, q˙ conv_rp denotes the rate of con￾vective heat transfer from casing to return air, q˙
+cond_z denotes the
+rate of heat conduction in the receiver casing at z, and q˙
+rad (cas↔P)
+denotes the net radiative heat exchange between the receiver cas￾ing and P.
+5
+
+V.D. Kumar, G. Singh, L. Chandra et al. International Journal of Heat and Mass Transfer 191 (2022) 122747
+Fig. 3. Front view of an open volumetric air receiver with a) one, b) two, and c) three intermediate absorber layers.
+Fig. 4. A schematic showing, a) 60 ° symmetry of an OVAR design and b) the differential element along the z-direction and c) all the modes of heat transfer in absorber.
+Fig. 5. A schematic showing the heat exchanges between the receiver casing, and the peripheral absorbers and the return air.
+6
+
+V.D. Kumar, G. Singh, L. Chandra et al. International Journal of Heat and Mass Transfer 191 (2022) 122747
+Fig. 6. A schematic showing the cross-section of a porous absorber and the impor￾tant geometrical parameters.
+Fig. 7. A schematic showing the different modes of heat transfer to and from the
+peripheral absorbers (P).
+The instantaneous energy balance, q˙ in − q˙ out = q˙ st, results in
+the following expression:
+kcas
+ρcascpcas
+∂2Tcas
+∂z2
+  	 conduction term
+− 2hrcas rcasin
+ρcascpcas
+
+r2
+casout − r2
+casin  (Tcas − Trp)
+  	 convection term
++ σ
+
+
+T 4
+P − T 4
+cas
+ρcascpcas
+ 1−cas
+cas  3(r2
+cas_out−r2
+cas_in ) rcas_in + 3(r2
+cas_out−r2
+cas_in ) rcas_inFcas−pu + 
+ 1−P
+P
+ (r2
+cas_out−r2
+cas_in ) 2rab 
+  	 radiation exchenge term
+= ∂Tcas
+∂t   	 storage term
+(6)
+In Eq. (6) the conduction, convection, and radiation exchange
+related terms are identified for the receiver casing. The prescribed
+initial condition (at t = 0) is Tcas = Tatm. The prescribed boundary
+conditions at the inlet and outlet are as follows:
+Inlet (at z = 0) : kcas
+∂Tcas
+∂z = σcas
+
+T 4
+cas − T 4
+atm
+Outlet (at z = L) :
+∂Tcas
+∂z = 0.
+2.2.2. Absorber
+A porous absorber is depicted using the schematic in Fig. 6. The
+important geometrical parameters like pore diameter, and absorber
+diameter, are depicted in this figure. Depending on the locations,
+the absorbers in an OVAR are identified as peripheral (P), inter￾mediate (M), and central (C) in Fig. 4. The unsteady heat transfer
+modeling for these absorbers is described subsequently. The pri￾mary air flows inside the pores of these absorbers. The return air
+flows around the absorber in between the narrow gaps.
+2.2.2.1. Peripheral absorber. The modes of heat transfer to and from
+P are depicted in Fig. 7. These absorbers interact with the receiver
+casing, M, and the return air around these absorbers. The rate of
+heat transfer, via forced convection, from P to primary air is given
+by q˙ conv_ap, the rate of heat transfer, via forced convection, from
+P to return air is given by q˙ conv_rp, the rate of heat transfer due
+to conduction at z is given by q˙
+cond_z, the net radiation-based heat
+exchange between P and the receiver casing is given by q˙
+rad (cas↔P),
+and the net heat radiation-based heat exchange between P and M
+is given by q˙
+rad (M↔P).
+The instantaneous energy balance gives,
+kP
+ρPcpP
+∂2TP
+∂z2
+  	 conduction term
+− 2haPnp.rpr
+ρPcpP (1 − ε)r2
+ab
+(TP − Ta_P )
+  	 convection term f rom P to primary air
+− 2hrp
+ρPcpP (1 − ε)rab
+(TP − TrP )
+  	 convection term f rom P to return−air
++
+σ
+
+
+T 4
+cas − T 4
+P
+
+ρPcpP
+
+ 1−P
+P
+
+(1 − ε)rab + (1−ε)rab
+Fpu−cas + 
+ 1−cas
+cas  6(1−ε)r2
+ab
+rcas_i
+
+  	 radiation exchange term between P and casing
++
+σ
+
+
+T 4
+M − T 4
+P
+
+ρPcpP
+
+ 1−P
+P
+
+(1 − ε)rab + (1−ε)rab
+Fpu−mu + 
+ 1−M
+M
+
+(1 − ε)2rab
+  	 radiation exchange term between P and M
++ q˙ p
+ρPcpPd∀P   	 heat input term
+= ∂TP
+∂t
+	 unsteady term
+(7)
+Here, the heat source to P for volumetric and non-volumetric
+heating is given as follows:
+q˙ p =
+
+q˙ gen.d∀P f or volumetric heating
+q
+in−P.dAPs f or non − volumetric heating
+For simulating the volumetric heating, for instance using the
+peripheral heating in the laboratory [7,8], the uniform internal heat
+generation (q˙ gen) is applied. For the non-volumetric heating, with
+concentrated solar radiation on the field, the heat flux q
+in−p (e.g.
+I(r)) is applied on the front surface and the distribution I(z) is ap￾plied along the axial direction. The prescribed initial and boundary
+conditions are as follows:
+Initial condition: The temperature of the peripheral absorber is
+equal to the ambient, i.e., at t = 0 TP = Tatm.
+Boundary conditions: The boundary conditions, for volumetric
+and non-volumetric heating, are applied at the inlet (z = 0) and
+the outlet (z = L) to the absorber. These are as follows: a) at z=0:
+kP
+∂TP
+∂z   	 conduction term
+= σP (T 4
+P − T 4
+atm)   	 radiation exchange between P and atmosphere
++ h(TP − Tatm)   	 convection term
+for the volumetric heating, and
+−k
+∂TP
+∂z   	 conduction term
+= q
+in−p   	 input heat flux
+− σP (T 4
+P − T 4
+atm)   	 radiation exchange between P and atmosphere
+−h(TP − Tatm)   	 convection term
+for the non-volumetric heating, and b) the outlet is treated as adi￾abatic, considering the externally insulated absorbers, i.e. at z = L:
+∂TP
+∂z = 0. The absorbers are internally (volumetrically) heated for
+simulating the volumetric heating effect. Therefore, the heat flux
+term is not included as the inlet boundary condition for volumet￾ric heating.
+2.2.2.2. Intermediate absorber. The multi-zone model includes the
+heat transfer in M, which is located in between P and C (Fig. 4).
+Thus, M interacts with P, C, and the return air. The direct radiation
+7
+
+V.D. Kumar, G. Singh, L. Chandra et al. International Journal of Heat and Mass Transfer 191 (2022) 122747
+Fig. 8. A schematic showing the modes of heat transfer to and from an intermedi￾ate absorber (M).
+exchange between M and receiver casing is neglected, assuming
+the small gaps between the absorbers. The different modes of heat
+exchange to and from M are depicted in Fig. 8. In this figure, the
+rate of heat transfer, via forced convection, from M to primary air
+is q˙ conv_am, the rate of heat transfer, via forced convection, from M
+to the return air is q˙ conv_rm, the rate of heat conduction in M at
+an axial position z is q˙
+cond_z, the net radiation-based heat exchange
+between M and P is q˙
+rad (P↔M) and between M and C is q˙
+rad (M↔C).
+The instantaneous energy balance for M is given by,
+kM
+ρMcpM
+∂2TM
+∂z2
+  	 conduction term
+− 2haM nMrpr
+ρMcpM(1 − ε)r2
+ab
+(TM − TaM )
+  	 convection term f rom M to primary air
+− 2hrM
+ρMcpM(1 − ε)rab
+(TM − TrM )
+  	 convection term f rom M to return−air
++
+σ
+
+
+T 4
+P − T 4
+M
+
+ρMcpM
+
+ 1−M
+M
+
+(1 − ε)rab + (1−ε)rabs
+Fmu−pu + 
+ 1−M
+M
+ (1−ε)rab
+2
+
+  	 radiation exchange term between P and M
++
+σ
+
+
+T 4
+C − T 4
+M
+
+ρMcpM
+
+ 1−M
+M
+
+(1 − ε)rab + (1−ε)rab
+Fmu−cu + 
+ 1−M
+M
+
+3(1 − ε)rab
+  	 radiation exchange term between C and M
++ q˙ M
+ρMcpMd∀M   	 heat input term
+= ∂TM
+∂t
+	 unsteady term
+(8)
+The heat source to M, for volumetric and non-volumetric heat￾ing, is as follows:
+q˙ M =
+
+q˙ gend∀M f or volumetric heating
+q
+in−M.dAMs f or non − volumetric heating
+Here, the volumetric heating is simulated using the uniform,
+internal, heat generation and the non-volumetric heating is sim￾ulated by using the radial and axial variation of heat-flux on the
+absorber. The prescribed initial and boundary conditions are as fol￾lows:
+Initial condition: The temperature of the intermediate absorber
+is equal to ambient i.e. at t = 0, TM = Tatm.
+Boundary conditions: The prescribed boundary conditions are
+a) at the inlet (z = 0):
+kM
+∂TM
+∂z   	 conduction term
+= σM(T 4
+M − T 4
+atm)   	 radiation exchange between M and atmosphere
++ h(TM − Tatm)   	 convection term
+for volumetric heating and
+−kM
+∂TM
+∂z   	 conduction term
+= q
+in−m 	 input heat f lux
+− σM(T 4
+M − T 4
+atm)   	 radiation exchange between M and atmosphere
+−h(TM − Tatm)   	 convective term
+for non-volumetric heating, and b) at the outlet, considering the
+external insulation, the adiabatic boundary condition is applied i.e.
+at z = L, ∂TM
+∂z = 0.
+2.2.2.3. Central absorber. The absorber located at the center is
+termed the central absorber (C). This absorber exchanges heat with
+M, the primary air, and the return air. Fig. 9 shows the different
+modes of heat exchange for C. The rate of heat transfer, via forced
+convection, from C to primary air is given by q˙ conv_ac, the rate of
+heat transfer, via forced convection, from C to return air is given by
+q˙ conv_rc, the net radiation-based heat exchange between C and M is
+given by q˙
+rad (C↔M). Here, the direct interaction between C and P
+is ignored considering the presence of M and small gaps between
+absorbers.
+The instantaneous energy balance gives,
+kC
+ρCcpC
+∂2TCabs
+∂z2
+  	 conduction term
+− 2haCncrpr
+ρCcpC (1 − ε)r2
+ab
+(TC − Ta_C )
+  	 convection term f rom C to primary air
+− 2hrC
+ρCcpC (1 − ε)rab
+(TC − TrC )
+  	 convection term f rom C to return−air
++
+σ
+
+
+T 4
+C − T 4
+M
+
+ρCcpC
+
+ 1−C
+C
+ (1−ε)rab
+2 + (1−ε)rab
+2Fcu−mu + 
+ 1−C
+C
+ (1−ε)rab
+6
+
+  	 radiation exchange term between C and M
++ q˙C
+ρCcpCd∀C   	 heat input term
+= ∂TC
+∂t
+	 unsteady term
+(9)
+As in P and M, the heat input, for volumetric and non￾volumetric heating, is as follows:
+Here, q˙C =
+
+q˙ gend∀C f or volumetric heating
+q
+in−C.dACs f or non − volumetric heating
+The prescribed initial and boundary conditions for solving this
+partial differential Eq. (9) are as follows:
+Initial condition: The temperature of the central absorber is
+equal to ambient i.e. at t = 0, TC = Tatm.
+Boundary conditions: The boundary conditions are prescribed
+at the inlet and the outlet. These are as follows: a) at the inlet
+z = 0,
+kC
+∂TC
+∂z   	 conduction term
+= σC (T 4
+C − T 4
+atm)   	 radiation exchange between C and atmosphere
++ h(TC − Tatm)   	 convection term
+for volumetric heating and
+−kC
+∂TC
+∂z   	 conduction term
+= q
+in−c 	
+input heat f lux
+− σC (T 4
+C − T 4
+atm)   	 radiation exchange between C and atmosphere
+−h(TC − Tatm)   	 convection term
+for non-volumetric heating, and b) at the outlet, considering ex￾ternal insulation, the adiabatic condition is applied, i.e. at z = L,
+∂TC
+∂z = 0.
+2.2.3. Primary air
+The primary air, a mixture of ambient and return air, flows in￾side the pores of an absorber. This leads to heat removal from the
+absorbers or heating of the primary air via forced convection. The
+heat transfer to primary air is identical for all the absorbers viz. P,
+M, and C. Therefore, one of the absorbers, namely P, is selected to
+8
+
+V.D. Kumar, G. Singh, L. Chandra et al. International Journal of Heat and Mass Transfer 191 (2022) 122747
+Fig. 9. A schematic showing the different modes of heat transfer to and from the central absorber (C).
+Fig. 10. Schematic showing heat transfer to and from primary air at peripheral absorber (P).
+deduce the heat transfer model for primary air (see Fig. 10). The
+rate of heat transfer due to the advection of primary air at z is
+given by m˙ acpaTa|z, the rate of heat transfer due to conduction at
+z is given by q˙
+cond_z and at z+dz is q˙
+cond_z+dz, and the rate of heat
+transfer, via forced convection, from an absorber to primary air is
+given by q˙ conv_ap.
+The instantaneous energy balance, for primary airflow inside P,
+gives,
+kap
+ρapcpap
+∂2Ta_P
+∂z2
+  	 conduction term
+− m˙ a_p
+2nπr2
+prρap
+∂Ta_P
+∂z   	 advection term in primary air
++
+2ha_p
+ρapcpaprpr
+(TP − Ta_P )
+  	 convection term f rom P to primary air
+= ∂Ta_P
+∂t   	 unsteady term
+(10)
+The identical equations can be deduced for primary airflow in￾side the pores of intermediate and central absorbers. Thus, the
+same is not repeated without the loss of generality. The prescribed
+initial and boundary condition for solving Eq. (10) are as follows:
+Initial condition: The temperature of primary is equal to the am￾bient i.e. at t = 0; Ta_P = Tatm.
+Boundary conditions: These are to be specified at the inlet and
+outlet to an absorber. During the operation of an OVAR the am￾bient air mixed with the return air at the inlet. Therefore, the
+conservation of energy provides at z = 0, Ta_P = ARR × TrP|z=0 +
+(1 − ARR)Tatm. At the outlet, considering external insulation, the
+adiabatic condition is applied, i.e. at z = L, ∂Ta_P
+∂z = 0. Generally,
+the experiments were used to estimate the ARR for an OVAR de￾sign see e.g. [5,22,50–52]. These investigations reveal that ARR de￾pends on several parameters such as absorber and receiver design,
+air mass flow rate and temperature, and ambient conditions.
+For identical designs of P, M and C, the heat transfer coeffi￾cient for primary airflow are estimated using the Reynolds number
+based on pore diameter (Red_pr) [53]:
+Nua = 4.36 +
+0.086
+
+Red_prPr d
+L
+1.33
+1 + 0.1Pr
+
+Red_pr
+d
+L
+1.33 (11)
+For non-identical absorbers, the above expression can be easily
+adapted. Thus, the developed approach is generic, and the model
+is adaptable for the different OVAR designs.
+2.2.4. Return air
+The hot primary air is allowed to flow through thermal energy
+storage (TES) or an application, like solar convective furnace. Here
+Fig. 11. Schematic showing the return airflow, through the different regions, for one
+intermediate absorber layer.
+the energy from primary air is recovered, and the resulting, rel￾atively cooled, return air is introduced around the C, M, and P
+through the return air flow chamber. The return air is used for the
+cooling and redistribution of heat among the absorbers for thermal
+uniformity. The direction of return airflow is opposite to that of the
+primary airflow (see Fig. 1f and g). For heat transfer modeling with
+return air, the identified central region, intermediate region and
+peripheral region, consistent with the absorbers, are depicted in
+Fig. 11. The return air flowing through the peripheral region inter￾acts with the casing and P. The return air flowing through the in￾termediate region interacts with M. The return air flowing through
+the central region interacts with C. Thus, the identified mutually
+exclusive regions, using the smallest gap between absorbers as in
+[44], reduce the model complexity to some extent. The inlet return
+air temperature at z/L=1 is maintained at 300 K for all the simu￾lations, except for the parametric investigation to analyze its effect
+on the performance of an OVAR. At the absorber inlet, return air
+coming out of the OVAR is mixed with the ambient air as shown
+in Fig. 1g. This serves as the primary air (P) for the OVAR, which
+flows through the pores of an absorber. A 3D CFD analysis for re￾turn airflow revealed the presence of cross-flow and vortex around
+the absorbers, which promotes the mixing of return air with am￾bient air, and the same was inferred from the experimental data
+[7,8]. The mixing of ambient and return air is modelled with the
+inlet boundary condition for the primary air and is described in
+the Section 2.2.3. For an incompressible flow of return air in these
+9
+
+V.D. Kumar, G. Singh, L. Chandra et al. International Journal of Heat and Mass Transfer 191 (2022) 122747
+Fig. 12. A schematic showing heat transfer for the return air flowing through the peripheral region.
+Fig. 13. A schematic showing heat transfer for the return air flowing through the intermediate region.
+three regions, the mass flow rate should satisfy the following:
+m˙ rP
+ArP
+= m˙ rM
+ArM
+= m˙ rC
+ArC
+. (12)
+The Reynolds number (Redh), based on the hydraulic diameter
+of central, intermediate, and peripheral regions, will be different.
+Therefore, unlike the primary air, the heat transfer modeling for
+return air will be different for the different regions. Hence, the
+governing equations are derived for the same. These are described
+subsequently.
+2.2.4.1. Return airflow through the peripheral region. The different
+modes of heat exchange, for return air flowing through the periph￾eral region, are depicted in Fig. 12. Here, q˙ conv_rP denotes the rate of
+convective heat transfer with the peripheral absorbers, q˙ conv_r−cas
+denotes the convective heat transfer with the casing, and q˙
+cond,z
+denotes the rate of heat conduction at z for the adopted coordi￾nate system. The rate of heat transfer by advection at z is denoted
+by m˙ rPcprPTrP|z. It may be noted that the return airflow along the
+z-direction and is depicted by an arrow.
+The instantaneous energy balance gives,
+krP
+ρrPcprP
+∂2TrP
+∂z2
+  	 conduction term
++
+m˙ rP
+ρrPArP
+∂TrP
+∂z   	 advection term in return air
++
+4πhrPrab
+ρrPcprPArP
+(TP − TrP )
+  	 convection term f rom P to return-air
++
+2πhrcasrcas_i
+3ρrPcprPArP
+(TCas − TrP )
+  	 convection term f rom cas to return−air
+= ∂TrP
+∂t
+	 unsteady term
+(13)
+The required initial and boundary conditions for solving the
+Eq. (13) are as follows:
+Initial condition: The return air temperature in the periphery re￾gion is the same as ambient i.e. at t = 0, TrP = Tatm
+Boundary conditions: The defined boundary conditions at the re￾turn air inlet z = L is TrP = Tatm and at the return air outlet z = 0
+is ∂TrP
+∂z = 0.
+2.2.4.2. Return airflow through the intermediate region. The return
+air flowing through the intermediate region interacts with M and
+the modes of heat transfer are illustrated in Fig. 13. Here, q˙ conv_rM
+depicts the convective heat transfer from M to the return air. The
+other symbolic representations for conduction and advection are
+already described.
+The instantaneous energy balance gives,
+krM
+ρrMcprM
+∂2TrM
+∂z2
+  	 conduction term
++
+m˙ rM
+ρrMArM
+∂TrM
+∂z   	 advection term in return air
++
+2πhrMrab
+ρrMcprMArM
+(TM − TrM )
+  	 convection term f rom M to return-air
+= ∂TrM
+∂t 	 unsteady term
+(14)
+Initial condition: at t = 0 is TrM = Tatm.
+Boundary conditions: at z = L is TrM = Tatm and at z = L is ∂TrM
+∂z =
+0.
+2.2.4.3. Return airflow through the central region. The modes of
+heat transfer for the return air flowing through the central region
+are shown in Fig. 14. Here, q˙ conv_rC represents the convective heat
+transfer from the central absorber to the return air.
+The instantaneous energy balance gives,
+krC
+ρrCcprC
+∂2TrC
+∂z2
+  	 conduction term
++
+m˙ rC
+ρrCArC
+∂TrC
+∂z   	 advection term in return air
++
+πhrCrab
+3ρrCcprCArC
+(TC − TrC )
+  	 convection term f rom C to return−air
+= ∂TrC
+∂t
+	 unsteady term
+(15)
+Initial condition: Initially the temperature of return air in the
+central region is equal to ambient temperature.
+At t=0; TrC = Tatm
+Boundary condition: The temperature of return air in its inlet i.e.
+at z=L is ambient. At the outlet of the central region i.e. z=0, the
+adiabatic boundary condition is considered.
+At z=L; TrC = Tatm
+At z=0; ∂TrC
+∂z = 0
+The required heat transfer coefficient for return air flowing
+around the P, M, and C are computed using Redhr = dhr∗m˙ r
+Ar μ [54] and
+is as follows:
+Nur = 0.345 ∗ Re0.597
+dhr . (16)
+Here, the convective heat transfer coefficient hr = Nur(kr/dhr)
+for the return air.
+10
+
+V.D. Kumar, G. Singh, L. Chandra et al. International Journal of Heat and Mass Transfer 191 (2022) 122747
+Fig. 14. A schematic showing heat transfer for the return air flowing through the central region.
+Fig. 15. The computed primary air temperature at the outlet of P at 5000 seconds for different a) grid sizes and b) time steps.
+2.3. Grid Independence test and validation
+A laboratory experiment for an OVAR design [7,8], with one
+central absorber C and six peripheral absorbers P having 52%
+porosity, is selected for the grid independence test and validation
+of the developed 1D multi-zone model. The experimental condi￾tions are input power q˙ = 1500 W, air mass flow rate m˙ a= 0.005
+kg/s, and the air return ratio ARR = 0.6 [44] obtained using the
+detailed air temperature measurement. Calculations are performed
+with different grid sizes (z) and time steps (t), and the ob￾tained values at 5000 seconds are shown in Fig. 15. The computed
+values for the primary air temperature at the outlet of P (Tap) at
+5000 seconds, for 0.0004 m≤ z ≤ 0.0016 m and t = 1 s, are
+867.20 K ≤Tap≤ 867.33 K and the percentage relative variation is ≤
+0.02 %. Thus, z = 0.0004 m is selected for the time-independence
+test. Subsequently, the different time-steps (1 s ≤ t ≤ 10 s) are
+considered for z = 0.0004 m and the computed values for Tap at
+5000 seconds are 867.07 K ≤Tap≤ 867.33 K and the relative per￾centage variation ≤ 0.019 % for t = 1 s. Therefore, a time-step
+t = 1 s is selected for further simulations.
+Fig. 16a shows a comparison between the computed and the
+measured primary air temperature at the outlet of C and P. The
+measured, time-dependent, inlet air temperature is used as a
+boundary condition for primary air. The comparison also reveals
+that the transient heating of primary air up to 300 seconds and
+the subsequent steady-state up to 2400 seconds are reproduced
+fairly well. Furthermore, the average values of measured primary
+air temperature at the outlet for all the 7 absorbers, at a time in￾terval of 250 seconds, are compared with the computed values in
+Fig. 16b. This shows that the deviations between the measured and
+computed average values are well within the experimental uncer￾tainty of about ±7%. The highest and lowest deviations are 14 °C at
+750 seconds and 7 °C at 250 seconds, respectively. Further analy￾ses for a smaller time interval revealed that the computed and ex￾perimental data are within the same uncertainty range. Moreover,
+Fig. 16c revealed that the computed, steady-state, axially varying,
+primary air temperature for C is consistent with the reported two￾zone model with one C and six P [44]. The multi-zone model is
+now applied for the design assessment and scale-up of an OVAR
+design [7,8] with several intermediate absorber layers. Here, the
+estimated ARR = 0.6 for the selected OVAR design, from the lab￾oratory experiments, is adopted. Furthermore, a parametric inves￾tigation is performed for a wide-range of ARR (0.3-0.8) to deter￾mine its effect on the performance of scale-up OVAR. These are
+presented subsequently.
+3. Results and Discussions
+This section reports the assessment of scale-up OVAR designs
+with one, two, and three intermediate absorber layers (Fig. 3) for
+a given total air mass flow rate m˙ a = 0.966 kg/s through OVAR
+and input power q˙ = 0.58 MW or q˙
+m˙ a = 600 kJ/kg. The selection
+of these parameters is motivated by the heat treatment inside a
+retrofitted solar convective furnace [55]. An absorber with diame￾ter dab = 0.3292 m, length L = 0.3292 m and porosity ε = 0.52 is
+selected based on the preliminary design analyses with one, two,
+or three intermediate absorber layers. In the analyses, the Reynolds
+number based on pore diameter (Red_pr) is maintained. These de￾tails are summarized in Table 2, which depicts that the number
+of straight pores increases substantially from 242 for the three in￾termediate absorber layers to 2500 for the one intermediate ab￾sorber layer. In other words, having several intermediate absorber
+layers seems more realistic than a single layer for fabrication. How￾ever, this will enhance the exposed front surface area of the ab￾sorbers to ambient and thus the heat losses. Therefore, a care￾ful assessment of the OVAR designs is necessary for optimization.
+Considering such aspects, this section reports the effect of a) num￾ber of intermediate absorber layers, b) gap between absorbers, c)
+absorber length, d) volumetric and non-volumetric heating, e) ab￾sorber porosity and f) air return ratio on the thermal efficiency of
+OVAR.
+Assuming that the entrance length is much smaller than the
+absorber pore length, the pressure drop across a straight, circular,
+pore is estimated using the following equation for laminar flow at
+11
+
+V.D. Kumar, G. Singh, L. Chandra et al. International Journal of Heat and Mass Transfer 191 (2022) 122747
+Fig. 16. A comparison between the computed and the measured [7,8] (a) primary air temperature at the outlet for C and P, b) average primary air temperature values for
+all the absorbers at a time interval of 250 seconds, c) comparison of computed temperature between present and two-zone model as in Singh et al. [43].
+Table 2
+The selected absorber parameters, to maintain, Red_pr, for the different numbers of intermediate absorber layers.
+Number of Intermediate absorber layers m˙ a(kg/s) Nab dab (m) Dcas (m) m˙ abs = m˙ a/Nab(kg/s) np dpr (m) Red_pr
+One 0.966 19 0.3292 2.536 0.0508 2500 0.0047 86
+Two 0.966 37 0.3292 3.458 0.0261 660 0.0091 86
+Three 0.966 61 0.3292 4.380 0.0158 242 0.0151 86
+a small Redpr = 86 [56]:
+ptotal = Kin
+Q2
+pr
+2gA2
+  	 sudden contraction
++
+128μLQpr
+d4
+pr   	 f or a straight pore
++ Kout
+Q2
+pr
+2gA2
+  	 sudden expansion
+(17)
+Here, ptotal is the total pressure drop across a straight pore,
+Qpr is the volume flow rate in a single pore, Kin and Kout are the
+loss coefficients, based on entrance and exit diameter ratio, and
+are equal to 0.24 [56]. The calculated values in Fig. 17 depict the
+highest pressure drop for the absorber design with 3 intermedi￾ate layers and the lowest pressure drop for the absorber design
+with 1 intermediate layer. Generally, these pressure-drop values
+are much smaller than that of the complex porous form type ab￾sorbers [10], and decrease exponentially for dab/L up to 1 and then
+rather slowly. Therefore, selecting dab/L ≥1 will be preferred and
+pre-assessment of pressure-drop is recommended for the continu￾ous operation of OVAR.
+Fig. 17. Pressure drop in pore with respect to dab/L.
+3.1. Volumetric heating
+The ambient air mixed with return air enters the absorber
+pores as primary air and gains the heat from volumetrically heated
+12
+
+V.D. Kumar, G. Singh, L. Chandra et al. International Journal of Heat and Mass Transfer 191 (2022) 122747
+Fig. 18. Time-dependent primary air temperature at the outlet of C, M and P for a) one intermediate absorber layer, b) two intermediate absorber layers and c) three
+intermediate absorber layers for volumetric heating.
+absorbers, and leaves through the absorber outlets. The time￾dependent, average, primary air temperature at the outlet of C, M,
+and P is shown in Fig. 18. In the provided legends, T_a stands for
+air temperature and the second subscript, c, m, and p, stands for
+central, intermediate, and peripheral absorbers. Following may be
+inferred:
+a. for one intermediate absorber layer, the air temperature in￾creases rapidly from 300 K to 850 K up to 2000 seconds and
+gradually increases up to 870 - 875 K until 4000 seconds at
+the steady-state.
+b. for two intermediate absorber layers (m1 and m2), the air tem￾perature rapidly increases, from 300 K to 830 K for C and M
+and from 300 K to 800 K for P, up to 4000 seconds. There￾fore, the rate of temperature rise decreases with the increas￾ing number of intermediate absorber layers. This is attributed
+to the elevated heat loss from the exposed, front, surface area
+of absorbers. Subsequently, the primary air temperature attains
+840-875 K at the steady-state around 6000 seconds.
+c. for three intermediate absorber layers (m1, m2, and m3), the
+air temperature gradually increases from 300 K to 830 K un￾til 8000 seconds. This is consistent with the findings from one
+and two intermediate absorber layers-based simulations. Hence,
+it may be concluded that the use of several intermediate ab￾sorber layers (M) benefits from a lower surface temperature,
+however, for a higher heat loss. This aspect will be investigated
+at a greater depth at a later stage.
+The axial variations for absorbers and primary air temperatures,
+from the inlet (z/L = 0) to the outlet (z/L = 1) for the absorbers,
+are provided in Fig. 19 at 8000 seconds. As expected for volumet￾ric heating, the absorber temperature increases from inlet to out￾let, and the primary air temperature follows the same trend. In the
+legend, T_C, T_M, and T_P stand for the absorber temperature for
+C, M, and P, respectively. The primary air temperatures at the out￾let for C, M, and P are identified with T_ac, T_am and T_ap, respec￾tively. The following may be inferred from this figure:
+a. for one intermediate absorber layer, the absorber temperature
+increases from 460 K at z/L = 0 to 890 K at z/L = 1. The air
+temperature increases from 310 K at z/L = 0 to 870 K at z/L = 1.
+b. for two intermediate absorber layers, the absorber temperature
+for C and M increases from 580 K at z/L = 0 to 890 K at z/L = 1,
+and that of P increases from 565 K to 850 K. The air temper￾ature for C and M increases from 317 K at z/L = 0 to 861 K
+13
+
+V.D. Kumar, G. Singh, L. Chandra et al. International Journal of Heat and Mass Transfer 191 (2022) 122747
+Fig. 19. Axial variation of primary air and absorber temperature at 8000 seconds for a) one intermediate absorber layer, b) two intermediate absorber layers and c) three
+intermediate absorber layers for volumetric heating.
+at z/L = 1. The air temperature for P increases from 310 K at
+z/L = 1 to 823 K at z/L = 1.
+c. for three intermediate absorber layers, the absorber tempera￾ture for C and M increases from 664 K at z/L = 0 to 865 K at
+z/L = 1 and that of P increases from 633 K at z/L = 0 to 812 K
+at z/L = 1. The air temperature for C and M increases from 321
+K at z/L = 1 to 815 K at z/L = 1 and for P from 309 K at z/L = 1
+to 768 K at z/L = 1.
+d. the difference between the absorber and primary air tempera￾ture increases with the number of layers, represented by a ver￾tical dotted double-arrowed line, for the same total air mass
+flow rate m˙ a = 0.966 kg/s. This is attributed to the calculated,
+surface-area averaged, convective heat transfer coefficients for
+the internal flow in a pore (hd_pr) 48.5 W/m2K, 25.3 W/m2K,
+and 15.6 W/m2K for one, two and three intermediate absorber
+layers, respectively.
+e. the absorber temperature gradient along the axial direction (in￾dicated by inclined dotted line) is the least for three interme￾diate absorber layers. This is expected to reduce the generated
+thermal stress and enhance the durability of OVAR for several
+intermediate absorber layers. Also, the multiple intermediate
+absorber layers may be selected considering fabrication diffi￾culties with a large number of pores. This means a balance be￾tween the losses and durability is the key for design optimiza￾tion. The heat losses for the OVAR designs with 1, 2, and three
+intermediate absorber layers are performed subsequently.
+The maximum radiation-based heat loss from the exposed front
+surface of the absorbers is estimated using the following equation:
+q˙rad = abσ Af ront
+
+T 4
+ab − T 4
+atm (18)
+where ab is the emissivity of absorber material, Af ront is the ex￾posed aperture of OVAR, σ is the Stefan-Boltzmann constant, and
+Tab is the absorber surface temperature at z=0. The ab may be
+expressed as a function of temperature and porosity, if available,
+for a particular absorber geometry. In the presented simulations
+ab = 0.6 is considered for a conservative assessment of the re￾ceiver efficiency. The natural convection based heat loss from the
+exposed absorber surface is obtained using the following equation:
+q˙ nat = hnatAf ront(Tabs − Tatm) (19)
+14
+
+V.D. Kumar, G. Singh, L. Chandra et al. International Journal of Heat and Mass Transfer 191 (2022) 122747
+Fig. 20. Heat losses from OVAR for volumetric heating with a) one intermediate absorber layer, b) two intermediate absorber layers, and c) thee intermediate absorber
+layers.
+where the heat transfer coefficient (hnat) is obtained using the fol￾lowing Nusselt number correlation [53]:
+Nunat =
+
+0.60 +
+0.378Ra1/6
+d
+
+1 + (0.559/Pr)
+9/168/27 2
+(20)
+The computed heat losses for volumetric heating of the ab￾sorbers with one, two and three intermediate absorber layers are
+shown in Fig. 20. Following may be observed:
+a. for one intermediate absorber layer, the radiation and natural
+convection-based heat losses are comparable.
+b. for 2 and three intermediate absorber layers, the radiation￾based heat loss is 1-2 times that of the natural convection at
+around 8000 seconds. This means radiation-based heat loss is
+likely to dominate in an OVAR with several intermediate ab￾sorber layers.
+c. generally, the increasing trend of heat losses is attributed to the
+rising absorber temperature during the unsteady phase.
+3.2. Non-volumetric heating
+The computed, time-dependent, primary air temperatures at
+the outlet of C, M and P are shown in Fig. 21. The air temper￾ature difference between C, M, and P for non-volumetric heat￾ing is higher than volumetric heating. In other words, thermal
+non-uniformity will be enhanced for non-volumetric heating. Thus,
+efforts are ongoing to homogenize the concentrated beam radi￾ation with sophisticated optical devices like homogenizers, onto
+the OVAR aperture. The approximation to estimate the extinction
+coefficient (β) is adopted from [49]. Here, the parameter c for
+β = c(1−ε)
+dpr is reported as variable (see e.g. [57,58]). Considering
+these findings 2≤ c ≤ 5 is numerically varied to calculate the ther￾mal efficiency (ηth) for the case with one intermediate absorber
+layer. The calculated thermal efficiencies are 0.74 ≤ ηth ≤0.76 for
+non-volumetric heating conditions. The change in computed ther￾mal efficiency of about 0.02 is quite small and is consistent with
+the reported findings of [58]. Therefore, c = 3.0 is maintained for
+simulations with this known uncertainty. The heat flux on the solid
+absorber surface is 507 – 640 Suns for 1 intermediate layer, 513-
+627 Suns for 2 intermediate layers and 528-612 Suns for 3 inter￾mediate layers for the non-volumetric heating condition. Following
+may be inferred from Fig. 21a, 21b, and 21c:
+a. for one intermediate absorber layer, the air temperature rapidly
+increases from 300 K to 685 K for P, 300 K to 750 K for M and
+300 K to 790 K for C up to 2000 seconds. At the steady-state,
+the temperature difference between C and P exceeds 110 K, and
+the maximum air temperature is higher than 800 K.
+b. for two intermediate absorber layers (denoted by m1 and m2),
+the air temperatures increase from 300 K to 640 K for P, 300 K
+to 700/723 K for m1/m2 and 300 K – 730 K for C. At the steady￾15
+
+V.D. Kumar, G. Singh, L. Chandra et al. International Journal of Heat and Mass Transfer 191 (2022) 122747
+Fig. 21. Temporal variation of primary air temperature at the absorber outlet for a) one intermediate absorber layer, b) two intermediate absorber layers and c) three
+intermediate absorber layers for non-volumetric heating.
+state, the maximum temperature difference between C and P is
+around 95 K, and the maximum air temperature is around 780
+K. This means, with the increasing number of intermediate ab￾sorber layers (i) the maximum air temperature decreases and
+(ii) the thermal non-uniformity is also mitigated. These are at￾tributed to the redistribution of heat flux onto the absorbers
+arranged in several layers (see Fig. 2).
+c. for three intermediate absorber layers, the maximum air tem￾perature at around 8000 seconds is around 730 K, and the max￾imum temperature difference between C and P is around 80 K.
+This reconfirms the effect of multiple intermediate absorbers
+layers on the heating up of air.
+The computed absorber and primary air temperatures at 8000
+seconds, along the axial direction, are shown in Fig. 22 for OVAR
+design with one, two, and three intermediate absorber layers. As
+expected, the non-volumetric heating results in the highest tem￾perature at the inlet z/L = 0 and the lowest temperature at the
+outlet z/L = 1. The primary air temperature increases from z/L = 0
+to z/L = 1 on account of the heat transfer from the heated ab￾sorbers. The following may be inferred from this figure:
+a. the thermal development length for air increases with the
+number of intermediate absorber layers. Consequently, the pri￾mary air attains the absorber temperature at around z/L = 0.25
+for one intermediate absorber layer and z/L = 0.65 for three
+intermediate absorber layers. An important observation is that
+the absorber length is to be carefully estimated depending on
+the number of intermediate absorber layers.
+b. the maximum absorber temperature at the inlet (z/L = 0) re￾duces with the increasing number of intermediate absorber lay￾ers. As a consequence, the primary air attains the lowest tem￾perature for the three intermediate absorber layers.
+c. the absorber temperature gradient, along the axial direction, is
+the highest for one intermediate absorber layer. Therefore, for
+an OVAR design, the thermal stresses will increase with the de￾creasing number of the intermediate absorber layers. As a con￾sequence, the use of multiple intermediate absorber layers will
+be beneficial for the durability of an OVAR design.
+One important question arises, whether the heat loss will be
+lower for a higher number of intermediate absorber layers?
+This aspect will be investigated subsequently.
+The computed, time-dependent, heat losses via radiation and
+natural convection are shown in Fig. 23. The increasing heat loss
+with the number of intermediate absorber layers is attributed to
+the increasing exposed surface area of absorbers to atmospheric
+16
+
+V.D. Kumar, G. Singh, L. Chandra et al. International Journal of Heat and Mass Transfer 191 (2022) 122747
+Fig. 22. Axial variation of primary air and absorber temperature at 8000 seconds, for OVAR design with a) one intermediate absorber layer, b) two intermediate absorber
+layers and c) three intermediate absorber layers, for non-volumetric heating.
+conditions. Also, the heat loss for non-volumetric heating is sub￾stantially greater than that of volumetric heating on account of the
+exposed surface temperature. An important observation is that the
+radiation-based heat loss is 3-4 times that of the natural convec￾tion. This means an appropriate coating with a low emissivity for
+thermal radiation and a high absorptivity for solar radiation should
+be employed, especially at the exposed surface of absorbers, for
+non-volumetric heating. Therefore, further improvement of the de￾veloped multi-zone model, including thermo-optical coupling, is
+foreseen.
+3.3. Parametric investigation for an OVAR design
+So far, detailed investigations are performed to assess the effect
+of volumetric and non-volumetric heating on the absorber temper￾ature, primary air temperature, and heat losses. In this sub-section,
+investigations are performed to assess the effect of important pa￾rameters, such as air return ratio (ARR), power to air mass flow
+rate ratio (q˙ /m˙ a), absorber diameter to length ratio, absorber gap
+to length ratio, porosity, and return air temperature on the thermal
+efficiency of an OVAR, for volumetric and non-volumetric heating
+conditions. This is a step towards the scale-up of an OVAR, design
+optimization, and recommending the operating conditions for high
+thermal efficiency and durability.
+3.3.1. Effect of Air Return Ratio
+Air return ratio (ARR) is defined as the fraction of return air,
+mixed with atmospheric air, which is sucked into the absorber
+pores as the primary air. Fig. 24 shows that the thermal efficiency
+of an OVAR increases with the increasing ARR for volumetric and
+non-volumetric heating, inlet return air temperature Tr_in = 300 K,
+dab/L =1 and G/L = 0.4. Therefore, ideally, a very high ARR should
+be preferred, which will promote internal cooling and thermal uni￾formity for absorbers. However, a high ARR will reduce the tem￾perature of primary air, a mixture of ambient air and return air, at
+the absorber inlet. Consequently, a marginal reduction in the out￾let primary air temperature is observed, for ARR > 0.6, in OVAR
+with three intermediate absorber layers. Thus an important finding
+17
+
+V.D. Kumar, G. Singh, L. Chandra et al. International Journal of Heat and Mass Transfer 191 (2022) 122747
+Fig. 23. The heat losses from OVAR for non-volumetric heating with a) one intermediate absorber layer, b) two intermediate absorber layers and c) three intermediate
+absorber layers.
+Fig. 24. The effect of air return ratio (ARR) on the OVAR thermal efficiency and the outlet temperature of primary air with one, two and three intermediate absorber layers,
+for (a) volumetric heating and (b) non-volumetric heating with q˙
+m˙ a = 600 kJ/kg.
+18
+
+V.D. Kumar, G. Singh, L. Chandra et al. International Journal of Heat and Mass Transfer 191 (2022) 122747
+Fig. 25. The effect of q˙ /m˙ a on the OVAR thermal efficiency (ηth ) and the outlet temperature of primary air (Tout) with one, two and three intermediate absorber layers, for
+(a) volumetric heating and (b) non-volumetric heating.
+is that the ARR should be carefully adopted for an OVAR design,
+pumping power, and outlet temperature requirement. As a com￾promise, an ARR = 0.6 is recommended for the prescribed OVAR
+design with three intermediate absorber layers.
+3.3.2. Effect of q˙ /m˙ a
+The computed thermal efficiency (ηth) and primary air outlet
+temperature (Tout), for 200 ≤ q˙
+m˙ a ≤ 800 ( kJ
+kg ), different heating con￾ditions, Tr_in = 300 K, dab/L =1 and G/L = 0.4 and ARR = 0.6 are
+shown in Fig. 25. Generally, the thermal efficiency decreases with
+increasing q˙
+m˙ a for volumetric and non-volumetric heating condi￾tions. Following may be inferred:
+a. for volumetric heating, 0.9≤ ηth ≤ 0.96 for one intermediate ab￾sorber layer and 0.79≤ ηth ≤ 0.88 for three intermediate ab￾sorber layers. For non-volumetric heating, 0.71≤ ηth ≤0.81 for
+one intermediate absorber layer and 0.58≤ ηth ≤ 0.69 for three
+intermediate absorber layers. The thermal efficiency for an
+OVAR design decreases with the increasing number of interme￾diate absorber layers for volumetric and non-volumetric heat￾ing.
+b. the outlet temperature of primary air is higher for volumetric
+heating, in comparison to that of the non-volumetric heating,
+in an OVAR. Therefore, an OVAR with non-volumetric heating
+should be operated at a much higher q˙
+m˙ a in comparison to the
+volumetric heating to attain the desired primary air tempera￾ture.
+3.3.3. Effect of absorber diameter to length ratio
+Fig. 26 shows the variation of OVAR thermal efficiency
+(ηth) and the outlet temperature of primary air (Tout) for differ￾ent absorber diameter to length ratios (0.5 ≤ dab/L ≤ 3), different
+heating conditions, Tr_in = 300 K, G/L = 0.4, and ARR = 0.6. The
+following may be inferred from this figure:
+a. ηth increases for 0.5 ≤ dab/L ≤ 1 with volumetric heating and
+0.5 ≤ dab/L ≤ 2 with non-volumetric heating for two and three
+intermediate absorber layers. Therefore, a relatively smaller ab￾sorber diameter should be preferred for volumetric heating
+in comparison to non-volumetric heating conditions. A sharp
+rise in ηth for 0.5 ≤ dab/L ≤ 1 is an indication that the ab￾sorber length is inadequate to attain the highest air temper￾ature, which leads to insufficient heat recovery. Also, the de￾cay in ηthfor 2 ≤ dab/L ≤ 3 indicates that the absorber length is
+more than adequate, and the absorber surface area is substan￾tial for heat loss.
+b. apparently, for both the heating conditions, 1 ≤ dab/L ≤ 2 may
+be recommended for the scale-up OVAR design with three in￾termediate absorber layers. Similar investigations are recom￾mended for selecting an appropriate absorber length for other
+OVAR designs.
+3.3.4. Effect of absorber gap to length ratio
+Fig. 27 depicts the variation of ηth and Tout for different
+absorber- gap to length ratios (0.05 ≤ G/L ≤ 0.3), Tr_in = 300 K,
+dab/L = 1, and ARR = 0.6. It may be noted that G/L determines
+the OVAR aperture and the return airflow regime around the ab￾sorbers. A small G/L implies densely packed, and a high G/L implies
+loosely packed absorbers in an OVAR. The increasing ηth for 0.05 ≤
+G/L ≤ 0.2, reveals that the relative heat recovery is higher than that
+of the heat losses from an OVAR aperture. It is worthwhile to note
+that ηth reaches a practical saturation at G/L = 0.2 for the OVAR
+designs with one, two and three intermediate absorber layers, and
+for different heating conditions. Therefore, 0.15 ≤ G/L ≤ 0.25 may
+be recommended for the scale-up OVAR design with several inter￾mediate absorber layers.
+3.3.5. Effect of absorber porosity
+Fig. 28 depicts the variation of ηth and Tout for different ab￾sorber porosities (0.3 ≤ ε ≤ 0.8), different heating conditions,
+Tr_in = 300 K, dab/L = 1, G/L = 0.4, and ARR = 0.6. The variations
+in ηth and Tout with porosity, for volumetric and non-volumetric
+heating effects, follow different trends. For volumetric heating, ηth
+increases rapidly for 0.3 ≤ ε ≤ 0.6, and attains a practical limit. For
+non-volumetric heating ηth increases monotonically with ε, how￾ever, the outlet primary air temperature follows a different trend.
+Therefore, ε for an absorber with the straight pore and volumet￾ric heating should be around 0.6, and ε for an absorber with non￾volumetric heating should be as high as possible. However, with
+increasing ε, the material strength and therefore the durability of
+an absorber will be affected. Thus, prescribing an upper limit for ε
+will be dependent on the selected absorber material.
+19
+
+V.D. Kumar, G. Singh, L. Chandra et al. International Journal of Heat and Mass Transfer 191 (2022) 122747
+Fig. 26. The effect of dab/L on the OVAR thermal efficiency (ηth ) and the outlet temperature of primary air (Tout) with one, two and three intermediate absorber layers, for
+(a) volumetric heating and (b) non-volumetric heating with q˙
+m˙ a = 600 kJ/kg.
+Fig. 27. The effect of G/L on the OVAR thermal efficiency (ηth ) and the outlet temperature of primary air (Tout) with one, two and three intermediate absorber layers, for (a)
+volumetric heating and (b) non-volumetric heating with q˙
+m˙ a = 600 kJ/kg.
+3.3.6. Effect of return air inlet temperature
+Fig. 29 depicts the variation of ηth and Tout for different return
+air inlet temperatures (300 K – 400 K), different heating condi￾tions, dab/L = 1, G/L = 0.4, and ARR = 0.6. Following may be in￾ferred:
+a. ηth decreases with the return air inlet temperature for volumet￾ric and non-volumetric heating.
+b. Tout increases with the increasing return air inlet temperature
+for volumetric and non-volumetric heating.
+The above reveals that with the increasing return air inlet tem￾perature, the primary air temperature at the OVAR inlet increases.
+However, the temperature difference between the absorber and
+primary air decreases. Consequently, the heat transfer rate de￾creases, leading to a reduction in heat recovery or thermal effi￾ciency. On the other hand, the increasing values for Tout is an out￾come of the overall temperature rise (T) from inlet to outlet.
+Thus, it can be concluded that T will be lower for a higher re￾turn air inlet temperature. This leads to drawing a recommenda￾tion that the inlet temperature of return air should be as low as
+possible for internal cooling for absorbers, thermal re-distribution
+for the absorbers, and also for achieving high thermal efficiency.
+3.3.7. Effect of absorber emissivity
+Fig. 30 depicts the variation of ηth and Tout for different
+temperature-dependent absorber emissivity [59], different heating
+conditions, Tr_in = 300 K, dab/L = 1, G/L = 0.4, and ARR = 0.6, for
+one intermediate absorber layer. The maximum relative percent￾age difference in the computed thermal efficiency (ηth) for a wide
+range (0.3 ≤  ≤0.7) is around 2-4 %. Also, with increasing value
+for  the thermal efficiency decreases, as expected, for an OVAR.
+Similar trend is expected for two and three intermediate absorber
+20
+
+V.D. Kumar, G. Singh, L. Chandra et al. International Journal of Heat and Mass Transfer 191 (2022) 122747
+Fig. 28. The effect of absorber porosity on the OVAR thermal efficiency (ηth ) and the outlet temperature of primary air (Tout) with one, two and three intermediate absorber
+layers, for (a) volumetric heating and (b) non-volumetric heating with q˙
+m˙ a = 600 kJ
+kg .
+Fig. 29. The effect of return air inlet temperature on the OVAR thermal efficiency (ηth ) and the outlet temperature of primary air (Tout) with one, two and three intermediate
+absorber layers, for (a) volumetric heating and (b) non-volumetric heating with q˙
+m˙ a = 600 kJ
+kg .
+layers. Therefore, the reported values using  = 0.6 are conserva￾tive. The unavailability of a suitable correlation between emissivity
+and porosity for straight pore-based absorbers limits further inves￾tigation and remains a prospect for further improvement.
+3.3.8. Effect of time-dependent solar irradiance
+The effect of time-dependent solar irradiance on the heat trans￾fer in an OVAR is analyzed using the average direct normal irra￾diance at Jodhpur for July 2012 and December 2012 (see Fig. 31a
+and 31b) [60]. The computed average air temperatures at the OVAR
+outlet for the design with one, two and three intermediate layers
+considering Tr_in = 300 K, dab/L = 1, G/L = 0.4, and ARR = 0.6 are
+shown in Fig. 30c and 30d. These reveal the temporal variation and
+allow operating an application within a certain time interval of a
+day, depending on the solar irradiance. For example, in the present
+case, the air temperature exceeds 600 K for July after around 9:00
+am, whereas the air temperature exceeds 800 K for December after
+around 9:00 am.
+3.4. Comparative Assessment for the scale-up OVAR designs
+So far, straight absorber pore-based scale-up OVAR designs with
+one, two, and three intermediate absorber layers have been ana￾lyzed, and some recommendations are provided for its operation.
+One final question remains: are the scale-up OVAR designs com￾parable to the state-of-the-art, in terms of thermal efficiency? To
+answer this question, further analyses are performed for volumet￾ric and non-volumetric heating with 200 ≤ q˙
+m˙ a ≤ 800 kJ
+kg , ARR = 0.6,
+and the absorber design parameters as in Table 2. For this assess￾ment, the available data from Hoffschmidt et al. [5], Avila-Marin
+et al. [12], Capuano et al. [61], Singh et al. [44], and Fend et al.
+[62] are compared with the scale-up OVAR designs in Fig. 32. The
+following may be inferred:
+21
+
+V.D. Kumar, G. Singh, L. Chandra et al. International Journal of Heat and Mass Transfer 191 (2022) 122747
+Fig. 30. The effect of emissivity on the OVAR thermal efficiency (ηth ) and the outlet temperature of primary air (Tout) with one intermediate absorber layers, for (a) volu￾metric heating and (b) non-volumetric heating with q˙
+m˙ a = 600 kJ
+kg .
+Fig. 31. Time-dependent, monthly averaged, solar irradiance for a) July 2012, b) December 2012 at Jodhpur; the computed time-dependent primary air temperature at the
+OVAR outlet for c) July 2012 and d) December 2012.
+22
+
+V.D. Kumar, G. Singh, L. Chandra et al. International Journal of Heat and Mass Transfer 191 (2022) 122747
+Fig. 32. A comparative assessment of thermal efficiency for the proposed scale-up OVAR design with one, two and three intermediate absorber layers with the reported
+data.
+a. with volumetric heating 0.79 ≤ ηth ≤ 0.96 and withnon￾volumetric heating 0.58 ≤ ηth ≤ 0.81 for the OVAR designs
+with one, two, and three intermediate absorber layers. This is
+well in the range of reported data.
+b. Capuano et al. [61] reported a reasonably high value for ηth
+indicating that the variable porosity-based design offers the
+volumetric-type absorption. However, such a complex structure
+will be prone to dust deposition, which is detrimental to its op￾eration at a high temperature [46].
+c. considering the above, adopting a low exposed surface area for
+the OVAR designs as in [61] is recommended for the scale-up of
+straight pore absorber-based OVAR designs, which is also bene￾ficial to mitigate the dust deposition-related critical challenges.
+d. for volumetric and non-volumetric heating conditions, the rec￾ommended ratio of absorber diameter (dab) to length (L) is
+1 ≤ dab/L ≤ 2 for the scale-up OVAR design with three interme￾diate absorber layers.
+e. for volumetric and non-volumetric heating conditions, the rec￾ommended ratio of absorber gap (G) to length (L) is 0.15 ≤
+G/L ≤ 0.25 for the scale-up OVAR designs with three interme￾diate absorber layers.
+f. based on the performed numerical investigations, the use of
+multiple intermediate absorber layers is recommended for the
+scale-up OVAR design. This is expected to mitigate the radial
+and axial thermal non-uniformity for absorbers and enhance
+the durability of an OVAR design.
+4. Conclusions and recommendations
+This paper presents a comprehensive, multi-zone, mathemati￾cal model for unsteady heat transfer in a straight pore-based open
+volumetric air receiver (OVAR). In this model, the porous absorbers
+are identified as central (C), intermediate (M) and peripheral (P)
+depending on their locations. In this model, all the modes of heat
+exchange between absorbers, between absorbers and receiver cas￾ing, and between absorbers and return air are included. A com￾parative assessment between the computed and measured primary
+air temperature at the absorber outlets revealed that a) the tran￾sient and steady phases are reproduced and b) the model predicts
+the experimental values within an uncertainty of about ±7% at the
+steady-state. As a next step, the model is used to investigate scale￾up OVAR designs with one, two and three intermediate absorber
+layers, for air mass flow rate m˙ a = 0.966 kg/s and input power
+q˙ = 0.58 MW or q˙
+m˙ a = 600 kJ/kg. The analyses lead to the following
+conclusions and recommendations:
+a. the temperature difference between absorbers and primary air
+decreases with the increasing number of intermediate absorber
+layers for volumetric and non-volumetric heating. The maxi￾mum temperature difference between the absorber and pri￾mary air at the inlet is less than 400 K for volumetric heating
+and is greater than 800 K for non-volumetric heating. For vol￾umetric heating, the radiation loss is 1-2 times that of natural
+convection, and for non-volumetric heating, the radiation loss
+is 3-4 times that of natural convection. Therefore, the use of a
+much higher flux concentration is recommended for the non￾volumetric heating to attain the desired temperature in com￾parison to the volumetric heating.
+b. the recommended air return ratio (ARR) is 0.6, for the scale￾up OVAR design, with volumetric and non-volumetric heating
+conditions. A higher ARR may lead to a reduction of primary
+air temperature at the absorber outlet.
+c. with volumetric heating the thermal efficiency, 0.79 ≤ ηth ≤
+0.96 and with non-volumetric heating the thermal efficiency,
+0.58 ≤ ηth ≤ 0.81 for the OVAR designs with one, two, and
+three intermediate absorber layers. These compare well with
+the existing OVAR designs and the reduction of exposed sur￾face area, following Capuano et al. [61], is recommended for the
+scale-up OVAR design.
+d. for volumetric heating, the absorber porosity up to 0.6 is rec￾ommended. For non-volumetric heating, a higher value of ab￾sorber porosity may be preferred considering absorber material
+for durability.
+e. the recommended ratio of (i) absorber gap (G) to length (L) is
+0.15 ≤ G/L ≤ 0.25 and (ii) absorber diameter (dab) to length (L)
+is 1 ≤ dab/L ≤ 2 for the scale-up OVAR design.
+f. with the increasing inlet temperature of return air the rise in
+primary air temperature (T) from absorber inlet to outlet de￾creases. Thus, the thermal efficiency of OVAR decreases with
+the increasing inlet temperature for return air and is consistent
+with the reported findings.
+Authors’ Statement
+The corresponding author hereby confirms that the submitted
+manuscript is original and not submitted elsewhere for publication.
+Declaration of Competing Interest
+The authors declare that there is no competing interest.
+23
+
+V.D. Kumar, G. Singh, L. Chandra et al. International Journal of Heat and Mass Transfer 191 (2022) 122747
+Acknowledgement
+The authors hereby acknowledge the received infrastructure
+support from IIT Jodhpur and IIT (BHU) Varanasi. The received
+helpful, critical, and insightful suggestions from the esteemed edi￾tors and reviewers are gratefully acknowledged. These have gone a
+long way to improve the quality of this manuscript.
+References
+[1] M.S. Raboac ˘ a˘, G. Badea, A. Enache, C. Filote, G. Rasoi ˘ , M. Rata, A. Lavric,
+R.A. Felseghi, Concentrating solar power technologies, Energies 12 (6) (2019)
+1048.
+[2] C.K. Ho, B.D. Iverson, Review of high-temperature central receiver designs
+for concentrating solar power, Renewable and Sustainable Energy Reviews 29
+(2014) 835–846.
+[3] M. Romero, R. Buck, J.E. Pacheco, An update on solar central receiver systems,
+projects, and technologies, J. Sol. Energy Eng. 124 (2) (2002) 98–108.
+[4] A.L. Avila-Marin, Volumetric receivers in solar thermal power plants with cen￾tral receiver system technology: a review, Solar energy 85 (5) (2011) 891–910.
+[5] B. Hoffschmidt, F.L.M. Tellez, A. Valverde, J.S. Fernandez, V. Fernandez, Perfor￾mance evaluation of the 200-kWth HiTRec-II open volumetric air receiver, J.
+Sol. Energy Eng. 125 (1) (2003) 87–94.
+[6] M.I. Roldán, O. Smirnova, T. Fend, J.L. Casas, E. Zarza, Thermal analysis and
+design of a volumetric solar absorber depending on the porosity, Renewable
+Energy 62 (2014) 116–128.
+[7] P. Sharma, R. Sarma, L. Chandra, R. Shekhar, P.S. Ghoshdastidar, On the design
+and evaluation of open volumetric air receiver for process heat applications,
+Solar Energy 121 (2015) 41–55.
+[8] P. Sharma, R. Sarma, L. Chandra, R. Shekhar, P.S. Ghoshdastidar, Solar tower
+based aluminum heat treatment system: Part I. Design and evaluation of an
+open volumetric air receiver, Solar Energy 111 (2015) 135–150.
+[9] G. Singh, R. Kumar, A. Dixit, L. Chandra, Thermal and Materials Perspective on
+the Design of Open Volumetric Air Receiver for Process Heat Applications, in:
+Applications of Solar Energy, Springer, Singapore, 2018, pp. 113–127.
+[10] V.D. Kumar, V.K. Upadhyay, G. Singh, S. Mukhopadhyay, L. Chandra, Open vol￾umetric air receiver: An innovative application and a major challenge, Wiley
+Interdisciplinary Reviews: Energy and Environment (2021) e404.
+[11] M. Böhmer, C. Chaza, The ceramic foil volumetric receiver, Solar energy mate￾rials 24 (1-4) (1991) 182–191.
+[12] A.L. Avila-Marin, M. Alvarez-Lara, J. Fernandez-Reche, Experimental results of
+gradual porosity wire mesh absorber for volumetric receivers, Energy Procedia
+49 (2014) 275–283.
+[13] C. Pabst, G. Feckler, S. Schmitz, O. Smirnova, R. Capuano, P. Hirth, T. Fend, Ex￾perimental performance of an advanced metal volumetric air receiver for Solar
+Towers, Renewable Energy 106 (2017) 91–98.
+[14] A.L. Avila-Marin, M.A. de Lara, J. Fernandez-Reche, Experimental results of
+gradual porosity volumetric air receivers with wire meshes, Renewable Energy
+122 (2018) 339–353.
+[15] S. Du, T. Xia, Y.L. He, Z.Y. Li, D. Li, X.Q. Xie, Experiment and optimization study
+on the radial graded porous volumetric solar receiver matching non-uniform
+solar flux distribution, Applied Energy 275 (2020) 115343.
+[16] S. Du, Z. Li, Y. He, D. Li, X. Xie, Y. Gao, Experimental and numerical analy￾sis of the hydraulic and thermal performances of the gradually-varied porous
+volumetric solar receiver, Science China Technological Sciences 63 (2020)
+1224–1234.
+[17] G. Barreto, P. Canhoto, M. Collares-Pereira, Combined experimental and numer￾ical determination of the asymmetry factor of scattering phase functions in
+porous volumetric solar receivers, Solar Energy Materials and Solar Cells 206
+(2020) 110327.
+[18] V.R. Patil, F. Kiener, A. Grylka, A. Steinfeld, Experimental testing of a solar air
+cavity-receiver with reticulated porous ceramic absorbers for thermal process￾ing at above 1000 C, Solar Energy 214 (2021) 72–85.
+[19] Q. Li, Q. Zhang, Experimental study on the influence of input solar flux, air
+flow rate, and absorber parameters on honeycomb ceramic air receiver perfor￾mance, Journal of Renewable and Sustainable Energy 12 (2) (2020) 023701.
+[20] C. Heisel, C. Caliot, T. Chartier, S. Chupin, P. David, D. Rochais, Digital design
+and 3D printing of innovative SiC architectures for high temperature volumet￾ric solar receivers, Solar Energy Materials and Solar Cells 232 (2021) 111336.
+[21] F. Wang, Y. Shuai, H. Tan, C. Yu, Thermal performance analysis of porous media
+receiver with concentrated solar irradiation, International Journal of Heat and
+Mass Transfer 62 (2013) 247–254.
+[22] M.J. Marcos, M. Romero, S. Palero, Analysis of air return alternatives for CRS–
+type open volumetric receiver, Energy 29 (5-6) (2004) 677–686.
+[23] Z. Wu, C. Caliot, G. Flamant, Z. Wang, Coupled radiation and flow modeling
+in ceramic foam volumetric solar air receivers, Solar Energy 85 (9) (2011)
+2374–2385.
+[24] O. Smirnova, T. Fend, S. Petrer, B. Georg, S. Daniel, J. Christoph, Numerical in￾vestigations of advanced volumetric receiver materials, SolarPACES 2011 Pro￾ceedings (2011).
+[25] T. Achenbach, K. Geimer, J. Göttsche, B. Hoffschmidt, A. Lynen, J. Bauer, Sim￾ulation and flow measurements of volumetric high temperature absorbers for
+solar tower power plants (2011).
+[26] F. Gomez-Garcia, J. Gonzalez-Aguilar, S. Tamayo-Pacheco, G. Olalde, M. Romero,
+Numerical analysis of radiation propagation in a multi-layer volumetric solar
+absorber composed of a stack of square grids, Solar Energy 121 (2015) 94–
+102.
+[27] H. Stadler, D. Maldonado, M. Offergeld, P. Schwarzbözl, J. Trautner, CFD model
+for the performance estimation of open volumetric receivers and comparison
+with experimental data, Solar Energy 177 (2019) 634–641.
+[28] G. Barreto, P. Canhoto, M. Collares-Pereira, Three-dimensional CFD modelling
+and thermal performance analysis of porous volumetric receivers coupled to
+solar concentration systems, Applied Energy 252 (2019) 113433.
+[29] Q. Zhu, Y. Xuan, Improving the performance of volumetric solar receivers with
+a spectrally selective gradual structure and swirling characteristics, Energy 172
+(2019) 467–476.
+[30] M. Ali, M. Rady, M.A. Attia, E.M. Ewais, Consistent coupled optical and thermal
+analysis of volumetric solar receivers with honeycomb absorbers, Renewable
+Energy 145 (2020) 1849–1861.
+[31] P. Wang, J.B. Li, R.N. Xu, P.X. Jiang, Non-uniform and volumetric effect on the
+hydrodynamic and thermal characteristics in a unit solar absorber, Energy 225
+(2021) 120130.
+[32] P. Sharma, L. Chandra, P.S. Ghoshdastidar, R. Shekhar, A novel approach for
+modelling fluid flow and heat transfer in an Open Volumetric Air Receiver us￾ing ANSYS-FLUENT, Solar Energy 204 (2020) 246–255.
+[33] M.I. Roldán, A. Avila-Marin, M. Alvarez-Lara, J. Fernandez-Reche, Experimental
+and numerical characterization of ceramic and metallic absorbers under lab-s￾cale conditions, Energy Procedia 69 (2015) 523–531.
+[34] X.L. Li, C. Sun, X.L. Xia, Z.H. Li, Y. Li, Modeling of coupled heat transfer in a
+windowed volumetric solar receiver, Solar Energy 201 (2020) 195–208.
+[35] R. Pitz-Paal, B. Hoffschmidt, M. Böhmer, M. Becker, Experimental and numer￾ical evaluation of the performance and flow stability of different types of
+open volumetric absorbers under non-homogeneous irradiation, Solar Energy
+60 (3-4) (1997) 135–150.
+[36] S. Luque, G. Menéndez, M. Roccabruna, J. González-Aguilar, L. Crema,
+M. Romero, Exploiting volumetric effects in novel additively manufactured
+open solar receivers, Solar Energy 174 (2018) 342–351.
+[37] G. Singh, S. Luque, J. González-Aguilar, M. Romero, L. Chandra, Open volumet￾ric air receiver: Current status, challenges and innovative solutions, Reference
+module in materials science and materials engineering, Elsevier, 2018.
+[38] F. Bai, One dimensional thermal analysis of silicon carbide ceramic foam used
+for solar air receiver, International Journal of Thermal Sciences 49 (12) (2010)
+2400–2404.
+[39] H.J. Lee, J.K. Kim, S.N. Lee, Y.H. Kang, Numerical analysis of heat transfer in
+multichannel volumetric solar receivers, Transactions of the Korean Society of
+Mechanical Engineers B 35 (12) (2011) 1383–1389.
+[40] F. Zaversky, L. Aldaz, M. Sánchez, A.L. Ávila-Marín, M.I. Roldán, J. Fernán￾dez-Reche, A. Füssel, W. Beckert, J. Adler, Numerical and experimental evalua￾tion and optimization of ceramic foam as solar absorber–Single-layer vs mul￾ti-layer configurations, Applied energy 210 (2018) 351–375.
+[41] R.R. Ribeiro, M.J. de Lemos, Transient behavior and thermal efficiency of vol￾umetric heat receivers, International Journal of Heat and Mass Transfer 149
+(2020) 119128.
+[42] M. Abuseada, N. Ozalp, C. Ophoff, Numerical and experimental investigation of
+heat transfer in a solar receiver with a variable aperture, International Journal
+of Heat and Mass Transfer 128 (2019) 125–135.
+[43] R. Capuano, T. Fend, P. Schwarzbözl, O. Smirnova, H. Stadler, B. Hoffschmidt,
+R. Pitz-Paal, Numerical models of advanced ceramic absorbers for volumetric
+solar receivers, Renewable and Sustainable Energy Reviews 58 (2016) 656–665.
+[44] G. Singh, V.D. Kumar, L. Chandra, R. Shekhar, P.S. Ghoshdastidar, One-dimen￾sional zonal model for the unsteady heat transfer analysis in an open volu￾metric air receiver, ASME J. Therm. Sci. Eng. Appl. 13 (1) (2021) 1–14.
+[45] G. Singh, L. Chandra, Detrimental Effects of Dust Deposition in Pores of an
+Open Volumetric Air Receiver (2017).
+[46] V.K. Upadhyay, G. Singh, L. Chandra, B. Bandyopadhyay, On the dust deposition
+and its effects on heat transfer in absorber pores of an open volumetric air
+receiver, Solar Energy 211 (2020) 1206–1213.
+[47] A. Salomé, F. Chhel, G. Flamant, A. Ferrière, F. Thiery, Control of the flux dis￾tribution on a solar tower receiver using an optimized aiming point strategy:
+Application to THEMIS solar tower, Solar Energy 94 (2013) 352–366.
+[48] Y.L. He, K. Wang, Y. Qiu, B.C. Du, Q. Liang, S. Du, Review of the solar flux dis￾tribution in concentrated solar power: non-uniform features, challenges, and
+solutions, Applied Thermal Engineering 149 (2019) 448–474.
+[49] T.J. Hendricks, J.R. Howell, Absorption/scattering coefficients and scattering
+phase functions in reticulated porous ceramics, Journal of Heat Transfer 118
+(1) (1996) 79–87.
+[50] F. Téllez, M. Romero, P. Heller, A. Valverde, G. Dibowski, S. Ulmer, Thermal
+performance of SolAir 3000 kWth ceramic volumetric solar receiver, 12th So￾larPACES International Symposium on Concentrated Solar Power and Chemical
+Energy (2004).
+[51] H. Stadler, A. Tiddens, P. Schwarzbözl, F. Göhring, T. Baumann, J. Trautner, Im￾proved performance of open volumetric receivers by employing an external air
+return system, Solar Energy 155 (2017) 1157–1164.
+[52] A. Tiddens, M. Röger, H. Stadler, B. Hoffschmidt, Air return ratio measurements
+at the solar tower Jülich using a tracer gas method, Solar Energy 146 (2017)
+351–358.
+[53] F.P. Incropera, D.P. DeWitt, Introduction to heat transfer, seventh ed., John Wi￾ley Publishers, New York, NY, 2007.
+24
+
+V.D. Kumar, G. Singh, L. Chandra et al. International Journal of Heat and Mass Transfer 191 (2022) 122747
+[54] R. Sarma, Design and Analysis of Recirculating Air System in an Open Volu￾metric Air Receiver, M. Tech. Thesis, Indian Institute of Technology, Jodhpur,
+2013.
+[55] V.D. Kumar, V.K. Upadhyay, G. Singh, S. Mukhopadhyay, L. Chandra, Open vol￾umetric air receiver: An innovative application and a major challenge, Wiley
+Interdisciplinary Reviews: Energy and Environment (2021) e404.
+[56] FM White, Fluid mechanics, 7th edn, McGraw Hill education, New Delhi, 2015.
+[57] P.F. Hsu, J.R. Howell, Measurements of thermal conductivity and optical prop￾erties of porous partially stabilized zirconia, EXPERIMENTAL HEAT TRANSFER
+An International Journal 5 (4) (1992) 293–313.
+[58] A. Kribus, Y. Gray, M. Grijnevich, G. Mittelman, S. Mey-Cloutier, C. Caliot, The
+promise and challenge of solar volumetric absorbers, Solar Energy 110 (2014)
+463–481.
+[59] N. Nunak, K. Roonprasang, T. Suesut, T. Nunak, Emissivity estimation using
+thermographic camera, Advanced Materials Research 811 (2013) 380–387.
+[60] S. Shekhar, Direct Normal Irradiance (DNI): Inter-comparability of Weather
+Databases in Context of India, Heat treatment 40 (2012) 80.
+[61] R. Capuano, T. Fend, H. Stadler, B. Hoffschmidt, R. Pitz-Paal, Optimized volu￾metric solar receiver: Thermal performance prediction and experimental vali￾dation, Renewable Energy 114 (2017) 556–566.
+[62] T. Fend, P. Schwarzbözl, O. Smirnova, D. Schöllgen, C. Jakob, Numerical inves￾tigation of flow and heat transfer in a volumetric solar receiver, Renewable
+energy 60 (2013) 655–661.
+25

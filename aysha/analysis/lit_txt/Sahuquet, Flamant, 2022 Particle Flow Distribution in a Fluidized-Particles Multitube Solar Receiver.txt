@@ -1,0 +1,259 @@
+SolarPACES 2022, 28th International Conference on Concentrating Solar Power and Chemical Energy Systems
+Receivers and Heat Transfer Media and Transport: Point Focus Systems
+https://doi.org/10.52825/solarpaces.v1i.717
+© Authors. This work is licensed under a Creative Commons Attribution 4.0 International License
+Published: 05 Jan 2024
+Particle Flow Distribution in a Fluidized-Particles 
+Multitube Solar Receiver
+Guillaume Sahuquet1[https://orcid.org/0000-0003-0275-2890]
+, Ronny Gueguen1[https://orcid.org/0000-0002-5236-8638]
+Lilian Fontalvo2
+, Samuel Mer3,a[https://orcid.org/0000-0001-7915-3146], Adrien Toutant3,a[https://orcid.org/0000-0002-
+7156-1732], Françoise Bataille3,b[https://orcid.org/0000-0003-4470-8636]
+, and Gilles Flamant4[https://orcid.org/0000-0003-
+4562-8515]
+1 PROMES-CNRS, UPVD, 7 rue du Four Solaire, 66120 Odeillo, France.
+3 PROMES-CNRS, UPVD, Rambla de la Thermodynamique, Tecnosud, 
+66100 Perpignan, France
+4 PROMES-CNRS (UPR 8521), 7 rue du Four Solaire, 66120 Odeillo, France. 
+Corresponding author: +33(0) 4 68 30 77 00, Gilles.Flamant@promes.cnrs.fr
+Abstract. A fluidized-particles two-tube solar receiver was tested at ambient temperature at 
+PROMES Laboratory to investigate the influence of an inhomogeneous solar flux density on 
+the particle mass flow rate between the tubes. The principle of this 3rd generation solar receiver 
+is to fluidize the particles in a container, called dispenser, in which the tubes’ bottom are im￾mersed. The fluidized particles are flowing upward the tubes by applying an overpressure in 
+the dispenser. Air velocities are changed inside the tubes, thanks to air mass flow controllers, 
+to represent temperature heterogeneity between the tubes. Air velocities from 0.05 up to 0.52 
+m/s were tested, both in homogeneous and heterogeneous conditions. In the heterogeneous 
+ones, the differences in air velocity between the tubes aim to mimic a difference in temperature 
+from 20 to 100 % with homogeneous air flow rates injected. The following conclusions were 
+drawn. First, the particle mass flux in the tubes are the same with homogeneous air velocities, 
+each one following a calibration map previously obtained. Second, different air velocities lead 
+to different particle mass flux. Third, the rise of the total particle mass flux diminishes the pres￾sure in the dispenser. Four, this diminution of pressure leads to a decrease of the particle mass
+flow rate of the tube with the lower air velocity. This influence can lead in some cases to the 
+stop of the fluidized bed circulation in the affected tube. 
+Keywords: Concentrated Solar Power, Particles Solar Receiver, Fluidized Particles, Particle 
+Flow Heterogeneity in Solar Receiver.
+Introduction
+Concentrated Solar Technologies consist of concentrating solar irradiation thanks to mirrors
+onto a receiver in order to produce heat. A heat transfer fluid (HTF) absorbs and conveys the
+thermal energy that can be stored or used to heat a working fluid in a heat exchanger. The 
+working fluid is coupled with a thermodynamic cycle that converts heat into electricity. The cycle
+conversion efficiency depends on the temperature of the heat source, according to the Carnot's 
+principle. Nowadays, molten salts are commonly used as HTF in power towers [1] and have 
+a limited operating temperatures in the range 220-565 °C that limits the efficiency of the 
+power block to ~42 % [2].
+To overcome these issues and improve the conversion efficiency from 42 to 50 %, 
+1
+
+Sahuquet et al. | SolarPACES Conf Proc 1 (2022) "SolarPACES 2022, 28th International Conference on 
+Concentrating Solar Power and Chemical Energy Systems"
+new HTF and high efficiency cycles are developed. Supercritical cycles need temperature
+between 600 °C and 750 °C. Among possible new HTF, solid particles can withstand temper￾ature up to 1400 °C, while reducing drastically storage cost. New particle receivers are under 
+development worldwide [3] as the falling particle receiver of Sandia National Laboratories [4], 
+the centrifugal receiver of the German Aerospace Center [5] and the fluidized particle-in-tube
+of the French National Center for Scientific Research (CNRS-PROMES Laboratory) [6].
+The latter has already been demonstrated and an extensive experimental data base 
+was established thanks to several projects, either at ambient temperature [7,8] or under con￾centrated solar flux [9-12]. In particular, tests at large scale with forty 3 m-long tubes under
+concentrated solar irradiation of the Horizon2020 Next-CSP project [13] revealed the existence 
+of heterogeneity in particle mass flow rate among the tubes. One of the possible explanations
+is a difference in air velocity between tubes due to temperature heterogeneity. To reproduce 
+this phenomenon, a 2-tube cold mock-up was built at PROMES Laboratory. Changing the aer￾ation velocity in each tube aims to reproduce the difference of air velocity due to temperature 
+heterogeneity between tubes. This protocol mimics the effect of temperature but still neglect 
+the air viscosity effect.
+Experimental Setup
+The cold mock-up is composed of two 3.70 m-long glass tubes of 45 mm internal diameter. 
+Figure 1 shows a 3D (a) and a schematic representation (b) of the cold mock-up. The particles
+used are 61 µm Sauter diameter olivine belonging to the group A of Geldart classification [14]. 
+They are fluidized in a container, called “dispenser“, thanks to a homogeneously distributed air 
+flow rate (qf) of 16.7 sm3/h (corresponding to 2.4 times the minimum fluidization velocity). By 
+applying an overpressure in the freeboard of the dispenser with a pressure-control valve, the 
+fluidized bed flows upwards inside the two tubes and particles are collected in weighting de￾vices to measure the particle mass flux (GP) in each tube, varying from 0 to 260 kg/(m².s) (i.e.
+1470 kg/h).
+Figure 1. a) 3D and b) schematic representation of the 2-tubes experimental setup.
+In the 2-tube mock-up, the air velocity in each tube varies thanks to air mass flow 
+controllers connected to injection nozzles located at 52 cm above the bottom of the tubes.
+The air flow rate can vary from 0 up to 2.50 sm3
+/h (superficial air velocity inside the tubes
+from 0 up to 0.52 m/s). Injection nozzles are part of the fluidized particle-in-tube technology 
+2
+
+Sahuquet et al. | SolarPACES Conf Proc 1 (2022) "SolarPACES 2022, 28th International Conference on 
+Concentrating Solar Power and Chemical Energy Systems"
+aiming at stabilizing the particle flow and controlling the fluidization regime. The particle vol￾ume fraction and the fluidization regime inside a tube are directly related to the air velocity 
+[7]. The tube close to the pressure-control valve is named Tube A and the other one, Tube 
+B. When particles flow out of the tube, an endless screw connected to a particle storage is 
+activated to compensate the loss of particles in the dispenser.
+A previous study with the same configuration but with a single tube resulted in the
+calibration map represented in Figure 2 [8]. This map is a plot of the particle mass flux (Gp) 
+versus the pressure imposed at the bottom of the dispenser. The latter is the sum of the 
+freeboard pressure and the pressure drop through the fluidized bed, of ~20–40 mbar over all 
+the tests. Each color corresponds to a given aeration air flow rate.
+Figure 2. Particle mass flux (in kg/(m².s)) for one tube as a function of the pressure at the 
+bottom of the dispenser (in Pa) and the air flow rate (in sm3/h).
+Both a given pressure in the freeboard of the dispenser (in the x-axis) and a given air 
+flow rate (in color) result in a particle mass flux (in y-axis) circulation inside the tube. The vari￾ation of these parameters enables to plot the colored zones with uncertainties taken into ac￾count. The latter are due to the pressure sensors and the weighing scale accuracies. We ob￾served that this map is valid for 1, 2 and 3 tubes configurations. Although some experiments 
+were carried out with three tubes, results of test with two tubes are reported in this paper since 
+no significant differences have been observed between two and three tubes.
+Results and discussion
+The operating procedure is the following:
+ Progressive homogeneous increase of air flow rates injected inside the tubes (Fig.3.a)
+through the injection nozzles that creates, with the appropriate initial pressure in the
+freeboard of the dispenser, particle mass fluxes in the 2 tubes (Fig.3.b) (time intervals 
+1-3). 
+3
+
+Sahuquet et al. | SolarPACES Conf Proc 1 (2022) "SolarPACES 2022, 28th International Conference on 
+Concentrating Solar Power and Chemical Energy Systems"
+ Then, only the air flow rate of tube A is changed to a higher value, triggering a rise in 
+the particle mass flux through it (time intervals 4 and 5). The particle feeding of the 
+dispenser is changed to keep the mass of particle in the dispenser constant.
+Time intervals are 3 minutes long and the particle and air flow rates are averaged on 
+the last minute of each interval to take into account the stationary state and not the transient 
+part.
+Figure 3. Experimental test 1 - a) Air flow rate (in sm3/h) and b) particle mass flux (in 
+kg/(m².s)) for tube A (in blue) and B (in orange) for different time intervals.
+c) Pressure in the freeboard of the dispenser (in Pa) through time (in s).
+Seven experimental tests were conducted, for initial pressure in the freeboard of the
+dispenser between 269 and 413 mbar and initial air flow rates between 0.25 and 1.17 sm3/h. 
+The same procedure is followed for each test with three time intervals of increasing homoge￾neous air velocities (same air flow rate injected in the two tubes) followed by 2 time intervals 
+of heterogeneous air flow rates (different air flow rates injected in the two tubes) configura￾tions. These heterogeneous air flow rates configurations aim to reproduce homogeneous air 
+flow rates configurations with heterogeneous temperatures (with Tube A temperature in K 
+from 1.2 to 2 times higher than Tube B).
+Several observations can be drawn. Firstly, for the homogeneous aeration configura￾tions:
+1. The tubes experience the same particle mass flux when the same air flow rate is in￾jected in each tube. In addition, the particle flux inside each tube follows the calibration 
+map in Figure 2.
+2. Increasing the air velocity results in a decrease of the particle volume fraction and in 
+the dilution of the mixture. This variation leads to an increase of the particle mass flux 
+since the pressure drop created by the fluidized bed decreases (it is proportional to the 
+particle volume fraction) [8].
+3. The increase of the total particle mass flux results in a decreases of the pressure in the
+freeboard of the dispenser. (Fig.3.c).
+Secondly, for the heterogeneous aeration configurations:
+4
+
+Sahuquet et al. | SolarPACES Conf Proc 1 (2022) "SolarPACES 2022, 28th International Conference on 
+Concentrating Solar Power and Chemical Energy Systems"
+1. The effect of the diminution of the dispenser freeboard pressure induced by the in￾crease of the total particle mass flux is strongly correlated to the decrease of the particle 
+mass flux in tube B. This decrease can be extended until a threshold value of air ve￾locity in the tube A for which the particle mass flux in the other tube becomes null. 
+2. The higher the total particle mass flux (sum of Tubes A and B), the higher the decrease 
+in pressure in the freeboard of the dispenser, even in heterogeneous aeration configu￾ration. Figure 4 plots the resulting linear correlation between the particle mass flux and 
+the pressure decrease in the dispenser freeboard. An explanation is yet to be devel￾oped.
+Figure 4. Decrease of the pressure in the freeboard of the dispenser (in Pa) as a function of 
+the total particle mass flux (in kg/(m².s)).
+Figure 5 illustrates the evolution path of the particle mass flux inside tube A and tube B 
+due to the variations of the aeration air flow rate. The experimental results are plotted in the 
+calibration map to emphasize dynamically the evolution of the particle mass flux inside each 
+tube. Only experiments 1, 2 and 5 are represented among the total of the seven conducted 
+tests to facilitate the reading. Test 1 corresponds to the test described previously in Figure 3
+with the associated interval numbers.
+5
+
+Sahuquet et al. | SolarPACES Conf Proc 1 (2022) "SolarPACES 2022, 28th International Conference on 
+Concentrating Solar Power and Chemical Energy Systems"
+Figure 5. Results of experimental tests 1, 2 and 5 represented in the calibration map of the 
+system.
+This representation clearly shows that as the total particle mass flux increases, the 
+pressure in the freeboard of the dispenser decreases, as the points are all left shifted. Let us 
+comment results of test 1, represented by the left blue (Tube A) and green (Tube B) curves. 
+Time intervals are denoted by black numbers. At the third time interval of test 1, the particle 
+mass flux and the pressure in the dispenser are in the blue zone corresponding to the calibra￾tion zone of an air flow rate injected of 1.67 sm3
+/h in both tubes. For time intervals 4 and 5, air 
+flow rate of tube A rises and the associated particle mass flux fits with the corresponding air 
+flow rates of respectively 2.00 and 2.50 sm3
+/h, i.e. pink and yellow zones. Meanwhile, air flow 
+rate in tube B is kept constant and, consequently, the associated particle mass flux follows the 
+blue zone downward as the pressure decreases. For test 2 with the rightmost curves, the par￾ticle mass flux of tube B (in dark pink) reaches zero at time interval 5, in other words the fluid￾ized bed stopped circulating through it.
+Conclusion
+A cold mock-up that can receive one, two or three tubes was built at PROMES Laboratory in 
+order to understand phenomena observed at the pilot-scale fluidized-bed solar receiver of the 
+Next-CSP project that is composed of 40 tubes, 3 m long (irradiated zone). In some operation 
+conditions, we observed that particle circulation flux strongly reduces inside some of the tubes. 
+The main hypothesis is that an inhomogeneous solar flux distribution onto the tubes creates 
+temperature differences among the tubes resulting in air velocity differences inside the tubes. 
+To represent this phenomenon, inhomogeneous air flow rates are injected in the tubes of the 
+cold mock-up. The particle mass flux and the related pressure in the freeboard of the dispenser 
+are studied. It is shown that particle circulation can stop inside the tube where low aeration 
+flow rate is maintained. 
+Further work, both experimental and theoretical, is currently ongoing in order to better 
+understand the phenomena at stake. Nonetheless, one can draw the following conclusions:
+6
+
+Sahuquet et al. | SolarPACES Conf Proc 1 (2022) "SolarPACES 2022, 28th International Conference on 
+Concentrating Solar Power and Chemical Energy Systems"
+1. For each tube, a given pressure in the freeboard of the dispenser and the same air flow 
+rate result in the same particle mass flux flowing inside both tubes. This characteristic 
+enables plotting a particle mass flux calibration map.
+2. Upon the hypothesis that a heterogeneous solar flux distribution leads to inhomogene￾ous air temperature among the tubes, air velocities are heterogeneous and so the par￾ticle mass flux.
+3. The pressure in the dispenser is influenced by the total particle mass flux. When the 
+latter increases, the former decreases linearly, and vice versa.
+4. The particle circulation inside the tubes is influenced by the pressure diminution and 
+the resulting particle mass flux diminishes following the curves corresponding to the air 
+flow rate in the calibration map. 
+5. For heterogeneous air flow rate aeration configurations, the tube with the lower air ve￾locity experiences a strong diminution in the particle mass flux, that can lead in some 
+cases to the stop of the fluidized bed circulation.
+Current experimental tests under concentrated solar flux at the Odeillo’s 1MW solar 
+furnace (France) show that the previous effects would be reduced by the variation of temper￾ature created by the change in particle mass flux. This positive feedback can be explained as 
+follows. Indeed, if the particle mass flow rate decreases in a tube, the thermal power extracted 
+also decreases and thus the particle and air temperature increase, and the air velocity too, 
+resulting in an increase of the particle mass flow rate. We observed this autoregulation phe￾nomenon for both low and high air flow rates.
+Data availability statement
+The data supporting the results can be accessed asking the authors.
+Author contributions
+Conceptualization, supervision, and resources, G.F.; methodology, software and investigation, 
+G.S. and R.G.; validation and formal analysis, S.M., A.T., F.B. and G.F.; data curation, G.S., 
+L.F. and R.G.; writing—original draft preparation, G.S. and R.G.; writing—review and editing, 
+R.G., S.M., A.T., F.B. and G.F.; funding acquisition, G.F. All authors have read and agreed to 
+the published version of the manuscript.
+Competing interests
+The authors declare no competing interests.
+Funding
+This work was funded by the French “Investments for the future” (“Investissements d’Avenir”) 
+programme managed by the National Agency for Research (ANR) under contract ANR-10-
+LABX-22-01 (labex SOLSTICE) and the U.S. Department of Energy, Solar Energy Technolo￾gies Office under Award Number 34211. Additional funding was awarded by the European 
+Union’s Horizon 2020 research and innovation program under Grant Agreement 727762, Next￾CSP project and by the Occitanie French region for the cold mock-up facility.
+Acknowledgement
+Authors thank Jean-Yves Peroy for the design of the experimental test bench.
+7
+
+Sahuquet et al. | SolarPACES Conf Proc 1 (2022) "SolarPACES 2022, 28th International Conference on 
+Concentrating Solar Power and Chemical Energy Systems"
+References
+1. Md. T. Islam, N. Huda, A.B. Abdullah, R. Saidur, “A comprehensive review of state-of￾the-art concentrating solar power (CSP) technologies: Current status and research 
+trends“, Renew. Sustain. Energy Rev, vol.91, pp. 987-1018, 2018, 
+https://doi.org/10.1016/j.rser.2018.04.097.
+2. H. Benoit, L. Spreafico, D. Gauthier, G. Flamant, “Review of heat transfer fluids in tube￾receivers used in concentrating solar thermal systems: Properties and heat transfer 
+coefficients“, Renew. Sustain. Energy Rev, vol.55, pp.298-315, 2016, 
+https://doi.org/10.1016/j.rser.2015.10.059.
+3. C. K. Ho, “A review of high-temperature particle receivers for concentrating solar power“, 
+Applied Thermal Engineering, vol.109, pp. 958-969, 2016, https://doi.org/10.1016/j.ap￾plthermaleng.2016.04.103.
+4. C. K. Ho, J. Christian, J. Yellowhair, S. Jeter, M. Golob, C. Nguyen, K. Repole, S. Abdel￾Khalik, N. Siegel, H. Al-Ansary, A. El-Leathy, B. Gobereit, “Highlights of the high-tem￾perature falling particle receiver project: 2012-2016”, AIP Conference Proceeding, 1850, 
+030027, 2017, https://doi.org/10.1063/1.4984370.
+5. W. Wu, L. Ambseck, R. Buck, R. Uhlig, R. Ritz-Paal, “Proof of concept test of a centrifu￾gal particle receiver”, Energy Procedia, vol.49, pp. 560–568, 2014, 
+https://doi.org/10.1016/j.egypro.2014.03.060.
+6. O. Behar, B. Grange, G. Flamant, “Design and performance of a modular combined 
+cycle solar power plant using the fluidized particle solar receiver technology“, En￾ergy Convers. Manag., vol.220, 113108, 2020, https://doi.org/10.1016/j.encon￾man.2020.113108.
+7. R. Gueguen, G. Sahuquet, S. Mer, A. Toutant, F. Bataille, G. Flamant, “Gas-Solid Flow
+in a Fluidized-Particle Tubular Solar Receiver: Off-Sun Experimental Flow Regimes 
+Characterization“, Energies, vol.14, pp. 7392, 2021
+https://doi.org/10.3390/en14217392.
+8. R. Gueguen, G. Sahuquet, S. Mer, A. Toutant, F. Bataille, G. Flamant, “Fluidization 
+Regimes of Dense Suspensions of Geldart Group A Fluidized Particles in a High As￾pect Ratio Column”, Chemical Engineering Science, 118360, 2022, doi: 
+https://doi.org/10.1016/j.ces.2022.118360.
+9. A. Le Gal, B. Grange, M. Tessonneaud, A. Perez, C. Escape, J.L. Sans, G. Flamant, 
+“Thermal analysis of fluidized particle flows in a finned tube solar receiver“, Sol. Energy, 
+vol.191, pp. 19-33, 2019, https://doi.org/10.1016/j.solener.2019.08.062.
+10. H. Benoit, I. Perez Lopez, D. Gauthier, J.-L. Sans, G. Flamant, “On-sun demonstration 
+of a 750 °C heat transfer fluid for con-centrating solar systems: Dense particle suspen￾sion in tube“, Sol. Energy, vol.118, pp. 622–633, 2015,
+https://doi.org/10.1016/j.solener.2015.06.007.
+11. I. Perez-Lopez, H. Benoit, D. Gauthier, J.-L Sans, E. Guillot, G. Mazza, G. Flamant,
+“On-sun operation of a 150 kWth pilot solar receiver using dense particle suspension as 
+heat transfer fluid“. Sol. Energy, vol.137, pp. 463–476, 2016, 
+https://doi.org/10.1016/j.solener.2016.08.034.
+12. B. Boissière, R. Ansart, D. Gauthier, G. Flamant, M. Hemati, “Experimental Hydrody￾namic Study of Gas-Particle Dense Sus-pension Upward Flow for Application as New 
+Heat Transfer and Storage Fluid“, Can. J. Chem. Eng., vol.93, pp. 1–14, 2015,
+https://doi.org/10.1002/cjce.22087.
+13. Next-CSP project. 2020. High Temperature Concentrated Solar Thermal Power Plant 
+with Particle Receiver and Direct Thermal Storage. Available online: http://cordis.eu￾ropa.eu/project/id/727762 (accessed on August 17 2022). 
+14. D. Geldart, “Types of Gas Fluidization”, Powder Technology, vol.7, pp. 285–292, 
+1973, https://doi.org/10.1016/0032-5910(73)80037-3.
+8

@@ -1,0 +1,28 @@
+item,reviewer_point,assessment,verification,action_taken
+1,NTU vs integral for non-isothermal wall,VALID — verified,Profile-corrected exponent +0.3407 (pooled) vs +0.3890; per-run change +1.5% to +8.7%. Reviewer's +0.34 and 1-9% both reproduce exactly.,Added profile-integration determination to 4.2; every downstream statement now uses +0.341
+1b,'structurally incapable at any calibration' too broad,VALID — internal contradiction,5.2 already scoped it correctly ('fixed function of axial position'); abstract and conclusions did not carry that scoping,Abstract + conclusions narrowed; explicitly notes an empirical h~Re^1.34 reproduces it by construction
+2,Graetz interpretation reversed,VALID — real error,"Gz_L=0.704 gives L_t/L=0.05*Gz_L=0.035, so fully developed over ~96.5%, not developing throughout",Corrected in 4.2; fix STRENGTHENS the argument (constant Nu makes NTU~Re^-1 exact)
+2b,Duct benchmark 3.09 unexplained,VALID,3.09 is neither square-duct limit; correct values 2.98 (uniform T) and 3.61 (uniform q),Both limits now given; ratio range restated as 14-106 and 17-129
+3,"Re nominal, Nu apparent",VALID,Re formed on mdot/100 while interpretation invokes maldistribution,Notation paragraph added to 3.1; Re_nom/NTU_app/Nu_app used in all headline claims
+4,+-25 K uniform shift tests offset not slope,VALID,Recomputed band on corrected exponent: +0.3199 to +0.3766,Restated as robust to a uniform calibration offset; flow-dependent bias explicitly not excluded
+5,'measured LTNE' too strong,VALID,T9/T10 are exposed probes; manuscript's own ref [19] shows radiative perturbation,Lambda recast as apparent wall-to-interior disequilibrium and an observation-weighted bound
+6,Closure not model-free; T2 omitted; storage,VALID,"T2 present in data (308-356 K, monotonic with run length); project's own exp_analysis: insulation still charging at run end","4.6 rewritten: 'apparent' not model-free, storage stated, span no longer called a bounding interval"
+6b,Instrumentation count inconsistent,VALID,"Text said seven, listed eight, code logs nine (T2,T3,T8,T9,T10,T11,T12,T15,T16)",Corrected to nine with T2's role described
+7a,Flow uncertainty 2.5% implemented as fixed 0.1 sL/min,VALID,"receiver_reduction.py:341 rng.normal(0,0.025)*4","Flagged to authors — code fix, not a text fix"
+7b,IEC tolerance /2 undocumented,VALID,"tol = max(1.5,0.004|t|)/2.0",Flagged — needs one clause stating the 95% interpretation
+7c,Eigenvalue abscissa common 1% multiplier,VALID,"e['x'] = e.x*(1+rng.normal(0,0.01))",Flagged
+7d,Lambda_107 slope pooled not grouped,VALID — verified,pooled 8.249e-4; common-slope/flux-intercept 8.497e-4 (reviewer: 8.50e-4),4.3 now reports 8.50e-4 with the three intercepts; pooled fit shown as the inferior alternative
+7e,Nu regression hides flux offsets,VALID — verified,"per-flux 1.4403/1.4728/1.5220 (r2>=0.9996); common-slope 1.4696+-0.0108, r2 0.9994 vs pooled 1.4430+-0.0690, r2 0.9711",Grouped model now primary in 4.2 and abstract
+7f,+-0.069 is a regression SE not run-to-run scatter,VALID,equals pool.stderr exactly,Relabelled
+8,"T12-T8 is a wall crossing, not the 3D peak",VALID,indicator is a two-probe side-wall difference,'axial peak migrates' replaced throughout with the observed crossing statement
+8b,eps* convention-dependent,VALID,reference table spans 0.57-0.79,Stated as an operational criterion under the length-averaged wall convention
+9a,18 vs 15 transients,VALID,collapse is 15 heating; 18 applies only to the capacitance identification,Fixed; the two surviving 'eighteen' uses are the capacitance ones and are correct
+9b,One-parameter dynamic system overclaim,VALID,wall half-rise 0.203 vs outlet 0.630 plus a fast wall component,Narrowed to a shared flow-dependent time scale on which late behaviour collapses
+9c,Cooling identification should use matched effectiveness,VALID — direction confirmed,"My recomputation: pooled 298.8 J/K, 0.0953 W/K -> matched 287.5 J/K, 0.0854 W/K, r2 0.964->0.983. Reviewer's 276/0.080 not reproduced","Reported in 4.4 as 288 J/K and 0.085 W/K with my numbers, not the reviewer's"
+10a,'energy-weighted wall temperature' misnamed,VALID,it is the length average of the piecewise profile,Renamed length-averaged (3 sites)
+10b,Data statement claims one script,VALID,README needs receiver_reduction.py AND make_figures.py,Corrected; Figure 1 noted as a schematic outside the pipeline
+10c,Reference-completion note cannot remain,VALID,internal note in submitted text,Removed
+10d,Abstract 609 w / body 13.6 kw too long,VALID,"now 610 / 15,290 after corrections","Section 5.2 cut 2596->2274; further cuts flagged as an editorial decision, not made"
+11,'two most recent reviews' obsolete,PARTLY VALID,datable claim; suggested 2023 review not independently verified by me,"Flagged, not acted on — would need the source in hand"
+12,Bypass vs redistribution as competing hypotheses,VALID — and worse than stated,5.3 referred to 'the two candidate mechanisms of section 5.2' but 5.2 presented only one after my expansion,Bypass restored to 5.2 with parity; dangling cross-reference resolved
+13,'central proof is not valid as written',OVERSTATED,proof holds for the class it names; defect was the uncorrected identity plus unscoped abstract/conclusions,Corrected rather than withdrawn; result stands at +0.341 against a required -1

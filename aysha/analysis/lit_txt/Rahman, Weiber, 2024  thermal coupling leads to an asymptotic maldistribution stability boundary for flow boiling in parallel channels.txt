@@ -1,0 +1,1221 @@
+International Journal of Heat and Mass Transfer 228 (2024) 125671
+Available online 11 May 2024
+0017-9310/© 2024 Elsevier Ltd. All rights reserved.
+The mechanism by which thermal coupling leads to an asymptotic 
+maldistribution stability boundary for flow boiling in parallel channels 
+Md Emadur Rahman , Justin A. Weibel * 
+Cooling Technologies Research Center, School of Mechanical Engineering, Purdue University, West Lafayette, IN 47907 USA 
+ARTICLE INFO 
+Keywords: 
+Flow maldistribution 
+Thermally coupled microchannels 
+Two-phase flow instability 
+Flow boiling 
+Stability analysis 
+ABSTRACT 
+Phase change heat transfer processes are attractive for the efficient thermal management of advanced semi￾conductor devices, with flow boiling in parallel microchannel heat sinks being one promising solution. However, 
+there are several implementation challenges associated with two-phase flow in parallel microchannels, partic￾ularly flow maldistribution, which can adversely affect performance and reliability. Two-phase flow models can 
+be useful in predicting and understanding the instability mechanisms that leads to maldistribution, such that 
+parametric performance trends and safe regions of operation can be identified. Channel-to-channel thermal 
+coupling has been shown to alleviate maldistribution, but it is not yet understood why this effect is limited to 
+some critical lateral thermal conductance above which there is no further benefit. In the current work, a two￾phase flow model with a lumped thermal capacitance representation of the heat sink wall is developed to 
+identify the mechanism for this asymptotic maldistribution stability boundary for thermally coupled micro￾channels. The lumped model allows the nature of stability boundary to be explained via a scaling analysis of the 
+eigenvalues. In such systems, it is identified that a single eigenvalue determines the occurrence of flow mal￾distribution. Scaling analysis shows that, for small values of thermal conductance, this eigenvalue becomes a 
+quadratic function of thermal coupling, which enhances the stability of microchannels and moves the stability 
+boundary. However, for large values of thermal conductance, the eigenvalue is dependent only on the fluid 
+properties, leading to a limit at which thermal coupling can no further improve stability or affect the stability 
+boundary. The lumped model developed in this work enables mechanistic understanding of the role of channel￾to-channel thermal coupling on mitigating flow maldistribution and therefore may offer important guidance on 
+the design of flow boiling systems and heat sinks. 
+1. Introduction 
+Two-phase flow heat exchange processes are used in many industrial 
+applications such as steam generation, air conditioning, and nuclear 
+reactor cooling [1,2]. Flow boiling using parallel microchannel heat 
+sinks is one such thermal management application that aims to enhance 
+the reliability and performance of computing clusters, radar technolo￾gies, power conversion systems, and electric drive motors by efficiently 
+dissipating intense, localized heat fluxes. Compared to single-phase 
+operation, these two-phase heat sinks feature higher heat transfer co￾efficients, lower pumping power requirements, and more compact de￾signs. However, one practical challenge is the occurrence of flow 
+maldistribution and instabilities that can degrade their heat transfer 
+performance compared to uniform flow and stable operation [3]. 
+In practical applications, microchannel heat sinks have many 
+parallel channels (versus a single channel) to provide high heat transfer 
+surface areas. However, this renders the heat sink further susceptible to 
+flow maldistribution between these many parallel channels, triggered by 
+Ledinegg instability or other flow instabilities (e.g., density wave os￾cillations, pressure drop oscillations, and temperature oscillations) un￾derlying flow instability mechanisms [4–9]. Flow maldistribution, as it 
+pertains to the focus of this work, refers to a steady flow distribution that 
+is non-uniform from channel to channel. 
+1.1. The mechanism of steady two-phase flow maldistribution 
+For a fixed heat input q′ to a single microchannel with subcooled inlet 
+temperature Tin, the pressure drop ΔP demand curve as a function of 
+mass flux Gch is a non-monotonic N-shaped curve (e.g., the solid red line 
+or dashed green line shown in Fig. 1(a)). This N-shaped demand curve 
+consists of three regions, a single-phase vapor outlet region where 
+* Corresponding author. 
+E-mail address: jaweibel@purdue.edu (J.A. Weibel). 
+Contents lists available at ScienceDirect 
+International Journal of Heat and Mass Transfer 
+journal homepage: www.elsevier.com/locate/ijhmt 
+https://doi.org/10.1016/j.ijheatmasstransfer.2024.125671 
+Received 3 March 2024; Received in revised form 28 April 2024; Accepted 5 May 2024 
+
+International Journal of Heat and Mass Transfer 228 (2024) 125671
+2
+pressure drop increases with mass flux (Region I), a liquid-vapor mixture 
+outlet region where pressure drop decreases with mass flux (Region II), 
+and a single-phase liquid outlet region where the pressure drop again 
+increases (Region III); further description of the two-phase flow be￾haviors that lead to the trends in this curve is provided in [4]. The sta￾bility of the operating point, P0, located in the liquid-vapor mixture 
+region depends on the pump characteristics [8,10]. For a fixed mass flux 
+positive displacement pump (vertical dashed black line), the flow is 
+stable for a single microchannel. For a constant pressure pump supply 
+(horizontal orange dashed line), the system has three possible states of 
+operation, and per the Ledinegg instability [10], the negative-slope 
+Region II with a liquid-vapor mixture at the outlet is unstable leading 
+to a flow excursion to the stable points. 
+Extending the above discussion, there is also a pressure drop load 
+curve for systems of multiple channels in parallel. For example, the inset 
+plot within Fig. 1(a) shows the pressure drop load curve for two identical 
+microchannel as a function of the total mass flux (Gin = Gch,1 + Gch,2). 
+Apart from the N-shaped curve (solid black line) in the intermediate 
+mass flux region, there are additional possible operating points (solid 
+light blue lines) that arise due to the possibility unequal flow 
+distributions. For parallel microchannels, one added constraint is that 
+the pressure drop across each individual microchannel must be equal (i. 
+e., ΔPch,1 = ΔPch,2). This condition can hold true for equal mass flux 
+through both channels (Gch,1 = Gch,2), corresponding to the N-shaped 
+black solid line in Fig. 1(a) (segments A-B, B-E, and E-F). For example, 
+Fig. 1(b) shows the flow distribution at operating point, P0, where both 
+parallel channels have the same two-phase exit quality. Alternatively, 
+the pressure drop constraint can also hold true unequal mass flux 
+through two parallel microchannels (Gch,1 ∕= Gch,2), corresponding to the 
+solid light blue lines in in Fig. 1(a). Three possible combinations of 
+unequal mass flow may exist for a system of two parallel microchannels, 
+corresponding to each light blue segment. Namely, (i) the first channel 
+at a very low mass flux and the second channel at an intermediate mass 
+flux (segment B-C), (ii) the first at a very low mass flux and the second at 
+a very high mass flux (segment C–D), and (iii) the first at an intermediate 
+mass flux and the second at a very high mass flux (segment D–E). 
+For the parallel channel system, the two-phase operating point P0 
+with a desired uniform mass flux through channels, Gch,1 = Gch,2 =
+Gin/2, is subject to a constant pressure drop constraint (ΔP = ΔPch,1 =
+ΔPch,2) regardless of the pump characteristics. Hence the point is un￾Nomenclature 
+Ac channel cross-section area (m2
+) 
+As heat transfer area (m2
+), (4WcLc)
+C Chisholm parameter 
+Clat lateral thermal conductance per unit channel length (W/ 
+mK) 
+Co confinement number, [g(ρf − ρg)D2
+h/σ]
+− 0.5 
+cp,ϕ vapor/liquid specific heat (J/kgK), ϕ = f, g 
+cw heat sink wall specific heat (J/kgK) 
+Dh hydraulic diameter (m) 
+FF frictional pressure gradient 
+FG gravitational pressure gradient 
+fϕ friction factor (
+2 τwρϕ
+G2
+in
+)
+, ϕ = f, g 
+g acceleration due to gravity (N/m2
+) 
+Gch,i mass flux to channel (kg/m2
+s), i = 1, 2 
+G∗
+ch,i equilibrium mass flux to channel (kg/m2
+s) 
+Gin total mass flux to channels (kg/m2
+s) 
+hconv,tp two-phase flow heat transfer coefficient (W/m2
+K) 
+hconv,ϕ vapor/liquid heat transfer coefficient (W/m2
+K), ϕ = f, g 
+hfb,i flow boiling heat transfer coefficient (W/m2
+K) 
+hnb nucleate boiling heat transfer coefficient (W/m2
+K) 
+h enthalpy (kJ/kg) 
+hin inlet enthalpy of liquid (kJ/kg) 
+hϕ liquid/vapor saturation enthalpy(kJ/kg), ϕ = f, g 
+hfg Enthalpy of vaporization (kJ/kg) 
+I identity matrix 
+J Jacobian Matrix 
+kϕ vapor/liquid thermal conductivity (W/mK), ϕ = f, g 
+Lc length of channel (m) 
+mw mass of heat sink wall (kg) 
+M molecular weight (kg/kmol) 
+p pressure (Pa) 
+pcr critical pressure (Pa) 
+Prϕ vapor/liquid Prandtl number (μϕcp,ϕ
+kϕ
+)
+, ϕ = f, g 
+Patm atmospheric pressure (Pa) 
+Pin channel inlet pressure (Pa) 
+Reϕo combined vapor and liquid Reynolds number, (Gch,iDh
+μϕ
+)
+, ϕ =
+f, g 
+q′ heat transferred to fluid per unit length (W/m) 
+q′
+0 heat input to channel outer surface per unit length (W/m) 
+Tf Fluid temperature (◦C) 
+Tin inlet temperature (◦C) 
+Tsat saturation temperature (◦C) 
+Tw,i wall temperature (◦C), i = 1, 2 
+T∗
+w,i equilibrium wall temperature (◦C) 
+t time (s) 
+u velocity (m/s) 
+Wc square channel width (m) 
+Whs square heat sink wall width (m) 
+x vapor quality (h− hf
+hg − hf
+)
+z coordinate along channel length (m) 
+ΔPch,i channel pressure drop (Pa) (Pin − Patm), i = 1, 2 
+ΔPA acceleration pressure drop (Pa) 
+ΔPF frictional pressure drop (Pa) 
+δG∗
+ch,1 perturbation of mass flux (kg/m2
+s) 
+δT∗
+w,i perturbation of wall temperature (◦C) 
+(
+∂p
+∂z
+)
+f liquid frictional pressure gradient (
+2ff
+vf(1− x)
+2G2
+Dh
+)
+(
+∂p
+∂z
+)
+g vapor frictional pressure gradient (
+2fg
+vgx2G2
+Dh
+)
+Subscripts 
+A acceleration 
+F friction 
+f liquid 
+G gravitation 
+g vapor 
+i,j channel indices 
+Greek symbol 
+α void fraction 
+β aspect ratio of channel (
+Wc
+Hc
+)
+λ eigenvalues of the Jacobian matrix 
+μϕ liquid/vapor dynamic viscosity (Pa⋅s), ϕ = f, g 
+ρf liquid/vapor density (kg/m3
+), ϕ = f, g 
+ρw heat sink wall density (kg/m3
+) 
+σ surface tension (N/m) 
+τw shear stress (Pa) 
+M.E. Rahman and J.A. Weibel 
+
+International Journal of Heat and Mass Transfer 228 (2024) 125671
+3
+stable due to the Ledinegg instability, and the system will settle to a 
+stable operating point with flow maldistribution. In the case of flow 
+maldistribution, one channel may have such a low mass flux that all of 
+the incoming liquid is evaporated and the exit becomes single-phase 
+vapor, while the second channel has such a high mass flux there the 
+liquid remains subcooled up to the channel exit, as illustrated in Fig. 1 
+(c). Comparing the uniformly distributed flow in Fig. 1(b) to the mal￾distributed flow in Fig. 1(c), it is expected that the heat transfer coeffi￾cient would be deteriorated due flooding of one channel with liquid; the 
+flow-starved microchannel with single-phase vapor at the outlet may 
+also potentially initiate a premature critical heat flux (CHF). 
+1.2. Literature review 
+Although two-phase microchannel heat sinks provide very high heat 
+transfer rates, many experimental works [9,11–15] have observed flow 
+maldistribution owing to the Ledinegg instability. Maldistribution cau￾ses some channels to be starved of flow relative to a uniform distribu￾tion, and premature critical heat flux (CHF) can be triggered [16–18]. As 
+a result, a number of control strategies have been explored to mitigate 
+flow maldistribution, such as inlet restrictors [13,18,19], increased 
+system pressure [20], and dynamic control of pumps and valves [21,22]. 
+Nevertheless, these solutions either increase system complexity or lead 
+to increased pressure drop. Hence, it becomes crucial to investigate the 
+behavior of two-phase flow maldistribution in parallel channels and to 
+formulate accurate models that aid in predicting and controlling the 
+flow in two-phase heat sinks. 
+A number of studies have experimentally characterized the flow 
+maldistribution caused by the Ledinegg instability [9,11,14,15,23]. The 
+notable, pioneering work of Akagawa et al. [23] investigated flow 
+maldistribution in very long parallel evaporator tubes with 
+millimeter-scale diameters. They experimentally obtained channel 
+pressure drop curves for individual tubes to reveal the N-shaped load 
+curve as illustrated in Fig. 1(a). The flow distribution, excursion, and 
+hysteresis phenomena were also observed in parallel tube experiments. 
+A stability criterion was derived from a Laplace transformation of the 
+linearized momentum and continuity equations for the system of par￾allel tubes, which explained the significant deviations from the uniform 
+flow distribution when any one of the channel load curves had a nega￾tive slope. Miglani et al. [11] experimentally investigated the flow dis￾tribution and wall temperature in two isolated parallel microchannels. 
+In their study, the effect of heat input on these quantities was measured. 
+Flow distribution and wall temperature were found to be uniform at low 
+heat input as with single-phase flow at subcooled conditions. Whereas at 
+relatively higher heat input, once boiling started inside the channels, the 
+flow distribution became unstable because of Ledinegg instability, 
+which induced flow maldistribution in the channels. The wall temper￾ature in the starved-flow channels increased due to deteriorated heat 
+transfer performance in that channel. In another work, Szczukiewicz 
+et al. [13] performed experiments for visualization flow distribution and 
+temperature in many parallel microchannels. In their study, the micro￾channels were prone to flow instabilities, backflow, and flow maldis￾tribution without any inlet restrictors, leading to high amplitude and 
+high-frequency temperature and pressure oscillations. The recent work 
+of Clark et al. [24] experimentally analyzed flow distribution in the 
+parallel microchannel heat sink. In their work, some channels were 
+repeatedly found to be flow starved, confirmed by high-speed flow 
+visualization. During this condition, the average heat sink temperature 
+was higher than with uniform flow through the channels. 
+Minzer et al. [25] investigated flow distribution in two parallel 
+channels with a simplified two-phase flow model where the channel 
+pressure drop was calculated for flow boiling in each single channel. The 
+governing model equations were used to obtain steady-state solutions 
+for the flow distribution and inlet pressure of the channels. The transient 
+equations were used to perform a linear stability analysis and predict the 
+flow dynamics in parallel channels. Baikin et al. [26] extended the 
+model of Minzer et al. [25] to four parallel channels and performed 
+experiments with various combinations of heated and unheated chan￾nels. Flow maldistribution was observed even for the case of equal 
+heating, confirmed via linear stability analysis, and transient simula￾tions verified the runaway trajectories from unstable operating points. 
+Recently, Van Oevelen et al. [27] studied flow distribution for a large 
+number of identical parallel microchannels (up to 200) as is commonly 
+found in heat sinks. A generalized linear stability analysis was per￾formed to show that, even with a constant mass supply pump, the sta￾bility behavior of the system having many parallel microchannels was 
+prone to flow maldistribution, and converged toward that system of 
+constant pressure supply pump with increasing number of channels. 
+The works discussed above all investigated the flow maldistribution 
+for thermally isolated parallel channels, that is, without incorporating 
+lateral thermal coupling (i.e., lateral heat transfer) between parallel 
+channels. However, there may be a high lateral thermal conductance 
+between channels manufactured within the same heat sink material, 
+which plays a critical role in mitigating the flow maldistribution caused 
+by the Ledinegg instability. Flynn et al. [28,29] experimentally 
+measured a difference in temperature between two parallel micro￾channels etched into a substrate depending on whether the channels 
+were either thermally coupled or thermally isolated, and attributed their 
+observations to the effect of thermal coupling on the Ledinegg insta￾bility. In their studies, flow visualization confirmed the severe flow 
+maldistribution in thermally isolated channels compared to thermally 
+coupled ones. Due to maldistribution, the temperature difference be￾tween flow-starved and flooded channels was experimentally reported 
+to be 40◦C, whereas thermally, it was less than 10◦C. Van Oevelen et al. 
+[30] were first to model this effect of lateral thermal coupling on flow 
+Fig. 1. (a) Pressure drop demand curve as a function of mass flux for flow 
+through two identical microchannels subject to uniform heating with a sub￾cooled liquid inlet. The demand curve for each identical channel (solid red and 
+green dashed lines) has three regions, Regions I, II, and III, based on channel 
+exit quality. For two parallel channels, a demand curve has regions with equal 
+flow through both channels (solid black lines) or maldistribution (solid light 
+blue lines). (b) If point operating point P0 were stable, then both microchannels 
+would have the same mass flux and two-phase exit vapor quality; (c) however, 
+because P0 is unstable due to the Ledinegg instability, the flow becomes mal￾distributed and one microchannel has a lower mass flux (P2 with vapor at the 
+outlet) while the other has a higher mass flux (P1 with a subcooled liquid 
+outlet). In the illustrations above, it is assumed that the channels are thermally 
+isolated from each other. 
+M.E. Rahman and J.A. Weibel 
+
+International Journal of Heat and Mass Transfer 228 (2024) 125671
+4
+distribution in two parallel microchannels by extending their model 
+from Ref. [27]. A finite volume discretization method was used to solve 
+the model equations. The severity of flow maldistribution was compared 
+for thermally isolated and thermally coupled parallel channels. It was 
+found that the severity of flow maldistribution was significantly reduced 
+for thermally coupled parallel channels because a channel experiencing 
+local dryout could transfer some heat input to the neighboring channel, 
+maintaining a more uniform wall temperature. Miglani et al. [9] 
+confirmed this behavior by experimentally measuring the flow maldis￾tribution in two parallel channels and showing that the mass flux dif￾ference between the parallel channels was significantly reduced for 
+thermally coupled parallel channels. A direct comparison between the 
+experimental data and theoretical model predictions [30] showed good 
+agreement. The model [30] was also validated against the experimental 
+data of Flynn et al. [28,29], showing reasonable agreement. 
+The above results demonstrate that the stability behavior of micro￾channels can be improved by allowing lateral heat transfer between the 
+channels, which reduces the flow maldistribution severity. However, an 
+important but unexplained observation from Ref. [30] is that the lateral 
+thermal coupling is not guaranteed to avoid flow maldistribution. At low 
+heat inputs, increasing the lateral thermal conductance shifts the sta￾bility boundary to the point where maldistribution can be avoided 
+altogether; however, the effect of increasing thermal conductance be￾comes weaker and weaker as the applied heat input increases. Above 
+some upper heat input threshold, the system is unstable and the 
+microchannels are prone to maldistribution no matter how high the 
+lateral thermal conductance. There is no available mechanistic expla￾nation for this asymptotic maldistribution stability boundary because 
+the previous studies have used finite volume discretization solutions that 
+do not permit physical interpretation of the system stability. Therefore, 
+this current work develops a dynamic model for predicting and 
+analyzing the flow distribution in parallel microchannels using a lumped 
+capacitance representation of a heat sink that allows mechanism 
+explanation of the effect of thermal coupling on the stability boundary. 
+The reduced-order model is first shown to capture the correct trends in 
+flow distribution, that is, the stability of the parallel microchannels in￾creases with lateral thermal coupling and reaches a limit at higher heat 
+inputs. A single eigenvalue is shown to be the cause for flow maldistri￾bution for two parallel channels. Scaling analysis inspection of the terms 
+in this eigenvalue then offers a mechanistic explanation for the 
+asymptotic stability boundary behavior. 
+2. Modeling approach 
+Fig. 2(a) illustrates the system having flow through two identical 
+microchannels placed in parallel with a common inlet and outlet header. 
+The adjacent channels are thermally coupled via a lateral thermal 
+conductance, Clat, representative of conduction between the channels 
+through the heat sink wall. The system reduces to the case of thermally 
+isolated channels when Clat = 0. The channels are subject to constant 
+total mass flux Gin from a positive displacement pump at the inlet 
+header. The mass flow splits and each microchannel receives some 
+portion of the inlet mass flow; e.g., for uniformly distributed flow, 
+G∗
+ch,1 = G∗
+ch,2 = Gin/2 at steady state conditions. Both channels also 
+receive a uniform, equal heat input per unit channel length q′
+0 on their 
+outer surfaces. Subcooled liquid enters the channels at Tin and fluid exits 
+as a subcooled liquid, liquid-vapor mixture, or superheated vapor, 
+depending on the heat input per unit length and mass flux. While the 
+conclusions drawn in this study are qualitatively generalizable, quanti￾tative results are shown for baseline microchannel dimensions and 
+materials that are representative of applications for the thermal man￾agement of advanced semiconductor devices, with all model input pa￾rameters given in Table 1 and geometries defined in Fig. 2(b). 
+2.1. Dynamic flow distribution model 
+Transient governing equations are developed to analyze flow dis￾tribution in the parallel microchannel configuration defined by Fig. 2. 
+The flow distribution model is adapted from our previous work on flow 
+distribution in parallel channels [31]. A one-dimensional partial dif￾ferential momentum equation is derived that describes the flow for the 
+1st microchannel as 
+∂Gch,1
+∂t +
+∂
+(
+Gch,1u
+)
+∂z = − ∂p
+∂z
+− FF (1) 
+where the first term on the left-hand side is rate of change of mass flux, 
+the second term on the left-hand side is the acceleration pressure 
+gradient, and FF is frictional pressure gradient. A simplified lumped 
+dynamic momentum equation for the heat sink is obtained by inte￾grating Eq. (1) along the channel length from the inlet to the exit, and 
+the new equation is given as: 
+dGch,1
+dt = 1
+Lc
+(Pin − Patm − ΔPF − ΔPA − ΔPG) (2) 
+where Lc is the length of the microchannel, Pin and Patm are inlet and 
+Fig. 2. (a) Schematic diagram of the scenario investigated to assess flow distribution in thermally coupled parallel microchannels; lateral heat transfer is possible 
+when there is a temperature difference (Tw,1 ∕= Tw,2) between the channels depending on the magnitude of the lateral thermal conductance Clat. (b) Cross-sectional 
+view of the thermally coupled parallel microchannel with relevant dimensions defined. 
+Table 1 
+Dimensions of the microchannel, system parameters, and operational 
+parameters. 
+Parameter Value 
+Channel length, Lc (mm) 10 
+Square channel width, wc (µm) 200 
+Hydraulic diameter, Dh (µm) 200 
+Heat input per unit length, q′
+0 (W/m) 220–250 
+Outlet pressure, Patm (kPa) 101 
+Mass flux, Gin (kg/m2
+s) 700 
+Fluid Water 
+Square heat sink wall, Whs (µm) 300 
+Inlet subcooling, Tsat − Tin (K) 20 
+Heat sink wall density, ρw (kg/m3
+) 2329 
+Wall specific heat capacity, cw (J/kgK) 700 
+Lateral thermal conductance, Clat (W/mK) 0–600 
+M.E. Rahman and J.A. Weibel 
+
+International Journal of Heat and Mass Transfer 228 (2024) 125671
+5
+outlet pressure of the microchannel, respectively, and ΔPF, ΔPA, and 
+ΔPG are the frictional, acceleration, and gravitational pressure drop, 
+respectively. The total pressure drop of the channel is ΔPch,1 = ΔPF +
+ΔPA + ΔPG. 
+Mass conservation across both parallel microchannel systems for a 
+constant total mass flux at the inlet Gin can be written as follows: 
+Gin = Gch,1 + Gch,2 (3) 
+where Gch,2 is the mass flux through the 2nd microchannel. The known 
+constant total mass flux Gin and the mass flux Gch,1 found by solving Eq. 
+(2) provide enough information to obtain Gch,2 = Gin − Gch,1 from Eq. 
+(3). Note that the distinction between the 1st and 2nd channel is arbi￾trary, given the symmetry of the system. 
+The models used to calculate the microchannel pressure drop com￾ponents ΔPF, and ΔPA with wall thermal capacity are detailed in our 
+previous work [4,31]. Note that when a wall thermal capacity is intro￾duced, the instantaneous heat input q′ to the fluid used for evaluating the 
+pressure drop is not necessarily equal to the applied heat input q0
+′ (i.e., 
+q′ ∕= q′
+0), which requires a separate dynamic thermal model, as is 
+described in the next section. 
+2.2. Dynamic thermal model 
+Fig. 2 depicts the cross-section of the thermally coupled parallel 
+microchannels receiving uniform heat input per unit channel length (q′
+0) 
+on the outer surface of the heat sink wall. The fluid temperatures in each 
+channel are equal for a uniform fluid flow through both parallel 
+microchannels, i.e., Tw,1 = Tw,2. In contrast, any non-uniform flow dis￾tributions will result in a wall temperature difference (Tw,1 ∕= Tw,2), 
+resulting in lateral heat transfer from the 1st to the 2nd microchannel or 
+vice versa via lateral thermal conductance (Clat). For flow maldistribu￾tion in a parallel microchannel heat sink with a finite thermal capacity, 
+the fluid-to-wall temperature difference and convective heat exchange 
+varies in a coupled manner, making the dynamic heat response more 
+complex. These heat transfer processes are simultaneously considered in 
+the modeling approach by considering the dynamic interaction between 
+thermal wall capacity and fluid flow, in addition to lateral thermal 
+coupling. Consequently, lumped thermal models for both the 1st and 
+2nd microchannel are developed by balancing the sensible energy 
+change with the heat input to the wall, the heat transferred from the wall 
+to the fluid, and lateral heat transfer between the channels, expressed for 
+the system as 
+dTw,i
+dt = q′
+0Lc
+mwcw
+− hfb,iAs
+(
+Tw,i − Tf ,i
+)
+mwcw
+− ClatLc
+(
+Tw,i − Tw,j
+)
+mwcw
+(4) 
+where, i ∕= j = 1,2 are the channel indices. The first term on the right￾hand side of Eq. (4) is the total heat input to the heat sink wall, the 
+second term on the right-hand side is the internal convection heat 
+transfer to the fluid (q′
+), and the last term is the heat transfer due to 
+thermal coupling between microchannels. The lateral thermal conduc￾tance, Clat, defines the strength of the thermal coupling. Also, mwcw is the 
+wall thermal capacity, hfb,i is the flow boiling heat transfer coefficient of 
+the i
+th microchannel, and As is convective heat transfer area in the 
+microchannel. The fluid temperature Tf,i of i
+th microchannel is calcu￾lated by taking the length-weighted-average temperatures of the sub￾cooled liquid phase, vapor-liquid mixture, and superheated vapor phase 
+along the flow length. 
+The internal convection heat transfer to the fluid q′ = hfb,iAs(Tw,i −
+Tf,i), where i = 1, 2, is dependent on the flow boiling heat transfer co￾efficient (hfb,i). calculated using the correlation from Bertsch et al. [32]: 
+hfb = hnb(1 − x) + hconv,tp[
+1 + 80(
+x2 − x6
+)
+e− 0.6Co] (5) 
+hnb = 55( p
+pcr)0.12(
+− log10(p
+pcr))− 0.55
+M− 0.5
+⋅
+(q′
+0Lc
+As
+)0.67
+(6) 
+hconv,tp = (1 − x)hconv,f + xhconv,g (7) 
+hconv,ϕ =
+(
+3.66 +
+0.0668(
+ReϕoPrϕDh
+/
+Lc
+)
+1 + 0.04(
+ReϕoPrϕDh
+/
+Lc
+)2/3
+)
+kϕ
+Dh
+(8) 
+where hnb is the nucleate boiling heat transfer coefficient, hconv,tp is the 
+two-phase flow heat transfer coefficient, and Co = [g(ρf − ρg)D2
+h/σ]
+− 0.5 is 
+the confinement number. Liquid-only (Refo) and vapor-only (Rego) 
+Reynolds numbers, when the entire mass flux through channel occurring 
+as liquid/vapor phase, are given as Reϕo = Gch,iDh/μϕ, where ϕ = f, g. 
+The heat transfer coefficient (hfb) of both microchannels is calculated by 
+taking the length-weighted-average of the heat transfer coefficient for 
+the subcooled liquid phase, vapor-liquid mixture, and superheated 
+vapor phase along the channel. 
+2.3. Eigenvalues of the dynamic system 
+The governing Eqs. (2) and (4) can be rewritten in dynamical form as 
+follows: 
+X˙(t) = F(X, η) (9) 
+where X = (Gch,1, Tw,1, Tw,2)
+T are phase variables, and η = (q′
+, Clat, Tin)
+T 
+are design and operating parameters. The equilibrium points of the 
+current system can be obtained by setting the right-hand sides of the 
+governing momentum Eq. (2) and energy Eq. (4) (or Eq. (9)) to zero such 
+that: 
+X˙(t) = 0 ⇒F(X, η) = 0 (10) 
+The equilibrium points of the 1st channel from the momentum 
+equation are: 
+G∗
+ch,1 = Gin
+2 (11) 
+where the asterisk denotes an equilibrium point. Therefore, the equi￾librium mass flux in the second microchannel is also G∗
+ch,2 = Gin −
+G∗
+ch,1 = Gin/2. From the energy equation, 
+T∗
+w,i = Tf ,i + q′
+0Lc
+hfb,iAs
+(12) 
+Because the heat transfer coefficient and fluid temperature at the 
+equilibrium operating conditions are equal for both parallel micro￾channels, it can be written T∗
+w,1 = T∗
+w,2. 
+All these equilibrium points do not necessarily provide optimal 
+performance, and sometimes undesirable flow maldistribution induced 
+by the Ledinegg instability and other instabilities may occur. A general 
+stability analysis is performed to find the stable and unstable equilib￾rium operating points. The stability of the equilibrium operating points 
+(G∗
+ch,1, T∗
+w,1, T∗
+w,2) are assessed by inspecting the eigenvalues of the Ja￾cobian matrix (J) obtained from the governing Eqs. (2) and (4). By 
+taking the partial derivative of Eq. (10) with respect to phase variables, 
+the Jacobian matrix of the present system is written as follows: 
+M.E. Rahman and J.A. Weibel 
+
+International Journal of Heat and Mass Transfer 228 (2024) 125671
+6
+J =
+⎡
+⎢
+⎢
+⎢
+⎢
+⎢
+⎢
+⎢
+⎢
+⎢
+⎣
+− 1
+2Lc
+(∂ΔPch,2
+∂Gch,1
++
+∂ΔPch,1
+∂Gch,1
+)
+− 1
+2Lc
+∂ΔPch,1
+∂Tw,1
+1
+2Lc
+∂ΔPch,2
+∂Tw,2
+Ashfb,1
+mwcw
+∂Tf ,1
+∂Gch,1
+− hfb,1As − ClatLc
+mwcw
+ClatLc
+mwcw
+− Ashfb.2
+mwcw
+∂Tf ,2
+∂Gch,1
+ClatLc
+mwcw
+− hfb,2As − ClatLc
+mwcw
+⎤
+⎥
+⎥
+⎥
+⎥
+⎥
+⎥
+⎥
+⎥
+⎥
+⎦
+(13) 
+The components of the Jacobian matrix depend on many system and 
+operating parameters, including the lateral thermal conductance and 
+heat input to fluid. To simplify the terms for subsequent presentation, J 
+is rewritten as: 
+J =
+⎡
+⎣ a − b b
+− c d e
+c e d
+⎤
+⎦ (14) 
+where a, b, c, d, and e are defined by the matrix entries in Eq. (13), for 
+example, e = ClatLc
+mwcw
+. The eigenvalues of the Jacobian are obtained by 
+solving the characteristic equation, 
+|J − λI| = 0 (15) 
+where I is the identity matrix and the Eq. (15) is rewritten as follows: 
+⃒
+⃒
+⃒
+⃒
+⃒
+⃒
+a − λ − b b
+− c d − λ e
+c e d − λ
+⃒
+⃒
+⃒
+⃒
+⃒
+⃒
+= 0 (16) 
+So, the characteristic polynomial obtained by solving the above 
+determinant is, 
+λ3 − (a + 2d)λ2 − (
+2bc − 2ad − d2 + e2
+)
+λ + 2bcd − ad2 + 2bce + ae2 = 0
+(17) 
+and the calculated eigenvalues λ from this Eq. (17) are given below as: 
+λ1 = d + e (18a) 
+λ2 = 1
+2
+(
+a + (d − e)−
+̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅
+(a − d + e)
+2 + 8bc √ )
+(18b) 
+λ3 = 1
+2
+(
+a + (d − e) +
+̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅
+(a − d + e)
+2 + 8bc √ )
+(18c) 
+The derived eigenvalues are functions of the lateral thermal 
+conductance and heat input. For instance, the terms a, b, and c depends 
+on the heat input, the term d depends on the heat input and lateral 
+conductance, and the term e is a function of the lateral conductance 
+only. The eigenvalues can be inspected to analyze the effect of these 
+parameters on the equilibrium points to demarcate operating regions 
+with maldistribution (unstable equilibrium points), where at least one of 
+the eigenvalues has a positive real part, versus region with uniform 
+distribution (stable equilibrium points) where all the eigenvalues have a 
+negative real part. Therefore, the forms of these eigenvalue expressions 
+can confirm the nature of how thermal coupling stabilizes systems of 
+parallel microchannels. 
+2.4. Transient solution of the flow distribution 
+The governing equations offer a dynamic model for analyzing the 
+transient flow distribution and wall temperature as a function of the 
+thermal coupling between parallel microchannels. The transient 
+response of the system is obtained by numerically solving the set of 
+ordinary differential Eqs. (2) and (4) using the MATLAB odes15s func￾tion, which is chosen as these equations are stiff. This function uses a 
+variable-step, variable-order (VSVO) solver based on the numerical 
+differentiation formulas (NDF) of orders 1 to 5 [33]. This solves the 
+equations as initial values problems (IVP), where the initial values are 
+perturbed equilibrium points (G∗
+ch,1 ± δGch,1; T∗
+w,1 ± δTw,1; T∗
+w,2 ± δTw,2). 
+3. Results and discussions 
+In these results, Section 3.1 first identifies the operating regions 
+corresponding to uniformly distributed versus maldistributed flow, ob￾tained by the stability analysis approach as described in Section 3.1. 
+Next, Section 3.2 presents the transient system response for various 
+lateral thermal conductances and heat inputs that result in different flow 
+distributions, obtained via transient solution of the governing equations 
+as described in Section 2.4. The dependence of the system eigenvalues 
+on various design and operating parameters is then discussed in detail 
+(Section 3.3). Section 3.3.1 reveals that the first and second eigenvalues 
+do not participate in determining the flow distribution of the system. 
+Section 3.3.2 describes the role of the third eigenvalue in governing the 
+flow distribution as a function of thermal coupling and heat input, and a 
+scaling analysis of the third eigenvalue in Section 3.3.3 explains the 
+asymptotic nature of the stability boundary. Lastly, Section 3.4 explores 
+the dynamic response for scenarios at which the stability boundary is has 
+asymptotically converged; although maldistribution is guaranteed in 
+microchannels for sufficiently high heat inputs, thermal coupling can 
+nevertheless reduce the severity of the wall temperature difference in 
+the presence of maldistribution. 
+3.1. Mapping the regions of flow stability and maldistribution 
+The eigenvalues of the parallel microchannel system depend on 
+several operational and design parameters as governed by Eq. 16. 
+Therefore, a stability map is generated by calculating the eigenvalues of 
+the Jacobian matrix for varying lateral thermal conductance Clat from 
+0–600 W/mK and heat input q′ from 228–242 W/m. All other design and 
+operating parameters are kept constant, as given in Table 1. Stable re￾gions will have uniform flow distribution and unstable regions will have 
+flow maldistribution, assessed per the sign of the positive real parts of 
+the eigenvalues as discussed in Section 2.3. 
+Fig. 3 displays a stability map for the parallel microchannels in the 
+parametric plane of the lateral thermal conductance Clat and heat input 
+q′
+, where blue marked points indicate stable flow (no marks are shown 
+Fig. 3. Stability map showing over the parametric plane of lateral thermal 
+conductance (Clat) and heat input (q′
+) to the system of two thermally coupled 
+parallel channels. The map demarcates the unstable (maldistribution) and 
+stable (no maldistribution) regions, where the stable region is indicated by blue 
+marks. Filled red triangle symbols indicate specific operating points at which 
+the transient flow distribution dynamics are discussed in Sections 3.2 and 3.4. 
+M.E. Rahman and J.A. Weibel 
+
+International Journal of Heat and Mass Transfer 228 (2024) 125671
+7
+for unstable flow). The entire plane is divided by a stability boundary 
+between maldistributed (unstable) and uniformly distributed (stable) 
+flow. It is evident from the figure that the flow is always stable for low 
+heat inputs q′ <230 W/m, below the threshold at which the liquid rea￾ches the saturation temperature at the outlet of microchannels for uni￾form flow distribution. This is because, as reviewed in Section 1.1, the 
+Ledinegg instability mechanism only occurs in the intermediate mass 
+flux region where there is a vapor-liquid mixture at the channel outlet. 
+Without any lateral thermal conductance (Clat ≈ 0), the flow becomes 
+maldistributed for any heat input q′ > 230 W/m. The stability of 
+microchannels improves with increasing non-zero thermal coupling. 
+Hence, the stability boundary increases to higher heat inputs with 
+increasing lateral thermal conductance, as observed in Fig. 3. The trend 
+in the stability boundary with increasing thermal coupling depicts a few 
+distinct characteristics. Initially, there is a steep increase in the stability 
+boundary from zero to low lateral thermal conductance. However, this 
+stability enhancement asymptotically converges to a particular heat 
+input at very high lateral thermal conductance, indicating that no level 
+of thermal coupling can avoid maldistribution above this heat input. The 
+same asymptotic maldistribution stability boundary has been previously 
+observed (but not explained) via the finite volume simulations of Van 
+Oevelen et al. [30], confirming that the currently developed lumped 
+model can accurately captures the effect of thermal coupling on flow 
+maldistribution. 
+The enhancement of stability with thermal coupling can be generally 
+explained as follows. In the absence of thermal coupling, heat transfer 
+from one channel to the other is prohibited; any perturbation in mass 
+flux unstably grows due to the negative slope of the single-channel load 
+curve (i.e., a slight reduction in flow rate to one channel increases the 
+pressure drop and causes a further flow rate reduction in an excursive 
+manner). This leads to a highly maldistributed flow where one channel 
+gets much less mass flux than the other to equalize the pressure across 
+both channels. As a result, the wall temperature in the flow-starved 
+channel is also becomes higher than the other channel. However, with 
+the mechanism of thermal coupling enabled, this increasing wall tem￾perature of the flow-starved channel causes heat transfer to the other 
+channel via thermal conduction between the two channels. With suffi￾cient thermal conductance, this allows the flow-starved channel to re￾turn to back its initial condition after releasing the heat stored in the 
+channel wall. While this improvement to stability is simply explained, it 
+is not trivial to understand why the improvement to stability asymptotes 
+with increasing thermal coupling. The modeling approach implemented 
+in the current work offers a mechanistic explanation of this trend in the 
+stability boundary, as will be discussed in the upcoming sections. 
+3.2. Dynamic system response for stable versus unstable conditions 
+The previous Section 3.1 introduced the stability map for the present 
+system having two distinct regions associated with uniformly distributed 
+and maldistributed flow in the parametric plane of lateral thermal 
+conductance (Clat) versus applied heat input (q′
+). However, this map can 
+only predict the occurrence of maldistribution via stability analysis, 
+whereas in this Section 3.3, the transient governing equations are solved 
+to analyze the flow maldistribution dynamics and its effect on the wall 
+temperature. 
+The two operating points for which these transient simulations are 
+performed lie on either side of the stability boundary for lateral thermal 
+conductances of 30 and 120 W/mK at q′ = 235 W/m. The rest of the 
+design and operating parameters are as specified in Table 1. The lower 
+lateral conductance corresponds to a point in the unstable region, while 
+the higher is in the stable region, both marked as red filled triangles in 
+Fig. 3. 
+Fig. 4 shows the temporal behavior of the mass flux and wall tem￾perature in the parallel microchannels, with flow maldistribution (Fig. 4 
+(a and b)) and without flow maldistribution (Fig. 4(c and d)). Fig. 4(a) 
+shows the transient mass flux with the occurrence of maldistribution for 
+a low lateral thermal conductance. With an external disturbance to the 
+steady state operating point, the mass flux in both channels diverges in 
+opposite directions from the initially uniform mass flux Gch,1 = Gch,2 =
+700 kg/m2
+s (as shown in the zoomed inset). Once the system has sta￾bilized, one microchannel is flooded with nearly all of the available mass 
+flux Gch,1 = 1380 kg/m2
+s, while the other is starved of fluid, Gch,2 = 2 g/ 
+m2
+s. These two new stable operating points correspond to P1 and P2 as 
+discussed in introduction section, Fig. 1. As a result, flow through the 
+microchannels remains maldistributed, which affects the wall temper￾atures as plotted in Fig. 4(b). The uniform initial mass flux means that 
+both microchannels initially have the same wall temperature. The wall 
+temperatures start to deviate from this condition as soon as the mass 
+fluxes become non-uniform. The channel receiving the lower mass flux 
+has vapor at the channel outlet, corresponding to a deteriorated heat 
+transfer coefficient and increased wall temperature. The difference in 
+the wall temperatures reaches a maximum when uneven mass flux first 
+Fig. 4. Transient (a,c) mass flux and (b,d) wall temperature for flow through 
+two parallel microchannels at q′ = 235 W/m, where different line styles (solid 
+versus dotted) are used to distinguish between the response of each channel. (a, 
+b) corresponds to a case with maldistribution (Clat = 30 W/mK) whereas (c,d) 
+corresponds to a case without maldistribution at a higher lateral thermal 
+conductance (Clat = 120 W/mK). 
+M.E. Rahman and J.A. Weibel 
+
+International Journal of Heat and Mass Transfer 228 (2024) 125671
+8
+reaches its absolute peak, and eventually settles to a fixed difference. 
+Fig. 4(c and d) exhibits the flow distribution and wall temperature of 
+the microchannels for a higher lateral thermal conductance in a stable 
+region (no maldistribution). Following a small flow disturbance, the 
+mass flux through the microchannels slowly converge with time till both 
+have the same uniform flow. As described above at the end of Section 
+3.1, this stability occurs because when one microchannel has a lower 
+mass flux and the wall temperature tries to increase, i.e., Tw,1(t) > T∗
+w,1; 
+the increased thermal coupling enables sufficient heat transfer between 
+the microchannels such that the system can returns to the uniform dis￾tribution. This process of heat transfer prevents the microchannels from 
+developing flow maldistribution, whereas in the case of the lower lateral 
+thermal conductance Clat = 30 W/mK, the heat transfer between 
+microchannels is insufficient to mitigate the flow maldistribution. 
+3.3. Dependence of eigenvalues on parameters 
+The stability map of flow maldistribution shown in Fig. 3 is based on 
+evaluation of the eigenvalues of the Jacobian matrix for the present 
+system. If at least one eigenvalue has a positive real part, the flow is 
+unstable. With the effect of lateral thermal coupling on flow maldistri￾bution established above, this section explains these trends based on the 
+dependency of the eigenvalues on the heat input and lateral thermal 
+conductance. 
+Fig. 5 plots representative eigenvalues of the Jacobian matrix 
+calculated as a function of the heat input in the presence of a given 
+lateral thermal conductance (Clat = 120 W/mK). The vertical axis in￾dicates the value of the real part of the eigenvalues, with emphasis on 
+whether these are positive or negative with respect to the solid black 
+horizontal zero line. It is observed from the figure that for lower heat 
+inputs q′ < 230 W/m for which the subcooled liquid entering the channel 
+does not reach the saturation temperature at the outlet, all three ei￾genvalues have negative real parts. So, for these powers, the uniform 
+flow distribution inside the microchannels is stable. As the heat input 
+applied to the microchannels further increases to q′ > 230 W/m, the 
+third eigenvalue, λ3, (red dotted line) starts to increase toward the 
+positive side of the axis. This eigenvalue λ3 remains negative between 
+230 W/m < q′ ⪅ 236 W/m, and hence there is no maldistribution despite 
+flow boiling in the channels owing to the thermal coupling. However, for 
+a high heat input q′ > 236 W/m, this eigenvalue becomes positive and 
+maldistribution appears. The star points on the curve of λ3 correspond to 
+points on a vertical dashed line of Fig. 4 where these points are stable (no 
+maldistribution) at q′ = 230 W/m, near to the stability boundary (but on 
+the stable side) at q′ = 235 W/m, and unstable (maldistribution) at q′ =
+242 W/m. Alternatively, the first and second eigenvalues of the system 
+(λ1 and λ2) always lie on the negative side of the axis for the entire range 
+of heat input. 
+3.3.1. Scaling analysis of the first and second eigenvalues 
+It was observed in Fig. 5 that the real parts of the first and second 
+eigenvalues (λ1 and λ2) were always negative (stable) for a specific value 
+of lateral thermal conductance Clat = 120 W/mK. A scaling analysis in 
+this subsection demonstrates that these two eigenvalues will remain 
+negative for all possible values of heat input and lateral thermal 
+conductance. 
+The first eigenvalue is written here again 
+λ1 = d + e = − hfb,1As − ClatLc
+mwcw
++
+ClatLc
+mwcw
+= − hfb,1As
+mwcw
+< 0 (19) 
+where the simplified expression only contains the convective heat 
+transfer coefficient hfb,1, the heat transfer area of the microchannel As, 
+and the specific thermal capacity of the heat sink mwcw. All these 
+quantities are universally positive, and as a result, λ1 will always remain 
+negative. Furthermore, it is independent of lateral thermal coupling. 
+The second eigenvalue λ2 is a non-trivial function of a, b, c, d and e, 
+the components of J as defined by Eqs. (14) and (15): 
+λ2 = 1
+2
+(
+a + (d − e)−
+̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅
+(a − d + e)
+2 + 8bc √ )
+(20) 
+If the term outside of the squared root is less than the squared root 
+term for any heat input and lateral thermal coupling, then the real part 
+of λ2 is negative. We first inspect the difference between d and e as 
+follows: 
+(d − e) = − hfb1As − ClatLc
+mwcw
+− ClatLc
+mwcw
+=
+(
+λ1 − 2ClatLc
+mwcw
+)
+< 0 (21) 
+It is established that λ1 is always negative, and the thermal conduc￾tance Clat and microchannel length Lc cannot be negative, so (d − e) is 
+always negative. Therefore, the sign of λ2 depends only the comparative 
+values of a versus 
+̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅
+(a − d + e)
+2 + 8bc √
+. The term (a − d + e)
+2 =
+{a − (d − e)}2 is always positive and greater than a by inspection 
+because (d − e) < 0. Additionally, the term 8bc is always greater than 
+zero because the partial derivative of channel pressure drop with respect 
+to wall temperature b = (∂ΔPch,2 /∂Tw,2)/2Lc is positive, and 
+c = − Ashfb.1(∂Tf,1 /∂Gch,1)/mwcw is also positive. As a result, this confirms 
+that 
+̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅
+(a − d + e)
+2 + 8bc √
+> a and therefore λ2 < 0. This scaling analysis 
+confirms that the second eigenvalue λ2 always remains negative and 
+does not cause flow maldistribution in the parallel microchannel system. 
+By deduction, the third eigenvalue λ3 solely cause flow maldistribution 
+in the current system. 
+3.3.2. Dependence of the third eigenvalue on lateral thermal coupling 
+This section analyzes the dependency of the third eigenvalue λ3 on 
+the magnitude of heat input and lateral thermal coupling. Fig. 6 plots λ3 
+as a function of heat input for multiple different increasing values of the 
+lateral thermal conductance 5 < Clat < 500 W/mK. As described earlier 
+in Fig. 6, λ3 is negative below q′ = 230 W/m for which there is subcooled 
+liquid exiting the channel. For q′
+>230 W/m, λ3 immediately crosses 
+from negative to positive and the system is unstable if the lateral thermal 
+coupling is zero or negligible. With increasingly non-zero lateral thermal 
+coupling, this crossover from negative to positive is delayed to higher 
+heat inputs. For example, the eigenvalue λ3 remains negative for a small 
+additional range of heat input 230 ⪅ q′ < ~231 W/m for a lateral 
+thermal conductance Clat = 10 W/mK. Whereas a larger lateral thermal 
+conductance Clat = 100 W/mK offers a wider range of stability for heat 
+Fig. 5. Dependency of the system eigenvalues λ1, λ2, and λ3 with respect to the 
+heat input q′ for a given lateral thermal conductance (Clat = 120 W/mK). The 
+first and second eigenvalues λ1 and λ2 remain negative for all heat inputs 
+whereas the third eigenvalue λ3 becomes positive at some particular heat input. 
+M.E. Rahman and J.A. Weibel 
+
+International Journal of Heat and Mass Transfer 228 (2024) 125671
+9
+inputs 230 ⪅ q′ ⪅235 W/m. These λ3 values confirm that higher thermal 
+coupling has a more substantial effect on mitigating maldistribution. 
+However, the improvement to flow stability comes to an end after the λ3 
+curve converges to a single line that crosses from negative to positive at a 
+fixed heat input of q′ = 240 W/m for very large lateral thermal 
+conductance (in the present case Clat⪆ 300–500 W/mK). This converged 
+λ3 profile is consistent with the asymptotic stability boundary as shown 
+in Fig. 3. A scaling analysis of λ3 in the next Section 3.3.3 explains this 
+convergent behavior. 
+3.3.3. Scaling analysis of the third eigenvalue to explain the asymptotic 
+stability boundary 
+This section describes the underlying reason why the stability 
+boundary for flow boiling in parallel microchannels is asymptotic with 
+increasing lateral thermal coupling, i.e., that there is a limit to miti￾gating maldistribution, via scaling analysis of the third eigenvalue λ3 in 
+the limit of high thermal conductance. The third eigenvalue is written 
+below: 
+λ3 = 1
+2
+(
+a + (d − e) +
+̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅
+(a − d + e)
+2 + 8bc √ )
+(22) 
+The components d = ( − hfb1As − ClatLc)/mwcw and e = ClatLc /mwcw 
+are proportional functions of the thermal coupling coefficient; the term 
+(d − e) is always negative and becomes increasingly negative with ther￾mal coupling. Hence, in the limit of high Clat, (a − d + e)
+2 =
+(a − (d − e))2 becomes significantly larger than 8bc which only depends 
+on thermodynamic properties via b and c, and therefore ̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅
+(a − d + e)
+2 + 8bc √
+≈ a − d + e. 
+After considering these scaling assumptions, in the limit of Clat→∞, 
+the third eigenvalue reduces to simply: 
+λ3 ≈ a (23) 
+It hence only depends on the Jacobian element a 
+= − (∂ΔPch,1 /∂Gch,1 +∂ΔPch,2 /∂Gch,2)/2Lc defining the slope of micro￾channel pressure drop depending on the thermodynamic properties 
+calculated based on heat input to microchannels, regardless of the 
+thermal coupling coefficient. Therefore, λ3 becomes dictated by only the 
+fluid thermophysical properties at sufficiently high lateral thermal 
+coupling. It is confirmed via stability and scaling analysis using our 
+novel lumped model that fluid properties ultimately govern the stability 
+behavior in the limit of high lateral thermal coupling, posing a limit to 
+which lateral thermal coupling can altogether avoid flow maldistribu￾tion. This explains the mechanism behind the asymptotic nature of the 
+flow maldistribution stability boundary with increasing lateral thermal 
+coupling. 
+3.4. Intensity of thermal coupling coefficient in maldistribution region 
+It is established in the previous sections that only the third eigen￾value (λ3) participates in causing the flow maldistribution. Moreover, 
+scaling analysis of this eigenvalue explains why the impact of lateral 
+thermal coupling reaches a limit in preventing maldistribution. 
+Although the linear stability behavior is limited, this section reveals that 
+lateral thermal coupling can nevertheless reduce the consequences of 
+flow maldistribution, even when it cannot be avoided altogether. 
+Here we analyze the flow dynamics in the unstable region at applied 
+heat input of q′ = 242 W/m and lateral thermal conductances of Clat = 50 
+W/mK and Clat = 500 W/mK corresponding to the filled triangle in 
+Fig. 3, with all other quantities as specified in Table 1. Fig. 7 plots the 
+transient (a) mass flux and (b) wall temperature for the above conditions 
+when subjected to a perturbation from the uniformly distributed flow 
+state. Both higher lateral thermal conductance (Clat = 500 W/mK) and 
+smaller lateral thermal conductance (Clat = 50 W/mK) cases eventually 
+exhibit flow maldistribution as expected based on the linear stability 
+analysis as shown in Fig. 7(a). However, the heat sink wall temperature 
+dynamics are still affected by lateral thermal coupling, as shown in Fig. 7 
+Fig. 6. Functional dependence of the third eigenvalue λ3 for varying lateral 
+thermal conductance and heat input. There is a shift in the heat input at which 
+the value becomes positions for increasing Clatfrom 0 to ≈ 200 W/mK; however, 
+further increases in Clat ⪆ 300–500 W/mK no longer affect λ3. 
+Fig. 7. Effect of lateral thermal coupling on (a) mass flux maldistribution and 
+(b) wall temperature difference for both high (dotted lines; Clat = 500 W/mK) 
+and low (solid lines; Clat = 50 W/mK) lateral thermal conductance. 
+M.E. Rahman and J.A. Weibel 
+
+International Journal of Heat and Mass Transfer 228 (2024) 125671
+10
+(b). Prior to maldistribution, the wall temperatures are equal for both 
+microchannels. In both cases wall temperature difference between 
+microchannels appears as soon as flow maldistribution occurs. However, 
+the temperature difference between microchannels is more severe for 
+lesser thermal coupling, leading to a higher maximum temperature in 
+the flow-starved channel. The lesser temperature difference between the 
+channels for the higher lateral thermal coupling can be attributed to 
+lateral heat transfer. Therefore, although the parallel system is linearly 
+unstable, causing flow maldistribution, the consequences such as risk of 
+thermal runaway or thermal stressed are nevertheless reduced. 
+4. Conclusions 
+Flow maldistribution in parallel boiling microchannels, and the ef￾fect of lateral thermal coupling, are analyzed using a lumped flow 
+model. A stability analysis performed using the developed model reas￾serts the influence of lateral thermal coupling on flow maldistribution 
+found in earlier studies using more complex numerical flow models. 
+Namely, without thermal coupling, flow maldistribution occurs in par￾allel microchannels for any heat input that causes the subcooled inlet 
+liquid to boil before exiting the channel. With thermal coupling, flow 
+maldistribution can be avoided up to higher heat input thresholds. 
+However, in the limit of very large thermal coupling, it no longer pro￾vides a benefit in terms of linear stability, and there is a critical heat 
+input above which the flow maldistribution occurs regardless of thermal 
+coupling. 
+This asymptotic nature of the maldistribution stability boundary is 
+explained for the first time in this work, owing to the ability to assess the 
+dependency of eigenvalues on thermal coupling using our lumped 
+model. A scaling analysis reveals that two of the eigenvalues are not 
+involved in flow maldistribution. Therefore, the occurrence of flow 
+maldistribution is defined solely by the third eigenvalue. The third 
+eigenvalue is a nonlinear function of the thermal coupling and fluid 
+properties. Scaling analysis shows that in the limit of very high thermal 
+coupling, this eigenvalue is solely dependent on the thermodynamic 
+properties of the fluid. Therefore, the third eigenvalue changes non￾linearly for low thermal coupling, but converges to a single stability 
+threshold in the limit of high coupling, providing the reasoning for the 
+asymptotic shape of the stability boundary. 
+Transient solutions of the lumped models are performed to illustrate 
+the flow and wall temperature dynamics for stable and unstable cases. In 
+the unstable region, the maldistribution between the microchannels is 
+extreme; as a result, the flow-starved microchannel has a higher wall 
+temperature. Although the linear stability confirms that very high lateral 
+coupling cannot entirely avoid maldistribution, the dynamic solutions 
+reveal that there is nevertheless a lesser difference between the wall 
+temperatures of each microchannels in the presence of maldistribution, 
+thereby reducing the consequences of maldistribution. 
+CRediT authorship contribution statement 
+Md Emadur Rahman: Writing – original draft, Methodology, 
+Investigation, Conceptualization. Justin A. Weibel: Writing – review & 
+editing, Supervision, Project administration, Conceptualization. 
+Declaration of competing interest 
+The authors declare that they have no known competing financial 
+interests or personal relationships that could have appeared to influence 
+the work reported in this paper. 
+Data availability 
+Data will be made available on request. 
+References 
+[1] S. Kakac, B. Bon, A Review of two-phase flow dynamic instabilities in tube boiling 
+systems, Int. J. Heat Mass Transf. 51 (2008) 399–433, https://doi.org/10.1016/j. 
+ijheatmasstransfer.2007.09.026. 
+[2] L.E. O’Neill, I. Mudawar, Review of two-phase flow instabilities in macro- and 
+micro-channel systems, Int. J. Heat Mass Transf. 157 (2020) 119738, https://doi. 
+org/10.1016/j.ijheatmasstransfer.2020.119738. 
+[3] S. Paul, S. Paul, M. Fernandino, C.A. Dorao, The overlooked role of pressure 
+oscillations on heat transfer deterioration during self-sustained flow oscillations, 
+Appl. Phys. Lett. 117 (2020) 253701, https://doi.org/10.1063/5.0020361. 
+[4] M.E. Rahman, J.A. Weibel, Mapping the amplitude and frequency of pressure drop 
+oscillations via a transient numerical model to assess their severity during 
+microchannel flow boiling, Int. J. Heat Mass Transf. 194 (2022) 123065, https:// 
+doi.org/10.1016/j.ijheatmasstransfer.2022.123065. 
+[5] M.D. Clark, M.E. Rahman, J.A. Weibel, S.V. Garimella, Effect of thermal 
+capacitance on microchannel heat sink response to pressure drop oscillations, Int. 
+J. Heat Mass Transf. 214 (2023) 124369, https://doi.org/10.1016/j. 
+ijheatmasstransfer.2023.124369. 
+[6] M.E. Rahman, A. Kumar, S. Singh, On the nonlinear characteristics of two-phase 
+flow system as modified Fitzhugh-Nagumo model, Int. J. Heat Mass Transf. 207 
+(2023) 123963, https://doi.org/10.1016/j.ijheatmasstransfer.2023.123963. 
+[7] M.E. Rahman, S. Singh, Pressure drop oscillations with symmetry breakdown in 
+two-phase flow parallel channels, J. Heat Transf. 143 (2021), https://doi.org/ 
+10.1115/1.4049032. 
+[8] M.E. Rahman, S. Singh, Flow excursions and pressure drop oscillations in boiling 
+two-phase channel, Int. J. Heat Mass Transf. 138 (2019) 647–658, https://doi.org/ 
+10.1016/j.ijheatmasstransfer.2019.04.025. 
+[9] A. Miglani, J.A. Weibel, S.V. Garimella, An experimental investigation of the effect 
+of thermal coupling between parallel microchannels undergoing boiling on the 
+Ledinegg instability-induced flow maldistribution, Int. J. Multiph. Flow. 139 
+(2021) 103536, https://doi.org/10.1016/j.ijmultiphaseflow.2020.103536. 
+[10] M. Ledinegg, Instability of flow during natural and forced circulation, Die Warme 
+61 (1938) 891–898. 
+[11] A. Miglani, J.A. Weibel, S.V. Garimella, Measurement of flow maldistribution 
+induced by the Ledinegg instability during boiling in thermally isolated parallel 
+microchannels, Int. J. Multiph. Flow. 139 (2021) 103644, https://doi.org/ 
+10.1016/j.ijmultiphaseflow.2021.103644. 
+[12] D. Bogojevic, K. Sefiane, A.J. Walton, H. Lin, G. Cummins, Two-phase flow 
+instabilities in a silicon microchannels heat sink, Int. J. Heat Fluid Flow. 30 (2009) 
+854–867, https://doi.org/10.1016/j.ijheatfluidflow.2009.03.013. 
+[13] S. Szczukiewicz, N. Borhani, J.R. Thome, Two-phase flow operational maps for 
+multi-microchannel evaporators, Int. J. Heat Fluid Flow. 42 (2013) 176–189, 
+https://doi.org/10.1016/J.IJHEATFLUIDFLOW.2013.03.006. 
+[14] S.H. Yoon, N. Saneie, Y.J. Kim, Two-phase flow maldistribution in minichannel 
+heat-sinks under non-uniform heating, Int. J. Heat Mass Transf. 78 (2014) 
+527–537, https://doi.org/10.1016/j.ijheatmasstransfer.2014.07.013. 
+[15] S.N. Ritchey, J.A. Weibel, S.V. Garimella, Local measurement of flow boiling heat 
+transfer in an array of non-uniformly heated microchannels, Int. J. Heat Mass 
+Transf. 71 (2014) 206–216, https://doi.org/10.1016/j. 
+ijheatmasstransfer.2013.12.012. 
+[16] S.V Garimella, T. Harirchian, Encyclopedia of Thermal Packaging: Volume 1: 
+Microchannel Heat Sinks for Electronics Cooling, World Scientific Publishing 
+Company, 2013, https://doi.org/10.1142/7819-vol1. 
+[17] Y.K. Prajapati, P. Bhandari, Flow boiling instabilities in microchannels and their 
+promising solutions - a review, Exp. Therm. Fluid Sci. 88 (2017) 576–593, https:// 
+doi.org/10.1016/j.expthermflusci.2017.07.014. 
+[18] A.E. Bergles, S.G. Kandlikar, On the nature of critical heat flux in microchannels, 
+J. Heat Transf. 127 (2005) 101–107, https://doi.org/10.1115/1.1839587. 
+[19] S.G. Kandlikar, W.K. Kuan, D.A. Willistein, J. Borrelli, Stabilization of flow boiling 
+in microchannels using pressure drop elements and fabricated nucleation sites, 
+J. Heat Transf. 128 (2006) 389–396, https://doi.org/10.1115/1.2165208. 
+[20] V.Y.S. Lee, T.G. Karayiannis, Influence of system pressure on flow boiling in 
+microchannels, Int. J. Heat Mass Transf. 215 (2023) 124470, https://doi.org/ 
+10.1016/j.ijheatmasstransfer.2023.124470. 
+[21] T. Zhang, J.T. Wen, A. Julius, Y. Peles, M.K. Jensen, Stability analysis and 
+maldistribution control of two-phase flow in parallel evaporating channels, Int. J. 
+Heat Mass Transf. 54 (2011) 5298–5305, https://doi.org/10.1016/j. 
+ijheatmasstransfer.2011.08.013. 
+[22] B.A. Odom, M.J. Miner, C.A. Ortiz, J.A. Sherbeck, R.S. Prasher, P.E. Phelan, 
+Microchannel two-phase flow oscillation control with an adjustable inlet orifice, 
+J. Heat Transf. 134 (2012), https://doi.org/10.1115/1.4007202. 
+[23] K. Akagawa, M. Kono, T. Sakaguchi, M. Nishimura, Study on distribution of flow 
+rates and flow stabilities in parallel long evaporators, Bull. JSME 14 (1971) 
+837–848, https://doi.org/10.1299/jsme1958.14.837. 
+[24] M.D. Clark, J.A. Weibel, S.V. Garimella, Impact of pressure drop oscillations and 
+parallel channel instabilities on microchannel flow boiling and critical heat flux, 
+Int. J. Multiph. Flow. 161 (2023) 104380, https://doi.org/10.1016/J. 
+IJMULTIPHASEFLOW.2023.104380. 
+[25] U. Minzer, D. Barnea, Y. Taitel, Flow rate distribution in evaporating parallel pipes￾modeling and experimental, Chem. Eng. Sci. 61 (2006) 7249–7259, https://doi. 
+org/10.1016/j.ces.2006.08.026. 
+[26] M. Baikin, Y. Taitel, D. Barnea, Flow rate distribution in parallel heated pipes, Int. 
+J. Heat Mass Transf. 54 (2011) 4448–4457, https://doi.org/10.1016/j. 
+ijheatmasstransfer.2011.04.034. 
+M.E. Rahman and J.A. Weibel 
+
+International Journal of Heat and Mass Transfer 228 (2024) 125671
+11
+[27] T. Van Oevelen, J.A. Weibel, S.V. Garimella, Predicting two-phase flow distribution 
+and stability in systems with many parallel heated channels, Int. J. Heat Mass 
+Transf. 107 (2017) 557–571, https://doi.org/10.1016/j. 
+ijheatmasstransfer.2016.11.050. 
+[28] R.D. Flynn, D.W. Fogg, J.-M. Koo, C.-H. Cheng, K.E. Goodson, Boiling flow 
+interaction between two parallel microchannels, in: Proc. ASME Int. Mech. Eng. 
+Congr. Expo. Heat Transf, Chicago 2, ASMEDC, 2006, pp. 317–322, https://doi. 
+org/10.1115/IMECE2006-14696. 
+[29] R. Flynn, C.-H. Cheng, K. Goodson, Decoupled thermal and fluidic effects on 
+hotspot cooling in a boiling flow microchannel heat sink, in: Proc. ASME 
+InterPACK Conf. Collocated with ASME/JSME Therm. Eng. Heat Transf. Summer 
+Conf., ASMEDC, Vancouver, 2007, pp. 179–184, https://doi.org/10.1115/ 
+IPACK2007-33484. 
+[30] T. Van Oevelen, J.A. Weibel, S.V. Garimella, The effect of lateral thermal coupling 
+between parallel microchannels on two-phase flow distribution, Int. J. Heat Mass 
+Transf. 124 (2018) 769–781, https://doi.org/10.1016/j. 
+ijheatmasstransfer.2018.03.073. 
+[31] M.E. Rahman, J.A. Weibel, Influence of convective heat transfer and wall thermal 
+capacity on dynamic interactions between wall temperature and pressure drop 
+oscillations during microchannel flow boiling, Int. J. Heat Mass Transf. 221 (2024) 
+125111, https://doi.org/10.1016/j.ijheatmasstransfer.2023.125111. 
+[32] S.S. Bertsch, E.A. Groll, S.V. Garimella, A composite heat transfer correlation for 
+saturated flow boiling in small channels, Int. J. Heat Mass Transf. 52 (2009) 
+2110–2118, https://doi.org/10.1016/j.ijheatmasstransfer.2008.10.022. 
+[33] The MathWorks Inc, MATLAB version: 9.10 (R2021a), The MathWorks Inc, Natick, 
+Massachusetts, United States, 2021 [Online]. Available: https://www.mathworks. 
+com. 
+M.E. Rahman and J.A. Weibel 

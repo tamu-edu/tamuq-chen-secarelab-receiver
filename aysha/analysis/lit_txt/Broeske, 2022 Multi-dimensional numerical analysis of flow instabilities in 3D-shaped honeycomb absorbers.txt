@@ -1,0 +1,1004 @@
+Solar Energy 247 (2022) 86–95
+Available online 20 October 2022
+0038-092X/© 2022 International Solar Energy Society. Published by Elsevier Ltd. All rights reserved.
+Contents lists available at ScienceDirect
+Solar Energy
+journal homepage: www.elsevier.com/locate/solener
+Multi-dimensional numerical analysis of flow instabilities in 3D-shaped
+honeycomb absorbers
+Robin Tim Broeske a,∗
+, Peter Schwarzbözl b
+, Bernhard Hoffschmidt b
+a DLR, Institute of Solar Research, Prof.-Rehm-Straße 1, 52428 Jülich, Germany
+b DLR, Institute of Solar Research, Linder Höhe, 51147 Köln, Germany
+A R T I C L E I N F O
+Keywords:
+Open volumetric receiver
+Flow stability
+CFD simulation
+Discrete 3D model
+1D LTNE model
+A B S T R A C T
+Considered a valid alternative to other receiver types, open volumetric receivers for central tower power plants
+have been developed and researched for multiple decades. 3D-Shaped absorber geometries, made possible by
+modern manufacturing technologies, particularly offer the promise of high thermal efficiencies. Yet, volumetric
+absorbers carry the inherent risk of flow instabilities, which can lead to a total failure of the receiver due to
+local overheating. Therefore, a numerical, multi-dimensional methodology for the flow stability analysis of
+volumetric absorbers is proposed. The first stage of the methodology applies an 1D LTNE continuum model
+to quantify the general pressure loss characteristic of an absorber and identifies critical pressure drop levels
+with potential for flow instability. These levels are tested as part of the second analysis stage using a discrete
+3D CFD model against different irradiation and flow perturbations. If the absorber is able to compensate the
+disturbances, its flow behavior is deemed stable. Otherwise, the absorber geometry is considered susceptible
+to local overheating due to flow instability.
+The new methodology has been validated against two reference absorbers with known stable resp. unstable
+flow behavior. Further, the new approach was applied to analyze the flow stability of two 3D-shaped
+honeycomb absorber geometries. It was shown that the geometric features of 3D-shaped absorbers can directly
+improve the flow stability, but do not prevent instabilities automatically. Therefore, a flow stability analysis
+should be included in design/optimization processes of new volumetric absorbers alongside a maximization of
+the thermal efficiency.
+1. Introduction
+Open volumetric receivers (OVR) have been developed for more
+than 25 years in parallel to the prevailing molten salt technology as
+a realistic alternative for central receiver power plants on an indus￾trial scale. Most work in the past and recently has been dedicated to
+finding suitable porous structures as volumetric absorbers. However,
+volumetric absorbers carry the risk of flow instabilities, where self￾reinforcing local overheating can lead to total failure of the structure.
+Receiver failures caused by local overheating have been observed dur￾ing experimental tests of different volumetric absorbers in the past (e.g.
+Hoffschmidt, 1997; Buck, 2000; Hoffschmidt et al., 2001). Kribus et al.
+(1996) were the first to show, using a theoretical one-dimensional
+model, the fundamental tendency towards flow instabilities for those
+volumetric absorbers that exhibit a linear dependence of the pressure
+loss on the flow velocity. Hoffschmidt (1997) and Pitz-Paal et al.
+(1997) developed a quasi-three-dimensional, which allowed to model
+∗ Corresponding author.
+E-mail address: robin.broeske@dlr.de (R.T. Broeske).
+1 Within the context of this publication, honeycomb absorber refers to absorber structures characterized by parallel channels (opposed to e.g. porous foams).
+the effects of radial heat transfer and non-homogeneous irradiation
+and included linear and quadratic pressure loss modeling based on
+the Darcy–Forchheimer equation. After the investigation of different
+types of volumetric absorbers, they concluded that absorbers with a
+dominantly quadratic pressure loss exhibit stable flow behavior and
+radial heat transfer reduces the probability of flow instabilities. Buck
+(2000) focussed on flow instability in solar–chemical receiver–reactors.
+They derived that solar–chemical reactors are generally more sus￾ceptible for flow instabilities than volumetric receivers, but different
+design measures aimed at modifying the pressure drop characteristic
+of the reactor can increase the flow stability. Becker et al. (2006)
+utilized a theoretical and a numerical model to study flow stability in
+different porous materials, and identified materials with a high thermal
+conductivity and a predominantly quadratic pressures loss behavior
+as the preferable materials for solar applications. Singh and Chandra
+(2018) analyzed the pressure loss characteristic of an OVR based on
+circular cylinders which showed no tendency for flow instabilities.
+https://doi.org/10.1016/j.solener.2022.10.007
+Received 2 June 2022; Received in revised form 27 July 2022; Accepted 4 October 2022
+
+Solar Energy 247 (2022) 86–95
+87
+R.T. Broeske et al.
+Nomenclature
+Acronyms
+CFD Computational fluid dynamics
+HiTRec High Temperature Receiver
+LTNE Local thermal non-equilibrium
+OVR Open volumetric receiver
+SiSiC Siliconized silicon carbide
+Greek Symbols
+𝛼 Absorptivity (−)
+𝛥𝑝 Pressure loss (Pa)
+𝜀 Emissivity (−)
+𝜅 Heat conductivity ( W
+m K )
+𝜇 Dynamic viscosity (Pa s)
+𝜌 Density ( kg
+m3
+)
+𝝈 (Linear) stress tensor ( N
+m2
+)
+𝜎𝑠𝑏 Stefan–Boltzmann constant ( W
+m2 K4
+)
+𝛹 Viewfactor (−)
+Roman Symbols
+𝐺 Irradiance ( W
+m2
+)
+ℎ Specific enthalpy ( J
+kg )
+𝑰 Unit tensor (−)
+𝐼 Incident irradiance ( W
+m2
+)
+𝐽 Surface radiosity ( W
+m2
+)
+𝐾 Kinetic energy ( J
+kg )
+𝐿 Absorber length (m)
+𝑁 Number of absorber unit cells (−)
+𝑝 Pressure (Pa)
+𝑝
+∗ Normalized pressure loss (−)
+̇𝑞 Heat flux ( W
+m2
+)
+𝑇 Temperature (K)
+𝑇
+∗ Normalized outlet temperature (−)
+𝒖 Velocity vector ( m
+s
+)
+𝑊 Width (m)
+Subscripts
+abs Absorber
+air Air
+ap Aperture
+cond Conduction
+f Fluid
+in Inlet
+k Radiation index
+lvl Level
+max Maximum
+out Outlet
+r Radiative
+s Solid
+sec Section
+sol Solar
+surf Surface
+tot Total
+Aiming at improving the thermal efficiency of open volumetric
+receivers, recent research focuses on 3D-shaped volumetric absorbers,
+but these absorbers have yet to be investigated with regards to flow
+stability. However, a flow stability analysis should be part of the
+design process of new 3D-shaped absorbers, because improved thermal
+efficiencies generally lead to more unstable flow behavior as shown
+by Hoffschmidt (1997). 3D-Shaped absorbers are volumetric structures
+where the geometry purposefully varies along the main flow direction.
+As a result, important absorber characteristics (e.g. the porosity) also
+change throughout the absorber, potentially improving the thermal
+efficiency. Investigated 3D-shaped absorbers include layered ceramic
+foams (Roldán et al., 2014; Chen et al., 2015; Zaversky et al., 2018),
+metal wire meshes (Ávila-Marín et al., 2018), stacked metal sheet
+absorbers (Pabst et al., 2017; Broeske et al., 2022), and honeycomb
+absorbers1
+(Gomez-Garcia et al., 2015; Alberti et al., 2016; Cagnoli
+et al., 2016; Capuano et al., 2017; Broeske et al., 2022). The listed
+studies represent only an excerpt of the research in the field of open
+volumetric receivers, more information on the development of the
+OVR technology can be found in the reviews by Ávila-Marín (2011)
+and Lipiński et al. (2021).
+A new two-stage methodology is introduced within this publication
+specifically designed for the investigation of 3D-shaped volumetric
+absorbers’ flow stability. For the first time, a discrete three-dimensional
+CFD model is used to analyze flow instability as part of the new
+methodology, which includes lateral radiative and conductive heat
+transfer between absorber unit elements. By applying the methodology
+to 3D-shaped honeycomb absorbers, it is demonstrated how volumetric
+absorbers can be directly designed to improve their flow stability.
+2. Methodology
+The new approach to investigate flow instability in volumetric
+absorbers is divided into two stages. First, a fast, one-dimensional con￾tinuum model is used to analyze the general pressure loss characteristic
+of an absorber structure. From the pressure drop characteristic, pressure
+drop levels with potential for flow instability are identified, which are
+further examined in the second analysis stage. By employing a three￾dimensional CFD model, the flow behavior of an absorber geometry is
+tested against irradiation and flow perturbations in order to determine
+if the volumetric absorber operates stably at the selected levels.
+2.1. First stage - 1D continuum model
+Volume-averaged methods, also called continuum models, are com￾mon approaches for the simulation of volumetric absorber geometries.
+Opposed to unit cell models (cf. Section 2.2), the absorber geometry
+is not directly modeled by the continuum approach. Rather, the heat
+transfer and flow mechanisms are governed by equations relying on
+effective properties. These properties (e.g. convective heat transfer
+coefficients) are determined experimentally or calculated from auxil￾iary numerical simulations. The review by Ávila-Marín et al. (2019)
+gives a thorough summary of the different continuum models used
+for the simulation of volumetric absorbers. With an one-dimensional,
+local thermal non-equilibrium (LTNE) continuum model previously
+developed by the authors (Broeske et al., 2022), the general pressure
+loss characteristic of the investigated absorbers is evaluated. Detailed
+information about the 1D model, e.g. on the governing equations, the
+boundary conditions and the radiation modeling, can be found in the
+previous publication by the authors (Broeske et al., 2022).
+Based on the studies by Pitz-Paal et al. (1997) and Becker et al.
+(2006), flow instabilities can occur if a single pressure drop level is
+associated with multiple air outlet temperature values. Such a pressure
+drop level would enable the absorber structure to reach different tem￾perature levels locally compared to the overall operating point of the
+OVR. If one of the associated temperature values is above the maximum
+allowable temperature of the absorber material, structural failure of the
+absorber due to local overheating becomes possible.
+The pressure drop characteristic of each investigated absorber is
+derived by running simulations with the continuum model for a wide
+
+Solar Energy 247 (2022) 86–95
+88
+R.T. Broeske et al.
+range of different massflow density values. For the evaluation, a nor￾malized air outlet temperature 𝑇
+∗ and a normalized pressure loss 𝑝
+∗ are
+introduced as defined by Pitz-Paal et al. (1997):
+𝑇
+∗ =
+𝑇𝑓,𝑜𝑢𝑡 − 𝑇𝑖𝑛
+𝑇𝑖𝑛
+(1)
+𝑝
+∗ =
+𝑝
+2
+𝑖𝑛 − 𝑝
+2
+𝑜𝑢𝑡
+𝑝𝑖𝑛
+𝜇𝑖𝑛
+𝜌𝑖𝑛𝐿𝐼𝑎𝑝
+× 108
+(2)
+The normalization is based on the incident solar irradiation 𝐼𝑎𝑝, the
+absorber depth 𝐿, and the inlet pressure 𝑝𝑖𝑛 and temperature 𝑇𝑖𝑛. The
+normalized pressure loss is expected to fall monotonically with an in￾creasing normalized outlet temperature for stable volumetric absorbers.
+Accordingly, the characteristics of absorbers with potential for flow
+instability would show regions with non-monotonic behavior. Within
+these regions, pressure drop levels associated with multiple outlet
+temperatures can be identified. These pressure drop levels are then
+selected for the second stage of the analysis.
+2.2. Second stage - 3D CFD model
+The continuum model used for the first analysis stage is based on
+the central assumption of a laterally uniform flux and temperature
+distribution allowing the reduction to one dimension. However, flow
+instabilities in volumetric absorbers are specifically associated with
+non-uniform flux and flow conditions (cf. Pitz-Paal et al., 1997; Becker
+et al., 2006). A three-dimensional CFD model is therefore adopted as
+the second stage of the instability analysis. Similar to volume-averaged
+approaches, 3D CFD models are often used for the calculation of the
+thermal efficiency of absorber geometries (cf. Ávila-Marín et al., 2019).
+In order to limit the needed computation time, uniform behavior is
+generally assumed again for the efficiency calculation and the absorber
+geometries are reduced to so called ‘‘unit cells’’, the smallest represen￾tative elements (e.g. a single channel for honeycomb absorbers). This
+assumption is dropped for the flow stability analysis and a horizontal
+row of 𝑁𝑡𝑜𝑡 unit cells is simulated instead of a single absorber unit cell.
+The details of the 3D CFD model are shown in Appendix.
+For each pressure drop level selected during the first stage, a series
+of simulations with the stationary 3D model are conducted. Through
+the introduction of disturbances, the flow behavior of the absorber
+geometry is tested w.r.t. its stability similar to the numeric model
+by Becker et al. (2006). First, a reference case with an uniform incident
+solar irradiation and an uniform pressure drop for all absorber channels
+is calculated. Constant, uniform temperature distributions are used
+as the initial values. For the introduction of the perturbations, the
+row of absorber unit cells is divided into three horizontal sections
+(similar to Pitz-Paal et al., 1997), each containing 𝑁𝑠𝑒𝑐 unit cells.
+Both, irradiation and flow perturbations are tested mimicking non￾homogeneous conditions caused by e.g. cloud-passages or a temporary
+blockage of absorber channels. Starting again from uniform tempera￾ture distributions, a solution with an active irradiation disturbance is
+created by increasing the incident solar irradiation for the left section,
+reducing the irradiation for the right section, while using the base
+flux level for the middle section. This solution is then applied as the
+starting value for another simulation, where the incident irradiation
+is reverted to the homogeneous distribution of the base case for all
+sections. Similarly, a solution with an active flow disturbance is created
+starting from uniform temperature distributions. Instead of setting a
+uniform pressure drop for the absorber channels, massflow density
+levels are enforced for each section. For the middle and right section,
+the massflow density is set to the value of the base case solution. The
+left section is assigned a significantly lower massflow density simulat￾ing a (partial) blockage. The resulting solution is used as the starting
+value for another simulation, where the flow disturbance is reverted by
+prescribing the uniform pressure drop of the base case again. For the
+final two simulations, simultaneous irradiation and flow perturbations
+are considered. An overview of the simulation cases is given in Table 1,
+Table 1
+Overview of the different 3D simulation cases.
+Case Start values Disturbed Disturbed
+irradiation flow
+Base constant values No No
+Ir-A constant values Yes No
+Ir-D Ir-A No No
+Fl-A constant values No Yes
+Fl-D Fl-A No No
+Ir+Fl-A constant values Yes Yes
+Ir+Fl-D Ir+Fl-A No No
+a suffix ‘‘A’’ indicates a simulation with active perturbation and a suffix
+‘‘D’’ a simulation with deactivated perturbation.
+Based on the results by Becker et al. (2006), the irradiation and flow
+disturbances should not have any effect on the calculated solutions for
+stable absorber geometries. The simulations with deactivated perturba￾tions are therefore expected to converge to the solution of the base case
+for stable absorbers. The results for volumetric absorbers with potential
+for flow instabilities are anticipated to vary between the base case and
+the perturbed cases.
+3. Results
+3.1. Reference absorbers
+In order to validate the new methodology, two monolithic hon￾eycomb absorbers have been selected for the first simulation series.
+The HiTRec absorber is manufactured out of siliconized silicon carbide
+(SiSiC) and consists of simple, square channels with a channel width
+of 2.0 mm and a wall strength of 0.8 mm (Hoffschmidt, 1997). The
+HiTRec absorber has been continuously proven to be a robust volu￾metric absorber without any known flow stability issues throughout
+experiments (e.g. Hoffschmidt et al., 2003) and the operation of the
+Solar Tower Jülich demonstration power plant (Koll et al., 2009).
+The second design, the CorRec absorber, has exhibited stability issues
+during experimental testing, which even lead to local melting of the
+absorber structure (Hoffschmidt et al., 2001; Fend et al., 2004). Similar
+to the HiTRec design, the CorRec absorber is also composed of square
+channels, but has a channel width of 1.12 mm and a wall strength of
+0.13 mm and is made out of the ceramic material Cordierit (Hoffschmidt,
+1997). The finer channels and thus higher porosity of CorRec design
+indicate a more linear pressure drop behavior compared to the less
+porous HiTRec absorber, which in combination with the significantly
+lower heat conductivity of Cordierit compared to SiSiC can explain
+the tendency towards flow instability (cf. Pitz-Paal et al., 1997; Becker
+et al., 2006). The aim of the first simulation series is to show that the
+new methodology can correctly depict the stable resp. unstable flow
+behavior of the two honeycomb absorbers.
+Aperture2
+(normal) irradiance levels of 𝐼𝑎𝑝 = 0.5
+MW
+m2
+, 1.0
+MW
+m2
+and
+1.5
+MW
+m2
+are considered, where the average angle of the incident ra￾diation is parallel to the main axis of the absorber channels and the
+maximum opening angle is 15°. The ambient pressure 𝑝𝑖𝑛 and temper￾ature 𝑇𝑖𝑛 are set to 101 325 Pa and 100 °C. As the first stage of the flow
+stability analysis, simulations with varying massflow densities were
+carried out using the 1D continuum model for each flux level and both
+geometries. The resulting normalized pressure loss 𝑝
+∗
+(Eq. (2)) values
+are plotted over the normalized outlet temperatures 𝑇
+∗
+(Eq. (1)) in
+Fig. 1.
+As seen in the zoomed, right view in Fig. 1, the CorRec absorber
+exhibits areas with a non-monotonous pressure loss behavior for all
+2 Within the context of this publication, the aperture is defined as the plane
+containing the absorber front.
+
+Solar Energy 247 (2022) 86–95
+89
+R.T. Broeske et al.
+Fig. 1. Stage 1 results — normalized pressure loss over normalized outlet temperature for the HiTRec and CorRec absorbers (left plot: full pressure loss range; right plot: zoomed
+view of the critical zones for the CorRec absorber).
+Table 2
+Pressure loss levels selected for the second stage of the flow stability analysis.
+Level Absorber 𝐼𝑎𝑝 [
+MW
+m2
+] 𝑝
+∗
+𝑙𝑣𝑙 [−] 𝛥𝑝𝑙𝑣𝑙 [Pa]
+1
+CorRec
+0.5 19.0 82.0
+2 1.0 19.4 168.0
+3 1.5 21.3 257.5
+4 1.0 19.8 184.0
+5 HiTRec 1.5 8.75 113.5
+three flux density levels. Within these regions, three different outlet
+temperature levels correspond to the same pressure loss value, a clear
+indicator for unstable flow behavior. For the two higher flux levels,
+the highest temperatures of the unstable regions extend beyond the
+maximum temperature of 1200 °C for Cordierit (Hoffschmidt, 1997),
+which is indicated by the left dashed line in Fig. 1, demonstrating the
+danger for overheating. Oppositely, the results for the HiTRec geometry
+show a monotonously decreasing pressing loss with increasing outlet
+temperatures. Therefore, the model predicts no instability problems for
+the HiTRec absorber.
+Five pressure drop levels (Table 2) have been selected for the
+second stage of the flow stability analysis as indicated by the horizontal
+dashed lines in Fig. 1. One pressure drop value was chosen for each of
+the instability regions for the CorRec absorber. Additionally, a fourth
+pressure drop level was selected for 𝐼𝑎𝑝 = 1.0
+MW
+m2
+, which is expected to
+correspond to stable operating point for the CorRec absorber similar to
+the pressure value picked for the HiTRec design.
+For each pressure drop level, seven 3D simulations as defined in
+Table 1 have been carried out. The irradiation and flow perturbations
+were implemented as described in Section 2.2 and a horizontal row of
+twenty four absorber channels was considered for both geometries (cf.
+Section 3.2). The 3D simulation results are presented in Fig. 2. Each row
+corresponds to one simulation, showing normalized outlet temperatures
+based on massflow-weighted averages for the left, mid, and right third,
+and for all 24 channels.
+All five base cases show homogeneous outlet temperatures as is
+expected for the uniform irradiation and press drop boundary condi￾tions. For cases with active disturbances (‘‘Ir-A’’, ‘‘Fl-A’’, ‘‘Ir+Fl-A’’),
+the normalized temperatures vary for the three sections, showing the
+effect of the applied perturbations. The behavior of the cases with the
+deactivated disturbances (‘‘Ir-D’’, ‘‘Fl-D’’, ‘‘Ir+Fl-D’’) however differs
+between the HiTRec and CorRec absorber. For the HiTRec design, the
+three cases with deactivated disturbances yield a homogeneous outlet
+temperature distribution again, which matches the results of the base
+case. This corresponds to the behavior expected for stable volumetric
+absorbers. The CorRec design only shows a stable behavior for the
+pressure drop of 𝛥𝑝 = 184.0 Pa and 𝐼𝑎𝑝 = 1.0
+MW
+m2
+. The results for the
+Fig. 2. Stage 2 results — normalized outlet temperatures for the 3D simulation cases
+for the HiTRec and CorRec absorbers.
+pressure drop levels selected based on the non-monotonous regions in
+Fig. 1 instead show clear unstable flow behavior. Despite deactivated
+perturbations, i.e. despite uniform irradiation and uniform pressure
+boundary conditions, the outlet temperatures still vary significantly
+between the three sections.
+The different flow behavior between the HiTRec and CorRec ab￾sorbers is further illustrated by Figs. 3 and 4. Each figure shows the
+solid surface temperature distributions for the base case, the case with
+an active combined perturbation (‘‘Ir+Fl-A’’) and the continued case
+with the deactivated perturbation (‘‘Ir+Fl-D’’). The HiTRec absorber
+successfully compensates the temperature increase in the left-most
+section caused by the applied disturbance, but a notable increase
+remains for the CorRec design. Concluding, the presented methodology
+
+Solar Energy 247 (2022) 86–95
+90
+R.T. Broeske et al.
+Fig. 3. Stage 2 results — 3D view of the solid surface temperature distributions for
+selected simulation cases for the HiTRec absorber (𝐼𝑎𝑝 = 1.5
+MW
+m2 & 𝛥𝑝 = 113.5 Pa).
+Fig. 4. Stage 2 results — 3D view of the solid surface temperature distributions for
+selected simulation cases for the CorRec absorber (𝐼𝑎𝑝 = 1.5
+MW
+m2 & 𝛥𝑝 = 257.5 Pa).
+correctly evaluates the flow behavior as stable for the HiTRec absorber
+and unstable for the CorRec absorber.
+3.2. Result independence
+With the aim of demonstrating the robustness of the presented flow
+stability analysis, the key numeric parameters of the second analysis
+stage, the number of simulated absorber unit cells and the introduced
+irradiation and flow disturbances, are investigated as part of the next
+sets of simulations.
+Number of simulated absorber unit cells
+Through numerical simulations, Hoffschmidt (1997) showed that
+the tendency towards flow instability of a volumetric absorber module
+is related to the ratio of its length/depth 𝐿 to its width 𝑊 . The
+cross-sections relevant for lateral heat transfer are directly proportional
+to the absorber depth, while the distance over which disturbance
+have to be compensated is proportional to the absorber width. As a
+consequence, Hoffschmidt concluded that an absorber’s flow stability
+generally increases3 with an increasing ratio 𝐿
+𝑊
+. All absorbers inves￾tigated within this publication have a fixed length of 𝐿 = 40 mm.
+However, the simulated absorber width directly depends on the number
+of simulated absorber unit cells. To test this dependency, the 3D
+simulations for the HiTRec and CorRec absorber for a flux level of
+1.5 MW from the previous section were repeated for varying numbers
+of absorber unit cells. The resulting normalized outlet temperatures are
+shown in Fig. 5.
+For the HiTRec absorber geometry, the base case and the cases with
+a combined irradiation and flow disturbance were carried out for one,
+three, eight and seventeen absorber channels per each of the three
+evaluation sections. The same disturbances, i.e. the same massflow
+3 The pressure drop characteristic of an absorber is also affected by a
+change of the absorber depth, which could potentially counteract the increased
+flow stability.
+Fig. 5. Stage 2 results — normalized outlet temperatures for different numbers of unit
+cells for the HiTRec and CorRec absorbers (𝐼𝑎𝑝 = 1.5
+MW
+m2
+, 𝛥𝑝 = 113.5 Pa for HiTRec,
+𝛥𝑝 = 257.5 Pa for CorRec).
+reductions and irradiation changes, were applied for all simulations.
+The maximum of 51 total channels corresponds to a physical width
+142.8 mm slightly larger than the width of 140 mm of a standard HiTRec
+absorber module, which is considered as the maximum relevant width.
+As expected based on the observations by Hoffschmidt (1997), the
+impact of the active disturbances (cases ‘‘Ir+Fl-A’’) increases with a
+growing number of absorber unit cells. However, the HiTRec absorber
+is able to negate the effect of the perturbations successfully after their
+deactivation (cases ‘‘Ir+Fl-D’’) clearly indicating a stable flow behavior.
+The simulations of the CorRec absorber were repeated for one, three
+and eight channels per section with a maximum simulated physical
+width of 30 mm.
+Compared to HiTRec, a significantly greater influence of the dis￾turbances can be observed despite the smaller corresponding physical
+width. In the case of 𝑁𝑠𝑒𝑐 = 1, the three simulated absorber channels
+show homogeneous outlet temperatures, but the outlet temperature
+level is changed even after the deactivation of the perturbation com￾pared to the base cases. This illustrates that the CorRec design is able to
+homogenize perturbations over the small width of three channels, but
+the perturbation can change the operating point of the whole absorber
+due to its unstable flow behavior. For 𝑁𝑠𝑒𝑐 = 8, the CorRec absorber
+cannot compensate the disturbance, the evaluations section maintain
+their non-uniform outlet temperatures. Even larger configurations do
+not need to be investigated as the effect of the flow instability only
+increases with the simulated width.
+The general approach of the flow stability analysis should include
+the simulation of an increasing number of absorber channels until
+either a clear indicator for flow instabilities is found (e.g. CorRec) or
+stable behavior is observed even for the largest relevant physical width
+(e.g. HiTRec).
+Irradiation and flow disturbances
+The irradiation and flow disturbances are meant to test the volumet￾ric absorbers against non-homogeneous conditions caused by e.g. cloud￾passages or a temporary blockage of absorber channels. The numerical
+
+Solar Energy 247 (2022) 86–95
+91
+R.T. Broeske et al.
+Table 3
+Overview of the tested disturbance configurations.
+Set Initial values Irradiation Disturbed
+𝑇𝑓
+[K] 𝑇𝑠
+[K] disturbance section (flow)
+1 800.00 1000.00 ±10% Left
+2 373.15 473.15 ±3% Left + mid
+3 373.15 1200.00 ±5% Left + right
+implementation of the perturbations however offers a number of de￾grees of freedom, e.g. the strength of the irradiation change or the
+scope of the massflow reduction. Three sets with different perturbations
+were therefore tested to analyze the influence on the flow stability
+analysis. The first set of simulations corresponds to the simulations
+shown in Section 3.1 (𝐼𝑎𝑝 = 1.5
+MW
+m2
+). For the other two sets the form
+of the irradiation disturbance (cases ‘‘Ir-A’’) was kept the same, i.e. an
+increased flux level for the left section, an unchanged level for the mid
+section, and a decrease for the right section. However, the strength of
+the irradiation change was reduced from ±10 % for set 1 to ±3 % for set
+2 and ±5 % for set 3. As described in Section 2.2, the flow disturbance
+for the first simulation set consists of a significant reduction of the
+massflow through the left-most section while keeping the base case
+massflow level for the other two sections. For the second simulation
+series, the massflow reduction is applied to the left and mid section
+and only the right section is kept at the base level. The third flow
+disturbance is created through a massflow reduction for the left section,
+a massflow increase for the right section and the base level for the mid
+section. The uniform initial temperature distributions used for the base
+cases and the cases with active perturbations are also modified between
+the three sets as shown in Table 3.
+In Fig. 6, the normalized outlet temperatures are presented for the
+different perturbation sets for both absorber geometries. The HiTRec
+absorber consistently compensates all disturbances and always con￾verges towards the base operating point after the deactivation of the
+disturbances. The temperature distributions for the CorRec absorber
+differ for the three simulation sets, but all show the apparent unstable
+flow behavior of the CorRec design. The goal of the presented flow
+stability analysis is to determine if an absorber geometry exhibits
+the tendency towards flow instability or not rather than simulating a
+specific unstable scenario. All tested perturbation configurations are
+equally suitable to test an absorber’s stability as seen in Fig. 6.
+3.3. 3D-shaped absorbers
+The presented methodology was developed with the aim of assess￾ing the flow stability of 3D-shaped volumetric absorbers. 3D-Shaped
+absorbers are characterized by intentional changes in their geometry
+along the flow direction. In particular, 3D-shaped honeycomb absorbers
+often have openings in the channel walls, which allow lateral energy
+exchange via radiation or interchanging air flow on top of the lateral
+heat conduction within the solid absorber. To investigate the influence
+of such geometric features on the flow stability, two 3D-shaped adapta￾tions of the CorRec absorber were created. A single absorber channel for
+each is shown in Fig. 7. The first design, the CorStep absorber, is based
+on the StepRec absorber investigated in a previous publication (Broeske
+et al., 2022).
+The StepRec absorber contains three steps of increasing width at
+the absorber front, which allow for a deeper penetration of the inci￾dent solar radiation and improve the thermal efficiency. The CorStep
+absorber is given a single step with a length of 5 mm and a width equal
+to half the channel width. The idea of the short step is to keep the
+pressure loss characteristic of the CorStep absorber close to the one
+of the original CorRec geometry, while still enabling the investigation
+of the effect of the open channel walls on the flow stability. The step
+is only added in the horizontal direction, so that the 3D stage of the
+analysis can again be limited to a horizontal row of absorber channels
+Fig. 6. Stage 2 results — normalized outlet temperatures for different configurations
+of irradiation/flow disturbances for the HiTRec and CorRec absorbers (𝐼𝑎𝑝 = 1.5
+MW
+m2
+,
+𝛥𝑝 = 113.5 Pa for HiTRec, 𝛥𝑝 = 257.5 Pa for CorRec).
+Fig. 7. Unit cell models for the CorStep and CorWin absorbers.
+instead of a full square. The second adaption, CorWin, adds four
+alternating windows to the downstream half of the absorber channel.
+As seen in Fig. 4, the effect of the perturbations, which the CorRec
+absorber cannot compensate for, is notably focused in the deeper half
+of the absorber channels. The four windows are added in an alternating
+pattern into the right and left side walls of the absorber channels. This
+makes a direct radiative energy exchange between channels and their
+second next neighbors possible and potentially reduces the effect of the
+perturbations. The wall strength, channel width and heat conductivity
+are kept unchanged from the original CorRec design (cf. Section 3.1).
+
+Solar Energy 247 (2022) 86–95
+92
+R.T. Broeske et al.
+Fig. 8. Stage 1 results — normalized pressure loss over normalized outlet temperatures
+for the CorStep and CorWin absorbers.
+Fig. 9. Stage 2 results — normalized outlet temperatures for the 3D simulation cases
+for the CorStep and CorWin absorbers compared to the CorRec results.
+The results of the continuum model simulations for the CorStep
+and CorWin absorbers are given in Fig. 8. The same incident solar
+radiation cases as in Section 3.1 were considered. Similar to the CorRec
+results (cf. Fig. 1), both designs show zones of non-monotonous press
+loss behavior signaling potential for flow instability. Therefore, one
+pressure drop level per geometry and 𝐼𝑎𝑝 = 1.5
+MW
+m2 were selected for the
+3D stage of the flow stability analysis. As for lateral heat conduction,
+the effect of energy exchange across channel openings on flow stability
+can only be assessed via the second 3D stage, because the continuum
+model assumes laterally uniform temperature distributions. For the
+CorStep absorber, a new pressure drop level 𝑝
+∗
+𝑙𝑣𝑙,6
+= 19.6 (𝛥𝑝𝑙𝑣𝑙,6 =
+255.0 Pa) close to the level of the CorRec absorber (𝑝
+∗
+𝑙𝑣𝑙,3
+) is used due to
+the similar pressure loss characteristics. A seventh pressure loss level
+𝑝
+∗
+𝑙𝑣𝑙,7
+= 18.5 (𝛥𝑝𝑙𝑣𝑙,7 = 240.5 Pa) has been selected for the CorWin
+geometry.
+In Fig. 9, the normalized outlet temperatures for the different
+channel sections are presented for the base cases and the cases of a
+combined irradiation and flow perturbation. Perturbations similar to
+the simulations of CorRec absorber were applied, the corresponding
+outlet temperatures for the CorRec design are repeated in Fig. 9. The
+solid surface temperature distributions for the CorStep absorber are
+Fig. 10. Stage 2 results — 3D view of the solid absorber temperature distribution for
+selected simulation cases for the CorStep absorber (𝐼𝑎𝑝 = 1.5
+MW
+m2 & 𝛥𝑝 = 255.0 Pa).
+Fig. 11. Stage 2 results — 3D view of the solid surface temperature distributions for
+selected simulation cases for the CorWin absorber (𝐼𝑎𝑝 = 1.5
+MW
+m2 & 𝛥𝑝 = 240.5 Pa).
+given by Fig. 10 and for the CorWin absorber by Fig. 11. Overall, the
+CorStep absorber shows the similarly unstable flow behavior compared
+to the original CorRec design. However, the CorWin absorber achieves
+homogeneous outlet temperatures even for the case with an active
+disturbance (‘‘Ir+Fl-A’’), as only the upstream half without the windows
+is affected. But, the unstable flow characteristic causes the operating
+point of all 24 channels to change for the case with the deactivated
+disturbance (‘‘Ir+Fl-D’’) despite the homogeneous outlet temperatures.
+The results for the two 3D-shaped absorbers lead to the expectation
+that further modification, e.g. a combination of the two designs, could
+yield a stable volumetric absorbers even with the low heat conductivity
+of Cordierit.
+4. Discussion
+The presented flow stability analysis methodology was shown to be
+able to correctly identify the flow behavior of the HiTRec absorber as
+stable and the CorRec absorber’s behavior as unstable. The numeric
+simulation results therefore match the observations made during exper￾iments in the past by Hoffschmidt et al. (2001) and Fend et al. (2004).
+This also has to serve as the validation of the new approach due to the
+lack of further, appropriate experimental data.
+As seen by the two pressure drop levels which were investigated
+for the CorRec design at 𝐼𝑎𝑝 = 1.0
+MW
+m2
+, the flow instabilities only occur
+within certain, critical pressure loss regions (𝛥𝑝𝑙𝑣𝑙,2 = 168.0 Pa). Outside
+of these zones (𝛥𝑝𝑙𝑣𝑙,4 = 184.0 Pa), the flow behavior of the CorRec
+absorber appears as stable. Thus, the first step of the flow analysis
+is necessary to identify these critical pressure loss levels. In turn, the
+second stage using the 3D CFD model is required to correctly assess
+the influence of lateral energy exchange on flow stability. The general
+pressure loss characteristic for the CorRec (Fig. 1) and the CorStep
+(Fig. 8) absorbers exhibit similar critical, non-monotonous regions. But,
+the open channel walls of the CorStep design make it better suited
+to compensate non-homogeneous temperature distribution associated
+
+Solar Energy 247 (2022) 86–95
+93
+R.T. Broeske et al.
+with flow instability (cf. Fig. 9), which can only be observed via the
+3D CFD model.
+In accordance with the results of Hoffschmidt (1997), the likelihood
+of flow instability was seen to increase for an increasing width of the in￾vestigated absorber segment (cf. Fig. 5). The considered absorber width
+is directly proportional to the number of simulated absorber unit cells
+during the second analysis stage. Therefore, a robust analysis should
+include simulations of an increasing number of absorber channels until
+either a clear indicator for flow instabilities is found or stable behavior
+is observed even for the largest relevant physical width.
+The implementation of the irradiation and flow stability distur￾bances offer a number of degrees of freedom to chose the actual
+disturbance against which the volumetric absorbers are tested against.
+All configurations considered for this publication appeared equally
+suited to evaluate the flow stability (cf. Fig. 6). However, it is difficult
+to directly assess how likely a concrete perturbation is to occur in a
+real open volumetric receiver. In the numerical analysis, the HiTRec
+absorber, which is known to be stable based on experiments and
+the operation of the Solar Tower Jülich, is able to compensate even
+the stronger perturbations, e.g. an irradiation disturbance of ±10 % at
+𝐼𝑎𝑝 = 1.5
+MW
+m2
+across a few absorber channels. Therefore, it is deemed
+advantageous to intentionally select strong disturbances in order to
+prevent an underestimation of flow instabilities, while using the HiTRec
+absorber as the benchmark for stable volumetric absorbers.
+5. Conclusion and outlook
+A new, numerical methodology for the flow stability analysis of
+volumetric absorbers has been developed. The first stage of the method￾ology applies an 1D LTNE continuum model to quantify the general
+pressure loss characteristic of an absorber and identifies critical pres￾sure drop levels with potential for flow instability. These levels are
+tested as part of the second analysis stage using a discrete 3D CFD
+model against different irradiation and flow perturbations. If the ab￾sorber is able to compensate the disturbances even for the critical
+pressure drop levels, its flow behavior is deemed stable. Otherwise, the
+absorber geometry is considered susceptible to flow instability.
+The new methodology has been validated for two reference ab￾sorbers with known stable resp. unstable flow behavior. Further, the
+new approach was applied to analyze the flow stability of two 3D￾shaped honeycomb absorber geometries. It was shown that the ge￾ometric features of such 3D-shaped absorbers can directly improve
+the flow stability, but do not prevent instability. Therefore, a flow
+stability analysis should be included in design/optimization processes
+of new volumetric absorbers alongside a maximization of the thermal
+efficiency. The new simulation approach was specifically created for
+this purpose. However, this cannot not directly replace the experimen￾tal evaluation of the flow stability, more experimental data would be
+particularly useful for 3D-shaped absorber designs. As the next steps,
+the presented methodology is planned to be further tested for and to
+be applied to more complex 3D-shaped volumetric absorber geometries.
+Declaration of competing interest
+The authors declare the following financial interests/personal rela￾tionships which may be considered as potential competing interests:
+The research institution at which this work has been conducted (DLR)
+holds a number of patents in relation to the topic of this publication
+(volumetric air receivers, ‘‘HiTRec’’ vol. air receiver technology) in￾cluding: DE10029940C1, DE19740644C2, DE112017002386A5. Some
+of the patents have been licensed (non-exclusively) to the company
+Kraftanlagen München GmbH.
+Acknowledgments
+This work was supported by the German Federal Ministry for Eco￾nomic Affairs and Energy on the basis of a decision by the German
+Bundestag, reference number 0324300B.
+Appendix. 3D CFD model details
+While Section 2.2 focused on the specific modeling of the flow insta￾bilities, the different components of the 3D CFD model are explained in
+this Appendix. The model is implemented within the open-source CFD
+software OpenFOAM® (2022). The majority of the model was already
+available in OpenFOAM, only the main boundary condition (Eq. (A.4))
+had to be added. The raytracing software which is used for the simula￾tion of the incident solar irradiation is not part of OpenFOAM, but was
+developed at the German Aerospace Center in the past.
+Governing equations
+The air flow is modeled based on the stationary, laminar and com￾pressible Navier–Stokes equations, which in general vector notation are
+given by (based on Schröder, 2010):
+⎧
+⎪
+⎨
+⎪
+⎩
+𝛁 ⋅ (𝜌𝒖) = 0
+𝛁 ⋅
+(
+𝜌𝒖𝒖𝑇
+)
+= −𝛁𝑝 + 𝛁 ⋅ 𝝈
+𝛁 ⋅ (𝜌𝒖ℎ) + 𝛁 ⋅ (𝜌𝒖𝐾) = 𝛁 ⋅ (𝝈 ⋅ 𝒖) + 𝛁 ⋅
+(
+𝜅𝑓𝛁𝑇𝑓
+)
+(A.1)
+Here, 𝒖 is the velocity vector, 𝐾 =
+1
+2
+𝒖 ⋅ 𝒖 denotes the (specific) kinetic
+energy and 𝝈 the linear stress tensor for Newtonian fluids:
+𝝈 = −
+2
+3
+𝜇𝛁 ⋅ 𝒖𝑰 + 𝜇
+(
+𝛁𝒖 + (𝛁𝒖)
+𝑇
+)
+(A.2)
+The Navier–Stokes equations are solved for the void volume of the
+horizontal row of absorber unit cells plus an (empty) entry region in
+front of the channels. The air density is modeled using the ideal gas law,
+while temperature and pressure dependent functions are implemented
+based on data from Stephan et al. (2013) for the other air properties.
+For the solid absorber volume of the unit cell row, a general heat
+conduction equation (e.g. Baehr and Stephan, 2006) is solved for the
+solid temperature field 𝑇𝑠
+:
+0 = 𝛁 ⋅
+(
+𝜅𝑠𝛁𝑇𝑠
+)
+(A.3)
+Temperature-dependent experimental data from the German Aerospace
+Center is used for the heat conductivity of SiSiC, while the heat con￾ductivity of Cordierit is set based on data from Hoffschmidt (1997).
+The differential equations are solved using the finite volume method
+as implemented by OpenFOAM. Second-order, upwind-biased solution
+schemes are used for the air flow simulation and second order central
+differencing schemes for the solid heat conduction.
+Boundary conditions
+The different components of the 3D model are connected with each
+other through an energy balance for the absorber surface areas:
+0 = ̇𝑞𝑐𝑜𝑛𝑑,𝑎𝑏𝑠 + ̇𝑞𝑐𝑜𝑛𝑑,𝑎𝑖𝑟 + ̇𝑞𝑠𝑜𝑙 − ̇𝑞𝑟
+(A.4)
+The energy balance is used to calculate the distribution of the surface
+temperature 𝑇𝑠𝑢𝑟𝑓 , which is then applied as a fixed value boundary
+condition for both volumetric regions, i.e. for the simulation of the air
+flow and the simulation of the heat conduction within the absorber.
+The derivation of he absorbed solar flux ̇𝑞𝑠𝑜𝑙 and the net radiative
+flux ̇𝑞𝑟 are explained in the next section. The heat conduction between
+solid absorber and absorber surface ( ̇𝑞𝑐𝑜𝑛𝑑,𝑎𝑏𝑠) and between air flow
+and absorber surface ( ̇𝑞𝑐𝑜𝑛𝑑,𝑎𝑖𝑟) are evaluated based on the surface
+normal temperature gradients. These gradients depend on the surface
+temperature 𝑇𝑠𝑢𝑟𝑓 and the volumetric temperature distributions of the
+solid (𝑇𝑠
+) resp. the air (𝑇𝑓
+) temperature. As a result, Eq. (A.4) connects
+all model components which are solved in an iterative fashion. Only
+the absorbed solar flux is calculated beforehand and treated as constant
+while solving the main model.
+For the beginning of the entry region, a fixed value temperature
+boundary condition sets the inlet temperature 𝑇𝑖𝑛 (cf. Eq. (1)), while
+zero gradient temperature boundary conditions are prescribed for all
+
+Solar Energy 247 (2022) 86–95
+94
+R.T. Broeske et al.
+remaining boundaries of the air flow and the heat conduction simula￾tion, i.e. for the absorber outlet, the entry region sides and the outer
+sides of the solid absorber volume.
+The flow boundary conditions differ between the simulation cases
+with active flow disturbances (cases ‘‘Fl-A’’ and ‘‘Ir+Fl-A’’, cf. Table 1)
+and all other 3D simulation cases. For the cases without flow distur￾bances, pure pressure boundary conditions are used. At the start of the
+entry region, the ambient/inlet pressure value of 𝑝𝑖𝑛 is applied, while
+the pressure at the outlet of each of the 𝑁𝑡𝑜𝑡 absorber channels is set
+to 𝑝𝑜𝑢𝑡 = 𝑝𝑖𝑛 − 𝛥𝑝 depending on the selected pressure drop level. A zero
+gradient boundary condition is used for the velocity at the absorber out￾let, while the inlet velocities are derived from the pressure gradient. For
+the cases with active flow disturbances, the outlet pressure boundary
+condition is changed to a zero gradient boundary condition. Outflow
+velocities based on the massflow density for the three channel sections
+are prescribed causing the flow disturbances. The deactivation of the
+flow disturbances (cases ‘‘Fl-D’’ and ‘‘Ir+Fl-D’’) is equal to reverting the
+flow boundary conditions back to the purely pressure-driven boundary
+condition set. The pressure-driven boundary set in particular allows the
+3D model to calculate the resulting massflow density distributions for
+the 𝑁𝑡𝑜𝑡 absorber channels, which can range from uniform in case of
+a stable absorber (cf. Fig. 3) to non-uniform in case of an unstable
+absorber (cf. Fig. 4).
+Radiation modeling
+All absorber surfaces are treated as opaque, diffusive reflecting
+surfaces with constant optical properties. For the SiSiC material of the
+HiTRec absorber and for the Cordierit material of the CorRec, CorStep
+and CorWin designs, a surface absorptivity and emissivity of 𝛼𝑠𝑢𝑟𝑓 =
+𝜀𝑠𝑢𝑟𝑓 = 80 % is used based on Hoffschmidt (1997). The radiation mod￾eling is split into separate approaches for the incident solar irradiation
+and the thermal radiation exchange between the absorber surfaces.
+The raytracing software FEMRay is used to track the incident solar
+irradiation. FEMRay was developed at the German Aerospace Center
+as an extension of the raytracing software MIRVAL and allows surface
+definitions via finite element meshes with MIRVAL (cf. Amsbeck et al.,
+2008; Schwarzbözl et al., 2008). The starting positions of the solar rays
+are spread out (based on a uniform random distribution) across the void
+portions of the channel entry cross-sections, i.e. the void part of cross￾section containing the absorber front surface. The initial directions are
+also generated randomly based on an average initial direction and an
+opening angle. The opening angle defines a cone around the average
+direction from which the initial directions are sampled as deviations
+from the average direction. The absorption and diffusive reflection
+of solar rays throughout the porous absorber are then tracked until
+the rays are either totally absorbed or reflected (back) out of the
+absorber structure. The final result of the raytracing software is the 3D
+distribution of the absorbed solar irradiation for each absorber surface
+̇𝑞𝑠𝑜𝑙, which is used as part of the boundary Eq. (A.4).
+The thermal emissions of the absorber surfaces and the subsequent
+radiative heat exchange is modeled via a surface-to-surface radiation
+model based on viewfactors. The radiation model, which is already
+part of OpenFOAM, defines the net radiative flux of each surface ̇𝑞𝑟 as
+the difference between irradiance 𝐺 and surface radiosity 𝐽. Based on
+the numeric division of the absorber surfaces into discrete subsurfaces
+or mesh elements, the surface radiosity of one element 𝑘 is the sum
+of surface emission and reflected irradiance, while the irradiance is
+calculated from the surface radiosities of all other elements and the
+viewfactors 𝛹𝑘,𝑙 between the elements:
+̇𝑞𝑟,𝑘 = 𝐺𝑘 − 𝐽𝑘
+, (A.5)
+𝐽𝑘 = 𝜀𝑘𝜎𝑠𝑏𝑇
+4
+𝑘
++
+(
+1 − 𝜀𝑘
+)
+𝐺𝑘
+, (A.6)
+𝐺𝑘 =
+∑
+𝑙
+𝛹𝑘,𝑙𝐽𝑙
+(A.7)
+In addition to the absorber surfaces, the void portions of the channel
+entry cross-sections and the void absorber outlet cross-sections are also
+part of the viewfactor model as artificial surfaces. The artificial inlet
+surfaces are treated as black surfaces (𝜀𝑘 = 1) with a temperature of
+zero Kelvin (𝑇𝑘 = 0). All radiation which reaches the inlet surfaces is
+absorbed and considered lost as part of the absorber (bulk) emission
+loss. The artificial outlet surfaces are also treated as black surfaces
+(𝜀𝑘 = 1), but they are given an artificial temperature 𝑇𝑜𝑢𝑡,𝑘 which is
+updated throughout the simulation:
+𝑇𝑜𝑢𝑡,𝑘 =
+4
+√
+𝐺𝑜𝑢𝑡,𝑘
+𝜎𝑠𝑏
+(A.8)
+This artificial temperature results in a net radiative flux of zero for the
+outlet surfaces implementing a perfectly (diffusive) reflective boundary
+condition for the absorber outlet. (Setting an emissivity of 𝜀𝑘 = 0 is
+not possible as the derivation of the solution via a linear system of
+equations requires 𝜀𝑘 > 0.) The radiation elements corresponding to
+the absorber surfaces are given the material emissivity (𝜀𝑘 = 𝜀𝑠𝑢𝑟𝑓 ) and
+their temperature is set based on the surface temperature distribution
+calculated based on the boundary Eq. (A.4).
+A system of linear equations can be derived from Eqs. (A.5)–(A.7)
+which is solved for the net radiative flux. The net radiative flux is then
+used as part of the absorber surface boundary condition linking the
+radiation model with the other model components.
+References
+Alberti, F., Santiago, S., Roccabruna, M., Luque, S., Gonzalez-Aguilar, J., Crema, L.,
+Romero, M., 2016. Numerical analysis of radiation propagation in innovative
+volumetric receivers based on selective laser melting techniques. In: AIP Conference
+Proceedings. 030001. http://dx.doi.org/10.1063/1.4949053.
+Amsbeck, L., Buck, R., Heller, P., Jedamski, J., Uhlig, R., 2008. Development of a tube
+receiver for a solar-hybrid microturbine system. In: 14th Biennial CSP Solarpaces
+Symposium 2008.
+Ávila-Marín, A.L., 2011. Volumetric receivers in solar thermal power plants with
+central receiver system technology: A review. Sol. Energy 85 (5), 891–910. http:
+//dx.doi.org/10.1016/j.solener.2011.02.002.
+Ávila-Marín, A., Fernández-Reche, J., Martinez-Tarifa, A., 2019. Modelling strategies for
+porous structures as solar receivers in central receiver systems: A review. Renew.
+Sustain. Energy Rev. 111, 15–33. http://dx.doi.org/10.1016/j.rser.2019.03.059.
+Ávila-Marín, A.L., Alvarez de Lara, M., Fernández-Reche, J., 2018. Experimental results
+of gradual porosity volumetric air receivers with wire meshes. Renew. Energy 122,
+339–353. http://dx.doi.org/10.1016/j.renene.2018.01.073.
+Baehr, H., Stephan, K., 2006. Wärme- und Stoffübertragung. Springer Verlag.
+Becker, M., Fend, T., Hoffschmidt, B., Pitz-Paal, R., Reutter, O., Stamatov, V.,
+Steven, M., Trimis, D., 2006. Theoretical and numerical investigation of flow
+stability in porous materials applied as volumetric solar receivers. Sol. Energy 80
+(10), 1241–1248. http://dx.doi.org/10.1016/j.solener.2005.11.006.
+Broeske, R.T., Schwarzbözl, P., Hoffschmidt, B., 2022. A new partitioned 1D LTNE
+continuum model for the simulation of 3D-shaped honeycomb absorbers. Sol.
+Energy (ISSN: 0038-092X) 236, 533–547. http://dx.doi.org/10.1016/j.solener.2022.
+02.024.
+Buck, R., 2000. Massenstrom-Instabilitäten bei volumetrischen Receiver-Reaktoren (Dis￾sertation).
+Cagnoli, M., Savoldi, L., Zanino, R., Zaversky, F., 2016. Numerical evaluation of an
+innovative cup layout for open volumetric solar air receivers. AIP Conf. Proc. 1734
+(1), 030007. http://dx.doi.org/10.1063/1.4949059.
+Capuano, R., Fend, T., Stadler, H., Hoffschmidt, B., Pitz-Paal, R., 2017. Optimized volu￾metric solar receiver: Thermal performance prediction and experimental validation.
+Renew. Energy 114, 556–566. http://dx.doi.org/10.1016/j.renene.2017.07.071.
+Chen, X., Xia, X.-L., Meng, X.-L., Dong, X.-H., 2015. Thermal performance analysis on a
+volumetric solar receiver with double-layer ceramic foam. Energy Convers. Manage.
+97, 282–289. http://dx.doi.org/10.1016/j.enconman.2015.03.066.
+Fend, T., Hoffschmidt, B., Pitz-Paal, R., Reutter, O., Rietbrock, P., 2004. Porous
+materials as open volumetric solar receivers: Experimental determination of ther￾mophysical and heat transfer properties. Energy 29 (5–6), 823–833. http://dx.doi.
+org/10.1016/s0360-5442(03)00188-9.
+Gomez-Garcia, F., Gonzalez-Aguilar, J., Tamayo-Pacheco, S., Olalde, G., Romero, M.,
+2015. Numerical analysis of radiation propagation in a multi-layer volumetric
+solar absorber composed of a stack of square grids. Sol. Energy 121, 94–102.
+http://dx.doi.org/10.1016/j.solener.2015.04.047.
+Hoffschmidt, B., 1997. Vergleichende Bewertung verschiedener Konzepte vol￾umetrischer Strahlungsempfaenger (Dissertation). DLR.
+Hoffschmidt, B., Fernandez, F., Hennecke, K., Romero, M., Stobbe, P., Tellez, F., 2001.
+Development of ceramic volumetric receiver technology. In: 5th Cologne Solar
+Symposium, Cologne, 21.06.01.
+
+Solar Energy 247 (2022) 86–95
+95
+R.T. Broeske et al.
+Hoffschmidt, B., Téllez, F.M., Valverde, A., Fernández, J., Fernández, V., 2003.
+Performance evaluation of the 200-kWth HiTRec-II open volumetric air receiver. J.
+Solar Energy Eng. 125 (1), 87–94. http://dx.doi.org/10.1115/1.1530627.
+Koll, G., Schwarzbözl, P., Hennecke, K., Hartz, T., Schmitz, M., Hoffschmidt, B., 2009.
+The solar tower Jülich - A research and demonstration plant for central receiver
+systems. In: Proceedings of the 15th SolarPACES Conference.
+Kribus, A., Ries, H., Spirkl, W., 1996. Inherent limitations of volumetric solar receivers.
+Sol. Energy Mater. Sol. Cells 118 (3), 151. http://dx.doi.org/10.1115/1.2870891.
+Lipiński, W., Abbasi-Shavazi, E., Chen, J., Coventry, J., Hangi, M., Iyer, S., Kumar, A.,
+Li, L., Li, S., Pye, J., Torres, J.F., Wang, B., Wang, Y., Wheeler, V.M., 2021.
+Progress in heat transfer research for high-temperature solar thermal applications.
+Appl. Therm. Eng. 184, 116137. http://dx.doi.org/10.1016/j.applthermaleng.2020.
+116137.
+Pabst, C., Feckler, G., Schmitz, S., Smirnova, O., Capuano, R., Hirth, P., Fend, T.,
+2017. Experimental performance of an advanced metal volumetric air receiver for
+solar towers. Renew. Energy 106, 91–98. http://dx.doi.org/10.1016/j.renene.2017.
+01.016.
+Pitz-Paal, R., Hoffschmidt, B., Böhmer, M., Becker, M., 1997. Experimental and
+numerical evaluation of performance and flow stability of different types of open
+volumetric absorbers under non-homogeneous irradiation. Sol. Energy 60 (3–4),
+135–150. http://dx.doi.org/10.1016/S0038-092X(97)00007-8.
+Roldán, M.I., Smirnova, O., Fend, T., Casas, J.L., Zarza, E., 2014. Thermal analysis and
+design of a volumetric solar absorber depending on the porosity. Renew. Energy
+62, 116–128. http://dx.doi.org/10.1016/j.renene.2013.06.043.
+Schröder, W., 2010. Fluidmechanik. Wissenschaftsverlag Mainz in Aachen.
+Schwarzbözl, P., Belhomme, B., Buck, R., Uhlig, R., Amsbeck, L., Schmitz, M., 2008.
+Simulation solarer turmsysteme. In: 11. Kölner Sonnenkolloquium.
+Singh, G., Chandra, L., 2018. On the flow stability in a circular cylinder based open
+volumetric air receiver for solar convective furnace. Energy Procedia 144, 88–94.
+http://dx.doi.org/10.1016/j.egypro.2018.06.012.
+Stephan, P., Kabelac, S., Kind, M., Martin, H., Mewes, D., Schaber, K. (Eds.),
+2013. VDI-Wärmeatlas. Springer Berlin Heidelberg, http://dx.doi.org/10.1007/978-
+3-642-19981-3.
+The OpenFOAM Foundation, 2022. OpenFOAM | Free CFD Software | The OpenFOAM
+Foundation. https://openfoam.org/, Accessed: 25.07.2022.
+Zaversky, F., Aldaz, L., Sánchez, M., Ávila-Marín, A.L., Roldán, M.I., Fernández￾Reche, J., Füssel, A., Beckert, W., Adler, J., 2018. Numerical and experimental
+evaluation and optimization of ceramic foam as solar absorber – Single-layer vs
+multi-layer configurations. Appl. Energy 210, 351–375. http://dx.doi.org/10.1016/
+j.apenergy.2017.11.003.

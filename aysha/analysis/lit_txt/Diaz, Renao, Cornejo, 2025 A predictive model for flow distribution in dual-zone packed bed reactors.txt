@@ -1,0 +1,1112 @@
+Contents lists available at ScienceDirect
+Chemical Engineering Journal
+journal homepage: www.elsevier.com/locate/cej
+A predictive model for flow distribution in dual-zone packed bed reactors
+Pablo Díaz , Consuelo Reinao, Iván Cornejo ∗
+Departamento de Ingeniería Química y Ambiental, Universidad Técnica Federico Santa María, Vicuña Mackenna 3939, Santiago, 8940897, Chile
+A R T I C L E I N F O
+Keywords:
+Dual-zone packed bed
+Flow distribution
+Flow control
+CFD
+Ergun equation
+A B S T R A C T
+This paper proposes a new predictive model for flow distribution in dual-zone packed bed reactors, which
+consist of two concentric regions, an inner core and an outer ring, each containing pellets with the same shape
+but different sizes. This configuration aims to manipulate flow paths for further improving reactor performance.
+The proposed model, derived from the Ergun equation, captures how the combination of different pellet
+diameters, relative core sizes and inlet conditions influence the flow distribution between the two regions of
+the bed. The model’s predictions are compared against reactor-scale CFD data across a wide range of Reynolds
+numbers and bed geometry combinations, showing strong agreement for all the tested conditions. According
+to the results, different terms of the Ergun equation dominate in different regions of the bed, influencing
+the local flow distribution and pressure drop. This insight highlights the importance of considering these
+varying effects when optimizing the packed bed reactor design. This study provides a theoretical framework
+to better understand and control flow distribution in dual-zone packed beds, with potential applications in
+catalytic chemical processes. The proposed model offers a useful engineering tool for novel packed reactor
+configurations.
+1. Introduction
+In the design of catalytic packed bed reactors, controlling flow dis￾tribution is essential for enhancing performance and preventing catalyst
+degradation, particularly in exothermic systems prone to hot spots. Hot
+spots are especially critical, for example, in emerging renewable synthe￾sis processes, such as the conversion of green hydrogen and captured
+CO2
+into methanol [1,2], the synthesis of dimethyl ether (DME) [2],
+biomass pyrolysis [3,4], and other value-added chemical syntheses.
+Flow maldistribution leads to localized regions where reactants convert
+at higher rates, creating zones of elevated temperature. This issue is
+further exacerbated by interphase resistances between the fluid and
+solid phases, causing maldistribution even in uniformly packed beds.
+The result is a rapid increase in temperature, particularly in adiabatic
+reactors with limited heat dissipation [5,6]. In some cases, maldistri￾bution causes regions of low flow, where reactants accumulate and
+undergo faster reactions, generating excessive heat. As these reactants
+leave the low flow regions, they mix with cooler components from
+other parts of the bed, leading to temperature drops. Such uncontrolled
+variations can result from physical obstructions or irregularities in
+catalyst packing such as fines posing significant challenges to reactor
+stability [5,6].
+Achieving a uniform temperature profile in catalytic beds is essen￾tial not only for maximizing reaction efficiency but also for prolonging
+∗ Corresponding author.
+E-mail address: ivan.cornejo@usm.cl (I. Cornejo).
+catalyst lifespan. Hot spots within the reactor can deactivate catalysts,
+reduce selectivity, and promote by-product formation, collectively di￾minishing process efficiency [7–9]. Current strategies to mitigate these
+issues include diluting the reactant concentration, lowering the inlet
+temperature, using smaller catalyst particles, and employing multiple
+adiabatic beds with inter-stage cooling. However, these approaches
+often come at the cost of reduced productivity, higher pressure drops,
+or increased capital and operating expenses [10,11]. For instance, while
+reducing catalyst particle size can mitigate hot spots, it significantly
+increases the pressure drop across the bed, raising operational costs.
+Similarly, increasing the bed’s thermal conductivity by mixing catalysts
+with inert materials helps diffuse temperature gradients but also leads
+to higher pressure drops, complicating operations [10,11]. Although
+these solutions effectively stabilize reactor performance, they highlight
+the inherent trade-offs between safe reactor operation and optimal
+efficiency. As a result, achieving better flow distribution without com￾promising productivity remains a core challenge in packed bed reactor
+design.
+As alternatives to traditional packed bed reactors, various support
+configurations have been explored. One promising approach involves
+combining pellets with open-cell foams, particularly for non-adiabatic
+catalytic processes that require high heat transfer rates [12–14]. Pack￾ing pellets within open-cell foams enhances thermal conductivity while
+https://doi.org/10.1016/j.cej.2025.162962
+Chemical Engineering Journal 515 (2025) 162962
+Available online 5 May 2025
+1385-8947/© 2025 Elsevier B.V. All rights are reserved, including those for text and data mining, AI training, and similar technologies.
+
+P. Díaz et al.
+preserving sufficient catalyst volume [13,14]. Research indicates that
+the packing efficiency and pressure drop in these systems depend
+heavily on the ratio between the foam window size and the pellet
+diameter. Larger pellets tend to improve packing efficiency, while
+smaller pellets increase porosity and promote local channeling. No￾tably, despite the foam structure, the pressure drop in packed foam
+systems is often comparable to or even lower than that in traditional
+packed beds with the same pellet size, owing to the increased poros￾ity [12]. Nonetheless, several challenges remain in the application of
+foams in catalytic reactors. While foams improve heat transfer, they
+can sometimes compromise mass transfer, particularly in systems where
+high reactant flow rates are necessary [15–17]. Another challenge is the
+mechanical stability of the foam structure, a high porosity may cause
+deformation or collapse over time, especially under high pressure and
+temperature conditions [18–20]. Addressing these challenges requires
+further optimization of foam materials and configurations to ensure
+consistent performance and longevity in industrial applications [20].
+Monolith supports have garnered significant attention in recent
+years. They consist of continuous solid structures with numerous chan￾nels running in parallel. This design not only reduces pressure drop
+but also improves flow uniformity and temperature distribution across
+the channels [21]. Among these designs, non-homogeneous core/ring
+monolith substrates featuring different cell densities in the core and
+periphery have shown great potential for enhancing flow control. By
+adjusting geometrical variables, these configurations may further po￾tentially optimize temperature profiles and reactor performance [22,
+23].
+Mixing pellet sizes has been shown to significantly influence flow
+behavior in industrial processes. When particles vary in size, predicting
+the pressure drop becomes more challenging due to complex fluid￾particle interactions, particularly when the size ratio between particles
+is large. The Ergun equation is traditionally employed to estimate
+pressure drop in packed beds but shows limitations when applied to
+systems with polydisperse particle size distributions [24,25]. Despite
+these complexities, fluid dynamics research often assumes uniform
+particle sizes, as it remains a valid approximation for many practical
+applications.
+In the analysis of packed bed reactors, pressure drop is a key factor
+influenced by flow distribution and plays a critical role in reducing
+operating costs. The Ergun equation [26] is the most widely used model
+for predicting pressure drop in packed beds [27], though some studies
+highlight its limitations. Specifically, it has been shown to overpre￾dict pressure drop when the particle Reynolds number (Re𝑝
+) exceeds
+300 [27]. To improve its accuracy, several modifications have been
+proposed. Some researchers have adjusted the equation’s constants to
+fit specific experimental conditions, as seen in the work of Macdonald
+et al. [28], KTA [29], and Ozahi et al. [30]. Others have incorporated
+additional terms to account for porosity, such as in the models by
+Rose [31] and Gibilaro et al. [32]. Wall effects also become significant
+in smaller reactors, where the ratio of tube diameter to particle size
+is reduced, prompting models that address these effects, such as those
+by Montillet [33] and Harrison et al. [34]. Although no consensus or
+general formula has been established across these models, the Ergun
+equation remains the standard in predictive studies involving packed
+beds [1,4,35], and it is also adopted for the purposes of this work.
+A more detailed description and analysis of these models, along with
+others, can be found in [27].
+The Ergun equation [26] consists of two terms. The first is linear
+and corresponds to the Kozeny–Carman equation, which applies to low
+Reynolds numbers (Re𝑝 < 10). The second is quadratic, known as the
+Burke-Plummer equation, and is relevant at high Reynolds numbers
+(Re𝑝 > 1000) [36]. These terms capture different physical phenomena.
+The linear term accounts for pressure losses due to viscous forces,
+while the quadratic one describes losses because of the inertial forces.
+Together, they model the cumulative pressure drop resulting from
+solid-fluid interactions across a wide range of flow regimes [26]. The
+complete equation is expressed as follows:
+𝛥𝑝
+𝐿
+=
+150𝜇(1 − 𝜀)
+2
+𝛷2𝐷2
+𝑝
+𝜀
+3
+𝑢 +
+1.75𝜌(1 − 𝜀)
+𝛷𝐷𝑝
+𝜀
+3
+𝑢
+2
+(1)
+Recent studies have proposed alternative packed-bed reactor con￾figurations, such as using square channels or operating with a small
+tube-to-particle diameter ratio, to better understand transport phe￾nomena and mitigate thermal hotspots in catalytic processes [37,38].
+These approaches, however, often require refinements to Ergun-like
+correlations, particularly by modifying inertial terms or accounting for
+wall effects in non-standard packings. Together, these cases underscore
+that the Ergun framework is still evolving through continuous refine￾ments, supporting that pressure-drop modeling in complex packed-bed
+geometries remains an interesting topic for the community.
+Selecting an appropriate pressure drop model is essential for de￾veloping a flow distribution model in dual-zone reactors, such as the
+one proposed by Reinao et al. [23]. This approach relies on two key
+principles: (i) mass balance, where the inlet flow is divided between
+the core and ring regions, and (ii) backpressure equilibrium, where
+the flow adjusts such that the pressure drop across both regions be￾comes balanced. In this configuration, a region with lower backpressure
+receives more flow, increasing its pressure drop until equilibrium is
+achieved. However, the application of these concepts to packed bed
+reactors remains largely unexplored. Driven by the need for efficient
+and reliable catalytic processes, this study aims to address the gap
+in understanding flow distribution in non-homogeneous packed bed
+reactors.
+This investigation hypothesizes that a strategic mixture of pellet
+sizes in the core and peripheral (ring) regions, as depicted in Fig.
+1, may effectively control flow distribution and, in turn, regulate the
+temperature profile. This configuration targets preventing central hot
+spots in the bed, where temperatures tend to be highest due to the
+distance from external cooling. While traditional hot spots due to
+local irregularities may still occur within the core or ring regions,
+this approach manipulates flow distribution to reduce the likelihood of
+overheating in the bed’s center, enhancing reactor performance by tai￾loring flow resistance in each region. However, designing such reactors
+through preliminary calculations requires accurate predictions of the
+residence time of reactants in each zone, a challenge that relies on the
+absence of engineering models capable of predicting flow distribution
+in dual-zone packed beds. Despite the maturity of Ergun-like models,
+surprisingly, no explicitly available models address 𝑐𝑜𝑟𝑒-𝑟𝑖𝑛𝑔 concentric
+configurations such as the one covered in this study. The lack of a
+dedicated framework for dual-zone packed beds presents a gap for
+systematic exploration of such configurations, particularly in terms of
+explicitly quantifying the influence of local parameters such as particle
+size on, for example, flow distribution. This study addresses this gap
+by developing the first predictive model tailored for these systems,
+providing a relevant tool for preliminary reactor design. The proposed
+model aims to enable more accurate flow predictions and support the
+optimization of catalytic reactor performance.
+In the presented context, the impact of varying pellet sizes between
+the core and ring regions of the bed is investigated using CFD. This
+configuration aims to create disparities in apparent permeability and
+inertial resistance, enabling controlled flow distribution. A reactor-scale
+model of the core/ring bed is employed to obtain flow distribution
+data and compare it with predictions from a theoretical model. First,
+the computational model is described along with a parametric study
+evaluating the effects of pellet size, inlet Reynolds number, and core
+size. Then, a theoretical model, based on the backpressure equilibrium
+and Ergun equation, is developed to capture the balance in pressure
+drop between regions with different particle sizes, facilitating a stable
+distribution of flow. The results from both the computational and
+theoretical approaches are then compared to assess the accuracy and
+applicability of the proposed model.
+Chemical Engineering Journal 515 (2025) 162962
+2
+
+P. Díaz et al.
+Fig. 1. Dual-zone packed bed with different particle sizes in core and ring regions.
+Fig. 2. Schematic of the computational domain.
+2. Computational model
+This section presents the development and implementation of the
+computational model used to analyze flow distribution and pressure
+drop in dual-zone packed beds.
+2.1. Description of the domain
+The computational domain was set to represent the dual-zone
+packed bed configuration from Fig. 1, allowing for variations in flow
+resistance between the core and ring regions to evaluate their impact
+on flow distribution. A schematic of the axisymmetric section used to
+generate the domain is shown in Fig. 2. The domain is divided into
+three sections: an inlet space before the pellet bed, an outlet part after
+the bed, and a middle section containing the packed bed. The lengths
+of these sections were L𝑖𝑛 = 1000 mm, L𝑜𝑢𝑡 = 20 mm, and L𝑠 = 150 mm,
+respectively. The overall system radius (R𝑡
+) was 35 mm. The packed bed
+consisted of spherical pellets with a uniform void fraction of 0.4, which
+is, in general terms, independent of the particle diameter [39,40].
+The core and ring regions feature different apparent permeability and
+inertial resistance due to variations in particle size.
+The bed is modeled using a continuum approach, where the sub￾strate is treated as a homogeneous porous medium with a represen￾tative apparent permeability and porosity. This approach simplifies
+the simulation by significantly reducing computational cost, making it
+suitable for systematic research. It leverages the axial symmetry of the
+domain to focus on macroscopic flow behaviors rather than particle￾scale interactions. While a DEM-CFD coupled model could provide
+more detailed insights into individual particle interactions [41], it goes
+beyond the scope of the current investigation, taking into account
+that the primary objective of the study is to analyze the overall flow
+distribution, for which the continuum approach is well-established and
+validated in packed bed reactor analysis.
+2.2. Flow model
+The flow regime through the domain was assumed to be turbulent
+and was modeled using a Reynolds-Average Navier–Stokes (RANS)
+model. For steady state and absence of gravitational effects, the con￾tinuity and momentum conservation equations were [42]:
+𝜕(𝜌𝑢𝑖
+)
+𝜕𝑥𝑖
+= 0 (2)
+𝜕(𝜌𝑢𝑖
+𝑢𝑗
+)
+𝜕𝑥𝑗
+= −
+𝜕𝑝
+𝜕𝑥𝑖
++
+𝜕
+𝜕𝑥𝑗
+[
+𝜇𝑡
+(
+𝜕𝑢𝑖
+𝜕𝑥𝑗
++
+𝜕𝑢𝑗
+𝜕𝑥𝑖
+)
+−
+2
+3
+𝜕𝑢𝑖
+𝜕𝑥𝑖
+𝛿𝑖𝑗]
+−
+𝜕𝜏𝑖𝑗
+𝜕𝑥𝑗
++ 𝑆𝑢𝑖
+(3)
+The closure was provided by the Boussinesq ‘‘eddy viscosity’’ ap￾proximation and the SST 𝑘 − 𝜔 model [42–44]. Different turbulence
+models for packed bed reactors have been studied in the literature,
+but this is still an open research topic. Despite this, SST RANS-based
+models have shown good representation of real phenomena and low
+computational cost [45,46].
+The Reynolds stress tensor was [42–44]:
+−𝜏𝑖𝑗 = −𝑢
+′
+𝑖
+𝑢
+′
+𝑗
+= 𝜇𝑡
+(
+𝜕𝑢𝑖
+𝜕𝑥𝑗
++
+𝜕𝑢𝑗
+𝜕𝑥𝑖
+)
+−
+2
+3
+𝜕𝑢𝑖
+𝜕𝑥𝑖
+𝛿𝑖𝑗 (4)
+The turbulence viscosity was [42–44]:
+𝜇𝑡 = 𝜌
+𝑘
+𝜔
+1
+max (
+1
+𝛼
+∗
+,
+𝑆𝐹2
+𝑎1𝜔
+) (5)
+The transport equations for turbulence kinetic energy (𝑘) and spe￾cific turbulence dissipation rate (𝜔) from SST model were [42–44]:
+𝜕(𝜌𝑘𝑢𝑖
+)
+𝜕𝑥𝑗
+=
+[(𝜇 +
+𝜇𝑡
+𝜎𝑘
+)
+𝜕𝑘
+𝜕𝑥𝑗
+]
++ 𝐺𝑘 − 𝑌𝑘
+(6)
+where
+𝐺𝑘 = 𝑚𝑖𝑛(𝜇𝑡𝑆
+2
+, 10𝜌𝛽∗𝑘𝜔) (7)
+𝑌𝑘 = 𝜌𝛽∗𝑘𝜔 (8)
+Chemical Engineering Journal 515 (2025) 162962
+3
+
+P. Díaz et al.
+𝜕(𝜌𝜔𝑢𝑖
+)
+𝜕𝑥𝑗
+=
+[(𝜇 +
+𝜇𝑡
+𝜎𝜔
+)
+𝜕𝜔
+𝜕𝑥𝑗
+]
++ 𝐺𝜔 − 𝑌𝜔 + 𝐷𝜔 (9)
+and
+𝐺𝜔 = 𝛼𝜔𝛼
+∗
+𝜌𝜇𝑡𝑆
+2
+(10)
+𝑌𝜔 = 𝜌𝛽∗𝜔
+2
+(11)
+𝐷𝜔 = 2(1 − 𝐹1
+)𝜌
+1
+𝜔𝜎𝜔2
+𝜕𝑘
+𝜕𝑥𝑗
+𝜕𝜔
+𝜕𝑥𝑗
+(12)
+Further details about constants and functions included in the SST
+model can be found in [43,44]. The term 𝑆𝑢𝑖
+in Eq. (3) was used
+to account for the extra head loss just in the porous medium due to
+the flow passing through the packed bed and was modeled by the
+Darcy–Forchheimer’s law [47], as shown in Eq. (13).
+𝑆𝑢𝑖
+= − (
+𝜇
+𝛼𝑖
+𝑢𝑖 + 𝐶𝑖
+1
+2
+𝜌𝑢𝑖
+|𝑢𝑖
+|
+)
+(13)
+The axial and radial components of 𝑆𝑢𝑖
+are equal in each zone,
+indicating that the medium is isotropic. This isotropy allows the flow
+to be treated similarly in both axial and radial directions, as in a flow￾through packed bed. The apparent permeability and inertial resistance
+for each region are determined using Eqs. (14) and (15). In these
+equations, the subscript 𝑛 denotes the core (𝑐) and ring (𝑟) regions,
+respectively.
+𝛼𝑎𝑥𝑖𝑎𝑙𝑛
+= 𝛼𝑟𝑎𝑑𝑖𝑎𝑙𝑛
+=
+𝛷2𝐷2
+𝑝
+𝜀
+3
+150(1 − 𝜀)
+2
+(14)
+𝐶𝑎𝑥𝑖𝑎𝑙𝑛
+= 𝐶𝑟𝑎𝑑𝑖𝑎𝑙𝑛
+=
+3.5(1 − 𝜀)
+𝛷𝐷𝑝
+𝜀
+3
+(15)
+The problem was implemented using the commercial CFD code
+ANSYS Fluent 2023R2 [42], which employs the finite volume method.
+Atmospheric air was used as the working fluid, with a constant density
+of 1.225 kg/m3 and a constant viscosity of 1.7894 × 10−5 Pa⋅s. The
+top boundary was defined as a no-slip wall for momentum, while
+the bottom boundary, representing the tube’s centerline, was set as
+a symmetry axis. The inlet velocity had a flat profile and varied in
+velocity magnitude across different runs, while the outlet boundary
+condition was set to a prescribed pressure of 1 bar.
+For interpolating, a second-order upwind scheme was used for
+momentum, and the pressure–velocity coupling was solved using a
+pseudo-transient, fully coupled approach. The convergence criteria for
+every run was having scaled residuals below 10−4
+, along with a stable
+pressure drop value.
+2.3. CFD model validation and grid independence
+This section is intended to validate the CFD framework, providing
+a spatially distributed reference for comparison with the proposed
+one-dimensional theoretical model. The grid independence study was
+performed by comparing the pressure drop across different meshes,
+using a particle diameter of 1 mm and an inlet Reynolds number
+(Re𝑖𝑛) of 10 000. The grid, fully composed of rectangular elements,
+was progressively refined, maintaining a constant aspect ratio of 1:2
+between the vertical and horizontal dimensions of the control volumes,
+which aligns with the flow direction. The results are presented in Fig.
+3. The difference in pressure drop between the second-to-last mesh
+(329 940 control volumes) and the finest mesh (517 725 control volumes)
+was only 0.04%. Since this difference is negligible, the mesh with
+329 940 control volumes was selected for further simulations.
+Given the absence of models for flow distribution in non-homogen￾eous fixed beds in the literature, the developed computational model
+was validated by comparing its pressure drop predictions with those
+obtained from Ergun’s equation (Eq. (1)) for flow through a packed
+bed, as described in Section 1.
+Fig. 3. Pressure drop vs. number of control volumes for grid independence study.
+Fig. 4. Comparison between computational model’s pressure drop and that calculated
+from Ergun equation.
+The pressure drop data from the computational model were cal￾culated by measuring the pressure difference between the inlet and
+outlet of the packed bed. To maintain consistency with the momentum
+balance, mass-averaged total pressure values were used across these
+sections. Using total pressure is essential for accurately determining
+losses between regions with different velocity profiles [23]. The pres￾sure at a specific axial position was determined using the following
+expression:
+𝑝|𝑥 =
+∫𝐴
+𝑝𝑢 𝑑𝐴
+∫𝐴
+𝑢 𝑑𝐴
+(16)
+Simulations were conducted for two particle diameters, 1 mm and
+3 mm, over a range of Re𝑖𝑛 from 100 to 10 000, as shown in Fig. 4.
+The computational model’s predictions showed good agreement with
+the Ergun equation for both particle sizes.
+The results in Fig. 4 highlight that for both 1 mm and 3 mm particle
+diameters, the computational model captures the expected non-linear
+relationship between the pressure drop and Re𝑖𝑛. As Re𝑖𝑛 increases, the
+pressure drop rises more sharply, reflecting the transition from viscous￾dominated to inertial-dominated flow, consistent with the behavior
+predicted by the Ergun equation. This agreement across a wide range
+of conditions demonstrates the robustness of the computational model
+for predicting pressure losses in dual-zone packed beds.
+Chemical Engineering Journal 515 (2025) 162962
+4
+
+P. Díaz et al.
+Table 1
+List of computational experiments. For all of them: 𝐷𝑝,𝑟 = 2 mm. For a core size of
+100%, the value of 𝐷𝑝,𝑐∕𝐷𝑝,𝑟 , is only indicated to report 𝐷𝑝,𝑐 , since there is no ring
+region in these cases.
+N Re𝑖𝑛 𝐷𝑝,𝑐∕𝐷𝑝,𝑟 Core Size, % N Re𝑖𝑛 𝐷𝑝,𝑐∕𝐷𝑝,𝑟 Core Size, %
+1 100 0.50 25 31 100 0.50 75
+2 100 0.75 25 32 100 0.75 75
+3 100 1.00 25 33 100 1.00 75
+4 100 1.25 25 34 100 1.25 75
+5 100 1.50 25 35 100 1.50 75
+6 1000 0.50 25 36 1000 0.50 75
+7 1000 0.75 25 37 1000 0.75 75
+8 1000 1.00 25 38 1000 1.00 75
+9 1000 1.25 25 39 1000 1.25 75
+10 1000 1.50 25 40 1000 1.50 75
+11 10 000 0.50 25 41 10 000 0.50 75
+12 10 000 0.75 25 42 10 000 0.75 75
+13 10 000 1.00 25 43 10 000 1.00 75
+14 10 000 1.25 25 44 10 000 1.25 75
+15 10 000 1.50 25 45 10 000 1.75 75
+16 100 0.50 50 46 100 0.50 100
+17 100 0.75 50 47 100 0.75 100
+18 100 1.00 50 48 100 1.00 100
+19 100 1.25 50 49 100 1.25 100
+20 100 1.50 50 50 100 1.50 100
+21 1000 0.50 50 51 1000 0.50 100
+22 1000 0.75 50 52 1000 0.75 100
+23 1000 1.00 50 53 1000 1.00 100
+24 1000 1.25 50 54 1000 1.25 100
+25 1000 1.50 50 55 1000 1.50 100
+26 10 000 0.25 50 56 10 000 0.50 100
+27 10 000 0.50 50 57 10 000 0.75 100
+28 10 000 1.00 50 58 10 000 1.00 100
+29 10 000 1.25 50 59 10 000 1.25 100
+30 10 000 1.50 50 60 10 000 1.50 100
+3. Results and discussion
+This section summarizes the main results obtained. As described
+by the Ergun equation, the principal variables affecting pressure drop,
+and consequently flow distribution, inside a packed bed are the in￾let (superficial) velocity, represented by Re𝑖𝑛, and particle diameter
+combination. These variables were selected for the parametric study,
+along with core size, in alignment with previous investigations on dual￾cell density monolith systems [23]. Three values were chosen for Re𝑖𝑛:
+100, 1000, and 10 000, which correspond to particle Reynolds numbers
+(Re𝑝
+) ranging from 1 to 500, covering a broad spectrum of values
+commonly reported in the literature [27,33,48]. The particle diameter
+in the ring region was held constant at 2 mm, while the core particle
+size was varied to obtain relative particle diameters (𝐷𝑝,𝑐∕𝐷𝑝,𝑟) ranging
+from 0.50 to 1.50, with increments of 0.25. Core size, defined as the
+percentage of the bed cross-sectional area assigned to the core region,
+was varied from 25% to 100% in increments of 25%. It is important to
+note that when the core size is 0% and 100%, the system corresponds to
+a homogeneous packed bed with the particle diameter corresponding to
+𝐷𝑝,𝑟 and 𝐷𝑝,𝑐 respectively. By combining all possible parameter values
+mentioned, a total of 60 simulations were performed, as listed in Table
+1.
+The core velocity was obtained from CFD simulations, and the
+percentage of flow passing through the core region was calculated
+using Eq. (17). This percentage represents the fraction of the total inlet
+flow directed through the core for an incompressible fluid, assuming
+constant density:
+𝑓𝑐 =
+𝑢𝑐𝐴𝑐
+𝑢𝑖𝑛𝐴𝑇
+100% (17)
+3.1. Exploratory analysis
+The first result presented is an exploratory, qualitative analysis
+to corroborate some model assumptions, such as the backpressure
+equilibrium between the core and ring of the bed.
+Table 2
+Pressure drop and particle Reynolds number for the conditions in Table 1.
+N 𝛥𝑝, Pa Re𝑝,𝑐 Re𝑝,𝑟 N 𝛥𝑝, Pa Re𝑝,𝑐 Re𝑝,𝑟
+1 15.44 0.46 3.50 31 28.96 0.86 6.25
+2 13.99 1.39 3.19 32 18.46 1.82 4.14
+3 12.45 2.86 – 33 12.45 2.86 –
+4 11.00 4.76 2.54 34 8.87 3.90 2.07
+5 9.72 6.99 2.26 35 6.62 4.94 1.56
+6 232.43 6.27 33.91 36 419.40 10.54 51.02
+7 205.06 15.98 30.99 37 260.80 19.37 36.82
+8 183.50 28.57 – 38 183.48 28.57 –
+9 166.88 43.00 26.63 39 139.35 37.93 23.24
+10 153.78 58.71 25.05 40 111.37 47.37 19.54
+11 9320.16 97.46 315.98 41 14 106.17 124.75 394.38
+12 8380.46 185.72 298.41 42 9915.24 204.03 326.72
+13 7732.26 285.71 – 43 7731.67 285.71 –
+14 7238.46 394.75 275.68 44 6376.09 368.99 257.28
+15 6840.38 511.22 267.35 45 5445.52 453.43 235.99
+16 20.23 0.61 4.50 46 48.49 1.43 –
+17 15.94 1.58 3.61 47 21.84 2.14 –
+18 12.45 2.86 – 48 12.45 2.86 –
+19 9.83 4.29 2.28 49 8.07 3.57 –
+20 7.90 5.80 1.85 50 5.68 4.29 –
+21 305.71 8.01 41.13 51 602.86 14.29 –
+22 230.57 17.56 33.73 52 297.05 21.43 –
+23 183.49 28.57 – 53 183.46 28.57 –
+24 152.24 40.36 24.86 54 127.91 35.71 –
+25 130.20 52.61 22.07 55 96.10 42.86 –
+26 11 365.28 109.87 351.69 56 17 821.17 142.86 –
+27 9105.72 194.54 312.05 57 10 833.75 214.29 –
+28 7732.02 285.71 – 58 7731.23 285.71 –
+29 6787.67 381.51 266.22 59 5996.63 357.14 –
+30 6086.70 480.85 250.86 60 4892.67 428.57 –
+Fig. 5 shows the pressure distribution for the section of the do￾main close to the substrate. It includes cases with different core sizes,
+Reynolds numbers, and relative pellet diameters. Notably, within the
+bed region, the pressure remains largely uniform along the radial direc￾tion, maintaining similar values in both the core and ring zones. This
+observation confirms that backpressure equilibrium is achieved under
+the evaluated conditions. Additionally, the pressure drop increases
+when the core size is smaller, as the extent of the more permeable
+region is reduced. Examining the influence of the Reynolds num￾ber, a comparison between Fig. 5(a) and (c) shows that a higher
+Reynolds number results in a more significant pressure drop. Further￾more, the comparison of Fig. 5(a) and (d) indicates that a relative
+particle diameter lower than 1.00 leads to an increase in pressure drop.
+Fig. 6 presents the velocity field within the same aforementioned
+section of the domain. In the bed region, the velocity remains relatively
+consistent and with different magnitudes for the core and ring zones.
+When the core size is reduced, the flow distribution variations become
+more pronounced, leading to an increase in velocity through the core.
+Additionally, a lower Reynolds number results in a reduced inlet ve￾locity, which subsequently decreases the overall flow rate through the
+bed, affecting the distribution and velocity magnitudes in both regions.
+It is also noted that as the relative particle diameter increases, the
+flow preferentially moves through the more permeable region as the
+resistance contrast between the core and ring intensifies.
+To complement previous results, Table 2 summarizes the pressure
+drop (𝛥𝑝), together with the core (Re𝑝,𝑐 = 𝜌𝑢𝑐𝐷𝑝,𝑐∕𝜇) and ring (Re𝑝,𝑟 =
+𝜌𝑢𝑟𝐷𝑝,𝑟∕𝜇) particle Reynolds numbers for the runs in Table 1. It is
+important to note that for a given inlet Reynolds number, the particle
+Reynolds numbers in the core and ring regions can vary significantly
+depending on the core size and particle diameter ratio. For instance,
+in case 30 of Table 2, the particle Reynolds number in the core is
+nearly twice that in the ring. This variation should be considered when
+analyzing potential flow regime transitions in physical systems.
+Chemical Engineering Journal 515 (2025) 162962
+5
+
+P. Díaz et al.
+Fig. 5. Pressure drop distribution for different core sizes, tube Reynolds number and relative pellet diameter. The 𝑥-axis is scaled as 𝑥∕(𝐿𝑖𝑛+𝐿𝑠+𝐿𝑜𝑢𝑡).
+3.2. Effect of the core size
+For the effect of core size, values ranging from 25% to 100% were
+implemented, increasing 25% each time. Since a core size of 100% is
+equivalent to 0%, as both represent homogeneous packed beds, these
+cases were included in the results of this section. The ratio 𝐷𝑝,𝑐∕𝐷𝑝,𝑟
+was kept fixed at 0.5, with the ring particle diameter set at 2 mm. Fig. 7
+shows the percentage of flow passing through the core (𝑓𝑐
+) as a function
+of core size for various Re𝑖𝑛 values. A positive correlation between 𝑓𝑐
+and core size is observed, indicating that larger core regions allow a
+greater fraction of the flow to pass through.
+Reynolds number (Re𝑖𝑛) significantly affects the flow distribution
+between the core and ring regions. At Re𝑖𝑛 = 100, the value of 𝑓𝑐
+is
+lower across all core sizes compared to higher Reynolds numbers. As
+Re𝑖𝑛 increases, the percentage of flow passing through the core also
+rises, reflecting a stronger dependence of flow distribution on inertial
+forces at higher velocities. The sensitivity of 𝑓𝑐
+to Re𝑖𝑛 depends on the
+size of the core. For smaller cores (25% and 50%), the differences in
+𝑓𝑐 between different Re𝑖𝑛 values are relatively minor, suggesting that
+at small core sizes, viscous forces play a more dominant role. As the
+core size increases to 75% and 100%, these differences become more
+pronounced, indicating that larger cores are more sensitive to variations
+in Re𝑖𝑛. Notably, at 100% core size (homogeneous bed), all Re𝑖𝑛 values
+converge since, in such a condition, there is an absence of a dual-zone
+configuration.
+This analysis suggests that larger cores, excluding the homogeneous
+case, exhibit greater sensitivity to changes in flow conditions, as inertial
+effects may become more dominant. However, the particle size ratio
+(𝐷𝑝,𝑐∕𝐷𝑝,𝑟) also plays a critical role in flow behavior, which will be
+addressed in the following sections.
+3.3. Effect of the tube Reynolds number
+The effect of tube Reynolds number (Re𝑖𝑛) on flow distribution
+was examined by fixing the core size at 25%. The particle size ratio
+(𝐷𝑝,𝑐∕𝐷𝑝,𝑟) was varied from 0.50 to 1.50 in increments of 0.25, with
+the ring particle diameter set at 2 mm. Re𝑖𝑛 values of 100, 1000, and
+10 000 were considered.
+As shown in Fig. 8, the percentage of flow passing through the
+core (𝑓𝑐
+) varies across different particle size ratios (𝐷𝑝,𝑐∕𝐷𝑝,𝑟) and tube
+Reynolds numbers (Re𝑖𝑛). At lower Re𝑖𝑛 values, 𝑓𝑐
+is more sensitive to
+particle size ratio, with larger ratios (e.g., 𝐷𝑝,𝑐∕𝐷𝑝,𝑟 = 1.50) allowing
+more flow through the core. This behavior reflects the dominance of
+viscous forces at lower Reynolds numbers. However, as Re𝑖𝑛 increases,
+the differences in 𝑓𝑐 across particle size ratios become less pronounced,
+indicating that inertial forces dominate at higher velocities, reducing
+the influence of particle diameter.
+Chemical Engineering Journal 515 (2025) 162962
+6
+
+P. Díaz et al.
+Fig. 6. Velocity distribution for different core sizes, tube Reynolds number and relative pellet diameter. The 𝑥-axis is scaled as 𝑥∕(𝐿𝑖𝑛+𝐿𝑠+𝐿𝑜𝑢𝑡).
+Fig. 7. Flow percentage through the core (𝑓𝑐
+) as a function of core size for different
+Re𝑖𝑛 values. 𝐷𝑝,𝑐∕𝐷𝑝,𝑟 = 0.5.
+Fig. 8. Flow percent passing through the core in function of tube Reynolds number in
+logarithmic scale with 𝜆𝑐 = 25%.
+Chemical Engineering Journal 515 (2025) 162962
+7
+
+P. Díaz et al.
+Fig. 9. Flow percent passing through the core in function of relative particle size with
+𝜆𝑐 = 25%.
+The trends in 𝑓𝑐 are non-linear, with larger particle size ratios
+sustaining higher core flows even at elevated Re𝑖𝑛. As Re𝑖𝑛 increases
+toward 10 000, the flow percentages across different particle size ratios
+tend to converge. This convergence suggests that beyond a certain
+Reynolds number, flow distribution becomes less sensitive to particle
+size ratio, as inertial forces dominate.
+3.4. Effect of the relative particle diameter
+The last variable studied was the relative particle diameter
+(𝐷𝑝,𝑐∕𝐷𝑝,𝑟). For this analysis, combinations of previously used parame￾ters were tested under two conditions. Firstly, a core size fixed at 25%,
+and secondly, a Re𝑖𝑛 fixed at 100. The results are presented in Figs. 9
+and 10, respectively.
+As shown in Fig. 9, 𝐷𝑝,𝑐∕𝐷𝑝,𝑟 has a significant effect on the percent￾age of flow through the core (𝑓𝑐
+). For particle size ratios of 0.50 and
+0.75, 𝑓𝑐
+is lower across all Reynolds numbers, although it increases
+as Re𝑖𝑛 rises. At a ratio of 1.0, 𝑓𝑐
+equals the core size, representing
+the homogeneous packed bed case where the core and ring have equal
+particle diameters. For larger ratios (1.25 and 1.50), 𝑓𝑐
+increases for
+all Reynolds numbers, although the growth in core flow becomes less
+significant as Re𝑖𝑛 increases. This behavior reflects the decreasing influ￾ence of particle diameter ratio on flow distribution at higher Reynolds
+numbers.
+The trends in Fig. 10 further demonstrate how increasing the parti￾cle size ratio enhances core flow. This is explained by differences in core
+flow resistance: when 𝐷𝑝,𝑐 exceeds 𝐷𝑝,𝑟, the core exhibits lower viscous
+resistance, increasing flow through the core region and driving more
+flow into the ring. Conversely, smaller 𝐷𝑝,𝑐∕𝐷𝑝,𝑟 ratios result in higher
+core viscous resistance, reducing 𝑓𝑐
+. This effect is consistent across all
+core sizes, as shown in the figure, with 𝑓𝑐
+rising as 𝐷𝑝,𝑐∕𝐷𝑝,𝑟 increases.
+3.5. Model development
+Building on the findings from the parametric study, a new model for
+flow distribution in dual-zone packed bed reactors was developed. The
+flow path of a fluid through a medium is governed by both viscous and
+inertial resistance. In a system with two regions of differing particle
+diameters, a stable state is reached when the backpressure in both
+regions is balanced, even though the flow distribution remains uneven,
+Fig. 10. Flow percent passing through the core in function of relative particle size
+with Re𝑖𝑛 = 100.
+as shown in Section 3.1. This backpressure equilibrium is expressed
+mathematically by Eq. (18).
+𝛥𝑝𝑐 = 𝛥𝑝𝑟
+(18)
+Replacing both sides of the equation by Darcy–Forchheimer’s law
+[47]:
+𝜇
+𝛼𝑐
+𝑢𝑐 + 𝐶𝑐
+1
+2
+𝜌𝑢2
+𝑐
+=
+𝜇
+𝛼𝑟
+𝑢𝑟 + 𝐶𝑟
+1
+2
+𝜌𝑢2
+𝑟
+(19)
+Applying mass balance under the assumption of constant density,
+the inlet flow is equal to the sum of the flows through each region of
+the substrate:
+𝐴𝑇
+𝑢𝑖𝑛 = 𝐴𝑐
+𝑢𝑐 + 𝐴𝑟
+𝑢𝑟
+(20)
+Solving for the ring velocity:
+𝑢𝑟 =
+(
+𝐴𝑇
+𝐴𝑟
+)
+𝑢𝑖𝑛 −
+(
+𝐴𝑐
+𝐴𝑟
+)
+𝑢𝑐
+(21)
+Defining the area fractions as 𝐴𝑐∕𝐴𝑇 = 𝜆𝑐
+for the core region, and
+𝐴𝑟∕𝐴𝑇 = (1 − 𝜆𝑐
+) for the ring one, Eq. (21) can be written as:
+𝑢𝑟 =
+(
+1
+1 − 𝜆𝑐
+)
+𝑢𝑖𝑛 −
+(
+𝜆𝑐
+1 − 𝜆𝑐
+)
+𝑢𝑐
+(22)
+By substituting Eq. (22) into Eq. (19) and simplifying the expres￾sions, the following model is obtained:
+𝑎𝑢2
+𝑐
++ 𝑏𝑢𝑐 + 𝑐 = 0 (23)
+where
+𝑎 =
+𝐶𝑐𝜌
+2
+−
+𝐶𝑟𝜌
+2
+(
+𝜆𝑐
+1 − 𝜆𝑐
+)2
+(24)
+𝑏 =
+𝜇
+𝛼𝑐
++
+𝜇
+𝛼𝑟
+(
+𝜆𝑐
+1 − 𝜆𝑐
+)
++ 𝐶𝑟𝜌𝑢𝑖𝑛 (
+𝜆𝑐
+(
+1 − 𝜆𝑐
+)2
+)
+(25)
+𝑐 = −[
+𝜇𝑢𝑖𝑛
+𝛼𝑟
+(
+1
+1 − 𝜆𝑐
+)
++
+𝐶𝑟𝜌𝑢2
+𝑖𝑛
+2
+(
+1
+(
+1 − 𝜆𝑐
+)2
+)] (26)
+Eq. (23) is solved using the quadratic formula, with only the positive
+root being physically meaningful. The negative solution would result in
+negative flow values or flows exceeding the total input, violating the
+mass balance.
+𝑢𝑐 =
+−𝑏 +
+√
+𝑏
+2 − 4𝑎𝑐
+2𝑎
+(27)
+Chemical Engineering Journal 515 (2025) 162962
+8
+
+P. Díaz et al.
+Fig. 11. Comparison of the proposed model and CFD data for several relative particle
+diameter and Re𝑖𝑛 with 𝜆𝑐 = 25%.
+Additional solutions exist for specific cases, as outlined below:
+if 𝑎 = 0 (𝜆𝑐 = 0.5 and 𝐷𝑝,𝑐 = 𝐷𝑝,𝑟):
+𝑢𝑐 =
+−𝑐
+𝑏
+= 𝑢𝑖𝑛 (28)
+if 𝜆𝑐 → 1:
+lim
+𝜆𝑐→1
+𝑢𝑐 = 𝑢𝑖𝑛 (29)
+This solution was validated numerically for cases where the core
+size approached 1.
+By substituting the velocity from Eqs. (23) to (26) into Eq. (17),
+the flow passing through the core is calculated and compared to CFD
+data. The results are presented in Figs. 11 and 12. The proposed
+model shows that all evaluated variables affect the flow distribution
+differently, depending on their combination, and the results are in
+excellent agreement with the CFD simulations.
+In Fig. 11, the core size is fixed at 25%, and the flow through the
+core (𝑓𝑐
+) is analyzed for several relative particle diameters (𝐷𝑝,𝑐∕𝐷𝑝,𝑟)
+across different Reynolds numbers (Re𝑖𝑛 = 100, 1000, and 10 000). The
+model captures the non-linear trend in 𝑓𝑐 with increasing particle di￾ameter ratio, showing excellent agreement with the CFD data. Overall,
+the alignment between the model and CFD results demonstrates that
+the proposed model reliably predicts the effect of Reynolds number on
+flow distribution.
+In Fig. 12, the Reynolds number is fixed at Re𝑖𝑛 = 100, and the core
+flow is analyzed for varying particle size ratios (𝐷𝑝,𝑐∕𝐷𝑝,𝑟) and different
+core sizes (𝜆𝑐 = 25%, 50%, 75%, and 100%). The proposed model again
+shows strong agreement with the CFD data, accurately capturing the
+increase in 𝑓𝑐 with larger particle size ratios and core sizes. The model
+also predicts the convergence to 100% flow at 𝜆𝑐 = 100%, representing
+a homogeneous bed, consistent with the CFD data. The agreement
+across all core sizes further validates the model’s ability to generalize
+to different geometrical configurations.
+A key observation is the importance of Re𝑖𝑛 in the proposed model.
+This contrasts with the model developed for monoliths, where Re𝑖𝑛
+does not affect flow distribution [23]. Notably, if the values of 𝐶𝑐 and
+𝐶𝑟 are set to zero in Eq. (23), the model reduces to that of a dual￾cell monolith, demonstrating its versatility. Thus, the proposed model
+can be applied more broadly to any dual-zone porous medium with
+appropriate apparent permeability and inertial resistance coefficients.
+Fig. 12. Comparison of the proposed model and CFD data for several relative particle
+diameter and core sizes with Re𝑖𝑛 = 100.
+4. Conclusions
+The flow distribution in a non-homogeneous fixed bed with dual
+pellet sizes in the core and ring regions was successfully investigated
+using a computational model. The results indicate that the fraction of
+flow passing through the core is influenced by several factors, including
+core size, relative pellet diameter, and tube Reynolds number.
+Larger core sizes result in higher flow percentages through the core,
+as the increased area reduces resistance compared to the ring region.
+At lower Reynolds numbers, the flow through the core is smaller, but
+it increases with higher Reynolds numbers, suggesting that higher flow
+rates promote more flow through the central region. This effect is
+more pronounced for larger core sizes, where the differences in flow
+percentage between Reynolds numbers are more significant.
+The relative diameter of the pellets (core over ring) also plays a
+crucial role in flow distribution. When the relative diameter is less than
+1.00, the flow through the core is reduced. As the relative diameter
+increases beyond 1.00, the flow through the core increases, although
+this effect diminishes at higher Reynolds numbers. A relative diameter
+of 1.00 leads to uniform flow distribution, where the percentage of flow
+through the core matches the core size.
+A predictive model is developed to describe the flow distribution
+between the core and ring regions, accounting for both viscous and
+inertial resistances. The model is expressed as a quadratic equation,
+with coefficients dependent on the properties of the system, including
+core size, Reynolds number, pellet diameters, and fluid properties
+(density and viscosity).
+Comparison of the proposed model with CFD simulation data shows
+excellent agreement across several core sizes, Reynolds numbers, and
+pellet diameters. This comparison suggests the model’s potential for
+optimizing the design of packed beds with dual pellet sizes to achieve
+improved flow distribution. Future experimental validation is recom￾mended to confirm the model’s accuracy under a broader range of
+operating conditions in non-ideal scenarios. Since flow distribution
+dictates heat generation and transport in reactive systems, the exten￾sion of this work to include temperature distribution and conversion
+analysis is a logical next step. Future studies should also integrate these
+aspects to provide a comprehensive understanding of dual-zone reactor
+performance with significant thermal effects.
+Chemical Engineering Journal 515 (2025) 162962
+9
+
+P. Díaz et al.
+Nomenclature
+𝑎, 𝑏, 𝑐 Core velocity model constants
+𝐴 Cross-sectional area, m2
+𝐴𝑐 Cross-sectional area of the core, m2
+𝐴𝑟 Cross-sectional area of the ring, m2
+𝐴𝑇 Total or tube cross-sectional area, m2
+𝐶𝑖
+Inertial resistance coefficients vector, m−1
+𝐶𝑐 Core inertial resistance coefficient, m−1
+𝐶𝑟 Ring inertial resistance coefficient, m−1
+𝐷𝑝 Particle diameter, m
+𝐷𝑝,𝑐 Core particle diameter, m
+𝐷𝑝,𝑟 Ring particle diameter, m
+𝑓𝑐 Fraction of the flow passing through the core
+𝐿 Bed length, m
+𝐿𝑖𝑛 Inlet tube length, m
+𝐿𝑜𝑢𝑡 Outlet tube length, m
+𝐿𝑠 Porous medium tube length, m
+𝑝 Pressure, Pa
+𝛥𝑝𝑐 Core pressure drop, Pa
+𝛥𝑝𝑟 Ring pressure drop, Pa
+𝑅𝑐 Core radius, m
+𝑅𝑡 Total or tube radius, m
+Re𝑖𝑛 Inlet or tube Reynolds number, = 𝜌𝑢𝑖𝑛(2𝑅𝑡
+)∕𝜇
+Re𝑝 Particle Reynolds number, = 𝜌𝑢𝑖𝑛𝐷𝑝∕𝜇
+𝑢 Velocity magnitude, m/s
+𝑢𝑖 Velocity vector, m/s
+𝑢𝑖𝑛 Inlet superficial velocity, m/s
+𝑢𝑐 Core superficial velocity, m/s
+𝑢𝑟 Ring superficial velocity, m/s
+𝛼𝑖 Apparent permeability vector, m2
+𝛼𝑐 Core apparent permeability, m2
+𝛼𝑟 Ring apparent permeability, m2
+𝜀 Bed porosity or void fraction
+𝜆𝑐 Core fractional size
+𝛷 Bed sphericity
+𝜌 Density, kg/m3
+𝜇 Viscosity, Pa⋅s
+CRediT authorship contribution statement
+Pablo Díaz: Writing – review & editing, Writing – original draft,
+Visualization, Validation, Software, Methodology, Investigation, For￾mal analysis, Conceptualization. Consuelo Reinao: Writing – review
+& editing, Writing – original draft, Visualization, Validation, Software,
+Methodology, Investigation, Formal analysis, Conceptualization. Iván
+Cornejo: Writing – review & editing, Writing – original draft, Super￾vision, Resources, Project administration, Methodology, Investigation,
+Funding acquisition, Formal analysis, Conceptualization.
+Acknowledgments
+The author Pablo Díaz is grateful for the financial support provided
+by DPP UTFSM through Programa de Incentivo a la Iniciación Científica
+(PIIC).
+Declaration of competing interest
+The authors declare that they have no known competing finan￾cial interests or personal relationships that could have appeared to
+influence the work reported in this paper.
+Data availability
+Data will be made available on request.
+References
+[1] S. Arab, J.-M. Commenge, J.-F. Portha, L. Falk, Methanol synthesis from CO2
+and H2 in multi-tubular fixed-bed reactor and multi-tubular reactor filled with
+monoliths, Chem. Eng. Res. Des. 92 (11) (2014) 2598–2608.
+[2] D. Iranshahi, A. Golrokh, E. Pourazadi, S. Saeidi, F. Gallucci, Progress in spherical
+packed-bed reactors: Opportunities for refineries and chemical industries, Chem.
+Eng. Processing- Process. Intensif. 132 (2018) 16–24.
+[3] W. Chansiriwat, K. Wantala, R. Khunphonoi, P. Khemthong, C. Lorentz, B.
+da Costa Magalhães, M. Prevot, D. Laurenti, C. Geantet, Gypsum-derived CaO
+catalytic pyrolysis of palm oil in a continuously packed bed reactor, J. Anal.
+Appl. Pyrolysis 178 (2024) 106414.
+[4] M. Mokashi, A.B. Shirsath, A. Çelik, P. Lott, H. Müller, S. Tischer, L. Maier, J.
+Bode, D. Schlereth, F. Scheiff, et al., Methane pyrolysis in packed bed reactors:
+Kinetic modeling, numerical simulations, and experimental insights, Chem. Eng.
+J. 485 (2024) 149684.
+[5] S.B. Jaffe, Hot spot simulation in commercial hydrogenation processes, Ind. Eng.
+Chem. Process. Des. Dev. 15 (3) (1976) 410–416.
+[6] M. Shah, D. West, V. Balakotaiah, Analysis of thermoflow instabilities in
+adiabatic packed-bed catalytic reactors, Chem. Eng. J. 452 (2023) 139365.
+[7] P. Forzatti, L. Lietti, Catalyst deactivation, Catal. Today 52 (2–3) (1999)
+165–181.
+[8] C.H. Bartholomew, Mechanisms of catalyst deactivation, Appl. Catal. A: Gen. 212
+(1–2) (2001) 17–60.
+[9] G.A. Tafete, N.G. Habtu, Reactor configuration, operations and structural catalyst
+design in process intensification of catalytic reactors: A review, Chem. Eng.
+Processing- Process. Intensif. 184 (2023) 109290.
+[10] R. Agrawal, D.H. West, V. Balakotaiah, Modeling and analysis of local hot
+spot formation in down-flow adiabatic packed-bed reactors, Chem. Eng. Sci. 62
+(18–20) (2007) 4926–4943.
+[11] R. Henda, A. Machac, B. Nilsson, Heat and mass transport in a nonlinear fixed￾bed catalytic reactor: Hot spots and thermal runaway, Chem. Eng. J. 143 (1–3)
+(2008) 195–200.
+[12] M. Ambrosetti, M. Bracconi, M. Maestri, G. Groppi, E. Tronconi, Packed foams
+for the intensification of catalytic processes: assessment of packing efficiency and
+pressure drop using a combined experimental and numerical approach, Chem.
+Eng. J. 382 (2020) 122801.
+[13] M. Ambrosetti, G. Groppi, W. Schwieger, E. Tronconi, H. Freund, Packed peri￾odic open cellular structures–an option for the intensification of non-adiabatic
+catalytic processes, Chem. Eng. Processing- Process. Intensif. 155 (2020) 108057.
+[14] R. Balzarotti, M. Ambrosetti, A. Beretta, G. Groppi, E. Tronconi, Investigation
+of packed conductive foams as a novel reactor configuration for methane steam
+reforming, Chem. Eng. J. 391 (2020) 123494.
+[15] A. Aguirre, V. Chandra, E. Peters, J. Kuipers, M.N. D’Angelo, Open-cell foams as
+catalysts support: A systematic analysis of the mass transfer limitations, Chem.
+Eng. J. 393 (2020) 124656.
+[16] C. Ferroni, M. Bracconi, M. Ambrosetti, M. Maestri, G. Groppi, E. Tronconi,
+A fundamental investigation of gas/solid heat and mass transfer in structured
+catalysts based on periodic open cellular structures (POCS), Ind. Eng. Chem.
+Res. 60 (29) (2021) 10522–10538.
+[17] C.W.M. Quintero, G. Ercolino, A. Poozhikunnath, R. Maric, S. Specchia, Analysis
+of heat and mass transfer limitations for the combustion of methane emissions
+on PdO/Co3o4 coated on ceramic open cell foams, Chem. Eng. J. 405 (2021)
+126970.
+[18] A. Hadi, R. Emadi, S. Baghshahi, S. Naghavi, Different pore size alumina foams
+and study of their mechanical properties, Ceramics- Silik. 59 (1) (2015) 6–9.
+[19] K. Dammler, K. Schelm, U. Betke, T. Fey, M. Scheffler, Open-cellular alumina
+foams with hierarchical strut porosity by ice templating: A thickening agent
+study, Materials 14 (2021) 1060.
+[20] R. Yeetsorn, S. Tungkamani, Y. Maiket, Fabrication of a ceramic foam catalyst
+using polymer foam scrap via the replica technique for dry reforming, ACS
+Omega 7 (5) (2022) 4202–4213.
+[21] W. Zhang, Y. Lin, Y. Zhang, T. Li, J. Li, Z. Chen, K. Norinaga, Regulation
+of temperature distribution in fixed bed reactor for CO2 methanation through
+‘‘CHESS’’ monolith structure catalyst, Appl. Therm. Eng. 236 (2024) 121826.
+[22] I. Cornejo, G. Garreton, R.E. Hayes, On the use of dual cell density monoliths,
+Catalysts 11 (9) (2021) 1075.
+[23] C. Reinao, I. Cornejo, A model for the flow distribution in dual cell density
+monoliths, Processes 11 (3) (2023) 827.
+[24] R. Beetstra, M.A. van der Hoef, J. Kuipers, Numerical study of segregation
+using a new drag force correlation for polydisperse systems derived from
+lattice-Boltzmann simulations, Chem. Eng. Sci. 62 (1–2) (2007) 246–255.
+[25] S. Gao, J. Theuerkauf, P. Pakseresht, K. Kellogg, Y. Fan, A modified Ergun equa￾tion for application in packed beds with bidisperse and polydisperse spherical
+particles, Powder Technol. 445 (2024) 120035.
+[26] S. Ergun, Fluid flow through packed columns, Chem. Eng. Prog. (1952) 89.
+[27] E. Erdim, Ö. Akgiray, İ. Demir, A revisit of pressure drop-flow rate correlations
+for packed beds of spheres, Powder Technol. 283 (2015) 488–504.
+[28] I. Macdonald, M. El-Sayed, K. Mow, F. Dullien, Flow through porous media-the
+Ergun equation revisited, Ind. Eng. Chem. Fundam. 18 (3) (1979) 199–208.
+Chemical Engineering Journal 515 (2025) 162962
+10
+
+P. Díaz et al.
+[29] NSSC KTA, Reactor core design of high-temperature gas-cooled reactors part 3:
+Loss of pressure through friction in pebble bed cores, 1981, Germany.
+[30] E. Ozahi, M.Y. Gundogdu, M.Ö. Carpinlioglu, A modification on Ergun’s correla￾tion for use in cylindrical packed beds with non-spherical particles, Adv. Powder
+Technol. 19 (4) (2008) 369–381.
+[31] H. Rose, On the resistance coefficient–Reynolds number relationship for fluid
+flow through a bed of granular material, Proc. Inst. Mech. Eng. 153 (1) (1945)
+154–168.
+[32] L. Gibilaro, R. Di Felice, S. Waldram, P.U. Foscolo, Generalized friction factor
+and drag coefficient correlations for fluid-particle interactions, Chem. Eng. Sci.
+40 (10) (1985) 1817–1823.
+[33] A. Montillet, Flow through a finite packed bed of spheres: a note on the limit
+of applicability of the Forchheimer-type equation, J. Fluids Eng. 126 (1) (2004)
+139–143.
+[34] L.D. Harrison, K.M. Brunner, W.C. Hecker, A combined packed-bed friction factor
+equation: Extension to higher Reynolds number with wall effects, AIChE J. 59
+(3) (2013).
+[35] K. Mohammadpour, A. Alkhalaf, E. Specht, CFD simulation of cross-flow mixing
+in a packed bed using porous media model and experimental validation, Comput.
+Part. Mech. 6 (2019) 157–162.
+[36] W.L. McCabe, J.C. Smith, P. Harriott, Unit Operations of Chemical Engineering,
+McGraw-Hill, New York, 2005.
+[37] S. Flaischlen, T. Turek, G.D. Wehinger, Local structure effects on hydrodynamics
+in slender fixed bed reactors: Spheres and rings, Chem. Eng. J. 475 (2023)
+146342.
+[38] J. Gorman, A. Zheng, E. Sparrow, Bounding wall effects on fluid flow and
+pressure drop through packed beds of spheres, Chem. Eng. J. 373 (2019)
+519–530.
+[39] S. Afandizadeh, E. Foumeny, Design of packed bed reactors: guides to catalyst
+shape, size, and loading selection, Appl. Therm. Eng. 21 (6) (2001) 669–682.
+[40] J. von Seckendorff, O. Hinrichsen, Review on the structure of random
+packed-beds, Can. J. Chem. Eng. 99 (2021) S703–S733.
+[41] C. Wu, Y. Ferng, C. Chieng, C. Liu, Investigating the advantages and disadvan￾tages of realistic approach and porous approach for closely packed pebbles in
+CFD simulation, Nucl. Eng. Des. 240 (5) (2010) 1151–1159.
+[42] ANSYS Inc., ANSYS Fluent User’s Guide Release 2023R2, Canonsburg, PA, USA,
+2023.
+[43] F.R. Menter, Improved Two-Equation K-Omega Turbulence Models for
+Aerodynamic Flows, Tech. Rep., 1992.
+[44] F.R. Menter, Two-equation eddy-viscosity turbulence models for engineering
+applications, AIAA J. 32 (8) (1994) 1598–1605.
+[45] N. Jurtz, M. Kraume, G.D. Wehinger, Advances in fixed-bed reactor modeling
+using particle-resolved computational fluid dynamics (CFD), Rev. Chem. Eng. 35
+(2) (2019) 139–190.
+[46] A.G. Dixon, B. Partopour, Computational fluid dynamics for fixed bed reactor
+design, Annu. Rev. Chem. Biomol. Eng. 11 (1) (2020) 109–130.
+[47] F.M. White, Fluid Mechanics, McGraw-Hill, New York, NY, USA, 2009.
+[48] E.M. Moghaddam, E. Foumeny, A. Stankiewicz, J. Padding, Fixed bed reactors of
+non-spherical pellets: importance of heterogeneities and inadequacy of azimuthal
+averaging, Chem. Eng. Sci.: X 1 (2019) 100006.
+Chemical Engineering Journal 515 (2025) 162962
+11

@@ -1,0 +1,1008 @@
+Chemical Engineering Science 299 (2024) 120515
+Available online 24 July 2024
+0009-2509/© 2024 Elsevier Ltd. All rights are reserved, including those for text and data mining, AI training, and similar technologies.
+Contents lists available at ScienceDirect
+Chemical Engineering Science
+journal homepage: www.elsevier.com/locate/ces
+A new model for pressure drop correction for series-arranged misaligned
+monoliths
+Ivan Cornejo
+Departamento de Ingenieria Quimica y Ambiental, Universidad Tecnica Federico Santa Maria, Vicuña Mackenna 3939, Santiago, 8940897, Chile
+A R T I C L E I N F O A B S T R A C T
+Keywords:
+Monoliths
+Pressure drop
+Misalignment
+CFD
+Channels
+This study presents a new model to predict the additional pressure drop for series-arranged misaligned monoliths,
+relevant for high-flow industrial applications. Long reactor tubes often contain multiple short monoliths, leading
+to extra pressure drops as the flow enters and leaves multiple monoliths. Existing models address aligned
+monoliths, but this research considers misalignment, where extra pressure drop is higher. Channel Reynolds from
+50 to 320, spacings from 0.1 to 20 channel diameters, and several void fractions are investigated using a discrete
+channel model. Results indicate a significant impact of misalignment on extra pressure drops in closely spaced
+monoliths due to flow collisions. A correction factor model that adapts to misalignment is proposed, starting
+from large values for closely spaced channels and decreasing as spacing increases. The proposed model aligns
+with discrete channel data and phenomenological behavior of aligned channels both in trend and magnitude,
+showing an R2 above 0.93.
+1. Introduction
+Monoliths consist of solid pieces with parallel straight channels that
+are widely used as catalytic support (Williams, 2001; Lock et al., 2021;
+Hayes and Cornejo, 2021). That shape gives high surface area while
+maintaining a compact structure, also good structural integrity, low
+backpressure and good flow distribution (Önsan and Avci, 2016; Cornejo
+and Hayes, 2021; Ibáñez et al., 2021). Initially, monoliths were used
+as single substrates in containers (Della Torre et al., 2020; Tischer et
+al., 2001; Tronconi and Forzatti, 1992). Later, it became more com￾mon to find applications implying more than one monolith in series
+(Chatterjee et al., 2009; Arab et al., 2014; Jang et al., 2018). Monoliths
+have gained attention during the last decade because they are partic￾ularly suitable for high-flow applications, such as automotive exhaust
+gas cleaning, CO2 hydrogenation to methanol, reforming, and propylene
+ammoxidation to acrylonitrile, to name a few (Arab et al., 2014; Azzoni
+et al., 2022; Salamon et al., 2020; Tahay et al., 2018; Schädel et al.,
+2009). Additive manufacturing has enabled the possibility of proposing
+novel monolith shapes and compositions. For example, Quintanilla et al.
+(2018) reported a 3D-printed Fe-doped silicon carbide monolithic cata￾lyst for wet peroxide oxidation processes, Busse et al. (2018) compared
+open-cell structures made with additive manufacture with monoliths,
+and Negri et al. (2018) tested several novel monolith shapes for mono￾propellant thrusters. Our group has also been testing and modeling flow
+E-mail address: ivan.cornejo@usm.cl.
+through monoliths with a non-homogeneous channel size (Cornejo et
+al., 2021; Reinao and Cornejo, 2023), while Kane and Northrop (2023)
+studied heat transfer in such configurations.
+In monoliths, the inner walls of the channels are usually coated with
+a catalyst layer a few microns thin called washcoat. Washcoat thickness
+prevents internal diffusion limitations, while external mass transfer lim￾itations are usually avoided by selecting small channel hydraulic diame￾ters, typically ranging from 0.5 to 2 mm (Ekström and Andersson, 2002;
+Clarkson, 1997). The most typical channel shape is square, however, it is
+possible to find monoliths with circular, triangular or hexagonal chan￾nels (Groppi and Tronconi, 1997; Depcik and Hausmann, 2013; Ding
+et al., 2023). Commonly, monoliths are made of ceramic materials, but
+metallic and silicon carbide substrates have also been tested (Quintero et
+al., 2022; Mehdipour et al., 2024). Another option is corrugated metal￾lic monoliths whose channel shape is usually assumed to be triangular
+(Avila et al., 2005; Tronconi et al., 2004; Shen et al., 2024). It is worth
+mentioning that for all channel shapes, it has been observed that, af￾ter washcoating, the channel tends to become rounder (Watling, 2020;
+Peszynski and Tesař, 2020).
+Inlet and outlet effects in monoliths, usually taken as minor losses,
+become particularly important in high-flow applications. The pressure
+drop from these effects scales quadratically with flow rate, unlike other
+losses, which scale linearly (Quadri et al., 2010; Carter et al., 1998).
+This has also been observed for the so-called wall-flow monoliths used in
+https://doi.org/10.1016/j.ces.2024.120515
+Received 28 May 2024; Received in revised form 5 July 2024; Accepted 15 July 2024
+
+Chemical Engineering Science 299 (2024) 120515
+2
+I. Cornejo
+particulate filters, where, depending on the operating condition, may be￾come relevant (Mesquida et al., 2020; Watling et al., 2021; Mitsouridis
+et al., 2023). That underscores the relevance of inlet and outlet effects
+in the applications where monoliths offer the most advantages.
+In a physical system, experimentally measuring inlet and outlet
+losses is quite challenging. On the other hand, discrete channel compu￾tational fluid dynamics (CFD) models, such as those used in this paper,
+stand out for their ability to accurately simulate fluid dynamics within
+the narrow confines of monolith channels. These models are particu￾larly useful for studying channel-scale phenomena, where the physical
+insertion of probes can disrupt the very flow fields that are wanted to
+measure (Hettel et al., 2013). In the past, CFD has been successfully
+utilized to describe channel scale phenomena in monoliths, with many
+works reported in the literature for cold and reacting flow (Iwaniszyn
+et al., 2021; Canu and Vecchi, 2002; Cornejo et al., 2022; Pawlowski et
+al., 2018).
+In general terms, pressure drop through a monolith can be computed
+as in Equation (1). In the equation, the terms Δ𝑝𝑒𝑙 and Δ𝑝𝑓𝑑 occur in￾side of the channels and come from friction at the hydraulic entrance
+length and fully developed region. For simplicity, let us define the losses
+directly inside the channel as Δ𝑝𝑐=Δ𝑝𝑒𝑙+Δ𝑝𝑓𝑑 . Δ𝑝𝑖 represents energy
+dissipation because of the upstream flow colliding with the frontal face
+of the substrate and entering the channels, while Δ𝑝𝑜 are losses because
+of the flow leaving the substrate to an open section (Cornejo et al.,
+2020a). Among the aforementioned, Δ𝑝𝑓𝑑 is the only one that scales
+linearly with flow rate.
+Δ𝑝 =Δ𝑝𝑖 ⏟⏟⏟
+𝑒𝑛𝑡𝑒𝑟𝑖𝑛𝑔
++Δ𝑝𝑒𝑙 +Δ𝑝𝑓𝑑
+⏟⏞⏞⏞⏞⏟⏞⏞⏞⏞⏟
+𝑖𝑛𝑠𝑖𝑑𝑒 (= Δ𝑝𝑐 )
++Δ𝑝𝑜 ⏟⏟⏟
+𝑙𝑒𝑎𝑣𝑖𝑛𝑔
+(1)
+Early models assumed fully developed laminar flow and neglected
+any inlet, entrance and outlet effect; hence, the pressure drop through
+the monoliths was computed by using the Hagen-Poiseuille equation
+(Benjamin et al., 1996). Mixing the latter with Darcy’s law made it
+possible to perform reactor scale simulations through the continuum
+approach since discrete channel models of a whole reactor are pro￾hibitive for systematic research (Hettel et al., 2019; Bertrand et al.,
+2012). Quadri et al. (2010) reported a series of experiments with long
+and short monoliths, showing that depending on length, void fraction
+and flow rate, the so-called minor losses dominate at a point that the
+relationship between pressure drop and flow rate is no longer linear, it
+turns quadratic. Among the variables potentially explaining that non￾linearity, upstream turbulence entering the channels was reported to
+have no effect on pressure drop (Strom et al., 2011; Cornejo et al.,
+2020a; Garretón et al., 2023). Extra losses due to the entrance length
+were investigated by Shah and London (1978), and the effect of the
+flow entering at an angle into the channels was studied and reported
+by Benjamin et al. (2003). More recently, Cornejo et al. (2019) used
+a discrete channel model to compare losses at the different parts of a
+channel, concluding that, depending on flow rate and void fraction, the
+most relevant quadratic losses come from Δ𝑝𝑜, Δ𝑝𝑖 and Δ𝑝𝑒𝑙, with Δ𝑝𝑜
+being the highest. Together can represent more than 30% of the total
+pressure drop. While such a percentage depends on channel length, this
+paper considers the same range of Reynolds numbers and a monolith
+with similar void fraction and channel size as in the cited study; hence,
+the same trend should also be valid.
+Some applications require two or more monoliths in series. Examples
+are automotive gas after treatment, with a catalytic oxidation monolith
+followed by a selective reduction one, and methanol synthesis carried
+out in tube-shell reactors (Arab et al., 2014). The latter is highly exother￾mic; hence, the tubes are filled with catalyst and externally cooled.
+Those reactors can have thousands of tubes, several meters long each
+(Montebelli et al., 2014). Given the manufacturing limitations of long
+monolithic structures, such reactor tubes can contain several monoliths
+arranged in series, as shown in Fig. 1(a).
+Fig. 1. (a) Reactor tube containing several monoliths. (b) Monolith channels in
+series.
+A closer look at the monolith channels in an in-series system is shown
+in Fig. 1(b). It can be seen that, depending on the relative gap length
+between substrates, Equation (1) may not apply since the flow aban￾doning the first monoliths may encounter the second substrate instead
+of freely flowing in a large open area. On the other hand, the flow ap￾proaching the second monolith may not have a flat velocity profile. In
+such a case, Δ𝑝𝑜 from one monolith combines with Δ𝑝𝑖 of the mono￾lith immediately downstream, being both terms represented as a single
+one named Δ𝑝𝑖∕𝑜. With that, Equation (1) can be adapted to describe
+the pressure drop through the whole system containing 𝑁 monoliths,
+as follows:
+Δ𝑝 =Δ𝑝𝑖 + 𝑁Δ𝑝𝑐 +(𝑁 − 1)Δ𝑝𝑖∕𝑜 +Δ𝑝𝑜 (2)
+Expressions for Δ𝑝𝑖 and Δ𝑝𝑜 are available in the literature for several
+shapes (Cornejo et al., 2020b). The pressure drops for single monoliths
+can be computed using Equation (3) and (4).
+Δ𝑝𝑖 = 𝑓1
+|
+|
+|𝑖
+⋅ 𝜇 ⋅ 𝑢𝑐 + 𝑓2
+|
+|
+|𝑖
+⋅ 1
+2
+𝜌 ⋅ 𝑢2
+𝑐 (3)
+Δ𝑝𝑜 = 𝑓2
+|
+|
+|𝑜
+⋅ 1
+2
+𝜌 ⋅ 𝑢2
+𝑐 (4)
+In Equation (3) and (4), 𝑓1 and 𝑓2 are empirical coefficients that
+depend on the monolith geometry and flow condition. 𝑓1 corresponds to
+the viscous losses related to the fluid’s viscosity, while 𝑓2 to the inertial
+losses, which are proportional to the dynamic pressure. The subscripts
+𝑖 and 𝑜 indicate the inlet and outlet faces of the substrate, respectively.
+According to previous works (Cornejo, 2021), Δ𝑝𝑖∕𝑜 can be computed
+from the previous two as in Equation (5).
+Δ𝑝𝑖∕𝑜 = 𝑓𝛿
+(
+Δ𝑝𝑖 +Δ𝑝𝑜
+) (5)
+The term 𝑓𝛿 is a correction factor that depends on the dimensionless
+spacing between substrates (𝛿∗). For perfectly aligned channels, it can
+be estimated using Equation (6). In the equation, 𝜏𝑐 is a model constant,
+𝐷 is channel diameter, Re is channel Reynolds number, and the group
+(𝛿∕𝐷 ⋅ Re) is 𝛿∗.
+𝑓𝛿 =1− 𝑒𝑥𝑝 [
+−𝜏𝑐
+( 𝛿
+𝐷 ⋅ Re
+)] (6)
+Equation (6) captures the dynamics for scenarios involving perfectly
+aligned monolith substrates. In such configurations, the longitudinal
+axes of the channels in a monolith align with those of the subsequent
+
+Chemical Engineering Science 299 (2024) 120515
+3
+I. Cornejo
+Fig. 2. Computational domain. (a) Both channels in series, (b) frontal view and (c) side view.
+one. As a result, when these substrates are placed very closely, the vis￾cous core flowing from the first channel directly enters into the next,
+making Δ𝑝𝑖∕𝑜 disappear because both channels behave as a single one
+but larger. In line with that, Equation (6) starts from 0 at a very close dis￾tance between substrates and grows to the asymptotic value of 1 when
+the substrates are so far from each other that Δ𝑝𝑜 and Δ𝑝𝑖 can be con￾sidered independent phenomena for each monolith.
+In practical scenarios, achieving perfect alignment of monolith chan￾nels along the entire length of a tube may be uncommon. When misalign￾ment occurs between consecutive monoliths, fluid flow and pressure
+drop dynamics exhibit notable differences. As the gap between mis￾aligned monoliths narrows, an increase in pressure drop is observed.
+This phenomenon could be explained by the direct collision of the vis￾cous core exiting one channel with the frontal wall or the inter-channel
+space of the subsequent monolith. In contrast with the aligned case,
+where the correction factor gradually increases from zero, in a mis￾aligned situation, the correction factor should start from a higher initial
+value, then progressively diminish towards the asymptotic value of 1 as
+the spacing between the monoliths increases.
+Currently, to the best of our knowledge, there are no comprehen￾sive data or models available able to accurately capture the dynamics
+and quantify the correction factor, 𝑓𝛿 , in scenarios involving misaligned
+monolith channels. Focused on that knowledge gap, this paper uses a
+discrete channel computational model to investigate the flow field and
+pressure drop for misaligned monolith channels. A parametric study en￾compassing a range of channel Reynolds numbers and monolith spacing
+lengths is performed. This approach was specifically designed to span
+a broad spectrum of 𝛿∗ values, allowing for observing both the initial
+and asymptotic values of the correction factor for pressure drop between
+substrates in the context of misalignment. The findings are presented in
+terms of the flow field and pressure drop, along with their dimensionless
+versions. A new model for the correction factor applicable to misaligned
+monoliths is proposed. This model, together with existing ones, aims
+to provide an accurate computation of the additional pressure drop re￾sulting from the flow exiting and entering consecutive monoliths across
+various gap lengths and flow rates for misalignment conditions.
+2. Computational model
+2.1. Description of the domain
+The computational model consists of a representative section of two
+identical monoliths with square channels arranged in series, as shown in
+Fig. 2(a). The monoliths are misaligned, meaning the center axis of the
+first monolith’s channel does not coincide with that of the downstream
+monolith. Instead of that, the center axis of a channel of the first mono￾lith lands exactly at the middle of the cross formed for the walls between
+channels of the second substrate. Because of that, the first monolith is
+directly represented by a channel, while the second monolith is repre￾sented by four fourths of a channel. Fig. 2(b) and (c) show the frontal
+and lateral view of such a configuration.
+The domain is symmetric; hence, it is possible to reconstruct the
+entire substrate by expanding the selected section vertically and hor￾izontally. Exceptions are the channels located at the external boundary
+of the substrate that are not perfectly square. Those represent just a
+small percentage of the total because a typical monolith has thousands
+of channels. Channel 1 had 𝐿1=16.8 mm as length, while channel 2
+had 𝐿2=6 mm. These lengths are sufficient to prevent boundary effects
+in the results. The channel diameter was 𝐷=1.2 mm for both mono￾liths. The gap between substrates, 𝛿, varies from 0.1𝐷 to 20𝐷, and wall
+thickness, 𝑤, moved from 0.16 to 0.80 mm, according to the analyzed
+case.
+The flow enters the first channel with a prescribed velocity accord￾ing to the analyzed Re, passes to an open section representing the gap
+between substrates, and then enters the second channel that ends in a
+prescribed pressure outlet.
+2.2. Flow model
+The investigated channel Reynolds numbers were significantly lower
+than the critical one for square channels, so the flow was assumed to be
+laminar. Additionally, it was taken into account that literature reports
+that when turbulent flow approaches a monolith with channels with sub￾critical Re, the turbulence quickly decays and the flow regime turns to
+laminar (Cornejo et al., 2018a, 2017). Careful should be taken because,
+according to published literature, turbulence can be generated when
+the flow leaves monolith channels (Cornejo et al., 2018b, 2020c; Hettel
+et al., 2019). Due to that, Large Eddy Simulation (LES) was used to
+corroborate the flow regime assumption. This is described in more detail
+in Section 2.4.
+Conservation and momentum equations for the laminar steady con￾dition were:
+𝜕(𝜌𝑢𝑖)
+𝜕𝑥𝑖
+=0 (7)
+𝜕(𝜌𝑢𝑖𝑢𝑗)
+𝜕𝑥𝑗
+=− 𝜕𝑝
+𝜕𝑥𝑖
++
+𝜕
+𝜕𝑥𝑗
+[
+𝜇
+( 𝜕𝑢𝑖
+𝜕𝑥𝑗
++
+𝜕𝑢𝑗
+𝜕𝑥𝑖
+)
+− 2
+3
+𝜕𝑢𝑖
+𝜕𝑥𝑖
+𝛿𝑖𝑗]
+(8)
+
+Chemical Engineering Science 299 (2024) 120515
+4
+I. Cornejo
+Table 1
+Ranges analyzed of every variable. 𝑤 is expressed in mm.
+Variable Range
+Channel Reynolds 50, 100, 150, 200, 250, 300, 320
+Gap length (𝛿∕𝐷) 0.12, 0.24, 0.48, 0.60, 0.72, 0.96, 1.20, 6.00, 12.00, 24.00
+Wall thickness (𝑤) 0.16, 0.32, 0.48, 0.64, 0.80
+Void fraction (𝜙)
+† 0.36, 0.43, 0.51, 0.62, 0.78
+† Computed from the wall thickness and channel diameter.
+Fig. 3. View of the mesh. End of Channel 1 and beginning of the gap region.
+As for the boundary conditions, a flat velocity profile was given to
+the inlet of Channel 1. The magnitude of the velocity changed according
+to the desired channel Re in every case (see Table 1). The inner walls
+and rear face of Channel 1 were set as no-slip surfaces. The left, right,
+top and bottom boundaries of the gap between channels were considered
+symmetry planes. For Channel 2, which is divided into four sections, the
+inner walls and frontal face were also set as no-slip boundaries, while the
+top, bottom left and right faces represented the center plane of the rest
+of the channels, hence, considered symmetry planes. Finally, the four
+faces at the end of Channel 2 were outlets with a prescribed pressure of
+100 kPa. The operating fluid was atmospheric air at 100 kPa and 20 ◦C
+with 𝜌=1.225 kg/m3 and 𝜇=1.7894×10−5 Pa⋅s.
+The computational model was implemented using ANSYS Fluent
+2023R2 software (2023a), which uses the finite volumes approach
+(FVM) (Malalasekera and Versteeg, 2007), in a x2 AMD EPYC ROME
+7452 CPU HPC machine, using a total of 64 physical cores. The pres￾sure velocity coupling was solved with the SIMPLE algorithm (Patankar,
+1980), and for the momentum term, a second-order upwind scheme was
+used (ANSYS Fluent, 2023b). Scaled residuals below 10−6 and a sta￾ble pressure drop were used as stop conditions. The latter was selected
+because it is a relevant variable for this study and is sensitive to grid
+quality.
+2.3. Mesh quality and validation
+The domain was discretized into a series of fully orthogonal hex￾ahedral control volumes. The aspect ratio between the edges of the
+control volumes was one; hence, the mesh was Cartesian. A view of
+the discretized domain can be seen in Fig. 3. The mesh quality was in￾vestigated assuming the most critical conditions, which were a gap size
+of 𝛿∕𝐷=20, a wall thickness of 𝑤=0.16 mm and 320 as the channel
+Reynolds number. For that case, the results from the two grids were
+compared. The first grid, or “normal”, had 1 206 600 control volumes
+while the second, or “refined”, had 4 826 400. The refined grid, which
+had four times more control volumes, was obtained by decreasing the
+element size homogeneously in all directions.
+Fig. 4. Validation.
+The simulation with the two grids ran until the previously mentioned
+stop condition. The pressure drop obtained from the normal and refined
+grid was 50.84 Pa and 50.76 Pa. That represents a difference of less than
+0.2%, therefore, the study continued with the normal grid.
+To validate the results, the friction factor’s shape constant was used.
+It is well established in the classical literature that the pressure drop
+for laminar flow in ducts can be computed from the Hagen-Poiseulle
+expression, as in Equation (9) (White, 2009).
+Δ𝑝 = Δ𝑥
+𝐷 ⋅ 𝑓 1
+2 ⋅ 𝜌 ⋅ 𝑢2
+𝑐 (9)
+The friction factor 𝑓 can be written as 𝐶/Re, and Re is (𝜌 ⋅ 𝑢𝑐 ⋅𝐷∕𝜇).
+Replacing that into Equation (9) and rearranging, leads to the mathe￾matical formula for 𝐶 shown in Equation (10):
+𝐶 =2 Δ𝑝 ⋅ 𝐷2
+Δ𝑥 ⋅ 𝜇 ⋅ 𝑢𝑐
+(10)
+The term 𝐶 is a constant that depends on the shape of the channel.
+When having a laminar regime, for square channels with fully devel￾oped flow, it is 56.80 (Bergman et al., 2011). Equation (10) was used to
+compute 𝐶 along of Channel 1. The pressure drop (Δ𝑝) was calculated
+from consecutive segments of length 𝐷. Additionally, Δ𝑝 was calculated
+as the difference in mass flow-weighted total pressure drop at the be￾ginning and end of each segment. The resulting values for 𝐶 are shown
+in Fig. 4.
+It should be remarked that in the domain, 𝑥=0 marks the begin￾ning of the gap between monoliths. That is, Channel 1, which is 16.8
+mm long, runs from 𝑥∕𝐷= -14 to 0. It can be seen in Fig. 4 that 𝐶
+progressively decreases along the channel as the flow develops, as ex￾pected theoretically (Wilcox, 1993). The final value for 𝐶 was 56.88,
+with an error close to 0.14% with respect to the expected 56.80. Such
+an accuracy is sufficient for the purpose of this work.
+2.4. Confirming the flow regime
+It is known that turbulence may arise when flow exits the first chan￾nel or even when it collides with the walls of the second channel down￾stream (Cornejo et al., 2018c). Such a phenomenon has been studied in
+single channels or for perfectly aligned channels but has not been in￾vestigated in a configuration like the one in this paper. For that reason,
+in addition to the performed in Section 2.3, a corroboration of the flow
+regime was also carried out. The boundary conditions were the same
+as in the validation section. LES was used as a flow model since it is
+suitable for predicting transitions in the flow regime. The simulation
+conditions were the same as those for the validation of the results. That
+is, Re=320, 𝛿∕𝐷=20 and 𝑤=0.16 mm. There was a difference in the
+boundary conditions of the gap section and Channel 2. Instead of us￾ing symmetry, the outer boundaries were set as periodic, mirroring the
+top-bottom and left-right faces in order to capture flow unsteadiness.
+
+Chemical Engineering Science 299 (2024) 120515
+5
+I. Cornejo
+Fig. 5. Dimensionless pressure for laminar and LES results. Line 1 is the center￾line of Channel 1 and line 2 is the centerline of Channel 2.
+Given that LES is unsteady and the flow motion is separated into a
+resolved and sub-grid scale, a special notation is assumed in Equation
+(11) to (15). In them, the variables with an overline are those for the
+resolved scale after applying the size filter (Berselli et al., 2006). Mass
+and momentum equation balances were:
+𝜕𝜌
+𝜕𝑡 +
+𝜕(𝜌𝑢𝑖)
+𝜕𝑥𝑗
+=0 (11)
+𝜕𝑢𝑖
+𝜕𝑡 + 𝑢𝑗
+𝜕𝑢𝑖
+𝜕𝑥𝑗
+=−1
+𝜌
+𝜕𝑝
+𝜕𝑥𝑖
++
+𝜕
+𝜕𝑥𝑗
+(
+𝜈
+𝜕𝑢𝑖
+𝜕𝑥𝑗
++
+1
+𝜌
+𝜕𝜏𝑖𝑗
+𝜕𝑥𝑗
+)
+(12)
+The term 𝜏𝑖𝑗 was computed as follows:
+𝜏𝑖𝑗 = 2
+3 ⋅ 𝜌𝑘𝑠𝑔𝑠 ⋅ 𝛿𝑖𝑗 −2𝐶𝑘 ⋅ 𝑘1∕2 ⋅ Δ𝑓 ⋅ 𝑆𝑖𝑗 (13)
+The term in Equation (13) is the subgrid-scale kinetic energy, com￾puted according to the DKE model (Kim and Menon, 1995a; Menon and
+Kim, 1996). In this subgrid model, 𝑘𝑠𝑔𝑠 is a conservative quantity that
+responds to the following balance:
+𝜕(𝜌𝑘𝑠𝑔𝑠)
+𝜕𝑡 +
+𝜕(𝜌𝑢𝑗𝑘𝑠𝑔𝑠)
+𝜕𝑥𝑗
+=−𝜏𝑖𝑗
+𝜕𝑢𝑖
+𝜕𝑥𝑗
+− 𝐶𝜀𝜌
+𝑘3∕2
+𝑠𝑔𝑠
+Δ𝑓
++
+𝜕
+𝜕𝑥𝑗
+(𝜇𝑠𝑔𝑠
+𝜎𝑘
+𝜕𝑘𝑠𝑔𝑠
+𝜕𝑥𝑖
+)
+(14)
+where
+𝜇𝑠𝑔𝑠 = 𝑘 ⋅ 𝜌 ⋅ 𝑘1∕2
+𝑠𝑔𝑠 ⋅ Δ𝑓 (15)
+More details about the LES and subgrid model, including the param￾eters and subfunctions, can be found in Kim and Menon (1995b); Kim
+et al. (1997); Menon et al. (1996).
+To obtain more details on the resolved side of the flow, for LES,
+the refined grid, with 4 826 400 control volumes, was used. As the in￾let boundary condition for turbulence, 𝑘𝑠𝑔𝑠 was set as zero, and no
+turbulence generators were used. This is because the objective of this
+simulation is to check if turbulence is triggered by the flow leaving and
+entering the channels. The time step size was manipulated to keep a
+CFL number below unity, leading to 𝑑𝑡 ≈ 10 μs. The schemes used were
+bounded central differencing for momentum and second-order implicit
+for time. Both as implemented in ANSYS Fluent 2023R2 (2023b). The
+problem was initialized with the inlet conditions and the stop criterion
+for every time step was having scaled residuals smaller than 10−4. The
+simulation ran until it converged to a steady solution, corroborating the
+laminar steady flow regime assumption. The results from LES agreed
+with those from the steady laminar simulation in terms of pressure drop
+through the domain and asymptotic shape factor (𝐶) in Channel 1.
+Dimensionless static pressure along two lines of the domain obtained
+from LES and laminar models are compared in Fig. 5. The figure shows
+overlapped curves for both flow models. It is also seen, as expected, that
+pressure in line 1 decreases non-linearly in the first part of Channel 1,
+and then the curve becomes linear as the flow develops. Entering the gap
+between substrates, the flow area suddenly expands. Consequently, ve￾locity progressively decreases, and static pressure increases. Then, line
+1 reaches the frontal face of Channel 2 and disappears. The flow collides
+that face with the respective increasing of the static pressure. Regarding
+line 2, it corresponds to the centerline of Channel 2, hence, it appears
+right at the beginning of the gap. It coincides with line 1 in the gap
+zone because there is no radial variation of static pressure in that part
+of the domain. Opposite to line 1, line 2 does not collide with walls. It
+enters Channel 2, where there is a marked reduction of the flow area,
+increasing flow velocity and suddenly decreasing pressure.
+Results from both channels agree and are consistent with theoretical
+expectations in terms of the absolute value of the shape factor in the
+developed zone and the trend in static pressure. They serve as evidence
+confirming the choice of a laminar flow regime.
+3. Results and discussion
+The results analyzed involve all the combinations between 7 channel
+Reynolds, 10 gap lengths and 5 wall thicknesses, making a total of 350
+simulations. The exact values for those variables are shown in Table 1.
+Channel Reynolds and wall thicknesses are typical values for monolith
+applications. Regarding the gap length, small and large values were con￾sidered, paying special attention to 𝛿∕𝐷< 1. For additional reference,
+the resulting void fractions were also reported in Table 1. Those were
+obtained as 𝜙 = 𝐷2∕(𝐷 + 𝑤)
+2.
+3.1. Exploratory analysis
+An initial qualitative analysis of flow through misaligned channels
+is performed. Fig. 6 shows the effect of increasing Re at a constant gap
+length, while Fig. 7 illustrates the effect of increasing the gap length at a
+constant Re. Three planes were selected for each simulation to observe
+the fluid dynamics through channels. The three planes are described
+below:
+• First plane, at 𝑧=0. Placed at the center of Channel 1, this plane
+offers a view of the flow as it exits the first channel and enters the
+gap. It coincides with the partition wall between the quarters of
+Channel 2 and thus is only visible from the inlet of Channel 1 to the
+end of the gap zone. It allows us to observe how the flow leaving
+Channel 1 with the highest velocity encounters its first physical
+obstruction because of the misaligned channels.
+• Second plane, at 𝑧=0.28𝐷. Positioned halfway between the center
+planes of Channel 1 and Channel 2, this plane cuts through three￾quarters of the way toward the left wall of the quarter-channel 2a
+(see Fig. 2b). It spans the entire domain, providing a view of the
+change in the flow trajectory and potential recirculating zones.
+• Third plane, at 𝑧=0.56𝐷. Aligned with the center of Channel 2,
+this plane captures the symmetry plane at the right boundary of the
+gap, along with the center of channels 2a and 2c (see Fig. 2b). It is
+particularly informative of the flow after fully entering the second
+channel, post-gap.
+The results in Fig. 6 and 7 underline the significant impact of struc￾tural alignment on the flow dynamics in series-arranged monolith chan￾nels. Data from previous research regarding a perfectly aligned config￾uration indicates a predictable behavior as the flow moves undisturbed
+from one channel to the next, promoting an uninterrupted velocity pro￾file with minimal disturbances dominated by viscosity. The misalign￾ment investigated in this paper introduces a more complex fluid behav￾ior due to the impact of the outflow of the first channel on the frontal
+face of the channel downstream, triggering flow separation and colli￾sion dynamics. The shortened gap in the misalignment configuration
+accentuates these phenomena, offering less space for pressure recovery
+
+Chemical Engineering Science 299 (2024) 120515
+6
+I. Cornejo
+Fig. 6. Effect of increasing Re at a constant gap length of 𝛿∕𝐷=0.1. From top to bottom Re are 50, 150, 250 and 320.
+or velocity profile development before the flow undergoes a quick redi￾rection entering the subsequent channel.
+Higher Reynolds numbers in misaligned channels exacerbate these
+effects, making the boundary layer more prone to separation and in￾creasing backpressure at the entrance of Channel 2. On the other hand,
+it seems in Fig. 6 that the zone upstream of Channel 2 affected by
+the viscous effects from its solid walls is independent of Re. The be￾havior of the boundary layer is particularly noteworthy in both Fig. 7
+and 6. In misaligned channels, the boundary layer is subject to detach￾ment and subsequent reattachment due to the direct collision with the
+channel walls, influencing the pressure drop across the transition zone.
+The latter phenomenon is enhanced by a higher Re and a shorter gap
+length.
+Fig. 8 shows a comparative analysis of the velocity and pressure
+fields at the entrance of the second monolith channel for short and long
+gaps. In the case with a short gap (Figs. 8(a) and (c)), the velocity field
+indicates that the flow exiting the first monolith directly collides with
+the wall of the second monolith channel, exhibiting energy dissipation
+upon impact. The collision results in localized regions of high pressure
+near the entrance of the second channel, as shown in the pressure field.
+
+Chemical Engineering Science 299 (2024) 120515
+7
+I. Cornejo
+Fig. 7. Effect of increasing the gap length at a constant Re of 250. Gap lengths are 0.1𝐷,1𝐷,5𝐷 and 10𝐷 from top to bottom.
+The velocity profile in this short gap case shows a lack of development
+as the flow transitions abruptly from the first to the second monolith,
+providing insufficient space for the flow to stabilize before entering the
+second monolith, potentially increasing losses.
+In contrast, for the case with a large gap (Fig. 8(b) and (d)), the veloc￾ity field indicates a smoother transition of the flow from the gap into the
+second monolith channel. The flow has sufficient space to develop and
+stabilize within the gap, reducing the intensity of the collision with the
+wall of the second monolith. The pressure field shows a more uniform
+distribution with fewer high-pressure zones, indicating a more smooth
+flow transition and lower losses than the short gap case.
+An interesting aspect to consider is how the misalignment influences
+the pressure drop in the downstream channel. There is an effect on the
+inlet velocity profile, and consequently on the hydraulic entrance length
+and overall pressure drop. While longer channels would be required
+for a thorough investigation, previous studies have explored this topic
+(Cornejo et al., 2019, 2020b). These studies show that a concave inlet
+velocity profile with peaks, similar to those obtained in this paper, af￾fects the local friction factor and pressure drop. They also highlight that
+different velocity profiles do not produce substantially different pressure
+drops among them, but there is a noticeable difference when compared
+to a completely flat profile. Given that the conditions in those studies
+
+Chemical Engineering Science 299 (2024) 120515
+8
+I. Cornejo
+Fig. 8. Velocity and pressure fields at the entrance of the second monolith channel for two gap lengths. (a) Velocity field for 𝛿∕𝐷 =0.1. (b) Velocity field for 𝛿∕𝐷 = 10.
+(c) Pressure field for 𝛿∕𝐷 =0.1. (d) Pressure field for 𝛿∕𝐷=10.
+are similar to those in this one, the results should apply here as well.
+However, further investigation considering the whole system, including
+the gap and downstream channels, is required to fully address this point.
+3.2. Data analysis and model development
+This section presents the data collected from simulations that span
+all the conditions shown in Table 1. The data is the pressure drop (Δ𝑝𝑖∕𝑜)
+from the beginning to the end of the gap between the monolith channels
+computed using Equation (16). In the equation, 𝑝𝑇 is the total pressure
+(static plus dynamic) and 𝐴 is the cross-section area at a plane at the
+exit of Channel 1 (𝑃1) and the inlet of Channel 2 (𝑃2). Pressure is mass
+flow weighted to keep consistency with the momentum balance given
+the change in flow profile and flow area.
+Δ𝑝𝑖∕𝑜 = ∫𝐴 𝜌 ⋅ 𝑢 ⋅ 𝑝𝑇 ⋅ 𝑑𝐴
+∫𝐴 𝜌 ⋅ 𝑢 ⋅ 𝑑𝐴
+|
+|
+|
+|𝑃1
+− ∫𝐴 𝜌 ⋅ 𝑢 ⋅ 𝑝𝑇 ⋅ 𝑑𝐴
+∫𝐴 𝜌 ⋅ 𝑢 ⋅ 𝑑𝐴
+|
+|
+|
+|𝑃2
+(16)
+Fig. 9 shows the pressure drop as a function of the scaled gap length
+(𝛿∕𝐷) for various Reynolds numbers and void fractions. It is possible
+to observe some trends in the figure. At very short gaps (𝛿∕𝐷<0.4),
+the pressure drop seems higher across all Reynolds numbers and void
+fractions, in line with the mentioned interaction effects between closely
+spaced monolith channels. As the gap length increases, the pressure drop
+decreases and stabilizes, confirming more independent flow behavior
+between the channels with increased spacing. The curves stabilize at
+longer gaps, indicating less interaction effects and pressure drops domi￾nated by individual channel characteristics. Lower void fractions result
+in higher pressure drops compared to higher ones due to increased flow
+Fig. 9. Pressure drop in the gap between substrates for several void fractions
+(𝜙), channel Re, and scaled gap lengths (𝛿∕𝐷).
+resistance in channels with proportionally smaller flow areas and colli￾sion zones. This effect is more pronounced at short gaps. The sharp de￾cline in pressure drop at small gap lengths followed by a plateau suggests
+a transition of the phenomenon dominating losses. Higher Reynolds
+numbers correspond to higher losses due to increased dynamic pressure,
+as expected.
+Fig. 10 provides an analysis of the pressure drop as a function of the
+scaled gap length (𝛿∕𝐷) for the extreme values of Re and void fractions
+
+Chemical Engineering Science 299 (2024) 120515
+9
+I. Cornejo
+Fig. 10. Pressure drop versus scaled gap length (𝛿∕𝐷) highlighting the behavior at low and high Re and low and high void fraction.
+considered in this study. Fig. 10(a) shows the data for Re=50. Here, the
+pressure drop is relatively low and remains consistent for different void
+fractions, with a decline as the gap length increases. This indicates that
+the impact of void fraction on pressure drop is relatively small at low
+flow velocities. At a high Re, as shown in Fig. 10(b), the pressure drop
+is significantly higher, particularly at small gap lengths, but follows a
+similar trend to that for lower Re.
+Regarding void fraction, data in Fig. 10(c) indicate that as the Re
+increases, the pressure drop also increases, particularly at short gap
+lengths. The pressure drop stabilizes at larger gaps, but the differences
+between Re remain pronounced. This trend follows the opposite pattern
+of that when the void fraction is low, underscoring the combined ef￾fect of low void fraction and high Re in producing pressure drops. It is
+observed in Fig. 10(d) that higher void fractions result in lower pres￾sure drops, as expected, due to the reduced flow resistance within the
+monolith channels.
+In Fig. 10(b) and 10(c), the observed trend where the pressure drop
+decreases with increasing gap length and then slightly increases for
+larger gaps might be explained by the interplay between flow resistance
+and secondary flow effects. Initially, as the gap length increases, the
+flow resistance decreases significantly because the flow obstruction is re￾duced, leading to a lower pressure drop. However, at larger gap lengths,
+secondary flow effects, such as boundary layer detachment and reattach￾ment, begin to play a role. These effects may cause slight increases in
+the pressure drop because the flow dynamics become more complex,
+resulting in additional pressure losses. The slight increase in pressure
+drop for larger gaps is challenging to explain due to the involvement of
+multiple factors, including flow around solid collisions with the frontal
+face of the substrate and variations in the flow area. Each of these fac￾tors impacts the pressure drop to different extents, and the dominant
+phenomenon may change with void fraction and gap length, leading to
+complex trends. Further research is needed to provide a more precise
+explanation for these observations.
+After analyzing the effect of the main variables on the pressure drop,
+a model that can fit the observed data is proposed. To do that, first, the
+variables are nondimensionalized.
+In line with Equation (6), the curves for Δ𝑝𝑖∕𝑜 are scaled by their
+respective asymptotic value, which should tend to (Δ𝑝𝑖
++Δ𝑝𝑜), obtaining
+the dimensionless pressure drop Δ𝑝∗
+𝑖∕𝑜 that equates the correction factor.
+This can be done with Equation (17).
+𝑓𝛿 =Δ𝑝∗
+𝑖∕𝑜 = Δ𝑝𝑖∕𝑜
+Δ𝑝𝑖 +Δ𝑝𝑜
+(17)
+A new expression for 𝛿∗ for the misaligned case appeared as neces￾sary since wall thickness plays a role in such a scenario. The choice of
+the expression came from fitting the values of 𝑎, 𝑏, 𝑐 and 𝑑 in Equation
+(18). The variables 𝛿, 𝐷, and Re were included because they are part of
+the model for aligned channels. The wall thickness, 𝑤, was added be￾cause it impacts the frontal area where the outflow from the first channel
+collides.
+𝛿∗ = 𝛿𝑎 ⋅ 𝐷𝑏 ⋅ 𝑤𝑐 ⋅ Re𝑑 (18)
+To reduce the range of possible solutions, the values for 𝑎, 𝑏, 𝑐 and
+𝑑 were restricted to the range from -2.5 to 2.5 in increments of 0.5.
+This range was based on typical values of such coefficients in boundary
+layer, jet flow and flow around objects problems. Additionally, 𝑎 was
+fixed to 1 because of its physical meaning, and the sum of 𝑎, 𝑏 and 𝑐
+was forced to be 0 in order to maintain nondimensionality. The results
+gave 𝑏=1, 𝑐=-2 and 𝑑=0.5. Finally, to relate the dimensionless gap
+with that for the aligned case, the expression was multiplied by 1 in the
+form of (𝐷⋅Re)/(𝐷⋅Re), leading to Equation (19) after rearranging.
+𝛿∗ = 𝛿 ⋅ 𝐷 ⋅ 1
+𝑤2 ⋅ Re1∕2 ⋅ 𝐷
+𝐷 ⋅ Re
+Re =
+( 𝛿
+𝐷 ⋅ Re
+)[(𝐷
+𝑤
+)2
+⋅ Re3∕2]
+(19)
+That mathematical treatment made it possible to propose Equation
+(20). The appearance of the term (𝐷∕𝑤)
+2 makes sense because it directly
+
+Chemical Engineering Science 299 (2024) 120515
+10
+I. Cornejo
+Fig. 11. Dimensionless pressure drop versus dimensionless gap length for vari￾ous Reynolds numbers and void fractions.
+Table 2
+Model parameters and goodness of the fit.
+Parameter Value
+𝑘𝑐 13.1208 ±0.9205†
+𝜏𝑐 0.4478 ±0.0225†
+R2 0.9314
+R2-adjusted 0.9312
+RMSE 0.1774
+† From the 95% confidence interval
+relates to the void fraction of the substrate. A misalignment modifier is
+explicitly included. When the channels are aligned, 𝛾 is 0, so the term
+simplifies to the dimensionless gap length used in previously existing
+models for aligned channels (Cornejo, 2021). For misaligned channels,
+𝛾 is 1,so the modifier actually participates. This extendsthe applicability
+of the nondimensionalization to both aligned and misaligned cases.
+𝛿∗ =
+( 𝛿
+𝐷 ⋅ Re
+)
+⏟⏞⏞⏟⏞⏞⏟
+Aligned 𝑥+
+[(𝐷
+𝑤
+)2
+⋅ Re3∕2]𝛾
+⏟⏞⏞⏞⏞⏞⏞⏞⏞⏞⏟⏞⏞⏞⏞⏞⏞⏞⏞⏞⏟
+Missalignment modifier
+(20)
+Using the dimensionless variables Δ𝑝∗
+𝑖∕𝑜 and 𝛿∗, a successful collapse
+of all the curves for the pressure drop curves against gap size is achieved.
+The result from applying Equation (17) and (20) to pressure drop and
+gap lenght, shown in Fig. 11, suggests that the chosen nondimensional￾ization is useful for generalizing the observed phenomena, at least for
+most of the practical applications.
+Next, an equation that models the correction factor 𝑓𝛿 is proposed.
+The development of this equation considers the established model for
+aligned channels in Equation (6), which exhibits an exponential increase
+from 0 to 1 as the dimensionless gap length 𝛿∗ increases. Observing
+Fig. 11, an exponential decrease from the initial to an asymptotic value
+of 1 is noticed. This inverse exponential behavior contrasts with the
+aligned case but suggests that a similar mathematical structure could be
+applicable.
+𝑓𝛿 =1+ 𝑘𝑐 ⋅ 𝑒𝑥𝑝 (
+−𝜏𝑐 ⋅ 𝛿∗) (21)
+Same as in the case for aligned channels, the two parameters 𝑘𝑐 and
+𝜏𝑐 are obtained through nonlinear regression. It should be noted that
+Equation (21) can be linearized to 𝑙𝑛(Δ𝑝𝑖∕𝑜 − 1) = 𝑙𝑛(𝑘𝑐 )−𝜏𝑐 ⋅ 𝛿∗, hence,
+the regression has a unique solution (Montgomery, 1996; Box et al.,
+2005). The result of the curve fitting is summarized in Table 2.
+Figs. 12 and 13 compare the proposed model against the data. Fig. 12
+shows the convergence of the pressure drop curves, demonstrating the
+effectiveness of the nondimensionalization and proposed model to de￾scribe the data in the whole range analyzed. Additionally, Fig. 13 shows
+the correlation between the measured and predicted values, further
+Fig. 12. Predicted dimensionless pressure drop using the proposed model versus
+dimensionless gap length compared to data.
+Fig. 13. Correlation plot of predicted using the proposed model versus computed
+from data correction factor 𝑓𝛿 .
+Table 3
+Parameter values for the aligned and misaligned cases.
+Case 𝛾𝑘𝑐 𝜏𝑐 Negligible effects if
+Aligned† 0 1 45.92 𝛿∗ ≥ 10−1
+Misaligned 1 13.12 0.4478 𝛿∗ ≥ 101
+† From Cornejo (2021).
+complementing the goodness of fit. It can be seen from this figure that
+the majority of data points closely align along the 45◦ line. Some lack
+of sensitivity is observed near unity and for the point at (8,7). Addi￾tionally, the points describe a slightly curvy shape, but these errors are
+tolerable for practical applications, provided that this is the first model
+of its kind trying to describe the phenomenon.
+Finally, due to their mathematical similarity, a general expression
+for both aligned and misaligned channels can be proposed by combin￾ing Equation (6) and Equation (21). The resulting model is shown in
+Equation (22).
+𝑓𝛿 = 1 + (−1)1−𝛾 ⋅ 𝑘𝑐 ⋅ 𝑒𝑥𝑝 (
+−𝜏𝑐 ⋅ 𝛿∗) (22)
+Replacing 𝛿∗ according to Equation (20), a more explicit form is
+obtained:
+𝑓𝛿 = 1 + (−1)1−𝛾 ⋅ 𝑘𝑐 ⋅ 𝑒𝑥𝑝{
+−𝜏𝑐
+( 𝛿
+𝐷 ⋅ Re
+)[(𝐷
+𝑤
+)2
+⋅ Re3∕2]𝛾}
+(23)
+The model is useful for both aligned and misaligned cases when using
+the correct set of parameters. It gives the value of the correction factor
+to be used in Equation (5). Table 3 summarizes parameter values.
+
+Chemical Engineering Science 299 (2024) 120515
+11
+I. Cornejo
+To prevent the most negative scenario of increased extra pressure
+drop, it is important to maintain sufficient separation between sub￾strates. The results show that the extra pressure drop does not depend
+on the absolute distance 𝛿, but on the dimensionless one 𝛿∗, which is
+affected by Re, 𝑤, 𝐷 and alignment condition, as shown in Equation
+(20). A recommended value for 𝛿∗ from which negative effects due to
+misalignment can be neglected is shown in Table 3.
+4. Conclusions
+This study successfully introduces a new model for predicting ad￾ditional pressure drops in misaligned monolith catalyst substrates ar￾ranged in series. The findings highlight a notable impact of misalign￾ment on pressure drops, particularly in closely spaced monoliths. How￾ever, it is important to note that the model is currently limited to mono￾liths misaligned by half of a channel diameter. Additionally, no rotation
+of the monoliths is considered. Addressing such limitations would re￾quire a significantly longer set of simulations, which is beyond the scope
+of the present exploratory study.
+It is concluded that for the studied misalignment, the extra pressure
+drop and correction factor differ significantly from that for the aligned
+scenario. These factors are significantly influenced by the void fraction,
+Reynolds number, and gap length. Higher Reynolds numbers and lower
+void fractions result in increased pressure drops due to greater dynamic
+pressure and frontal collision. Shorter gap lengths lead to higher pres￾sure drops due to increased interaction effects between fluid and solid.
+Dimensionless variables are introduced to generalize the phe￾nomenon in a typical range of conditions for monolith applications.
+Based on them, a unified correction factor model, applicable to both
+aligned and misaligned channels, extends existing frameworks. By in￾corporating a misalignment modifier, the model predicts the correction
+factor across different gap lengths, flow rates and void fractions, enhanc￾ing its practical applicability. Minor discrepancies, such as the slight
+curvature in the correlation plot, are acknowledged but acceptable for
+practical applications.
+Experimental validation of the proposed model is highly recom￾mended, along with an exploration of the effect on the pressure drop
+for different channel shapes.
+This study also acknowledges that misalignment affects the pressure
+drop in the downstream channels. It is expected that non-homogeneous
+inflow profiles due to misalignment cause variations in local friction
+factor and pressure drop. However, further investigation with longer
+channels is needed to fully understand this effect.
+Nomenclature
+𝐶 Shape factor
+𝐷 Channel hydraulic diameter, m
+𝑓 Darcy friction factor, -
+𝑓1,𝑓2 Model parameters, -
+𝑓𝛿 Correction factor, -
+𝛾 Misalignment term
+𝑘𝑐 Model parameter, -
+𝑘𝑠𝑔𝑠 Sub-grid turbulence kinetic energy, m2/s2
+𝑤 Substrate wall thickness, m
+𝑝 Pressure, Pa
+𝑝𝑇 Total pressure, Pa
+Δ𝑝𝑐 Pressure drop inside of a substrate, Pa
+Δ𝑝𝑖 Pressure drop when entering a substrate, Pa
+Δ𝑝𝑜 Pressure drop when leaving a substrate, Pa
+Δ𝑝𝑖∕𝑜 Combined effect of Δ𝑝𝑜 and Δ𝑝𝑖 for substrates in series, Pa
+Re Reynolds number, -
+𝑡 Time, s
+𝑢 Velocity magnitude, m/s
+𝑢𝑐 Channel velocity, m/s
+𝛿 Length of the gap between substrates, m
+𝛿𝑖𝑗 Kronecker delta, -
+𝜙 Substrate void fraction, -
+𝜌 Fluid density, kg/m3
+𝜏𝑐 Model parameter, -
+𝜇 Fluid viscosity, Pa⋅s
+𝜇𝑠𝑔𝑠 Sub-grid turbulence viscosity, Pa⋅s
+CRediT authorship contribution statement
+Ivan Cornejo: Writing – review & editing, Writing – original draft,
+Visualization, Validation, Supervision, Software, Resources, Project ad￾ministration, Methodology, Investigation, Funding acquisition, Formal
+analysis, Data curation, Conceptualization.
+Declaration of competing interest
+The authors declare that they have no known competing financial
+interests or personal relationships that could have appeared to influence
+the work reported in this paper.
+Data availability
+Data will be made available on request.
+Acknowledgements
+Financial support provided by ANID/R23F0001 is acknowledged.
+The author is also grateful to Gonzalo Garretón for his discussions on
+the preliminary results and to Consuelo Reinao for her significant con￾tribution to the graphical abstract.
+References
+ANSYS Fluent Release 2023R2. aNSYS Inc., Canonsburg, PA, USA.
+ANSYS Fluent Theory Guide Release 2023R2. aNSYS Inc., Canonsburg, PA, USA.
+Arab, S., Commenge, J.-M., Portha, J.-F., Falk, L., 2014. Methanol synthesis from co2 and
+h2 in multi-tubular fixed-bed reactor and multi-tubular reactor filled with monoliths.
+Chem. Eng. Res. Des. 92 (11), 2598–2608.
+Avila, P., Montes, M., Miró, E.E., 2005. Monolithic reactors for environmental applica￾tions: a review on preparation technologies. Chem. Eng. J. 109 (1–3), 11–36.
+Azzoni, M.E., Franchi, F.S., Usberti, N., Nasello, N.D., Castoldi, L., Nova, I., Tronconi, E.,
+2022. Dual-layer adscr monolith catalysts: a new solution for nox emissions control
+in cold start applications. Appl. Catal. B, Environ. 315, 121544.
+Benjamin, S., Clarkson, R., Haimad, N.a., Girgis, N., 1996. An experimental and predictive
+study of the flow field in axisymmetric automotive exhaust catalyst systems. SAE
+Technical Paper No. 961208.
+Benjamin, S., Zhao, H., Arias-Garcia, A., 2003. Predicting the flow field inside a close￾coupled catalyst—the effect of entrance losses. Proc. Inst. Mech. Eng., Part C, J. Mech.
+Eng. Sci. 217 (3), 283–288.
+Bergman, T.L., Incropera, F.P., DeWitt, D.P., Lavine, A.S., 2011. Fundamentals of Heat
+and Mass Transfer. John Wiley & Sons, New Jersey, NY, USA.
+Berselli, L.C., Iliescu, T., Layton, W.J., et al., 2006. Mathematics of Large Eddy Simulation
+of Turbulent Flows, vol. 2. Springer.
+Bertrand, F., Devals, C., Vidal, D., de Préval, C.S., Hayes, R.E., 2012. Towards the simu￾lation of the catalytic monolith converter using discrete channel-scale models. Catal.
+Today 188 (1), 80–86.
+Box, G.E., Hunter, J.S., Hunter, W.G., 2005. Statistics for Experimenters: Design, Innova￾tion, and Discovery, vol. 2. Wiley-Interscience, New Jersey, NY, USA.
+Busse, C., Freund, H., Schwieger, W., 2018. Intensification of heat transfer in catalytic
+reactors by additively manufactured periodic open cellular structures (pocs). Chem.
+Eng. Process.-Process Intensif. 124, 199–214.
+Canu, P., Vecchi, S., 2002. Cfd simulation of reactive flows: catalytic combustion in a
+monolith. AIChE J. 48 (12), 2921–2935.
+Carter, R.N., Menacherry, P., Pfefferle, W.C., Muench, G., Roychoudhury, S., 1998. Lab￾oratory evaluation of ultra-short metal monolith catalyst. Tech. Rep., SAE Technical
+Paper.
+Chatterjee, D., Burkhardt, T., Rappe, T., Güthenke, A., Weibel, M., 2009. Numerical sim￾ulation of doc+ dpf+ scr systems: doc influence on scr performance. SAE Int. J. Fuels
+Lubr. 1 (1), 440–451.
+Clarkson, R.J., 1997. A theoretical and experimental study of automotive catalytic con￾verters. Ph.D. thesis. Coventry University.
+Cornejo, I., 2021. A model for correcting the pressure drop between two monoliths. Cat￾alysts 11 (11), 1314.
+
+Chemical Engineering Science 299 (2024) 120515
+12
+I. Cornejo
+Cornejo, I., Hayes, R.E., 2021. A review of the critical aspects in the multi-scale modelling
+of structured catalytic reactors. Catalysts 11 (1), 89.
+Cornejo, I., Nikrityuk, P., Hayes, R., 2017. Turbulence decay inside the channels of an
+automotive catalytic converter monolith. Emiss. Control Sci. Technol. 3 (4), 302–309.
+Cornejo, I., Hayes, R.E., Nikrityuk, P., 2018c. A new approach for the modeling of turbu￾lent flows in automotive catalytic converters. Chem. Eng. Res. Des. 140, 308–319.
+Cornejo, I., Nikrityuk, P., Hayes, R.E., 2018a. Multiscale RANS-based modeling of the
+turbulence decay inside of an automotive catalytic converter. Chem. Eng. Sci. 175,
+377–386.
+Cornejo, I., Nikrityuk, P., Hayes, R.E., 2018b. Turbulence generation after a monolith in
+automotive catalytic converters. Chem. Eng. Sci. 187, 107–116.
+Cornejo, I., Nikrityuk, P., Hayes, R.E., 2019. Pressure correction for automotive catalytic
+converters: a multi-zone permeability approach. Chem. Eng. Res. Des. 147, 232–243.
+Cornejo, I., Nikrityuk, P., Hayes, R.E., 2020b. The influence of channel geometry on the
+pressure drop in automotive catalytic converters: model development and validation.
+Chem. Eng. Sci. 212, 115317.
+Cornejo, I., Nikrityuk, P., Hayes, R.E., 2020c. Effect of substrate geometry and flow con￾dition after the turbulence generation after a monolith. Can. J. Chem. Eng. https://
+doi.org/10.1002/cjce.23687.
+Cornejo, I., Nikrityuk, P., Lange, C., Hayes, R.E., 2020a. Influence of upstream turbulence
+on the pressure drop inside a monolith. Chem. Eng. Process.-Process Intensif. 147,
+107735.
+Cornejo, I., Garreton, G., Hayes, R.E., 2021. On the use of dual cell density monoliths.
+Catalysts 11 (9), 1075.
+Cornejo, I., Nikrityuk, P., Hayes, R.E., 2022. Heat and mass transfer inside of a monolith
+honeycomb: from channel to full size reactor scale. Catal. Today 383, 110–122.
+Della Torre, A., Montenegro, G., Onorati, A., Cerri, T., Tronconi, E., Nova, I., 2020. Nu￾merical optimization of a scr system based on the injection of pure gaseous ammonia
+for the nox reduction in light-duty diesel engines. In: SAE 2020 World Congress Ex￾perience. WCX 2020, April. SAE International, pp. 1–11.
+Depcik, C.D., Hausmann, A.J., 2013. Review and a methodology to investigate the effects
+of monolithic channel geometry. J. Eng. Gas Turbines Power 135 (3), 032301.
+Ding, H., Tong, S., Qi, Z., Liu, F., Sun, S., Han, L., 2023. Syngas production from chemical￾looping steam methane reforming: the effect of channel geometry on bacoo3/ceo2
+monolithic oxygen carriers. Energy 263, 126000.
+Ekström, F., Andersson, B., 2002. Pressure drop of monolithic catalytic converters exper￾iments and modeling. SAE Technical paper No. 2002-01-1010.
+Garretón, G., Maxwell, L., Cornejo, I., 2023. Transition of the flow regime inside of mono￾lith microchannel reactors fed with highly turbulent flow. Catalysts 13 (6), 938.
+Groppi, G., Tronconi, E., 1997. Theoretical analysis of mass and heat transfer in monolith
+catalysts with triangular channels. Chem. Eng. Sci. 52 (20), 3521–3526.
+Hayes, R.E., Cornejo, I., 2021. Multi-scale modelling of monolith reactors: a 30-year per￾spective from 1990 to 2020. Can. J. Chem. Eng. 99 (12), 2589–2606.
+Hettel, M., Diehm, C., Torkashvand, B., Deutschmann, O., 2013. Critical evaluation of in
+situ probe techniques for catalytic honeycomb monoliths. Catal. Today 216, 2–10.
+Hettel, M., Daymo, E., Schmidt, T., Deutschmann, O., 2019. CFD-modeling of fluid do￾mains with embedded monoliths with emphasis on automotive converters. Chem. Eng.
+Process.-Process Intensif. https://doi.org/10.1016/j.cep.2019.107728.
+Ibáñez, M., Sanz, O., Egaña, A., Reyero, I., Bimbela, F., Gandía, L.M., Montes, M., 2021.
+Performance comparison between washcoated and packed-bed monolithic reactors
+for the low-temperature Fischer-Tropsch synthesis. Chem. Eng. J., 130424.
+Iwaniszyn, M., Jodlowski, P.J., Sindera, K., Gancarczyk, A., Korpys, M., Jedrzejczyk, R.J.,
+Kolodziej, A., 2021. Entrance effects on forced convective heat transfer in laminar flow
+through short hexagonal channels: experimental and cfd study. Chem. Eng. J. 405,
+126635.
+Jang, J., Lee, J., Choi, Y., Park, S., 2018. Reduction of particle emissions from gasoline
+vehicles with direct fuel injection systems using a gasoline particulate filter. Sci. Total
+Environ. 644, 1418–1428.
+Kane, S.P., Northrop, W.F., 2023. A quasi-dimensional model of heat transfer between
+multi-concentric monolith structures. Thermo 3 (4), 515–536.
+Kim, W., Menon, S., 1995a. A new dynamic one-equation subgrid-scale model for large
+eddy simulations. In: 33rd Aerospace Sciences Meeting and Exhibit. Reno, NV, USA.
+Kim, W.-W., Menon, S., 1995b. On the properties of a localized dynamic subgrid-scale
+model for large-eddy simulations. J. Fluid Mech.
+Kim, W.-W., Menon, S., Kim, W.-W., Menon, S., 1997. Application of the localized dynamic
+subgrid-scale model to turbulent wall-bounded flows. In: 35th Aerospace Sciences
+Meeting and Exhibit. Reno, NV, USA, p. 210.
+Lock, J., Clasén, K., Sjoblom, J., McKelvey, T., 2021. A control-oriented spatially resolved
+thermal model of the three-way-catalyst. SAE International (Apr. 6, 2021). https://
+www.sae.org/publications/technical-papers/content/2021-01-0597.
+Malalasekera, W., Versteeg, H., 2007. An Introduction to Computational Fluid Dynamics:
+the Finite Volume Method. PEARSON Prentice Hall, Upper Saddle River, New Jersey,
+USA.
+Mehdipour, F., Delrieux, T., Maurer, F., Grunwaldt, J.-D., Klahn, C., Dittmeyer, R., 2024.
+Opportunities and limitations of metal additive manufacturing of structured catalytic
+converters. Catal. Commun., 106873.
+Menon, S., Kim, W.-W., 1996. High Reynolds number flow simulations using the localized
+dynamic subgrid-scale model. In: 34th Aerospace Sciences Meeting and Exhibit. Reno,
+NV, USA, p. 425.
+Menon, S., Yeung, P.-K., Kim, W.-W., 1996. Effect of subgrid models on the computed
+interscale energy transfer in isotropic turbulence. Comput. Fluids 25 (2), 165–180.
+Mesquida, I.M.V., Cornejo, I., Nikrityuk, P., Greiner, R., Votsmeier, M., Hayes, R.E., 2020.
+Towards a fully predictive multi-scale pressure drop model for a wall-flow filter.
+Chem. Eng. Res. Des. 164, 261–280.
+Mitsouridis, M.A., Koltsakis, G., Viswanathan, S., George, S., Hruby, E.J., Kozlov, A., Pan,
+J., Ponnaiyan, A., Zhou, W., 2023. An experimental and modeling study of ash depo￾sition and migration in diesel particulate filters. Int. J. Eng. Res. 24 (5), 1787–1803.
+Montebelli, A., Visconti, C.G., Groppi, G., Tronconi, E., Kohler, S., 2014. Optimization
+of compact multitubular fixed-bed reactors for the methanol synthesis loaded with
+highly conductive structured catalysts. Chem. Eng. J. 255, 257–265.
+Montgomery, D.C., 1996. Desing and Analysis of Experiments. Jonh Wiley & Sons, New
+Jersey, NY, USA.
+Negri, M., Wilhelm, M., Hendrich, C., Wingborg, N., Gediminas, L., Adelöw, L., Maleix,
+C., Chabernaud, P., Brahmi, R., Beauchet, R., et al., 2018. New technologies for
+ammonium dinitramide based monopropellant thrusters–the project rheform. Acta
+Astronaut. 143, 105–117.
+Önsan, Z.I., Avci, A.K., 2016. Multiphase Catalytic Reactors: Theory, Design, Manufactur￾ing, and Applications. John Wiley & Sons.
+Patankar, S., 1980. Numerical Heat Transfer and Fluid Flow. CRC Press, Boca Raton,
+Florida, USA.
+Pawlowski, S., Nayak, N., Meireles, M., Portugal, C., Velizarov, S., Crespo, J., 2018.
+Cfd modelling of flow patterns, tortuosity and residence time distribution in mono￾lithic porous columns reconstructed from x-ray tomography data. Chem. Eng. J. 350,
+757–766.
+Peszynski, K., Tesař, V., 2020. Algebraic model of turbulent flow in ducts of rectangular
+cross-section with rounded corners. Flow Meas. Instrum. 75, 101790.
+Quadri, S., Benjamin, S.F., Roberts, C.A., 2010. Flow measurements across an automotive
+catalyst monolith situated downstream of a planar wide-angled diffuser. Proc. Inst.
+Mech. Eng., Part C, J. Mech. Eng. Sci. 224 (2), 321–328.
+Quintanilla, A., Casas, J., Miranzo, P., Osendi, M.I., Belmonte, M., 2018. 3D-printed Fe￾doped silicon carbide monolithic catalysts for wet peroxide oxidation processes. Appl.
+Catal. B, Environ. 235, 246–255.
+Quintero, C.W.M., Ercolino, G., Specchia, S., 2022. Combined silicon carbide and zirconia
+open cell foams for the process intensification of catalytic methane combustion in lean
+conditions: impact on heat and mass transfer. Chem. Eng. J. 429, 132448.
+Reinao, C., Cornejo, I., 2023. A model for the flow distribution in dual cell density mono￾liths. Processes 11 (3), 827.
+Salamon, E., Cornejo, I., Mmbaga, J.P., Kołodziej, A., Lojewska, J., Hayes, R.E., 2020.
+Investigations of a three channel autogenous reactor for lean methane combustion.
+Chem. Eng. Process.-Process Intensif. 153, 107956.
+Schädel, B.T., Duisberg, M., Deutschmann, O., 2009. Steam reforming of methane, ethane,
+propane, butane, and natural gas over a rhodium-based catalyst. Catal. Today 142
+(1–2), 42–51.
+Shah, R.K., London, A.L., 1978. Laminar Flow Forced Convection in Ducts: a Source Book
+for Compact Heat Exchanger Analytical Data. Academic Press, New York, USA.
+Shen, Z., Nabavi, S.A., Clough, P.T., 2024. Design and performance testing of a mono￾lithic nickel-based sic catalyst for steam methane reforming. Appl. Catal. A, Gen. 670,
+119529.
+Strom, H., Sasic, S., Andersson, B., 2011. Effects of the turbulent-to-laminar transition in
+monolithic reactors for automotive pollution control. Ind. Eng. Chem. Res. 50 (6),
+3194–3205.
+Tahay, P., Khani, Y., Jabari, M., Bahadoran, F., Safari, N., 2018. Highly porous mono￾lith/tio2 supported cu, cu-ni, ru, and pt catalysts in methanol steam reforming process
+for h2 generation. Appl. Catal. A, Gen. 554, 44–53.
+Tischer, S., Correa, C., Deutschmann, O., 2001. Transient three-dimensional simulations
+of a catalytic combustion monolith using detailed models for heterogeneous and ho￾mogeneous reactions and transport phenomena. Catal. Today 69 (1–4), 57–62.
+Tronconi, E., Forzatti, P., 1992. Adequacy of lumped parameter models for scr reactors
+with monolith structure. AIChE J. 38 (2), 201–210.
+Tronconi, E., Groppi, G., Boger, T., Heibel, A., 2004. Monolithic catalysts with ‘high con￾ductivity’ honeycomb supports for gas/solid exothermic reactions: characterization of
+the heat-transfer properties. Chem. Eng. Sci. 59 (22–23), 4941–4949.
+Watling, T.C., 2020. Flow and forced convection heat and mass transfer characteristics of
+developed laminar flow in square channels with rounded corners: a model for flow in
+washcoated monolith channels. Ind. Eng. Chem. Res. 59 (44), 19770–19780.
+Watling, T.C., Van Lishout, Y., Rees, I.D., 2021. Backpressure prediction for flow-through
+monoliths and wall-flow filters using 1-dimensional models: entrance effect pressure
+change, developing flow and validation using length-varying techniques. Emiss. Con￾trol Sci. Technol., 1–18.
+White, F.M., 2009. Fluid Mechanics. McGraw-Hill, New York, NY.
+Wilcox, D.C., 1993. Turbulence Modeling for CFD. DCW Industries, La Canada, California,
+USA.
+Williams, J.L., 2001. Monolith structures, materials, properties and uses. Catal. Today 69
+(1–4), 3–9.

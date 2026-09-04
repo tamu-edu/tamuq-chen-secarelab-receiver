@@ -1,0 +1,1005 @@
+Solar Energy 214 (2021) 72–85
+Available online 13 December 2020
+0038-092X/© 2020 The Author(s). Published by Elsevier Ltd on behalf of International Solar Energy Society. This is an open access article under the CC BY
+license (http://creativecommons.org/licenses/by/4.0/).
+Experimental testing of a solar air cavity-receiver with reticulated porous 
+ceramic absorbers for thermal processing at above 1000 ◦C 
+Vikas R. Patil, Fabio Kiener, Adrian Grylka, Aldo Steinfeld * 
+ETH Zurich, Department of Mechanical and Process Engineering, 8092 Zurich, Switzerland 
+ARTICLE INFO 
+Keywords: 
+Solar 
+Thermal 
+Concentrated 
+Volumetric 
+Receiver 
+Cavity 
+Process heat 
+High temperature 
+ABSTRACT 
+Concentrated solar energy can be used as the source of high-temperature heat for industrial processes, but the 
+challenge is to design a solar receiver that can effect such a thermal conversion efficiently. This study reports on 
+the engineering design and experimental testing of a 5 kW solar cavity-receiver containing a reticulated porous 
+ceramic (RPC) structure that can absorb high-flux radiation volumetrically and heat up, by convection, an air 
+flow serving as the heat transfer fluid. The thermal performance, characterized by the thermal efficiency and the 
+air outlet temperature, was determined experimentally for four parameters, namely: RPC material (silicon￾infused silicon carbide or SiSiC, alumina, and ceria), mean pore size (range 0.8–2.5 mm, corresponding to 10–30 
+pores per inch or PPI, at 0.90 porosity), solar concentration ratio (range 1965–3900 suns over a 4 cm-diameter 
+cavity aperture, supplied by a high-flux solar simulator), and air mass flow rate (range 2–10 kg/h). Thermal 
+efficiencies between 0.22 and 0.69 were obtained at steady-state air outlet temperatures ranging from 1160 to 
+450 ◦C. Larger pores enhance heat transfer while variable porosity across the RPC can reduce temperature 
+gradients and potentially contribute to the design optimization. The highest efficiency of 0.69 was achieved by 
+the SiSiC 10 PPI cavity at an air outlet temperature of 1133 ◦C and air mass flow rate of 9.9 kg/h. The solar 
+receiver design proved to deliver a high-temperature air flow (>1000 ◦C) with a reasonably high thermal effi￾ciency (>0.65). 
+1. Introduction 
+Several energy-intensive thermal and thermochemical processes of 
+industrial interest proceed at high temperatures (>1000 ◦C) and are 
+characterized by their concomitant emissions of vast amounts of 
+greenhouse gases (GHG) and other pollutants, derived mainly from the 
+combustion of fossil fuels for heat generation. Examples are found in the 
+power generation sector (e.g. Brayton heat engines), in the mineral and 
+metallurgical sector (e.g. calcination, carbothermic reduction, and 
+recycling processes), and in the production of fuels and chemical com￾modities (e.g. reforming, gasification, and H2O/CO2 splitting cycles). 
+For example, direct CO2 emissions from the production of iron and steel 
+accounted for 6–7% of the global GHG emissions in 2017, while cement 
+production accounted for another 6–7% (International Energy Agency, 
+2020), highlighting the importance of decarbonizing these processes. 
+The production of solar drop-in fuels for the aviation and shipping 
+sectors can further avoid approximately 6% of the global GHG emissions 
+(Eyring et al., 2005; Grote et al., 2014). Thus, GHG emissions can be 
+significantly diminished and even eliminated by substituting fossil fuel 
+by concentrated solar energy as the source of high-temperature process 
+heat, which can be delivered at large scale (>100 MWthermal) by 
+concentrating solar tower systems (Romero and Steinfeld, 2012). Only 
+few stable heat transfer media are suitable for application at the perti￾nent temperatures, such as gases, supercritical fluids, liquid metals, and 
+ceramic particles (Romero and Gonzalez-Aguilar, ´ 2017). If the applica￾tion allows for an oxidizing atmosphere, air becomes an attractive heat 
+transfer fluid (HTF). Despite its inferior heat transfer properties vis-a-vis `
+other HTFs, especially its relatively low specific heat capacity, air has 
+the advantage of being stable, safe, abundant, environmentally benign, 
+and inexpensive. In addition, solar air receivers can be directly inte￾grated with a thermocline-based heat storage system using a packed bed 
+of rocks (Zanganeh et al., 2012), combined with a thermochemical heat 
+storage system using for example the CuO/Cu2O redox cycle (Gigantino 
+et al., 2020), enabling the round-the-clock delivery of heat at high 
+temperatures for industrial applications. For these reasons, 
+high-temperature solar receivers have predominantly used air as the 
+HTF (Sedighi et al., 2019) and can be classified into tubular and volu￾metric (Ho, 2017). Solar tubular receivers use an array of opaque 
+metallic or ceramic tubes exposed to concentrated solar radiation and 
+* Corresponding author. 
+E-mail address: aldo.steinfeld@ethz.ch (A. Steinfeld). 
+Contents lists available at ScienceDirect 
+Solar Energy 
+journal homepage: www.elsevier.com/locate/solener 
+https://doi.org/10.1016/j.solener.2020.11.045 
+Received 7 August 2020; Received in revised form 9 November 2020; Accepted 16 November 2020 
+
+Solar Energy 214 (2021) 72–85
+73
+carrying the HTF on the inside. They have a scalable modular design 
+(multiple tubes) and can sustain high fluid pressures, but at the expense 
+of design limitations imposed by the materials of construction of the 
+tube such as the maximum operating temperature, thermal conductivity, 
+resistance to thermal shocks, and inertness to oxidation by air. On the 
+other hand, solar volumetric receivers use metallic or ceramic porous 
+structures directly exposed to the incident concentrated solar radiation, 
+enabling its penetration and absorption within the volume and not just 
+on the exposed surface. This way, heat is efficiently transferred to the air 
+flowing across the porous matrix. With proper design, the maximum 
+solid and air temperatures can be achieved in the interior of the struc￾ture, which reduces re-radiation losses to the surroundings and the 
+thermal loading on the solar receiver walls (Hoes et al., 2019; Luque 
+et al., 2018). This phenomenon is typically described as the ‘volumetric 
+effect’, wherein the temperature of the solid at the front (irradiated) side 
+is lower than that of the air exiting the absorber at the rear. 
+The most important indicator of the thermal performance of the solar 
+receiver is its thermal efficiency, ηreceiver, which gives the conversion 
+extent of the incident solar radiative energy into the sensible heat of the 
+HTF. For a solar air receiver, it is defined as the ratio of enthalpy gain of 
+air flowing across the receiver and the solar radiative power input Psolar: 
+ηreceiver = m˙ air ∫ Tair,out
+Tair,in cp(T)dT
+Psolar
+(1) 
+where m˙ air is the air mass flow rate, Tair,in and Tair,out are the inlet and 
+outlet air temperature, and cp(T) is the temperature-dependent specific 
+heat capacity of air. 
+Some of the earliest documented tests of solar volumetric air re￾ceivers were performed in the late 1970s (Battleson, 1981). Numerous 
+experimental and numerical works have been carried out since then in 
+pursuit of high ηreceiver at high air outlet temperatures. Avila-Marín ´
+(Avila-Marín, ´ 2011) provided a chronological review of volumetric re￾ceivers tested until 2010. Subsequent advances in volumetric receivers 
+have been summarized in (Gomez-Garcia et al., 2016a; Ho, 2017; Ho 
+and Iverson, 2014). A brief overview of solar volumetric receivers is 
+provided from the point of view of absorber materials, operating pres￾sure, absorber morphologies and incident solar flux intensity. In terms of 
+materials, volumetric absorbers can be either metallic or ceramic. 
+Metallic absorbers can provide stable operation under varying condi￾tions owing to their high thermal conductivity, making them promising 
+candidates for applications at up to 900 ◦C. Metallic absorbers have been 
+tested experimentally with various morphologies, examples of which 
+include wire meshes (Avila-Marin et al., 2018, 2014), open-cell foams 
+(Albanakis et al., 2009), monolithic honeycombs (Pabst et al., 2017) and 
+additively manufactured ordered structures (Capuano et al., 2017; 
+Luque et al., 2018). As the industrial processes targeted by this study 
+proceed at above 1000 ◦C, the following discussions will focus on 
+ceramic absorbers. In terms of operating pressure, pressurized as well as 
+atmospheric receivers have been tested. Several high-temperature 
+volumetric receiver designs have used pressurized air with the aim to 
+directly integrate with a Brayton power cycle, with air serving both as 
+the HTF and working fluid (Sedighi et al., 2019). Examples are 
+windowed air receivers containing Si3N4 and SiC foam absorbers, 
+achieving a maximum ηreceiver of 0.71 at 1050 ◦C and 5.2 bar pressure 
+(Buck et al., 2002; Leuchsner, 1991; Pritzkow, 1991), and containing a 
+ceramic pin based absorber, achieving a record high ηreceiver of 0.80 at 
+1200 ◦C and 19.7 bar (Karni et al., 1997; Kribus et al., 2001). Windows 
+are critical and troublesome components in scale-up designs because 
+they must be relatively thin for minimum radiation attenuation yet 
+strong and durable at high temperatures and pressures (Karni et al., 
+1998; Roger ¨ et al., 2006). An example of a windowless pressurized air 
+receiver is a SiC cavity with an annular reticulated porous ceramic (RPC) 
+foam-type absorber made of SiSiC, delivering air outlet temperatures 
+exceeding 1200 ◦C and achieving a maximum ηreceiver of 91% at 700 ◦C 
+and 4 bar (Hischier et al., 2012; Pozivil et al., 2015). On the other hand, 
+atmospheric pressure or ‘open’ air receivers draw ambient air directly 
+into their porous absorbers. Open solar air receivers could facilitate the 
+integration of solar heat into high-temperature processes without the 
+limitations of pressurized receivers by decoupling the pressure-specific 
+stage via an intermediate heat exchange stage and/or thermal energy 
+storage stage using a HTF at ambient pressure. The use of solar receivers 
+in such a configuration has been proposed by several recent studies, 
+including for power generation via highly efficient combined cycle 
+(topping air Brayton and bottoming steam Rankine) (Zaversky et al., 
+2020), gasification of carbonaceous waste (Parrodi et al., 2019), liquid 
+fuel production via methane reforming (von Storch et al., 2016), calci￾nation of limestone for cement production and reduction of metal ores 
+(Nathan et al., 2019). In terms of absorber morphology, ceramic ab￾sorbers have been experimentally tested in various forms, examples of 
+which include monolithic honeycombs (Agrafiotis et al., 2007; Gomez￾Garcia et al., 2016b; Hoffschmidt et al., 1999; Li and Zhang, 2020), 
+RPC structures (Chavez and Chaza, 1991; Mey-Cloutier et al., 2016; 
+Wang et al., 2020; Zaversky et al., 2018), and additively manufactured 
+ordered structures (Hoes et al., 2019). Of special interest are the RPC 
+structures because of their efficient volumetric absorption and enhanced 
+solid-fluid convective heat transfer, as demonstrated in high￾temperature solar thermal and thermochemical applications (Buck 
+et al., 1991; Chavez and Chaza, 1991; Fend et al., 2004; Furler et al., 
+2012; Marxer et al., 2017; Zaversky et al., 2019). The relevant heat 
+transfer properties are thus the extinction coefficient and the convective 
+heat transfer coefficient, which in turn depend on the porosity and pore 
+size (or pore density, often expressed in pores per inch – PPI). In the 
+pursuit of achieving the volumetric effect, numerous numerical and 
+experimental studies have been undertaken to study the impact of 
+porosity and pore size on the heat transfer within the RPCs (Haussener 
+et al., 2010; Mey-Cloutier et al., 2016; Petrasch et al., 2008, 2007; Wang 
+et al., 2020; Wu et al., 2011; Zaversky et al., 2018). 
+The conversion of concentrated solar radiation to heat at a given 
+temperature is a function of the solar concentration ratio C, defined as 
+the solar radiative flux intensity Isolar normalized over 1 kW/m2 (i.e. 1 
+sun). Current commercial solar tower systems are mainly designed for C 
+< 1000 suns (Blanco and Miller, 2017) averaged over the solar re￾ceiver’s aperture, delivering process heat usually at below about 600 ◦C 
+for driving steam-based Ranking cycles. Most of the experimental 
+studies on volumetric receivers have also used mean C < 1000 suns. In 
+recent years, values of C > 2500 suns have been demonstrated at pre￾commercial scale using a densely-packed heliostat field (Romero et al., 
+2019) and/or secondary optics (Pozivil et al., 2015), enabling the 
+Nomenclature 
+cp specific heat capacity [J/kg/◦C] 
+C solar concentration ratio 
+HFSS high-flux solar simulator 
+HTF heat transfer fluid 
+Isolar solar flux intensity [kW/m2
+] 
+m˙ air mass flow rate of air across the receiver [kg/h] 
+PPI pores per inch 
+Psolar solar radiative power [kW] 
+RPC reticulated porous ceramic 
+T1 to T5 temperatures on the RPC’s outer periphery [◦C] 
+SiSiC silicon-infused silicon carbide 
+T temperature [◦C] 
+T3front, T4front temperatures on the RPC’s inner periphery in front 
+of T3 and T4 [◦C] 
+Tair,out outlet air temperature [◦C] 
+Tpyrometer pyrometer temperature [◦C] 
+ηreceiver thermal efficiency of the solar receiver [-] 
+V.R. Patil et al. 
+
+Solar Energy 214 (2021) 72–85
+74
+delivery of heat at temperatures exceeding 1000 ◦C. 
+In view of the potential of open volumetric solar receivers, and the 
+significance of the RPC properties for obtaining superior thermal per￾formance, this study aims to demonstrate a proof-of-concept of a solar 
+cavity-receiver compact design featuring RPC bricks as volumetric ab￾sorbers and air as HTF, and to investigate the influence of various design 
+and operational parameters. Modular arrays of a scaled-up version of 
+such a solar receiver concept are envisaged on top of a solar tower with 
+secondary optics for high solar concentration ratios, to drive thermal 
+and thermochemical processes highlighted in the preceding discussion 
+that operate at close to or above 1000 ◦C. Results of experimental testing 
+of the lab-scale solar receiver are presented, using RPCs of different 
+materials and mean pore size, exposed directly to thermal radiation 
+generated by a high-flux solar simulator of varying flux intensities and 
+subjected to an air flow of varying mass flow rates. The dependent 
+variable of primary interest is the air outlet temperature under steady￾state conditions. The significance of these experimental parameters is 
+explained as follows. 
+RPC material – High surface absorptivity in the visible and IR range of 
+the spectrum is important for maximizing the absorption of incident 
+solar radiation and high-temperature radiative emission. High thermal 
+conductivity is important for homogenizing the temperature across the 
+RPC structure by mitigating hotspots and associated flow instabilities. 
+Three RPC materials were investigated: silicon-infused silicon carbide 
+(SiSiC), alumina (Al2O3) and ceria (CeO2). SiSiC has a relatively high 
+absorptivity and thermal conductivity (Gianella et al., 2012). Alumina 
+has a significantly lower absorptivity and thermal conductivity 
+compared to SiSiC, but it has a high maximum service temperature in air 
+of about 1750 ◦C (Gianella et al., 2012), which is a favorable attribute 
+for high-temperature absorbers. Surface absorptivity of ceria is high at 
+high temperatures due to change in non-stoichiometry (Ackermann 
+et al., 2017), while its thermal conductivity is even lower than that of 
+alumina. 
+RPC mean pore size – Porosity and pore size can significantly affect 
+the interplay between radiative and convective heat transfer. There is a 
+general consensus in the literature that higher foam porosity 
+(approaching 0.90) results in higher receiver efficiency owing to 
+enhanced radiation heat transfer by enabling deeper radiative penetra￾tion (Kribus et al., 2014; Wang et al., 2020; Wu et al., 2011; Zaversky 
+et al., 2018). Accordingly, a porosity of ~0.90 was chosen for the 
+various RPC samples tested in this study. Large pores (mean pore 
+diameter ~4 mm) absorb the incident solar radiation more uniformly 
+within the RPC volume (Kribus et al., 2014), whereas smaller pores lead 
+to better convective heat transfer between the RPC and the air (Mey￾Cloutier et al., 2016; Wang et al., 2020; Zaversky et al., 2018), although 
+additional factors play a role too, including flux intensity and direction 
+of incident radiation, spectral selectivity and thermal conductivity of 
+RPC material, and air mass flow rate. The optimum pore size is therefore 
+expected to be a gradient from large to small pores in the direction of 
+incident radiation (Kribus et al., 2014). While such gradients are not 
+feasible with conventional foam fabrication methods, this study inves￾tigated RPCs with uniform but different pore sizes in the range 2.5–0.8 
+mm, corresponding to pore densities between 10 and 30 PPI, as the basis 
+for validating a detailed heat transfer and fluid flow model of the solar 
+receiver. The validated model is expected to deliver, among other 
+things, an optimum pore size distribution for achieving maximum 
+ηreceiver. 
+Radiative flux intensity – This study used Isolar values ranging between 
+1965 and 3900 kW/m2 (averaged over the receiver aperture) – supplied 
+in this case by a high-flux solar simulator. 
+Fig. 1. (a) 3-D cut-section of the solar receiver, (b) vertical cross-section marked with main dimensions, and displaying radiative propagation of a generic incident 
+sunray (solid line) and its subsequent scattering or re-emission (dashed lines). 
+Fig. 2. Photographs of the solar receiver assembly: (a) cavity front with RPC bricks (SiSiC 10 PPI) lined with ceria laminate and alumina-silica insulation. (b) Cavity 
+front closed by alumina-silica insulating disk with 4 cm-diameter open aperture. (c) Water-cooled aluminum shield to protect from spilled radiation. (d) Fully 
+assembled solar receiver with cooling water connections at the front, thermocouple ports along the lateral steel shell and the air outlet connection at the rear. 
+V.R. Patil et al. 
+
+Solar Energy 214 (2021) 72–85
+75
+Air mass flow rate – The resulting Tair,out and ηreceiver are strongly 
+dependent on the air mass flow rate across the RPCs, which was varied 
+between 2 and 10 kg/h. 
+The following sections describe in detail the solar receiver design, 
+materials and methods used for its testing, and its thermal performance. 
+2. Solar receiver design 
+Fig. 1 shows: a) a cut-section of the 3-D geometry of the solar 
+receiver, and b) its main dimensions and radiative propagation of a 
+generic incident sunray across the cavity. Fig. 2 shows photographs 
+outlining the various assembly stages of the solar receiver. It comprises 
+an axisymmetric cavity constructed as an assembly of eight trapezoidal 
+RPC bricks forming an octagon and an octagonal RPC brick at the rear 
+end of the cavity (Fig. 2a). The octagonal shape was chosen considering 
+the modularity and structural stability of the cavity made out of an array 
+of bricks at the given size scale. This modular arrangement facilitates 
+scale-up by increasing the number of bricks while maintaining thermo￾mechanical stability of individual bricks. The cavity front is closed by an 
+alumina-silica insulating disk with a 4 cm-diameter aperture for the 
+access of concentrated solar radiation (Fig. 2b). With this enclosure-type 
+arrangement, the RPC cavity is directly exposed to high-flux solar ra￾diation, enabling efficient radiative absorption by multiple internal re￾flections and approaching a blackbody absorber. Its apparent 
+absorptance, calculated by the Monte Carlo ray-tracing technique, is 
+0.995. The aperture is windowless, i.e. it is open to the surroundings at 
+the front for the access of ambient air used as the HTF. A layer of ceria 
+laminate insulation surrounds the length of the RPC cavity, which is 
+further bounded by alumina-silica insulation blocks. A 5 mm gap is 
+maintained between the RPC bricks and the insulation walls using 
+spacers. The air gap, being directly connected to the channels leading to 
+the receiver outlet, creates a pressure difference across the thickness of 
+the RPC which facilitates uniform air flow especially in the radial di￾rection, consequently improving the convective heat transfer between 
+the RPC and the air. Air enters the cavity from the front, flows across the 
+RPC structure, and exits through five channels through the ceramic 
+insulation which merge into an outlet axial alumina pipe (Alsint 99) at 
+the rear of the cavity. This assembly is enclosed in a stainless steel vessel. 
+An internally water-cooled aluminum shield around the aperture pro￾tects the setup from spilled radiation (Fig. 2c). 
+Table 1 
+Morphological, optical and thermal properties of the seven RPCs tested in this work, relevant for high-flux, high-temperature radiative and convective heat transfer. 
+RPC material Ceria SiSiC Alumina References 
+Nominal pore density (PPI) 10 10 20 30 10 20 30 ceria: (Ackermann et al., 2017); SiSiC and alumina: manufacturer. 
+Macro porosity* (–) 0.83 0.90 0.91 0.87 0.90 0.91 0.87 
+Strut porosity* (–) 0.26 0 0 0 0.30 0.30 0.30 
+Dual-scale porosity* (–) 0.87 0.90 0.91 0.87 0.93 0.94 0.91 Calculated using correlations in (Ackermann et al., 2017) 
+Mean pore diameter (mm) ~2.3 ~2.5 ~1.2 ~0.8 ~2.5 ~1.2 ~0.8 
+Specific surface area (m2
+/ 
+m3
+) 
+842 778 1537 2412 778 1537 2412 
+Extinction coefficient (m− 1
+) 301 247 480 804 247 480 804 
+Spectral hemispherical 
+reflectivity (–) 
+0.30–0.90 in visible 
+spectrum 
+0.09–0.03 
+@ 1.0–1.4 μm 
+and ~800–1300 ◦C 
+0.85–0.40 
+@ 0.88 μm 
+and ~1000–2000 ◦C 
+(Ackermann and Steinfeld, 2017; Potamias et al., 2019) 
+Solid thermal conductivity 
+(Wm− 1
+K− 1
+) 
+(Ackermann et al., 2017; Ortona et al., 2014; Purdue University. 
+Thermophysical Properties Research Center, 1967) 
+@500 ◦C 5.13 ~60 ~10.89 
+@1000 ◦C 1.82 ~42 ~6.35 
+@1500 ◦C 0.83 ~38 ~7.43 
+Effective thermal 
+conductivity 
+(Wm− 1
+K− 1
+) 
+@0.87 porosity 
+(10 PPI): 
+@0.90 porosity 
+(10 PPI): 
+@0.93 porosity 
+(10 PPI): 
+Calculated using correlation in (Ackermann et al., 2017) 
+@500 ◦C ~0.2654 ~1.4110 ~0.1602 
+@1000 ◦C ~0.1736 ~1.0430 ~0.1571 
+@1500 ◦C ~0.1672 ~0.9906 ~0.2018 
+*Macro porosity includes only the voids formed by foam cells and macro-pores; strut porosity results from voids left behind by incineration of the polymer foam 
+template and micro-pore forming additives, if any; dual-scale porosity includes the macro and strut porosity. For details, see (Ackermann et al., 2017). SiSiC has zero 
+strut porosity due to infusion of Si in the strut voids. 
+Fig. 3. (a) 3D schematic of the RPC cavity with one of the trapezoidal RPC bricks highlighted in blue. Photograph of one such trapezoidal RPC brick from the seven 
+different cavities tested: (b) SiSiC 10 PPI (dashed white lines outlining the trapezoidal shape), (c) SiSiC 20 PPI, (d) SiSiC 30 PPI, (e) alumina 10 PPI, (f) alumina 20 
+PPI, (g) alumina 30 PPI, (h) ceria 10 PPI. (For interpretation of the references to colour in this figure legend, the reader is referred to the web version of this article.) 
+V.R. Patil et al. 
+
+Solar Energy 214 (2021) 72–85
+76
+RPC materials – Correlations between RPC mean pore diameter, 
+porosity and nominal pore density, determined by processing the exact 
+3D digital geometry of the RPC obtained by tomographic scans 
+(Ackermann et al., 2017), were applied in this study. As the porosity of 
+all the RPCs was nearly the same (~90%), the pore density of an RPC, 
+expressed in pores per inch (PPI), has been used throughout this work to 
+identify the pore size. The SiSiC and alumina RPCs have nominal pore 
+densities of 10, 20 and 30 PPI each, which were the standard foam sizes 
+available at their commercial manufacturer (EngiCer SA, Switzerland). 
+The ceria RPC with 10 PPI was manufactured in-lab using the replica 
+method and was also included because it has been studied extensively 
+for thermochemical applications (Furler et al., 2012). Fig. 3 shows the 
+seven different RPCs tested. Table 1 provides their morphological, op￾tical and thermal properties relevant for high-flux, high-temperature 
+radiative and convective heat transfer based on manufacturer data and 
+correlations from literature. Fig. 4 plots the thermal conductivity of solid 
+SiSiC, alumina and ceria as well as effective thermal conductivity of 
+their 10 PPI RPCs as a function of temperature. The solid thermal con￾ductivity of SiSiC, and hence the effective thermal conductivity of its 
+RPC, are significantly higher than those of alumina and ceria, which 
+makes an interesting case for comparative study. 
+3. Experimental set-up 
+Fig. 5 depicts the scheme of the experimental setup. Experimentation 
+was carried out at the ETH’s high-flux solar simulator (HFSS): an array 
+of seven high-pressure Xe arcs, each close-coupled to ellipsoidal re￾flectors, supplied a beam of concentrated thermal radiation mimicking 
+the radiative heat transfer characteristics of highly concentrating solar 
+systems. Psolar was measured by placing a water-cooled calorimeter at 
+the same location in the solar simulator as the solar receiver, before the 
+experimental runs. The calorimeter is a well-insulated cavity with the 
+same aperture diameter and front conical section as the solar receiver. 
+Its inner surfaces are lined with an absorbent-coated, coiled copper tube 
+carrying cooling water. With an apparent absorptance of 0.995 (deter￾mined by ray-tracing simulations), the radiant power Psolar from the 
+lamps entering through the calorimeter aperture is equal to the enthalpy 
+gain of the cooling water, calculated by measuring the mass flow rate 
+and increase in water temperature. During the experimental runs, the 
+same Psolar entered the solar receiver through its aperture. The 
+windowless aperture also served as an inlet for ambient air, suctioned 
+into the cavity by a downstream vacuum pump (Becker AG, VASF 1.80/ 
+2). The air mass flow rate m˙ air was controlled by varying the suction 
+pressure generated by the vacuum pump using its in-built variable fre￾quency drive. Five B-type sheathed thermocouples (Omega Engineering 
+Ltd.), T1-T5, measured temperatures of the RPC structure at its outer 
+periphery. Air temperature at the outlet was measured by a K-type 
+sheathed thermocouple (Omega Engineering Ltd.), Tair,out, located 4 cm 
+downstream of the merger point of the five outlet channels from the 
+cavity and roughly at the center of the cross-section of the outlet pipe 
+(see Fig. 5). A second, similar thermocouple placed at the same axial 
+location but nearly touching the outlet wall, verified that there was no 
+significant difference in Tair,out (<5% relative at low flow rates, <1% at 
+Fig. 5. Schematic of the experimental setup: (1) HFSS with seven Xe-arc lamps (L1-L7) coupled to ellipsoidal reflectors, (2) solar receiver, (3) RPC cavity, (T1-T5) 
+five thermocouples at the RPC outer periphery, (T) thermocouple at air outlet, (4) water-cooled heat exchanger, (5) air mass flow meter, (6) vacuum pump, (7) 
+laboratory gas exhaust. Relative dimensions between the HFSS and the solar receiver are not to scale. 
+Fig. 4. Solid thermal conductivities of SiSiC, alumina and ceria, and effective 
+thermal conductivities of their 10 PPI RPCs as a function of temperature, 
+plotted on a logarithmic scale to highlight significant differences. 
+V.R. Patil et al. 
+
+Solar Energy 214 (2021) 72–85
+77
+Table 2 
+Details of the four radiative power levels supplied to the solar receiver by the HFSS. 
+*Measured in a separate experiment using a water-cooled calorimeter. 
+**See Fig. 5 for position of arc lamps on the solar simulator relative to the solar receiver. 
+***Measured in a separate experiment on a Lambertian target using a camera from the lamp side. 
+V.R. Patil et al. 
+
+Solar Energy 214 (2021) 72–85
+78
+high flow rates) across the cross-section at the given location. This radial 
+uniformity in Tair,out could be explained by the small cross-section of the 
+outlet pipe (1.5 cm internal diameter) and good mixing as hinted by high 
+values of Reynolds number (in the range 1500–5000, depending on the 
+flow rate) calculated using measured mass flow rate and Tair,out. In 
+selected experimental runs, two S-type thermocouples (TC Direct, Pt/Pt￾Rh10%) were placed on the RPC’s inner periphery in front of thermo￾couples T3 and T4 to examine the temperature gradient across the RPC 
+thickness. An infrared pyrometer (Omega Engineering Ltd., iR2C) tar￾geting the open aperture was also installed to measure the effective 
+cavity temperature, but it was applied for the SiSiC cavity only because 
+reflected radiation contaminated the measurements for the alumina and 
+ceria cavities. The air’s sensible heat was not utilized. Instead, the 
+heated air was cooled down to below 40 ◦C by a water-cooled shell-and￾tube heat exchanger in order to stay below the maximum working 
+temperatures of the air mass flow meter (Endress + Hauser AG, t-mass 
+A150) and vacuum pump. 
+Parameters – Every experimental run was defined by four parameters: 
+RPC material, RPC mean pore diameter, mean C over aperture, and m˙ air. 
+The three former were fixed for each experimental run while m˙ air was 
+varied over the range 2–10 kg/h in steps of roughly 0.75 kg/h during a 
+single run. Thus, at a given m˙ air, the steady-state Tair,out was recorded as 
+the quantity of primary interest. The (quasi) steady-state is defined as 
+the first time instance when a change of < 1% in Tair,out is recorded 
+relative to its value during the last 5 min. Using different combinations 
+of the arcs, four values of Psolar were applied: 2.5, 3.1, 4.1 and 4.9 kW. 
+The corresponding mean values of C over the aperture were: 1965, 2475, 
+3230 and 3900 suns, respectively. Reproducibility of Tair,out measure￾ments was confirmed by repeating one of the experimental runs, namely 
+SiSiC 30 PPI cavity with 3.1 kW power input (Appendix A). Calorimeter 
+measurements were also repeated to verify Psolar reproducibility (for 
+ηreceiver calculation), yielding measurements within a maximum error of 
+0.17 kW (<6.8% of Psolar), based on instrumentation accuracy 
+(Appendix B). The HFSS delivers stable steady-state radiative fluxes at 
+fixed directional distributions, enabling reproducibility of the experi￾mental boundary conditions. Table 2 shows the four combinations of 
+HFSS arc lamps used and their corresponding radiative power and flux 
+intensity distribution at the aperture plane. 
+4. Results and discussion 
+The course of a representative experimental run is plotted in Fig. 6. 
+The experiment was started by igniting the relevant number of arcs of 
+the HFSS while flowing air through the receiver at the minimum possible 
+m˙ air (~2.5 kg/h) to accelerate the heat up rate. Following an initial rapid 
+rise, the temperature of the RPC cavity (T1-T5) and air at the receiver 
+outlet (Tair,out) reached the first (quasi) steady-state at around 50 min 
+from the start. m˙ air was then incremented in steps of ~0.75 kg/h, waiting 
+long enough at each flow rate step to ensure that the quasi-steady-state 
+condition was fulfilled for Tair,out. As expected, Tair,out decreased with 
+increasing m˙ air. At around 10 kg/h, the experiment was completed by 
+switching off the HFSS and maintaining the same air flow rate to facil￾itate cool down. Typically, T1-T5 were higher than Tair,out by 200–400 ◦C, depending on the RPC material, pore density, and C. Despite being 
+located symmetrically on the vertical cross-section of the solar receiver, 
+readings of thermocouples T2 and T5 differed by up to 150 ◦C in some 
+Fig. 7. Thermal performance of the seven RPC cavities, each tested at C = 1965 suns (Psolar = 2.5 kW): (a) steady-state Tair,out as a function of m˙ air (maximum error: 
+±6 ◦C), (b) ηreceiver as a function of steady-state Tair,out (maximum error: ±0.04). 
+Fig. 6. Temporal variation of temperatures (left axis) and air mass flow rate 
+(right axis) across the receiver over the course of a representative experimental 
+run. Parameters: SiSiC 20 PPI cavity with C = 2475 suns. 
+V.R. Patil et al. 
+
+Solar Energy 214 (2021) 72–85
+79
+Fig. 10. Thermal performance of the seven RPC cavities, each tested at C = 3900 suns (Psolar = 4.9 kW): (a) steady-state Tair,out as a function of m˙ air (maximum error: 
+±10 ◦C), (b) ηreceiver as a function of steady-state Tair,out (maximum error: ±0.04 ◦C). 
+Fig. 9. Thermal performance of the seven RPC cavities, each tested at C = 3230 suns (Psolar = 4.1 kW): (a) steady-state Tair,out as a function of m˙ air (maximum error: 
+±8 ◦C), (b) ηreceiver as a function of steady-state Tair,out (maximum error: ±0.04). 
+Fig. 8. Thermal performance of the seven RPC cavities, each tested at C = 2475 suns (Psolar = 3.1 kW): (a) steady-state Tair,out as a function of m˙ air (maximum error: 
+±7 ◦C), (b) ηreceiver as a function of steady-state Tair,out (maximum error: ±0.04). 
+V.R. Patil et al. 
+
+Solar Energy 214 (2021) 72–85
+80
+cases. Factors that may have influenced this data include: uneven irra￾diation of the cavity from the arcs of the HFSS, uncertainty of contact 
+between the thermocouple tip and the RPC due to thermal expansion, 
+and buoyancy effects. 
+Figs. 7-10 display the thermal performance of the seven different 
+RPC cavities at the four C inputs: 1965, 2475, 3230 and 3900 suns. In 
+each figure, part (a) plots the steady-state Tair,out as a function of m˙ air, 
+while part (b) plots the ηreceiver as a function of the steady-state Tair,out 
+(following Eq. 1). The seven RPC cavities tested are denoted by distinct 
+marker types in each figure. Maximum errors in Tair,out and ηreceiver, 
+based on error propagation of associated instruments (see Appendix B), 
+are stated in the figure captions. For all runs, the steady-state Tair,out 
+decreases with increasing m˙ air (part(a) of Figs. 7-10). Higher mass flow 
+rates, hence higher interstitial velocities lead to better heat transfer 
+between the RPC and the air, which in turn reduces the steady-state 
+temperature attained by the RPC itself, and hence by the air. The 
+steady-state Tair,out at a given m˙ air increases with Psolar, which is a direct 
+consequence of increasing C (part(a) of Figs. 7-10). ηreceiver decreases 
+with Tair,out (part(b) of Figs. 7-10). This is because higher Tair,out values 
+result from higher RPC temperatures, which lead to higher radiative 
+heat losses through the aperture and higher conductive heat losses 
+through the thermal insulation, thus decreasing the ηreceiver. The steep 
+drop in ηreceiver above a certain Tair,out, as observed in each case, is 
+indicative of increasing radiative heat losses, which scale with the fourth 
+power of temperature. An additional common trend is the slight increase 
+in Tair,out with increase in m˙ air for the first few m˙ air data points (each 
+experiment was started with the lowest m˙ air), attributed to the transient 
+heating of the insulating walls at the start of the experiment, as 
+confirmed by repeating one of the experiments with a longer heat-up 
+time before recording the first Tair,out (Appendix A). This transient 
+phenomenon does not affect the comparative analysis, as each experi￾ment followed the same procedure. 
+For C = 1965 suns (Fig. 7(a)), Tair,out ranged from about 850 to 450 ◦C over m˙ air of 2.5 to 10 kg/h. For the same PPI, SiSiC cavities delivered 
+higher temperatures than their alumina counterparts by about 45–140 ◦C, depending on PPI and m˙ air, which corresponds to a relative difference 
+of about 8–23%. Within the same material SiSiC, 10 PPI and 20 PPI 
+cavities performed similarly and better (i.e. delivered higher Tair,out) 
+Fig. 11. Maximum difference between steady-state temperatures measured at five locations on the outer periphery of the RPC cavity (see T1-T5 in Fig. 5) as a 
+function of m˙ air, for the seven different RPC cavities tested with C = (a) 1965, (b) 2475, (c) 3230 and (d) 3900 suns. Values for SiSiC 20 and 30 PPI in (c) and (d) are 
+omitted due to thermocouple malfunction. 
+V.R. Patil et al. 
+
+Solar Energy 214 (2021) 72–85
+81
+than the 30 PPI under same operating conditions. For alumina, the 10 
+PPI cavity delivered the highest Tair,out, followed by 30 PPI and then 20 
+PPI cavities under same operating conditions. For ceria, the 
+10 PPI cavity achieved the highest Tair,out among all the cavities, 860 ◦C 
+at m˙ air = 3.2 kg/h, but dropped sharply below Tair,out of all SiSiC cavities 
+with increasing m˙ air. The ceria 10 PPI cavity had mm-scale gaps between 
+adjacent RPC bricks at some locations because of imperfections in 
+machining the bricks, which presumably led to the air bypassing parts of 
+the RPC structures, resulting in inefficient heat transfer with the ceria 
+RPCs. Fig. 7(b) reflects this trend, wherein ηreceiver values of ceria 10 PPI 
+change abruptly going from high Tair,out (low m˙ air) to low Tair,out (high 
+m˙ air). In terms of ηreceiver (Fig. 7(b)), the highest ηreceiver value for every 
+cavity is obtained at the lowest Tair,out (i.e. highest m˙ air), which drops 
+sharply with increasing Tair,out (i.e. decreasing m˙ air) thereafter. At lower 
+m˙ air, the pore-scale Reynolds number is also lower and in the range 
+5–200 at most locations in the RPC (estimated by CFD modeling), 
+leading to poorer convective heat transfer between the RPC and the air. 
+At higher Tair,out, the cavity loses significant portions of the absorbed 
+Psolar via radiative emission through the open aperture and conduction 
+through the insulation walls. The SiSiC 10 PPI cavity achieved the 
+highest ηreceiver of 0.61 at Tair,out = 610 ◦C and m˙ air = 8.8 kg/h. At the 
+highest Tair,out, ηreceiver values were between 0.25 and 0.20 for all cav￾ities because of the significant heat losses. Note that the ηreceiver profile 
+arches back slightly due to the aforementioned effect of transient heat￾ing of the insulation walls at the start of the experiment, which limited 
+the value of steady-state Tair,out achieved at the lowest m˙ air. 
+For C = 2475 suns (Fig. 8(a)), Tair,out ranged from 960 to 587 ◦C over 
+m˙ air = 2.6 to 9.8 kg/h. Most notably, the ceria 10 PPI cavity spanned this 
+entire range of Tair,out, starting with the highest values among all the 
+cavities at low m˙ air and ending with the lowest Tair,out at the highest m˙ air. 
+As discussed in the previous section, this behavior may be linked to air 
+bypassing parts of the RPC structure. SiSiC cavities achieved higher 
+temperatures than corresponding alumina cavities of the same PPI. In 
+fact, all three SiSiC cavities, irrespective of pore size, achieved nearly the 
+same Tair,out at each m˙ air (as seen from their overlapping plots), while 
+also distinctly outperforming all the three alumina cavities. Within the 
+alumina cavities, 10 PPI achieved the highest temperatures. At lower 
+m˙ air, alumina 20 PPI showed higher temperatures than 30 PPI, but this 
+difference diminished with increasing m˙ air. The discussion of ηreceiver 
+(Fig. 8(b)) follows similarly to that of Fig. 7(b). The highest ηreceiver value 
+of about 0.66 was achieved by all the three SiSiC cavities, which per￾formed similarly to each other, at Tair,out ≈ 730 ◦C and m˙ air ≈ 9.7 kg/h. 
+At the highest Tair,out = 960 ◦C, ηreceiver approached 0.31. 
+For C = 3230 suns (Fig. 9(a)), Tair,out ranged from 1095 to 834 ◦C 
+over m˙ air of 2.8 to 10.1 kg/h. Similar to the experiments of Fig. 7 and 
+Fig. 8, the ceria 10 PPI cavity achieved higher Tair,out than any other 
+cavity and dropped steeply across Tair,out values of all other cavities with 
+increasing m˙ air. For the same pore size (PPI), SiSiC cavities achieved 
+higher temperatures than their alumina counterparts, except for a few 
+m˙ air values, where Tair,out for alumina 10 PPI was nearly similar to that of 
+SiSiC 10 PPI. At these low m˙ air, temperatures for SiSiC 30 PPI were 
+generally lower than those for SiSiC 10 PPI, which in turn were lower 
+than those for 20 PPI. The trend is clearer for the alumina cavities: 10 
+PPI performed distinctly better than 20 PPI, which in turn performed 
+Fig. 12. (a) Schematic of solar receiver setup with the additional thermocouples T3front and T4front, and the pyrometer, for the repeated experimental runs with SiSiC 
+RPC cavities at C = 2475 suns. Temporal variation of temperatures and m˙ air for (b) SiSiC 10 PPI, (c) SiSiC 20 PPI and (d) SiSiC 30 PPI cavities. 
+V.R. Patil et al. 
+
+Solar Energy 214 (2021) 72–85
+82
+better than 30 PPI. Fig. 9(b) shows that the highest ηreceiver of about 0.66 
+was achieved by SiSiC 10 PPI at Tair,out = 960 ◦C and m˙ air = 9.5 kg/h, and 
+by SiSiC 30 PPI at Tair,out = 914 ◦C and m˙ air = 10 kg/h. Similar to Fig. 7 
+and Fig. 8, at the highest Tair,out = 1095 ◦C, ηreceiver approached 0.30. 
+For C = 3900 suns (Fig. 10(a)), the highest value of C, Tair,out for all 
+the cavities was higher than 1000 ◦C for the entire range of m˙ air (except 
+for a single data point of ceria 10 PPI at 981 ◦C), with the highest Tair,out 
+= 1163 ◦C by the ceria 10 PPI cavity at m˙ air = 5.2 kg/h as well as at 5.87 
+kg/h. These experiments were started from m˙ air of about 4.5 kg/h 
+(instead of about 2.5 kg/h for the aforementioned experiments with 
+lower C) to prevent overheating of the RPCs. While comparing the 
+different cavities from Fig. 10(a), it is important to note that the 
+maximum relative difference between any two Tair,out values (even at 
+dissimilar m˙ air) is less than 16%, which is a significantly narrower range 
+compared to lower C levels. In terms of RPC materials, ceria 10 PPI 
+repeated the aforementioned behavior of reaching the highest Tair,out at 
+the lower flow rates and falling sharply across Tair,out of all other cavities 
+as the flow rate increased. For the same pore size, SiSiC distinctly out￾performed alumina. Among the SiSiC cavities, 10 PPI performed best, 
+followed by 20 PPI and 30 PPI. Among the alumina cavities, 10 PPI 
+performed the best, while 20 and 30 PPI performed nearly similarly. 
+Fig. 10(b) shows that ηreceiver peaked at about 0.69 for SiSiC 10 PPI at 
+Tair,out = 1133 ◦C and m˙ air = 9.9 kg/h. At the highest Tair,out = 1163 ◦C, 
+ηreceiver approached 0.35. Larger pore sizes yielded better performance 
+than smaller pores at this high C level. 
+The temperature gradient in the RPC cavity is characterized in 
+Fig. 11(a-d), which shows the maximum difference between any two 
+measurements by thermocouples T1 to T5 (denoted by ΔTRPC) as a 
+function of m˙ air for the seven tested RPC cavities with the four C inputs 
+1965, 2475, 3230 and 3900 suns. These temperatures were recorded at 
+the same time instance as the corresponding steady-state Tair,out mea￾surement in Figs. 7-10. Note that in Fig. 11(c) and 11(d), values of ΔTRPC 
+are omitted for experiments with SiSiC 20 PPI and SiSiC 30 PPI because 
+of thermocouple malfunction. It is found that the SiSiC cavities consis￾tently showed lower ΔTRPC values compared to the alumina cavities. 
+This could be a consequence of the significantly higher solid (and hence 
+effective) thermal conductivity of SiSiC compared to alumina (Fig. 4), 
+which diffuses the hotspots and homogenizes the temperature across the 
+RPC. Comparing different pore sizes within the same material, there is 
+no clear trend, although at lower m˙ air, the largest pore size (10 PPI) tends 
+to have the lowest ΔTRPC, which could be attributed to better redistri￾bution of incident solar radiation and thermal emission from the RPC. 
+The highest ΔTRPC values of up to 500 ◦C were observed for the lowest C 
+= 1965 suns. Such large temperature gradients are attributed to asym￾metry of Isolar around the cavity axis caused by the use of only three arc 
+lamps. The range of ΔTRPC values shrinks to about 50–250 ◦C, as C 
+(hence number of arc lamps used) increases and the incident flux dis￾tribution becomes more homogenous. With increasing m˙ air, ΔTRPC 
+generally increases, even though the absolute RPC temperatures 
+decrease as the receiver cools down with increasing m˙ air. Based on the 
+measurements of RPC thermocouples T1-T5, it appears that certain parts 
+of the cavity were cooled better than the others, which indicates non￾uniform flow and possibly the influence of arc-lamp hotspots as well. 
+Such large temperature gradients in the RPC, especially at high m˙ air, are 
+undesired and can in principle be avoided by designing porous struc￾tures with variable porosity/pore size in the direction of incident radi￾ation (Capuano et al., 2017; Hoes et al., 2019; Luque et al., 2018). It is 
+important to distinguish this ΔTRPC from the local temperature differ￾ence between the RPC and the air, which does decrease with increasing 
+m˙ air, as seen from the values of T1-T5 and Tair,out in the representative 
+experimental run shown in Fig. 6. 
+RPC temperatures of the three SiSiC cavities were further investi￾gated by repeating their experiments with C = 2475 suns. Three addi￾tional instruments were used in the repeated runs, as shown 
+schematically in Fig. 12(a). Two thermocouples were inserted on the 
+RPC’s inner periphery in front of T3 and T4, termed T3front and T4front. 
+The thermocouple probes of wire diameter 0.35 mm were positioned 
+approximately 3 mm under the irradiated RPC surface and were thus 
+assumed to be shielded from direct irradiation by the arc lamps. A py￾rometer targeting the aperture was employed to measure the cavity’s 
+nominal temperature (Tpyrometer). Fig. 12(b-d) plots T3front, T4front, T3, 
+T4, Tpyrometer, and Tair,out, as well as m˙ air as a function of time for the 
+repeated experiments with the SiSiC 10, 20 and 30 PPI cavities. Three 
+major observations can be drawn from the results: 1) For all three SiSiC 
+cavities, T3front and T4front were lower than T3 and T4, respectively. This 
+is counter-intuitive because the temperature at the directly irradiated 
+(‘front’) surface of an RPC with uniform porosity is expected to be higher 
+than that at the rear, given that most of the incident radiation is 
+absorbed in the first few millimeters following Bouguer’s law of expo￾nential decay (attenuation). The lower temperature measurements at 
+the front, compared to rear, are attributed to convective cooling by the 
+relatively cold air flow as it impinges at the RPC front. 2) Furthermore, 
+the difference between T3 and T3front, which are positioned directly 
+upstream of the central exit channel, increased with m˙ air, due to 
+increased convective heat transfer by the incoming cold air with 
+increasing m˙ air. Uncertainties in these measurements include thermo￾couples that might not be in contact with the RPC’s struts and therefore 
+measuring the air flow temperature. 3) Tpyrometer closely followed T3 and 
+T4 within a range of 50 ◦C (which represents a relative difference of less 
+than 5%) at all m˙ air for all three SiSiC cavities. Tpyrometer can be a useful 
+metric to estimate the re-radiation losses through the aperture but 
+cannot capture the information on the temperature distribution inside 
+the cavity, parts of which were at a higher temperature than Tpyrometer. 
+Pyrometer readings below 1000 ◦C were excluded from the plots, as it is 
+not designed to measure below this temperature. In terms of Tair,out, the 
+three SiSiC cavities performed similarly as in the runs of Fig. 8 and 
+Fig. 11(b) for C = 2475 suns. 
+Discussion of overall results – The volumetric effect of the solar 
+receiver design becomes evident under certain conditions when 
+comparing the air outlet temperature with the RPC front temperatures. 
+For the SiSiC 30 PPI cavity (Fig. 12(d)), at high m˙ air values (between 6.9 
+and 9.7 kg/h), Tair,out values were greater than the average of T3front and 
+T4front by about 18–91 ◦C. It is worth noting that Tair,out was measured 
+roughly 10 cm downstream of the rear edge of the RPC cavity and still 
+exceeded the average RPC front temperatures. This behavior was 
+observed prominently for the 30 PPI cavity, which had about 3.1 and 1.6 
+times the surface area of the 10 PPI and 20 PPI cavities, respectively. 
+This indicates the importance of convective heat exchange together with 
+volumetric radiation absorption to achieve the volumetric effect. Inci￾dent concentrated radiation penetrates the RPC and undergoes attenu￾ation following Bouguer’s law exponential decay. This volumetric 
+absorption is exploited by the HTF flowing across the RPC and being 
+effectively heated by convective exchange occurring within the RPC’s 
+volume with a relatively high specific surface area (see Table 1). In terms 
+of radiation attenuation, Monte Carlo ray-tracing analysis at the pore￾scale on the exact 3D digital geometry obtained by computer tomogra￾phy of RPC samples with 10, 20 and 30 PPI indicated values of the 
+effective extinction coefficient of around 247, 480 and 804 m− 1
+, 
+respectively (Table 1) (Ackermann et al., 2017). Recent studies on hi￾erarchically ordered porous structures with a porosity gradient 
+V.R. Patil et al. 
+
+Solar Energy 214 (2021) 72–85
+83
+exhibited a step-wise radiative attenuation that lead to a more uniform 
+temperature distribution across the structure (Hoes et al., 2019). 
+For the same pore size, SiSiC cavities performed better than the 
+corresponding alumina cavities, attributed to the higher thermal con￾ductivity of SiSiC. For SiSiC cavities, there was no prominent trend with 
+respect to the pore size: 10 and 20 PPI performed similarly at C = 1965 
+suns, all three pore sizes performed similarly at C = 2475 suns, the trend 
+at C = 3230 suns was mixed and lastly, at C = 3900 suns, larger pores 
+performed better than smaller ones. On the other hand, for the alumina 
+cavities, the 10 PPI (larger pores) performed better than 20 and 30 PPI 
+across all C levels. However, this trend was not followed when 
+comparing the 20 and 30 PPI. The lack of a prominent trend between the 
+pore sizes across different C levels indicates the presence of competing 
+effects between radiation, convection and conduction heat transfer. 
+Most of the past parametric studies on RPC absorbers (experimental, 
+numerical or combined) indicate that higher pore densities (i.e. smaller 
+pore sizes, in the range of 1–2 mm or smaller) achieve better perfor￾mance owing to improved convective heat transfer (Mey-Cloutier et al., 
+2016; Wang et al., 2020; Wu et al., 2011; Zaversky et al., 2018), while 
+some indicate that larger pores (~4 mm) are more suitable owing to 
+improved radiation heat transfer (Kribus et al., 2014). However, this 
+study placed the absorbers inside a cavity and used much higher mean 
+solar concentration ratios and resulting RPC temperatures compared to 
+the past studies. Differences in performance due to pore size may have 
+been diminished by multiple internal reflections of the incident solar 
+radiation and thermal re-emission by the RPCs (cavity effect). Thermal 
+conductivity is an additional important property, given the more ho￾mogenous temperature distribution exhibited by SiSiC RPC cavities 
+relative to alumina (Fig. 11). Finally, convective heat transfer is strongly 
+dependent on the flow characteristics across the porous structures, 
+especially its uniformity, which in turn affect the temperature distri￾butions. Overall, the larger pore size of 10 PPI (~2.5 mm mean pore 
+diameter) tends to provide an advantage over smaller pores for condi￾tions C > 3000 suns and Tair,out > 1000 ◦C, which may be expected given 
+the important role of radiation exchange at such high flux intensities and 
+re-emission temperatures. 
+5. Summary and conclusions 
+An experimental investigation was conducted with a solar receiver 
+featuring an open cavity containing RPC bricks directly exposed to 
+concentrated solar radiation and using air as the heat transfer fluid. 
+Steady-state air outlet temperatures Tair,out ranging from 1160 to 450 ◦C 
+were achieved at m˙ air between 2 and 10 kg/h for C between 1965 and 
+3900 suns, resulting in receiver thermal efficiencies ηreceiver between 
+0.22 and 0.69. For the same pore size, SiSiC performed better than 
+alumina in terms of Tair,out, attributed to its higher thermal conductivity 
+and surface absorptivity for solar radiation. Ceria, which was tested only 
+with 10 PPI pore size, achieved the highest Tair,out out of all the cavities 
+at every flux intensity but only at low m˙ air (i.e. at high Tair,out). Ceria Tair, 
+out values dropped steeply with increasing m˙ air because of air bypassing 
+the RPC structure via gaps created by imperfect machining. There was 
+no prominent trend between the three different pore sizes of SiSiC ma￾terial across different C levels, presumably due to the effect of the cavity 
+on the interplay between radiation, convection and conduction heat 
+transfer. However, the results indicate that the larger pores of 10 PPI 
+(~2.5 mm mean pore diameter) tend to be beneficial for the low￾conducting alumina material and for both materials under conditions 
+of high C (>3000 suns) and Tair,out (>1000 ◦C) due to the dominant role 
+of radiation heat transfer across the cavity. At the highest C = 3230 suns, 
+Tair,out values were consistently higher than 1000 ◦C for all m˙ air. 
+Increasing the m˙ air from roughly 4 to 11 kg/h decreased the steady-state 
+Tair,out only by about 12%, while nearly doubling the ηreceiver to 0.69. 
+Main sources of irreversibility were due to re-radiation through the 
+cavity’s aperture, conduction through the insulating walls and temper￾ature gradients of up to 500 ◦C across the RPC cavity, indicating a 
+considerable scope for optimizing the design for maximum ηreceiver. The 
+results of this experimental study will be further used to validate a heat 
+transfer and fluid flow model for design optimization and scale-up. The 
+solar air receiver design is simple, robust, and scalable owing to its 
+modularity, and can be directly integrated with a thermocline-based 
+heat storage, enabling the round-the-clock delivery of heat for high￾temperature thermal and thermochemical industrial applications. 
+Declaration of Competing Interest 
+The authors declare that they have no known competing financial 
+interests or personal relationships that could have appeared to influence 
+the work reported in this paper. 
+Acknowledgements 
+We gratefully acknowledge the financial support by the Swiss State 
+Secretariat for Education, Research and Innovation (Grant No. 16.0183) 
+and the European Union’s Horizon 2020 Research and Innovation Pro￾gram (Project INSHIP – Grant No. 731287). We thank Philipp Haueter 
+and Julian Urech for the technical support with the experimental setup, 
+and Marie Hoes and Emiliano Casati for their support with the 
+experimentation. 
+Appendix A. Repeated experiment with longer heat-up time 
+The experimental run with SiSiC 30 PPI cavity and 3.1 kW power input (C = 2475 suns) was repeated in order to serve two purposes: (i) to verify 
+repeatability of the experiments, and (ii) to confirm the hypothesis that the increase in steady-state Tair,out (instead of decrease) with increasing m˙ air 
+observed at the start of all experiments was due to transient heating of the insulation. The definition of steady-state (<1% change in 5 min) was applied 
+to Tair,out only, and not to the insulation temperatures, in order to complete the experiments in a reasonable amount of time. Tair,out is expected to attain 
+steady-state faster than the temperature of the insulation around the RPC cavity. As a consequence, at the start of the experiment (i.e. at the lowest 
+m˙ air), a higher proportion of heat is expected to flow into the cavity walls for sensible heating of the insulation, curtailing the value of Tair,out measured. 
+An additional 50 min of heat-up time was allowed at the start of the repeated run. The first steady-state Tair,out (i.e. at the lowest m˙ air) was higher by 
+nearly 15 ◦C than the first steady-state Tair,out of the original experiment, while the remaining steady-state Tair,out values were identical (Fig. A1). 
+V.R. Patil et al. 
+
+Solar Energy 214 (2021) 72–85
+84
+Appendix B. Error estimation of Tair, out and ηreceiver 
+The error in the air outlet temperature was calculated as a combination of the errors of associated measuring instruments: 
+δTair,out =
+̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅
+δTC2
+air,out + δNI2
+9213 √
+(A2.1) 
+where δTair,out, δTCair,out and δNI9213 are the standard deviations of Tair,out, the air outlet thermocouple and the NI 9213 thermocouple input module, 
+respectively. Similar error calculation was applied for the receiver efficiency. 
+ηreceiver = Pair,out
+Psolar
+= m˙ air ∫ Tair,out
+Tair,in Cp,air(T)dT
+V˙
+waterρwaterCp,waterΔTwater
+(A2.2) 
+where V˙
+water, ρwater, Cp,water and ΔTwater are the volumetric flow rate, density, specific heat capacity and temperature gain of the water flowing across the 
+calorimeter used to measure Psolar. 
+References 
+Ackermann, S., Steinfeld, A., 2017. Spectral hemispherical reflectivity of 
+nonstoichiometric cerium dioxide. Sol. Energy Mater. Sol. Cells 159, 167–171. 
+https://doi.org/10.1016/j.solmat.2016.08.036. 
+Ackermann, S., Takacs, M., Scheffe, J., Steinfeld, A., 2017. Reticulated porous ceria 
+undergoing thermochemical reduction with high-flux irradiation. Int. J. Heat Mass 
+Transf. 107, 439–449. https://doi.org/10.1016/j.ijheatmasstransfer.2016.11.032. 
+Agrafiotis, C., Mavroidis, I., Konstandopoulos, A., Hoffschmidt, B., Stobbe, P., 
+Romero, M., Fernandezquero, V., 2007. Evaluation of porous silicon carbide 
+monolithic honeycombs as volumetric receivers/collectors of concentrated solar 
+radiation. Sol. Energy Mater. Sol. Cells 91, 474–488. https://doi.org/10.1016/j. 
+solmat.2006.10.021. 
+Albanakis, C., Missirlis, D., Michailidis, N., Yakinthos, K., Goulas, A., Omar, H., 
+Tsipas, D., Granier, B., 2009. Experimental analysis of the pressure drop and heat 
+transfer through metal foams used as volumetric receivers under concentrated solar 
+radiation. Exp. Therm. Fluid Sci. 33, 246–252. https://doi.org/10.1016/j. 
+expthermflusci.2008.08.007. 
+Avila-Marín, ´ A.L., 2011. Volumetric receivers in Solar Thermal Power Plants with 
+Central Receiver System technology: A review. Sol. Energy 85, 891–910. https://doi. 
+org/10.1016/j.solener.2011.02.002. 
+Avila-Marin, A.L., Alvarez-Lara, M., Fernandez-Reche, J., 2014. Experimental Results of 
+Gradual Porosity Wire Mesh Absorber for Volumetric Receivers. Energy Procedia 49, 
+275–283. https://doi.org/10.1016/j.egypro.2014.03.030. 
+Avila-Marin, A.L., Alvarez de Lara, M., Fernandez-Reche, J., 2018. Experimental results 
+of gradual porosity volumetric air receivers with wire meshes. Renew. Energy 122, 
+339–353. https://doi.org/10.1016/j.renene.2018.01.073. 
+Battleson, K.W., 1981. Solar power tower design guide: solar thermal central receiver 
+power systems, a source of electricity and/or process heat. Albuquerque, NM, and 
+Livermore, CA (United States). doi: 10.2172/6335255. 
+Blanco, M.J., Miller, S., 2017. Introduction to concentrating solar thermal (CST) 
+technologies, in: Advances in Concentrating Solar Thermal Research and 
+Technology. Elsevier, pp. 3–25. doi: 10.1016/B978-0-08-100516-3.00001-0. 
+Buck, R., Br¨
+auning, T., Denk, T., Pfander, ¨ M., Schwarzbozl, ¨ P., Tellez, F., 2002. Solar￾Hybrid Gas Turbine-based Power Tower Systems (REFOS). J. Sol. Energy Eng. 124, 
+2–9. https://doi.org/10.1115/1.1445444. 
+Buck, R., Muir, J.F., Hogan, R.E., Skocypec, R.D., 1991. Carbon dioxide reforming of 
+methane in a solar volumetric receiver/reactor: the CAESAR project. Sol. Energy 
+Mater. 24, 449–463. https://doi.org/10.1016/0165-1633(91)90082-V. 
+Capuano, R., Fend, T., Stadler, H., Hoffschmidt, B., Pitz-Paal, R., 2017. Optimized 
+volumetric solar receiver: Thermal performance prediction and experimental 
+validation. Renew. Energy 114, 556–566. https://doi.org/10.1016/j. 
+renene.2017.07.071. 
+Chavez, J.M., Chaza, C., 1991. Testing of a porous ceramic absorber for a volumetric air 
+receiver. Sol. Energy Mater. 24, 172–181. https://doi.org/10.1016/0165-1633(91) 
+90057-R. 
+Eyring, V., Kohler, ¨ H.W., Lauer, A., Lemper, B., 2005. Emissions from international 
+shipping: 2. Impact of future technologies on scenarios until 2050. J. Geophys. Res. 
+110, D17306. https://doi.org/10.1029/2004JD005620. 
+Fend, T., Hoffschmidt, B., Pitz-Paal, R., Reutter, O., Rietbrock, P., 2004. Porous materials 
+as open volumetric solar receivers: Experimental determination of thermophysical 
+Fig. A1. Repeated experimental run with SiSiC 30 PPI cavity, 3.1 kW power 
+input (C = 2475 suns) and 50 mins of additional heat-up time to verify 
+repeatability of measurements and to check the effect of additional heat-up 
+time on initial values of Tair,out. 
+V.R. Patil et al. 
+
+Solar Energy 214 (2021) 72–85
+85
+and heat transfer properties. Energy 29, 823–833. https://doi.org/10.1016/S0360- 
+5442(03)00188-9. 
+Furler, P., Scheffe, J., Gorbar, M., Moes, L., Vogt, U., Steinfeld, A., 2012. Solar 
+Thermochemical CO 2 Splitting Utilizing a Reticulated Porous Ceria Redox System. 
+Energy Fuels 26, 7051–7059. https://doi.org/10.1021/ef3013757. 
+Gianella, S., Gaia, D., Ortona, A., 2012. High temperature applications of Si-SiC cellular 
+ceramics. Adv. Eng. Mater. 14, 1074–1081. https://doi.org/10.1002/ 
+adem.201200012. 
+Gigantino, M., Sas Brunser, S., Steinfeld, A., 2020. High-Temperature Thermochemical 
+Heat Storage via the CuO/Cu2O Redox Cycle: From Material Synthesis to Packed-Bed 
+Reactor Engineering and Cyclic Operation. Energy Fuels. https://doi.org/10.1021/ 
+acs.energyfuels.0c02572. 
+Gomez-Garcia, F., Gonz´
+alez-Aguilar, J., Olalde, G., Romero, M., 2016a. Thermal and 
+hydrodynamic behavior of ceramic volumetric absorbers for central receiver solar 
+power plants: A review. Renew. Sustain. Energy Rev. 57, 648–658. https://doi.org/ 
+10.1016/j.rser.2015.12.106. 
+Gomez-Garcia, F., Santiago, S., Luque, S., Romero, M., Gonzalez-Aguilar, J., 2016b. A 
+new laboratory-scale experimental facility for detailed aerothermal 
+characterizations of volumetric absorbers, in: AIP Conference Proceedings 1734. p. 
+030018. doi: 10.1063/1.4949070. 
+Grote, M., Williams, I., Preston, J., 2014. Direct carbon dioxide emissions from civil 
+aircraft. Atmos. Environ. 95, 214–224. https://doi.org/10.1016/j. 
+atmosenv.2014.06.042. 
+Haussener, S., Coray, P., Lipinski, ´ W., Wyss, P., Steinfeld, A., 2010. Tomography-Based 
+Heat and Mass Transfer Characterization of Reticulate Porous Ceramics for High￾Temperature Processing. ASME J. Heat Transf. 132 (023305), 1–9. https://doi.org/ 
+10.1115/1.4000226. 
+Hischier, I., Leumann, P., Steinfeld, A., 2012. Experimental and numerical analyses of a 
+pressurized air receiver for solar-driven gas turbines. doi: 10.1115/1.4005446. 
+Ho, C.K., 2017. Advances in central receivers for concentrating solar applications. Sol. 
+Energy 152, 38–56. https://doi.org/10.1016/j.solener.2017.03.048. 
+Ho, C.K., Iverson, B.D., 2014. Review of high-temperature central receiver designs for 
+concentrating solar power. Renew. Sustain. Energy Rev. 29, 835–846. https://doi. 
+org/10.1016/j.rser.2013.08.099. 
+Hoes, M., Ackermann, S., Theiler, D., Furler, P., Steinfeld, A., 2019. Additive￾Manufactured Ordered Porous Structures Made of Ceria for Concentrating Solar 
+Applications. Energy Technol. 7, 1900484. https://doi.org/10.1002/ 
+ente.201900484. 
+Hoffschmidt, B., Pitz-Paal, R., Bohmer, ¨ M., Fend, T., Rietbrock, P., 1999. 200 kWth open 
+volumetric air receiver (HiTRec) of DLR reached 1000◦C average outlet temperature 
+at PSA. J. Phys. IV Fr. 9, 551–556. https://doi.org/10.1051/jp4:1999387. 
+International Energy Agency, 2020. Tracking Industry 2020 – Analysis [WWW 
+Document]. URL https://www.iea.org/reports/tracking-industry-2020 (accessed 
+7.8.20). 
+Karni, J., Kribus, A., Doron, P., Rubin, R., Fiterman, A., Sagie, D., 1997. The DIAPR: A 
+high-pressure, high-temperature solar receiver. J. Sol. Energy Eng. Trans. ASME 119, 
+74–78. https://doi.org/10.1115/1.2871853. 
+Karni, J., Kribus, A., Ostraich, B., Kochavi, E., 1998. A High-Pressure Window for 
+Volumetric Solar Receivers. J. Sol. Energy Eng. 120, 101–107. https://doi.org/ 
+10.1115/1.2888051. 
+Kribus, A., Doron, P., Rubin, R., Reuven, R., Taragan, E., Duchan, S., Karni, J., 2001. 
+Performance of the Directly-Irradiated Annular Pressurized Receiver (DIAPR) 
+operating at 20 bar and 1200◦C. J. Sol. Energy Eng. Trans. ASME 123, 10–17. 
+https://doi.org/10.1115/1.1345844. 
+Kribus, A., Gray, Y., Grijnevich, M., Mittelman, G., Mey-Cloutier, S., Caliot, C., 2014. The 
+promise and challenge of solar volumetric absorbers. Sol. Energy 110, 463–481. 
+https://doi.org/10.1016/j.solener.2014.09.035. 
+Leuchsner, V., 1991. The PLVCR 500 and HCPC, tests and results, NASA STI/Recon 
+Technical Report N. 94. 
+Li, Q., Zhang, Q., 2020. Experimental study on the influence of input solar flux, air flow 
+rate, and absorber parameters on honeycomb ceramic air receiver performance. 
+J. Renew. Sustain. Energy 12, 023701. https://doi.org/10.1063/1.5142805. 
+Luque, S., Men´endez, G., Roccabruna, M., Gonzalez-Aguilar, ´ J., Crema, L., Romero, M., 
+2018. Exploiting volumetric effects in novel additively manufactured open solar 
+receivers. Sol. Energy 174, 342–351. https://doi.org/10.1016/j. 
+solener.2018.09.030. 
+Marxer, D., Furler, P., Takacs, M., Steinfeld, A., 2017. Solar thermochemical splitting of 
+CO 2 into separate streams of CO and O 2 with high selectivity, stability, conversion, 
+and efficiency. Energy Environ. Sci. 10, 1142–1149. https://doi.org/10.1039/ 
+C6EE03776C. 
+Mey-Cloutier, S., Caliot, C., Kribus, A., Gray, Y., Flamant, G., 2016. Experimental study of 
+ceramic foams used as high temperature volumetric solar absorber. Sol. Energy 136, 
+226–235. https://doi.org/10.1016/j.solener.2016.06.066. 
+Nathan, G.J., Suenaga, M., Kodama, T., Tourbier, D., Zughbi, H., Dally, B.B., Stechel, E. 
+B., Sattler, C., Cochrane, D., DeGaris, R., Lovegrove, K., Hooey, L., Jeanes, S., Metha, 
+G.F., Arjomandi, M., Matthews, C., 2019. HiTeMP Outlook 2018. Transforming High 
+Temperature Minerals Processing: A multi-stakeholder perspective on pathways to 
+high value, net-zero CO2 products for the new economy. 
+Ortona, A., Trimis, D., Uhlig, V., Eder, R., Gianella, S., Fino, P., D’Amico, G., Boulet, E., 
+Chazelas, C., Gr¨
+amer, T., Cresci, E., Wünning, J.G., Altena, H., Beneke, F., 
+Debier, M., 2014. SiSiC Heat Exchangers for Recuperative Gas Burners with Highly 
+Structured Surface Elements. Int. J. Appl. Ceram. Technol. 11, 927–937. https://doi. 
+org/10.1111/ijac.12087. 
+Pabst, C., Feckler, G., Schmitz, S., Smirnova, O., Capuano, R., Hirth, P., Fend, T., 2017. 
+Experimental performance of an advanced metal volumetric air receiver for Solar 
+Towers. Renew. Energy 106, 91–98. https://doi.org/10.1016/j.renene.2017.01.016. 
+Parrodi, J.C.H., Lucas, H., Gigantino, M., Sauve, G., Esguerra, J.L., Einh¨
+aupl, P., 
+Vollprecht, D., Pomberger, R., Friedrich, B., Van Acker, K., Krook, J., Svensson, N., 
+Van Passel, S., 2019. Integration of resource recovery into current waste 
+management through (Enhanced) landfill mining. Detritus 8–2019, 141–156. 
+Petrasch, J., Meier, F., Friess, H., Steinfeld, A., 2008. Tomography based determination 
+of permeability, Dupuit-Forchheimer coefficient, and interfacial heat transfer 
+coefficient in reticulate porous ceramics. Int. J. Heat Fluid Flow 29, 315–326. 
+https://doi.org/10.1016/j.ijheatfluidflow.2007.09.001. 
+Petrasch, J., Wyss, P., Steinfeld, A., 2007. Tomography-based Monte Carlo determination 
+of radiative properties of reticulate porous ceramics. J. Quant. Spectrosc. Radiat. 
+Transf. 105, 180–197. https://doi.org/10.1016/j.jqsrt.2006.11.002. 
+Potamias, D., Alxneit, I., Koepf, E., Wokaun, A., 2019. Double Modulation Pyrometry 
+Applied to Radiatively Heated Surfaces With Dynamic Optical Properties. J. Sol. 
+Energy Eng. 141, 1–8. https://doi.org/10.1115/1.4040842. 
+Pozivil, P., Ettlin, N., Stucker, F., Steinfeld, A., 2015. Modular design and experimental 
+testing of a 50 kWth pressurized-air solar receiver for gas turbines. J. Sol. Energy 
+Eng. Trans. ASME 137. https://doi.org/10.1115/1.4028918. 
+Pritzkow, W.E.C., 1991. Pressure loaded volumetric ceramic receiver. Sol. Energy Mater. 
+24, 498–507. https://doi.org/10.1016/0165-1633(91)90086-Z. 
+Purdue University. Thermophysical Properties Research Center, 1967. Thermophysical 
+Properties of High Temperature Solid Materials: Oxides and their solutions and 
+mixtures. Solutions and their mixtures of simple oxygen compounds, including 
+glasses and ceramic glasses / Y.S. Touloukian, editor. Macmillan. 
+Roger, ¨ M., Pfander, ¨ M., Buck, R., 2006. Multiple Air-Jet Window Cooling for High￾Temperature Pressurized Volumetric Receivers: Testing, Evaluation, and Modeling. 
+J. Sol. Energy Eng. 128, 265–274. https://doi.org/10.1115/1.2212437. 
+Romero, M., Gonzalez-Aguilar, ´ J., 2017. Next generation of liquid metal and other high￾performance receiver designs for concentrating solar thermal (CST) central tower 
+systems, in: Advances in Concentrating Solar Thermal Research and Technology. 
+Elsevier, pp. 129–154. doi: 10.1016/B978-0-08-100516-3.00007-1. 
+Romero, M., Gonzalez-Aguilar, J., Sizmann, A., Batteiger, V., Steinfeld, A., Zoller, S., 
+Brendelberger, S., Lieftink, D., 2019. Solar-Driven Thermochemical Production of 
+Sustainable Liquid Fuels from H2O and CO2 in a Heliostat Field, in: Proceedings of 
+the ISES Solar World Congress 2019. Solar World Congress, 04.-07. Nov. 2019, 
+Santiago, Chile. 
+Romero, M., Steinfeld, A., 2012. Concentrating solar thermal power and thermochemical 
+fuels. Energy Environ. Sci. 5, 9234–9245. https://doi.org/10.1039/c2ee21275g. 
+Sedighi, M., Padilla, R.V., Taylor, R.A., Lake, M., Izadgoshasb, I., Rose, A., 2019. High￾temperature, point-focus, pressurised gas-phase solar receivers: A comprehensive 
+review. Energy Convers. Manag. https://doi.org/10.1016/j.enconman.2019.02.020. 
+von Storch, H., Roeb, M., Stadler, H., Sattler, C., Hoffschmidt, B., 2016. Efficiency 
+potential of indirectly heated solar reforming with different types of solar air 
+receivers. Appl. Therm. Eng. 92, 202–209. https://doi.org/10.1016/j. 
+applthermaleng.2015.09.065. 
+Wang, P., Li, J.B., Zhou, L., Vafai, K., 2020. Experimental characterization on pore 
+parameter and the irradiation absorption efficiency of a series SiC foam specimens. 
+Energy Convers. Manag. 212, 112795 https://doi.org/10.1016/j. 
+enconman.2020.112795. 
+Wu, Z., Caliot, C., Flamant, G., Wang, Z., 2011. Coupled radiation and flow modeling in 
+ceramic foam volumetric solar air receivers. Sol. Energy 85, 2374–2385. https://doi. 
+org/10.1016/j.solener.2011.06.030. 
+Zanganeh, G., Pedretti, A., Zavattoni, S., Barbato, M., Steinfeld, A., 2012. Packed-bed 
+thermal storage for concentrated solar power – Pilot-scale demonstration and 
+industrial-scale design. Sol. Energy 86, 3084–3098. https://doi.org/10.1016/j. 
+solener.2012.07.019. 
+Zaversky, F., Aldaz, L., S´
+anchez, M., Avila-Marín, ´ A.L., Rold´
+an, M.I., Fernandez-Reche, ´ J., 
+Füssel, A., Beckert, W., Adler, J., 2018. Numerical and experimental evaluation and 
+optimization of ceramic foam as solar absorber – Single-layer vs multi-layer 
+configurations. Appl. Energy 210, 351–375. https://doi.org/10.1016/j. 
+apenergy.2017.11.003. 
+Zaversky, F., Aldaz, L., S´
+anchez, M., Fernandez-Reche, ´ J., Füssel, A., Adler, J., 2019. 
+Experimental and numerical evaluation of a small array of ceramic foam volumetric 
+absorbers. In: AIP Conference Proceedings, p. 030066. https://doi.org/10.1063/ 
+1.5117578. 
+Zaversky, F., Les, I., Sorbet, P., Sanchez, ´ M., Valentin, B., Brau, J.-F., Siros, F., 2020. The 
+challenge of solar powered combined cycles – Providing dispatchability and 
+increasing efficiency by integrating the open volumetric air receiver technology. 
+Energy 194, 116796. https://doi.org/10.1016/j.energy.2019.116796. 
+V.R. Patil et al. 

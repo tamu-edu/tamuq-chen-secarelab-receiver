@@ -1,0 +1,1319 @@
+Applied Thermal Engineering 266 (2025) 125634
+Available online 19 January 2025
+1359-4311/© 2025 The Authors. Published by Elsevier Ltd. This is an open access article under the CC BY license (http://creativecommons.org/licenses/by/4.0/).
+Research Paper
+Experimental assessment of different compact flow channel geometries on
+pressurised gas solar receivers
+D. D’Souza a,b,*
+, M.J. Montes b
+, M. Romero a
+, J. Gonz´
+alez-Aguilar a,**
+a High Temperature Processes Unit, IMDEA Energy, Avda. Ram´
+on de la Sagra 3 28935 Mostoles, ´ Spain b E.T.S. Ingenieros Industriales - UNED, C/Juan del Rosal 12 28040 Madrid, Spain
+ARTICLE INFO
+Keywords:
+Compact channel
+Experimental characterisation
+Pressurised gas
+Solar receiver
+Concentrated solar thermal
+Parametric analysis
+ABSTRACT
+Pressurised gas receivers using optimised compact flow channels exhibit promising thermal performance in
+concentrated solar thermal systems, paving the way to integrate solar energy in high efficiency thermodynamic
+power cycles and industrial heat processes. This work is focused on the experimental characterisation of several
+compact absorber samples, in order to verify previous numerical analysis aimed at maximising thermal efficiency
+while simultaneously minimising pressure drop. Four variants of plain rectangular channel absorber samples
+were fabricated varying channel height, breadth and wall thickness. Each absorber sample was experimentally
+studied by varying mass flow rate, inlet pressure and incident radiation flux.
+The experimental campaign verified important findings and predictions of a previously developed numerical
+model including that the maximum thermal efficiency and pressure drop occurs at the smallest channel size
+besides the positive effect of taller and narrower channels. The maximum thermal efficiency observed was 95.8%
+with the corresponding pressure drop measured at 6.3% of the inlet pressure. This performance, in terms of
+thermal efficiency and relative pressure drops, is on par and even surpasses the state-of-the-art receivers of its
+type. Such high thermal efficiencies (above 90%) and low relative pressure drops (below 3%) were also observed
+for other operating conditions and absorber geometries as well.
+1. Introduction
+The solar thermal receiver is a critical component of any Concen￾trated Solar Power (CSP) or Concentrated Solar Thermal (CST) system as
+it serves to transfer the concentrated solar radiation incident on its
+surface as thermal energy to a heat transfer medium. The heat transfer
+medium employed in the receiver may be a solid, liquid or gas with this
+selection providing a means to classify receivers. Solids, especially as
+particles, are capable of attaining high temperatures and use as thermal
+storage media but particle conveyance, attrition and transport besides
+design difficulties in particle–fluid heat exchangers remain challenges
+for solid particle receivers [1,2]. Liquids, especially thermal oil and
+molten salt, are widely deployed and are the most prevalent Heat
+Transfer Fluid (HTF) in commercial systems [3,4] though the working
+temperature bounds of both these fluids create challenges. Thermal oils
+cannot operate above 400 ◦C due to decomposition and general chem￾ically instability at higher temperatures [4]. This in turn precludes them
+from use in high temperature applications such as next generation
+power systems, that typically require temperatures above 700 ◦C [5] or
+industrial processes [6]. Molten salts can achieve higher operational
+temperatures but have a high freezing point and solidify at around
+240 ◦C which leads to salt crystallisation and the formation of plugs that
+creates blockages in the circuit [7]. Preventing this requires heat traces
+which is a major parasitic energy loss and their implementation incurs a
+significant material and financial cost [5]. Additionally, corrosion and
+erosion caused by molten salts, especially closer to the receiver when the
+molten salt becomes more chemically unstable at higher temperature, is
+a concern that needs to be monitored [8,9]. Nanofluids are also
+emerging as an active area of research and development in the CST field
+[10,11] but their application is limited to lower temperature systems
+such as parabolic trough collectors [12,13].
+Gas phase receivers can obviate several of these constraints as gases
+are able to operate over a broad temperature and pressure ranges
+without physical or chemical degradation. Moreover, gases tend to not
+be toxic or environmentally hazardous while being relatively inexpen￾sive [14]. On the downside, gases have unfavourable thermo-physical
+properties compared to liquids, which leads to poor heat transfer that
+* Corresponding author at: E.T.S. Ingenieros Industriales - UNED, C/Juan del Rosal 12 28040 Madrid, Spain.
+** Corresponding author at: High Temperature Processes Unit, IMDEA Energy, Avda. Ramon´ de la Sagra 3 28935 Mostoles, ´ Spain.
+E-mail addresses: dsouza@ind.uned.es (D. D’Souza), jose.gonzalez@imdea.org (J. Gonz´
+alez-Aguilar).
+Contents lists available at ScienceDirect
+Applied Thermal Engineering
+journal homepage: www.elsevier.com/locate/apthermeng
+https://doi.org/10.1016/j.applthermaleng.2025.125634
+Received 17 May 2024; Received in revised form 16 December 2024; Accepted 17 January 2025
+
+Applied Thermal Engineering 266 (2025) 125634
+2
+affects the thermal efficiency of the receiver and limits its operational
+temperature as the heat evacuation from the receiver solid itself is not as
+effective [15].
+In this regard, the design of the flow channels in solar receivers plays
+a critical role as they must ensure sufficient heat transfer to the fluid
+without it undergoing excessive pressure drop. This is especially true
+when the heat transfer fluid is a gas as their compressibility lends them
+to additional pressure losses as compared to liquid media. These pres￾sure drops may be alleviated by pressurising the system though this in
+turn adds to the system complexity and cost as additional appropriate
+pressure-rated components are necessitated [16,17]. The reduction in
+pressure drop is primarily due to a reduction in fluid velocity which
+occurs at the higher densities, corresponding to an increased pressure
+level, for the same mass flow rate [18].
+Pressurised gas receivers can be grouped based on the gas employed
+(air, helium, nitrogen, etc.), the receiver irradiation pattern (directly,
+indirectly or hybrid) and the fluid flow path geometry [19]. The selec￾tion of gas used as the HTF in the receiver is a crucial system design
+parameter which may be done based on the application, optimal ther￾mophysical properties of the gas, cost, etc [20]. In the early stages of
+pressurised gas receiver development, the primary application of said
+receivers was for pre-heating pressurised air before entering the com￾bustion chamber in modified open gas turbine power cycles [21,22].
+Given the application had pressurised air as the working fluid in the
+power cycle, the simplest system design called for the same pressurised
+air to be used as the HTF in the receiver. In other applications, such as
+industrial process heat, that usually employ an intermediary heat
+exchanger between the solar thermal loop and the process, alternative
+gases, with better thermophysical properties than air, may be used to
+improve the receiver and overall system efficiency [23,24]. More
+recently, the trend toward more thermally efficient supercritical carbon
+dioxide (sCO2) power cycles [5,25] has lead to the investigation and
+development of pressurised gas receivers using sCO2 as the HTF [26,27].
+Classifying receivers based on irradiation pattern has them split into
+directly irradiated receivers, which have their flow channels irradiated,
+and indirect receivers which have a solid physical separation between
+the irradiated surface and the flow channels of the HTF [19]. Directly
+irradiated receivers are limited in their operating pressure by the
+fragility of the quartz glass window used to allow incident light inside
+the pressurised receiver [28].
+On the basis of the internal flow channel geometry, pressurised gas
+receivers may be classified, non-exclusively, as tubular, embedded
+channel, impinging jet and micro/compact channel [19]. Tubular re￾ceivers are by far the most studied and developed [22,29,30], though
+alternative concepts exist such as the embedded channel receiver [31],
+impinging jet receiver [32–34], Reticulated Porous Ceramic (RPC) lined
+cavity receivers [35–37] and compact channel receiver [38,39]. While
+tubular receivers boast low pressure drops of below 2 % of their inlet
+pressure, the thermal efficiency of such receivers does not exceed 80 %.
+Other proposed pressurised receivers have sought to improve on the
+performance of the conventional tubular receiver but inevitably face the
+same competing considerations of thermal efficiency maximisation and
+pressure drop minimisation. While some tubular receiver variants,
+notably the flat panel and bladed as well as embedded receivers, are able
+to achieve high efficiencies, they do so at the cost of excessive pressure
+drops well above 10 % of the inlet pressure. On the other hand, other
+receiver concepts, such as the RPC and impinging cavity receivers, have
+lower pressure drops below 1 % of their inlet pressure levels. However,
+the corresponding thermal efficiencies attained by these receivers is also
+lower, often below 60 %. Table 1 provides a summary of select pres￾surised gas receiver designs and performances, as well as the operating
+conditions under which they were experimentally characterised.
+Compact flow channels offer several benefits such as greater heat
+transfer area for the same volume besides improving the heat transfer by
+convection due to decreased diffusion length as compared to conven￾tional tubular channels [43]. The reduction in channel size results in a
+volume reduction for the same effective heat transfer area, i.e. its
+compactness, which in turn causes enhanced heat transfer coefficients
+Notation
+Acronyms
+AISI American Iron and Steel Institute
+CCD Charged Coupled Device
+CST Concentrated Solar Thermal
+CSP Concentrated Solar Power
+EDM Electrical Discharge Machining
+HCE Heat Collector Element
+HTF Heat Transfer Fluid
+HFSS High Flux Solar Simulator
+IR Infrared
+N2 Nitrogen (gas)
+O2 Oxygen (gas)
+PF Perforated Fin
+PFHE Plate Fin Heat Exchanger
+PRF Plain Rectangular Fin
+sCO2 Supercritical Carbon Dioxide
+SLM Selective Laser Melting
+Latin letters
+A Area (m2
+)
+B Breadth (m)
+D Diameter (m)
+fD Darcy pressure friction loss factor
+fF Fanning pressure friction loss factor
+H Height (m)
+K Coefficient of pressure drop
+L Length (m)
+m˙ Mass flow rate (kg/s)
+N Number of channels/elements
+Nu Nusselt number
+P Pressure (Pa)
+ΔP Pressure Drop (Pa)
+Pr Prandtl number
+Q˙ Thermal power (W)
+r Radius (m)
+Re Reynolds number
+t Channel wall thickness (m)
+T Temperature (K)
+v Velocity (m/s)
+Greek Letters
+η Efficiency
+ρ Density (kg m− 3
+)
+Δ Differential
+ε Roughness (m)
+Subscripts
+abs Absorbed
+c Channel, Contraction
+e Expansion
+h Hydraulic
+inc Incident
+v Vertical
+Xe Xenon
+D. D’Souza et al.
+
+Applied Thermal Engineering 266 (2025) 125634
+3
+for the same mass flow rate. However, a higher pressure drop will also
+occur which could be offset by pressurisation.
+Reviewing the current state of the art in the study of such compact
+channel pressurised gas receivers, specifically focussing on experimental
+works, a microchannel receiver prototype was developed [38,39] based
+on compact heat exchanger concept. It was divided into 12 parallel
+channels, each being 1 mm wide and 3 mm high. Rectangular ribs were
+attached on top of each channel, to improve the heat transfer to fluid,
+having the same width as the channel and a height and pitch of 2 mm
+and 1 mm, respectively. The receiver was manufactured using Selective
+Laser Melting (SLM) in Inconel 625. The outer (or top) surface of 30 mm
+× 30 mm was the irradiated plane. An experimental campaign was
+carried out using pressurised air (2–6 bar) as the HTF and thermal ef￾ficiency of around 64 % was observed with a pressure drop of around
+750 mbar.
+On a smaller scale, absorber panels with a Plated Fin Heat Exchanger
+(PFHE) type structure and channel sizes in the order of hundreds of
+micrometres were manufactured of Haynes 230 using Electrical
+Discharge Machining (EDM) [42,44]. Lab-scale absorber panels of 2 cm
+× 2 cm were fabricated and demonstrated to absorb 100 W cm− 2 of
+incident flux using supercritical carbon dioxide (sCO2) at 650 ◦C and
+80–200 bar as the working fluid, reporting thermal efficiencies around
+90 %.
+Another receiver prototype, using sCO2 as the HTF and internal flow
+channels based on PFHE concepts, was developed by the National
+Renewable Energy Laboratory (NREL). The receiver consisted of a
+compact structure with two attached plates having a wavy fin
+arrangement between them. The plates, which may be stacked one atop
+the other, act as the absorber surfaces of the concentrated solar radiation
+and are arranged to form a cavity [41]. To withstand the higher internal
+pressures demanded of a sCO2 receiver (up to 25 MPa) while simulta￾neously bettering heat transfer to fluid, a high fin density (up to 32 fins/
+cm) and thin walls were designed. The receiver, and its individual
+panels, were constructed of Inconel 625 and was predicted to have an
+efficiency of around 90 %.
+From the review of past studies into pressurised gas receiver design
+and development, it is evident that an overarching objective was to
+maximise heat transfer to the gas, and ultimately the receiver thermal
+efficiency, without suffering excessive pressure drops in the process. To
+this end, in a previous work, the authors of this manuscript presented a
+numerical analysis into the comparative performances of pressurised gas
+receivers with various compact flow channel geometries which
+concluded that the Plain Rectangular Fin (PRF) and Perforated Fin (PF)
+channel receivers performed best in terms of exergy and energy effi￾ciencies [45]. Furthermore, the influence geometrical parameters,
+common to all evaluated receiver flow channel geometry types, was
+explored and uncovered optimum geometric configurations that maxi￾mised the exergy and energy efficiency respectively. The four common
+geometric parameters selected were the channel breadth, height and
+wall thickness besides the number of vertical channels (rows). The
+exergy efficiency, which accounts for heat transfer to HTF and its
+pressure drop, was largest in receivers having taller and narrower
+channels with thicker walls. The energy efficiency, which only depends
+on the solar to HTF heat transfer, was maximised in receivers having the
+smallest channels with the fewest number of vertical channels. As the
+exergy efficiency also factored in the pressure drop, it was found to be a
+valuable performance indicator of the receiver as excessive pressure
+drops are an inherent, though undesirable, feature of gas receivers. The
+parametric analysis concluded that there were optimum geometrical
+configurations that maximised the exergy efficiency and an experi￾mental study was proposed to verify these findings.
+As a natural continuation of the previous numerical analysis of
+pressurised gas receivers, this work presents the experimental evalua￾tion of pressurised gas receivers based on the same compact channel
+geometries studied in the numerical models. More specifically, this work
+focuses on the experimental investigation into the effects of receiver
+flow channel geometry, besides other operational parameters, and its
+comparison with the previously developed numerical model. Through
+this experimental campaign, this work seeks to verify the predictions of
+the pressurised gas receiver numerical model and demonstrate the po￾tential of pressurised gas receivers with optimised compact flow channel
+geometries for concentrated solar thermal applications. Attaining high
+thermal efficiencies (above 90 %) at low pressure drops (below 5 % of
+inlet pressure) is the perennial challenge of solar receiver design, which
+most state-of-the-art receivers fall short of as shown in Table 1, and in
+this experimental work, it is attempted to achieve these performance
+objectives and analyse the factors affecting the proposed receivers’
+performances and in so doing contribute to the field of solar receiver
+development.
+The structure of the manuscript is as follows. The experiment design
+and preparation are described in Section 2. Firstly, the experimental
+setup itself, including the test facility, its operational boundaries and
+instrumentation is presented in Section 2.1 followed by a description of
+the absorbers designed and manufactured for experimentation in Sec￾tion 2.2. Multiple absorbers, each with different internal geometries,
+were tested in this campaign. The experiment design and overall plan of
+experimentation is laid out in Section 2.3. This section details the
+operating parameters chosen to be varied and the levels of each
+parameter to carry out a characterisation of each fabricated absorber to
+evaluate the performance of the absorber at each operating point. Sec￾tion 3 delves into the results of the experiment campaign. The perfor￾mance of each of the absorbers tested is presented and compared against
+one another as well as to the numerical model of the pressurised gas
+receiver. Finally, Section 4 presents the conclusions of the work as well
+as propose future lines of research.
+2. Experiment design and preparation
+2.1. Experimental facilities and operation capacities
+The experiments were performed using a specifically designed
+pressurised receiver testbench making use of the KIRAN-42 High Flux
+Table 1
+Pressurised gas receivers: state of the art with performance and operating conditions.
+Receiver Operating conditions Performance indicators Ref
+Inlet Temperature Outlet Temperature Inlet Pressure Thermal efficiency Pressure drop ◦C ◦C bar % mbar %
+SOLGATE 290 350–550 6.5 75 100–120 1.5 [21]
+SOLHYCO 600 749–783 3.75 38–45 67–72 1.87 [22]
+SOLUGAS 300–350 800 9 71.3–78.1 200 2.2 [30]
+Embedded circumferential 135 520 3.81–3.9 83–96 1570–1940 46 [31]
+Embedded axial 150 450 3.85–4.05 78–96 410–550 12 [31]
+Impinging jet 674 800 3 74.1 − − [40]
+Microchannel (CNRS) ΔT = 100 – 360 4 64.28 750 18.75 [39]
+Sunshot (Brayton) 150 450 250 90.6 < 7500 < 3 [41]
+Microchannel (OSU) 400 650 81–86 90 < 4000 < 2 [42]
+D. D’Souza et al.
+
+Applied Thermal Engineering 266 (2025) 125634
+4
+Solar Simulator (HFSS) [46,47] as a concentrated sun-like light source,
+at the IMDEA Energy, Madrid (Spain). The KIRAN-42 HFSS acted as the
+primary radiative source and is comprised of 7 independent xenon short￾arc lamps, each of 6 kW (electrical), with truncated ellipsoidal reflectors.
+The radiation flux profile on the target plane can be altered by varying
+the number of operational lamps, the pointing of individual lamps and
+the position of the target plane relative to the HFSS [48,49]. A calori￾metric testbench is required to characterise and analyse the performance
+of the pressurised gas absorbers by quantifying the heat transfer from
+the incident solar thermal radiation to the HTF. Besides this, the test￾bench is also required to provide some level of control over key oper￾ating parameters to permit an experimental characterisation of the
+absorber. The pressurised gas receiver testbench facing the KIRAN-42
+HFSS is depicted in Fig. 1.
+The experimental facility was designed to be inherently flexible in
+terms of operating conditions. Multiple receiver concepts may be tested
+as individual absorbers or in some combination of the same (series/
+parallel) given the multi-lamp KIRAN-42 HFSS and its manipulable
+pointing strategies. Furthermore, aspects related to the absorber itself
+including the material used, external geometry, internal flow channel
+geometry and surface treatment were variable within limits of the
+testbench and desired experimental conditions though this will be dis￾cussed in more detail in Section 2.2. Operating parameters related to the
+calorimetric testbench such as the gas used, pressure level, mass flow
+rate and inlet temperature could also be varied and controlled within the
+constraints of the specific instrumentation used. The process and
+instrumentation diagram of the experiment facility is presented in Fig. 2.
+Referring to Fig. 2, when starting from the pressurised air cylinder, the
+high-pressure air passes through a pressure regulator, that delivers a
+constant output pressure as required by the experiment, before passing
+through a mass flowmeter. Compressed air cylinders with a fixed
+composition of 79 % Nitrogen (N2) and 21 % Oxygen (O2) were used to
+supply the pressurised air throughout the experiment campaign. Abso￾lute pressure sensors are placed before and after the absorber besides
+thermocouples to quantify the heat transfer to the HTF as the properties
+of the gas vary as a function of its pressure and temperature. This
+experiment data was inputted into the fluid property database REFPROP
+[50] to obtain the thermophysical properties at the absorber inlet and
+outlet with which the performance could be evaluated. A series of
+thermocouples are also proposed at various locations on the surface of
+the absorber to assess the solid temperature and its variations across the
+length and breadth of the absorber. The heated air then passes through a
+length of coiled tubing submerged in a cooled water tank before the air is
+eventually discharged to the environment at room temperature via a
+needle valve to ensure adequate backpressure.
+The system instrumentation also includes a charged-coupled device
+(CCD) camera and a thermographic or infra-red (IR) camera. Both these
+cameras are situated behind the lamps of the KIRAN-42 HFSS and are
+pointed towards the testbench. The CCD camera, with a light intensity
+filter, is used to safely view the testbench from the front during lamp
+operation and is essential in generating the radiation flux profiles/maps.
+The thermographic camera allows analysing infrared radiation from the
+absorber. A Gardon-type heat flux sensor is utilised to quantify the ra￾diation flux incident on the absorber. Table 2 details some important
+instrumentation used in the experimental setup including its operating
+range and instrument error. The experimental test setup, along with its
+instrumentation, can be observed in Fig. 3. Further information about
+the experimental setup can be found in [51] which includes photos and
+annotated drawings of the key components, their relative positions on
+the testbench and their functions.
+Data from the instrumentation (excluding cameras) was communi￾cated through National Instrument data acquisition devices, including C
+series modules and chassis, to the LabVIEW software [52]. Through
+LabVIEW, experiment monitoring and control was executed and
+experiment data was saved at regular time intervals. This data was then
+processed in MATLAB [53] to analyse the experimental data and assess
+absorber performance.
+2.2. Absorber design and fabrication
+As the absorbers to be tested were of a relatively small size and were
+designed for a one-off experiment campaign, additive manufacturing
+was identified as the preferred means of fabrication. Absorbers of
+stainless steel (316L) manufactured by Selective Laser Melting (SLM)
+will be presented in this work with this material selection guided by ease
+of manufacturability and its, relatively, high temperature strength. The
+pressurised receiver numerical model indicated that the perforated fin
+and plain rectangular fin receivers have the best performances [45].
+Given the slight but inescapable inaccuracies of 3D printing holes and
+overhangs (sags and shape deformations) [54], it was decided to
+manufacture all the absorber samples using the plain rectangular fin
+compact flow geometry. Absorbers of different internal flow geometries
+were proposed to be built to investigate the effect of the variation of
+these geometrical parameters on the performance. The four geometrical
+Fig. 1. Experimental setup developed for gas phase receiver testing with KIRAN 42 HFSS; (a) entire setup as in position, (b) testbench close-up projected view.
+D. D’Souza et al.
+
+Applied Thermal Engineering 266 (2025) 125634
+5
+design parameters identified and varied in the numerical model, namely
+channel height (Hc), wall thickness (t), number of vertical channels (Ncv)
+and channel breadth (Bc), were also varied in the experimental ab￾sorbers. As there are four geometrical parameters varied, there will be
+four absorber variations, as laid out in Table 3, labelled PR1, PR2, PR3
+and PR4.
+As can be observed in Table 3, PR1 has square channels whilst PR2
+and PR3 have taller and broader channels respectively. PR4 has a
+thinner channel wall because of which an additional channel, along the
+horizontal row, is added. Fig. 4 provides a better visualisation of the
+differences in each absorber’s cross-section. The design of the absorbers
+had to factor in thermal, mechanical and manufacturing considerations.
+Numerical analysis [45] revealed that the optimum velocity, for good
+heat transfer at lower pressure drops, was around 20–30 m/s while the
+additive manufacturing method, given that the internal flow channels
+would be challenging to access and post-process, recommended mini￾mum channel sizes of 1 mm. The wall thicknesses were determined using
+the design by rule approach following the ASME Section VIII Division I
+[55].
+Each of these absorbers have been designed to have the same outer
+dimensions, to facilitate mounting and dismounting besides to simplify
+the insulation design. The absorber outer dimensions were reached after
+consideration of the operational limitations of the experimental facil￾ities, including the KIRAN-42 HFSS and air supply, resulting in an
+absorber length of 63.75 mm, breadth of 24 mm and height (depth) of
+11 mm. Additional information regarding the design of the absorbers
+can be found in [51]. Once the design of the four absorbers was estab￾lished, numerical modelling and simulation was performed to verify that
+the maximum temperature and temperature gradients were within
+limits. Identical inlet and outlet sections were designed on either end of
+the absorber and manufactured as one piece as is evident in Fig. 5(a).
+Only one face of the absorbers was exposed to the incident radiation
+with the remaining faces insulated as shown in Fig. 5(b).
+2.3. Experiment design and method
+In order to conduct an experimental characterisation of the four
+absorbers, three operational parameters, namely peak incident flux,
+Fig. 2. Process and instrumentation diagram of experimental test setup.
+Table 2
+Instrumentation used in experimental setup.
+Instrum-ent Manuf-acturer Model Measur-ed paramet-er Unit Operating / Measurem-ent Range Instrument Error
+Gardon flux gauge Vatell Corporation TG-1000 Radiation flux kW/m2 0 – 1600 3 %
+Thermocouples TC Ltd Type K (class 1) Temperature ◦C Continuous: 0 – 1100
+Short Term: − 180 – 1350 { ±1.5, − 40 < T < 375
+0.4%T, 375 < T < 1000
+Mass flowmeter Bronkhorst F-111AC Mass flow rate g/s 0 – 2.15 0.5 %
+Pressure transducer TC Ltd 716–912 Absolute pressure bar 0 – 16 0.5 %
+Spectrophotometer PerkinElmer LAMBDA 1050+ Radiation absorptivity − 175–––3300 nm 1 %
+D. D’Souza et al.
+
+Applied Thermal Engineering 266 (2025) 125634
+6
+mass flow rate and air inlet pressure, were varied at the levels/points
+given in Table 4. The upper and lower limits of these operational pa￾rameters were set based on practical design considerations of the test￾bench and absorber. For example, the upper limit of the mass flow rate
+was calculated based on the expected experiment runtime and pressur￾ised gas cylinder capacity so that an experiment run could always be
+performed using a single cylinder. On the other hand, the lower limit of
+the mass flow rate and the upper limit of the peak incident flux were set
+by numerically evaluating the risk of overheating the absorbers and
+preventing the same by ensuring sufficient gas velocity in the flow
+channels and controlled incident heat. The minimum peak flux limit was
+determined as that needed to achieve a significant temperature rise in
+the gas. A more detailed explanation of the experiment design, including
+the use of a previously developed numerical model [45] and learnings
+from preliminary trials, can be found in [51]. The inlet pressures were
+controlled to be within limits of those used in similar experimental
+studies [39] as it is understood that, while pressurisation reduces pres￾sure drop in the absorber, higher system pressure levels require more
+complex and expensive piping, fittings and instrumentation with a
+suitable pressure rating that offsets performance gains in reduced
+pressure drops.
+Thus, for each absorber, 24 experiments were conducted at each
+combination of the operational parameters according to the experiment
+procedures laid out in the Appendix and [51] which includes supple￾mentary data related to each experiment run and the design of experi￾ments. Briefly, a typical experiment run entailed maintaining a fixed
+mass flow rate and inlet pressure and gradually increasing the incident
+radiation flux. At each incident flux level, the absorber was allowed to
+reach ‘steady-state’ or thermal equilibrium which was taken as when the
+air outlet temperature stabilised to within 1 % of its mean value. This
+normally took around 7–8 min though longer wait times were given to
+ensure that the absorber was stable and to allow for 5 min for the
+recorded or measurement interval. An experiment run can be observed
+in Fig. 6 in which the mass flow rate of air is kept constant while the
+incident flux level increases four times which causes the outlet tem￾perature to also rise to four distinct levels.
+It was initially proposed to also operate at 8 bar but this operating
+inlet pressure point had to be scrapped due to time constraints. The
+incident flux profiles corresponding to each of the four peak incident
+flux levels listed in Table 4, are presented in Fig. 7. The characterisation
+of the KIRAN-42 HFSS, and the generation of the radiation flux maps,
+was performed before testing with the absorber using the indirect
+characterisation or flux mapping method [49] that requires the use of a
+Gardon heat flux sensor and CCD camera. A more detailed elaboration of
+the characterisation technique used can be found in [51] which also
+presents the procedures and guidelines for radiation flux mapping.
+In addition to the radiation flux profiles, Table 5 presents the values
+of radiation on the absorbers, as well as their distribution, which has be
+used and will be presented in the subsequent performance analysis.
+The performance indicators used in this study are the pressure drop
+and the energy and thermal efficiencies which are defined in Eqs. (1) and
+(2) respectively.
+Fig. 3. Pressurised receiver test setup as seen from front (left) and back (right). Absorber centrally located in rectangular aperture in radiation shield fac￾ing frontward.
+Table 3
+Internal flow channel geometric parameters of 4 experimental absorbers.
+Receiver
+(notation)
+Geometric Parameters
+Hc (mm) t(mm) Ncv (rows) Bc (mm)
+Plain Rectangular (PR1) 1 3 2 1
+Plain Rectangular (PR2) 2 3 2 1
+Plain Rectangular (PR3) 1 3 2 2
+Plain Rectangular (PR4) 2 2 2 1
+D. D’Souza et al.
+
+Applied Thermal Engineering 266 (2025) 125634
+7
+ηenergy = Q˙
+HTF
+Q˙
+Xe,inc
+, (1)
+ηthermal = Q˙
+HTF
+Q˙
+abs
+, (2)
+where Q˙
+HTF is the useful heat transferred to the HTF, Q˙
+Xe,inc is the total
+incident xenon radiation on the receiver and Q˙
+abs is the absorbed radi￾ation. Exergy efficiency was used when analysing the compact flow
+channel geometry variants in the preceding numerical analysis [45] and
+was found to be a useful tool for the optimisation and comparison of
+receiver types. However, this function cannot be directly employed in
+this experimental study due to practical considerations. Primarily, the
+exergy of the incident radiation on the absorber from the multi-lamp
+HFSS, considering the optics of the HFSS and the short-arc xenon light
+source, has not been evaluated and is, as such, beyond the scope of this
+work. Moreover, the exergy gain [56], or alternatively entropy gener￾ation [57,58], in the HTF has to be evaluated at multiple intervals given
+the significant change in the HTF properties especially along the
+absorber length. While this is easily achieved in the numerical model by
+discretisation of the absorber into multiple Heat Collector Elements
+(HCEs), the current experimental setup only has thermocouples and
+pressure sensors before and after the absorber. This provides an aggre￾gate representation of the absorber performance but it fails to capture
+the internal phenomena within the flow channels along the flow length
+and thus the exergy gain cannot be accurately gauged.
+3. Results and discussion
+3.1. Observations during experimentation and subsequent analyses
+The four absorbers were individually experimented upon, at each of
+the planned operating points, and the experimental observations were
+Fig. 4. Cross-sectional view of experimental absorbers: (a) PR1, (b) PR2, (c) PR3, (d) PR4. Flow channels in white. Absorber internal dimensions as in Table 3.
+Fig. 5. Experimental absorber: (a) As manufactured, (b) In position on testbed with insulation.
+Table 4
+Operating control parameters and respective datapoints.
+Parameter Unit Limits Operation set-points
+Peak Incident flux kW/m2 200 – 2000 200 – 300 – 400 – 500
+Mass flow rate g/s 1 – 2 1 – 1.50 – 2
+Inlet Pressure bar 3 – 15 4 – 12
+D. D’Souza et al.
+
+Applied Thermal Engineering 266 (2025) 125634
+8
+compared with the pressurised receiver numerical model. This numer￾ical model had to be modified to introduce some of the experimental
+conditions such as non-uniform incident radiation flux, roughness in the
+absorber channels, surface absorptivity and pressure drops that were
+previously not factored into the model. These modifications are detailed
+in the Appendix.
+Over the course of the experiments, it was observed that prolonged
+operation at high temperatures led to oxidation of the absorber which
+serves to discolour (darken) it as is evident in Fig. 8 where the absorber
+is uniformly coloured before and non-uniformly discoloured post￾experimentation.
+Analysing this oxidation was further complicated by the fact that it
+was a continuous process depending on the local temperature on the
+absorber walls. Consequently, the surface absorptance was not uniform
+throughout the experiment run of the absorber but continuously
+changed. The absorptance was measured before the start of experi￾mentation on the absorber and subsequently only after all the
+Fig. 6. Typical experiment run with single absorber at constant mass flow rate
+and increasing outlet temperatures corresponding to increasing incident
+flux levels.
+Fig. 7. Incident radiation profile at different peak flux levels used in experimental campaign: (a) 200 kW/m2
+, (b) 300 kW/m2
+, (c) 400 kW/m2
+, (d) 500 kW/m2
+. White
+rectangle represents the incident exposed surface of absorber.
+Table 5
+Incident radiation at the peak flux levels used in the experiment campaign.
+Peak radiation
+flux
+(kW/m2
+)
+Mean radiation
+flux
+(kW/m2
+)
+Standard
+deviation
+(%)
+Radiation on
+absorber
+(W)
+200 161.8 6.8 252.9
+300 232.5 1.4 370.3
+400 273.0 2.1 434.9
+500 388.4 2.9 611.5
+D. D’Souza et al.
+
+Applied Thermal Engineering 266 (2025) 125634
+9
+experiments on each absorber were conducted. This was due to the
+infeasibility of removing the absorber, testing it in a spectrophotometer
+UV–Vis Lambda 1050 (Perkin Elmer) and remounting it in the testbed
+for each experiment operation point.
+To overcome this challenge, multiple photos of the absorbers were
+recorded and their image processing, using the measured absorptance
+data and corresponding images as reference, was performed to estimate
+the absorptance before and after each experiment run. The aggregate
+results of this analysis can be observed in Fig. 9, though it should be
+noted that for the subsequent analysis, each absorber was subdivided
+into three regions (inlet, centre and outlet) with different absorptances
+as laid out in the Appendix. Fig. 9 is solely intended to demonstrate the
+trend of rising absorptances as the experiments wore on and general
+utility of the image processing technique employed to estimate the ab￾sorptances between the initial and final measured values.
+For intermediate experiment runs, the absorber was not removed and
+instead the absorptance was estimated using image based techniques,
+interpolating between the known absorptance measurement points
+determined with the spectrophotometer. When using one of the mea￾surement points as reference, thisimage based technique, developed as a
+MATLAB routine using its Image Processing Toolbox, was able to predict
+the other point’s absorptance within 5 % of its reading with the spec￾trophotometer. It was hence deemed a practical means with which to
+determine the absorptance values of the absorbers in the intermediate
+experiment runs.
+An experiment run typically consisted of multiple experiment oper￾ation points increasing the incident radiation flux while keeping the
+mass flow rate and inlet pressure constant as indicated in the operation
+procedure which is detailed, along with ancillary test and precautionary
+procedures, in [51]. The xenon weighted absorptances of the absorbers
+before and after the entire set of experiments was, on average, around
+0.35 and 0.75 respectively.
+The absorbers were relatively small and metallic and hence have low
+thermal inertia. Thermal equilibrium was achieved within a few minutes
+and could hence be described as thermally stable at any given operating
+point. As a precautionary measure during experimentation, it was
+decided to abort a given operating point if the temperature of the
+absorber solid rose above a safe threshold. This primarily occurred at
+high incident radiation fluxes and low mass flow rates. Nevertheless, the
+gradual temperature rise allowed sufficient time to implement miti￾gating solutions such as defocussing the solar simulator or increasing the
+mass flow rate and hence even in extreme conditions the system per￾formed as expected and was simple to control.
+3.2. Experimental characterisation of individual absorbers
+Though all four absorbers were experimentally characterised, this
+section will focus on the results of the PR1 absorber before a compara￾tive analysis is made with the other absorbers in the subsequent section.
+This is simply to limit the quantum of graphical information which is
+otherwise similar, in behaviour, among all four absorbers regarding
+performance patterns with varying input parameters. The individual
+absorber plots and details may be found in [51]. The pressure drop
+variations with incident radiation flux and mass flow rates are presented
+in Fig. 10. It should be noted that the incident radiation levels plotted on
+the x-axis correspond to the peak flux values listed in Table 4 with the
+zero value indicating a ‘cold’ reading before the lamps are switched on.
+Observing Fig. 10, the pressure drop rises with increasing incident
+radiation levels. This is because of the increase in the channel velocity
+with higher fluid temperatures, and hence lower densities, expected
+when the incident radiation level rises. Higher channel velocities cause
+higher pressure drops. On the other hand, at greater inlet pressure levels,
+seen in Fig. 10(b), the pressure drop falls which can be attributed to the
+larger density at elevated pressures and thus the smaller channel ve￾locity resulting in a lower pressure drop. Higher mass flow rates cause
+greater channel velocities, if the cross-sectional flow area is constant,
+and this explains the increased pressure drops at higher flow rates. The
+numerical model generally lines up reasonably well with the experi￾mental data. The pressure drops coincide well given that the exact value
+of surface roughness, which plays an important role in the pressure drop,
+is unknown and an estimated value, based on relevant studies into the
+surface roughness during similar manufacturing techniques, has been
+employed [59,60].
+To further evaluate the effect of this surface roughness in dimen￾sionless terms, the friction factor was calculated from the experimentally
+measured pressure drop using Eq. (3):
+fD = 2 ΔPDh
+v2
+c Labs
+, (3)
+where fD is the Darcy friction factor, ΔP is the pressure drop, Dh refers to
+the hydraulic diameter, vc is the velocity of fluid in the channel and Labs
+is the length of the absorber. The channel velocity is calculated after first
+measuring the average density of the air, using the absorber inlet and
+Fig. 8. Absorber front: (a) before experiments, (b) after experiments. In the photographs, the absorber inlet and outlet are at the right and left ports, respectively.
+Fig. 9. Average absorptance after each experiment run.
+D. D’Souza et al.
+
+Applied Thermal Engineering 266 (2025) 125634
+10
+outlet air temperatures and pressures, as well as the mass flow rate from
+the testbench instrumentation.
+Observing Fig. 11, the friction factor remains, broadly, unchanging
+with increasing incident radiation at both 4 bar and 12 bar inlet pres￾sures. Referring to Eq. (3), this behaviour can be understood as the
+increased channel velocity, due to higher average fluid temperatures at
+higher incident radiation levels, increases the pressure drop which
+counteracts the effect of this greater channel velocity and ultimately
+maintains the friction factor at a relatively stable level. On the other
+hand, the mass flow rate appears to have a small positive effect on the
+average friction factor though the values of average friction factor do not
+vary widely across mass flow rates with mean values of 0.073 and
+0.0688 at 4 bar and 12 bar inlet pressures respectively at standard de￾viations of 0.011 and 0.014 at these respective pressure levels.
+It should be noted that the numerical model of the absorbers [45],
+whose output is plotted along with the experimental results in Fig. 11,
+divides the absorber into multiple heat collector elements along the
+absorber length (flow direction) and calculates the friction factor and
+pressure drop sequentially from the absorber inlet to outlet. This is done
+as the air properties vary along the absorber length. It is the average
+friction factor, calculated after the overall pressure drop of the absorber
+is numerically determined, that is plotted in Fig. 11.
+The variation of the outlet air temperature at different incident ra￾diation flux levels and mass flow rates is depicted in Fig. 12. The lower
+and upper bands represent the results of the numerical model when fed
+with the absorptances before and after the experiment run respectively.
+The outlet temperature is expected to rise with higher incident ra￾diation values as the heat input to the HTF is greater. The mass flow rate
+is indirectly related to the outlet temperature as a lower flow rate must
+be compensated by a higher outlet temperature, assuming the heat
+transferred to the HTF is the same. Increased inlet pressures seem to
+slightly increase the outlet temperature as the effect of the higher den￾sity offsets the associated fall in channel flow velocity to improve the
+heat transfer to the fluid. Regarding the uncertainty related to the ab￾sorptances, it is observed in Fig. 12 that the outlet temperatures
+experimentally observed lie within the bounds of those predicted by the
+Fig. 10. Experimental results of absorber PR1 compared with numerical model. (a) Pressure drop at inlet pressure of 4 bar, (b) Pressure drop at inlet pressure of
+12 bar.
+Fig. 11. Experimental results of absorber PR1 compared with numerical model: (a) Friction factor at inlet pressure of 4 bar, (b) Friction factor at inlet pressure of
+12 bar.
+D. D’Souza et al.
+
+Applied Thermal Engineering 266 (2025) 125634
+11
+numerical model when the absorptances before and after experimenta￾tion are fed to the model. In general, at lower radiation flux levels the
+outlet temperature is closer to the lower bound as significant oxidation
+has not occurred and the prevalent absorptance is closer to that
+measured before the experiment run. Besides, as the experiment run
+progresses, it is observed that the outlet temperatures at higher radiation
+flux levels are closer to the upper bounds. This is reasonable as at these
+elevated temperature conditions, extensive surface oxidation occurs and
+the absorptance subsequently rises to be more in line with the absorp￾tance measured after the experiment run.
+3.3. Comparative performance analysis of absorbers
+From Table 6, it is evident that PR1 consistently has the highest
+pressure drop which is unsurprising as it has the smallest channels and
+hence the largest channel velocity which directly affects the pressure
+drop. As PR2 and PR3 have the same wetted area, the measured pressure
+drops are similar as the only differentiating influence on their pressure
+drop would be the heat conducted through the receiver bulk and hence
+transmitted to the fluid, which is a relatively weak effect. PR4 has the
+largest number of flow channels and thus, for the same mass flow rate,
+has the lowest fluid velocity and pressure drop. Of course, the surface
+roughness of each absorber may not be the same and that has an outsized
+effect on the pressure drop but this roughness is unknown and is
+assumed equal for the sake of this discussion.
+It should be noted that most of the differences in measured pressure
+drop between absorbers, especially at higher input pressures and lower
+mass flow rates, are miniscule and cannot be concluded upon given the
+magnitude of measurement uncertainty. The omitted cells in Table 6
+correspond to those operating points at which the measured pressure
+drop falls within the bounds of experimental error and hence these
+values are discarded.
+At higher inlet pressures, the pressure drop is expectedly lower as the
+channel velocity is correspondingly lower due to the larger fluid density.
+The relative pressure drop is always below 1 % at 12 bar inlet pressures
+but rises to around 2.5 % when the inlet pressure is 4 bar. At its peak, for
+the PR1 absorber operating at 4 bar, peak incident radiation flux of 500
+kW/m2 and a mass flow rate of 2 g/s, the pressure drop is 7.5 %.
+The energy and thermal efficiencies of the absorbers at the different
+operating conditions used in the experimental campaign are tabulated in
+Table 7. The efficiency values at some operating points are omitted
+because the experiment runs at those operating points were abandoned
+as the absorber solid temperature rose above safety limits defined in the
+experiment operating procedure. This overheating of the absorber pri￾marily occurred at high incident radiation flux levels and low mass flow
+rates. As mentioned previously, the absorptances at each set of operating
+conditions changed as the previously unoxidised and otherwise un￾treated absorbers oxidise with the elevated surfaces temperatures. It was
+observed that the heaviest oxidation only occurred at higher fluxes and
+Fig. 12. Experimental results of PR1 absorber compared with numerical model. (a) Outlet temperature at inlet pressure of 4 bar, (b) Outlet temperature at inlet
+pressure of 12 bar.
+Table 6
+Experimental absorber pressure drop.
+Control parameter Pressure drop
+Peak
+flux
+(kW/
+m2
+)
+Inlet
+pressure
+(bar)
+Mass
+flow
+rate
+(g/s)
+PR1
+(mbar)
+PR2
+(mbar)
+PR3
+(mbar)
+PR4
+(mbar)
+0 4 1.0 42 19 − 14
+0 4 1.5 114 63 64 24
+0 4 2.0 244 72 69 96
+200 4 1.0 57 21 25 20
+200 4 1.5 136 69 33 33
+200 4 2.0 253 118 64 81
+300 4 1.0 58 31 25 15
+300 4 1.5 154 77 38 42
+300 4 2.0 277 124 79 78
+400 4 1.0 66 35 20 13
+400 4 1.5 158 79 45 45
+400 4 2.0 281 128 81 80
+500 4 1.0 78 0 0 0
+500 4 1.5 170 86 44 48
+500 4 2.0 299 138 80 96
+0 12 1.0 − − − −
+0 12 1.5 47 11 0 6
+0 12 2.0 66 32 31 0
+200 12 1.0 9 7 7 12
+200 12 1.5 48 15 16 0
+200 12 2.0 84 36 30 22
+300 12 1.0 20 0 7 0
+300 12 1.5 56 21 13 7
+300 12 2.0 95 40 21 21
+400 12 1.0 23 − − −
+400 12 1.5 49 23 5 −
+400 12 2.0 101 38 22 20
+500 12 1.0 27 0 0 0
+500 12 1.5 61 20 6 7
+500 12 2.0 111 41 32 22
+D. D’Souza et al.
+
+Applied Thermal Engineering 266 (2025) 125634
+12
+low mass flow rates. More specifically at mass flow rates of 1 g/s, and to
+a lesser extent 1.5 g/s, and incident radiation peak fluxes of 400–500
+kW/m2
+, the absorbers underwent severe oxidation which altered all
+subsequent experiments on the same absorber. At elevated tempera￾tures, stainless steel 316L develops a protective oxide layer, of princi￾pally chromium oxides [61,62], that has a darker colour and an
+increased absorptance [63,64]. The increased absorptance causes more
+heat to be absorbed from the incident radiation which, in turn, leads to
+added heat transfer to the gas. As more radiation power is transferred to
+the gas, the energy efficiency of the absorber improves. The higher
+temperature of the gas causes also increases its specific volume which
+results in a greater fluid velocity and higher pressure drops. This com￾plements the heat transfer as increased channel velocity and turbulence,
+due to the greater pressure drop, enhances the convective heat transfer.
+As the experiment plan called for experiments at the lower pressure
+level (4 bar) to be conducted first, the oxidation on the absorber, and
+hence its absorptance, during the 12 bar experiment runs were greater
+leading to better energy efficiencies at higher pressures in Table 7 for all
+absorbers. The lack of consideration of a varying absorptance makes
+energy efficiency a less reliable performance indicator than the thermal
+efficiency in this instance. The uncertainties of the energy and thermal
+efficiencies were challenging to ascertain as multiple experimental
+variables, each with their own uncertainties, interacted and combined
+into more complex terms [65]. An error analysis has been performed
+conforming to the International Organization for Standardization (ISO)
+guide [66] which employs the Taylor Series Method (TSM) to model
+experiment errors and their propagation. It revealed that the maximum
+and mean absolute error in the energy efficiency was 2.7 % and 2.15 %
+respectively and the maximum and mean absolute error in the thermal
+efficiency was 3.6 % and 2.8 % respectively. A sensitivity analysis was
+performed [51] to gain further insight into the interactions and in￾fluences that shape the efficiencies but it is considered beyond the scope
+of this work.
+Regarding the thermal efficiency, multiple interesting trends are
+observed. It falls with increasing radiation flux which is expected given
+the higher thermal losses at the elevated surface temperatures corre￾sponding to higher incident radiation. The mass flow rate has a signif￾icant impact on the thermal efficiency with greater mass flow rates
+leading to increased efficiencies due to enhanced turbulence-led heat
+transfer and heat evacuation from the absorber surface owing to reduced
+thermal resistance in the absorber bulk. The inlet pressure has a less
+noticeable effect though it is generally observed that thermal efficiencies
+were slightly higher at lower pressure levels which is explained by
+increased channel flow velocities, and associated heat transfer co￾efficients, at lower pressures.
+The highest thermal efficiency is observed in PR1 at 95.8 % though it
+also performs better than the other absorbers at most other operation
+points. This improved efficiency is expected given that PR1 has the
+smallest channel size and wetted area and thus the largest channel flow
+velocity which ultimately results in the best heat transfer to fluid. PR2,
+however, follows closely behind PR1 in terms of thermal efficiency
+which verifies the findings of the numerical model which found
+improved thermal performance with taller and narrower channels with
+thicker walls due to improved thermal conduction through the solid
+walls. In line with this understanding, PR4 has worse thermal efficiency
+than PR2 due to thinner channel walls and the additional horizontal flow
+channel. Finally, PR3 exhibits the worst thermal efficiency which was
+expected as the broader flow channels increased the thermal resistance
+of the absorber which ultimately resulted in higher thermal losses and
+worse heat transfer to fluid.
+The pressure drop at the highest thermal efficiency (PR1) is 6.3 % of
+the inlet pressure and similar values of relative pressure drop are
+observed at thermal efficiencies above 90 % at inlet pressures of 4 bar
+though these fall to around 0.75 % at inlet pressures of 12 bar. Though
+the thermal efficiencies of PR2 are slightly lower than those corre￾sponding to PR1, the pressure drops are also lower with relative pressure
+drops around 3 % of the inlet pressure at 4 bar. Again, the relative
+pressure drops for PR2 crash to just 0.33 % at inlet pressures of 12 bar.
+This not only experimentally demonstrates that the absorbers achieve a
+high thermal efficiency without excessive pressure drop but also in￾dicates that, as predicted by the numerical model, an optimum absorber
+geometrical configuration has taller and narrower channels.
+4. Conclusions and future work
+This study aimed to experimentally validate a previously conducted
+numerical analysis on the influence of internal flow channel geometries
+on the performance of solar absorbers. The primary goal was to confirm
+Table 7
+Experimental energy and thermal efficiency.
+Control parameter Energy Efficiency Thermal Efficiency
+Peak flux
+(kW/m2
+)
+Inlet pressure (bar) Mass flow rate
+(g/s)
+PR1(%) PR2(%) PR3(%) PR4(%) PR1(%) PR2(%) PR3(%) PR4(%)
+200 4 1.0 59.9 64.2 62.9 65.5 75.6 67.2 54.1 56.4
+200 4 1.5 62.6 67.2 66.0 71.0 84.8 88.7 60.3 73.5
+200 4 2.0 61.8 67.8 68.4 76.2 95.8 94.2 90.5 91.6
+300 4 1.0 56.2 57.5 56.3 60.9 71.0 60.2 48.4 52.4
+300 4 1.5 60.1 62.8 61.7 67.3 81.4 82.8 56.4 69.6
+300 4 2.0 61.6 64.5 64.6 72.0 95.5 91.4 88.1 90.9
+400 4 1.0 57.5 58.2 59.6 62.8 72.6 60.9 51.3 54.0
+400 4 1.5 64.6 63.7 63.0 67.9 83.6 79.9 57.6 70.3
+400 4 2.0 66.0 66.8 66.2 71.4 94.3 90.2 90.2 90.2
+500 4 1.0 58.1 − − − 73.4 − − −
+500 4 1.5 63.6 64.7 62.2 67.6 78.4 81.2 56.9 69.9
+500 4 2.0 65.6 66.6 64.6 70.6 93.7 89.9 88.1 89.2
+200 12 1.0 66.5 − 69.7 66.9 72.1 78.9 50.3 55.0
+200 12 1.5 78.0 72.9 70.6 75.3 81.1 84.7 55.3 72.5
+200 12 2.0 79.1 73.8 75.7 79.1 93.4 93.2 68.8 76.8
+300 12 1.0 64.3 65.8 62.7 62.3 69.7 70.6 45.2 51.2
+300 12 1.5 75.2 66.9 65.3 71.7 78.2 77.7 51.1 69.1
+300 12 2.0 78.8 70.3 70.4 76.3 93.1 90.5 64.0 74.1
+400 12 1.0 65.3 65.1 62.9 63.6 70.7 69.8 45.4 52.2
+400 12 1.5 77.4 67.5 68.2 72.2 80.5 74.8 53.4 69.5
+400 12 2.0 82.8 72.9 72.4 78.9 90.0 89.4 65.8 76.7
+500 12 1.0 60.2 − − − 65.2 − − −
+500 12 1.5 72.8 65.6 63.6 69.0 75.7 72.6 49.8 66.4
+500 12 2.0 79.2 71.1 68.2 74.9 86.1 87.2 62.0 72.8
+D. D’Souza et al.
+
+Applied Thermal Engineering 266 (2025) 125634
+13
+the predictions of the numerical model regarding optimal channel ge￾ometries that maximise heat transfer from solar to fluid while mini￾mising pressure drop.
+The experimental setup included a pressurised receiver test facility,
+utilising the KIRAN-42 High Flux Solar Simulator as the concentrated
+light source. Four stainless steel absorbers, designed with varying rect￾angular channel aspect ratios and wall thicknesses, were manufactured
+using Selective Laser Melting (SLM) for this investigation. The experi￾mentation involved characterising each absorber by varying the incident
+radiation flux, mass flow rate, and inlet pressure to observe their
+performance.
+The experimental results indicated that the absorber with the
+smallest channels achieved the highest thermal efficiency of 95.8 %,
+surpassing several state-of-the-art receivers that typically do not exceed
+90 % efficiency. Furthermore, this absorber demonstrated a low pressure
+drop of 6.3 % of the inlet pressure, which is superior to similar state-of￾the-art receivers operating at comparable thermal efficiencies. Other
+absorbers, which had increased channel height, showed slightly lower
+thermal efficiencies, although still above 90 %, and even lower relative
+pressure drops of less than 3 %.
+The experiment campaign was conducted using pressurised air as the
+heat transfer fluid and the thermal properties of the fluid, including its
+density, thermal conductivity, specific heat etc, have an impact on the
+absorber performance. The results of this study should thus be consid￾ered as specific to pressurised air. Compact channel solar absorbers may
+employ a multitude of heat transfer fluids that, for the same flow
+channel geometry, may exhibit better or worse performance as has been
+observed in this experimental work.
+These findings confirmed the numerical model’s predictions,
+showing that absorbers with smaller channels provide better heat
+transfer to the fluid, and that optimal flow channel geometries might
+feature taller and narrower channels. The study also examined the
+impact of channel wall thickness, but its influence was less clear
+compared to other parameters. A noticeable decline in performance was
+observed in the absorber with increased channel breadth, aligning with
+the numerical model’s expectations.
+One significant source of uncertainty in the experimental results was
+the absorptance of the absorbers. The stainless steel absorbers were
+untreated and unoxidized, leading to changes in absorptance as the
+temperature of the absorber solid increased during the experiments. The
+absorptance was measured before and after the experiments using a
+spectrophotometer and image processing, which introduced variability
+in the results. This issue could have been mitigated by either measuring
+the absorptance after each experiment run or by pre-treating the ab￾sorbers to ensure a more consistent absorptance, with the latter being
+preferable for simplicity and time efficiency.
+Further experimental work can be carried out using the developed
+pressurised receiver test facility. Future studies could involve evaluating
+absorbers made from different materials or with various surface treat￾ments under different conditions, such as varying mass flow rates, inlet
+pressures, working gases, and incident radiation levels. Additionally,
+receiver sizes and configurations could also be tested within the facili￾ty’s limits.
+Declaration of competing interest
+The authors declare that they have no known competing financial
+interests or personal relationships that could have appeared to influence
+the work reported in this paper.
+Acknowledgments
+The authors wish to thank “Comunidad de Madrid” for the financial
+support to ACES4NET0-CM project (TEC-2024/ECO-116), through the
+R&D activities programme “Tecnologías 2024”. The authors wish to
+thank “Comunidad de Madrid” and European Structural Funds for the
+financial support to ACES2030-CM project (S2018/NMT-4367), through
+the R&D activities programme “Tecnologías 2018”.
+Appendix
+A.1 Modifications to pressurised gas receiver numerical model
+In this section the modifications made to original numerical model [51], which was modified to consider several experimental items that were not
+initially taken into account, are briefly described below.
+(1) Inhomogeneous incident radiation flux distribution
+The original numerical model assumed a uniform incident radiation flux distribution across the absorber which is not the case in this experimental.
+As the numerical model divides the receiver into heat collector elements (HCEs) along the flow direction/absorber length, the model was slightly
+modified to allow for the input of different incident radiation power for each HCE. The incident radiation flux on the receiver has been integrated
+along the receiver breadth for each HCE (i.e. pixel along the absorber breadth in the flux map image) to determine the incident radiation on each HCE.
+The number of HCEs depends on the pixel matrix that comprises the flux map image and more specifically the number of pixels in the direction along
+the absorber length. As the number of HCEs is a controllable input in the model, the incident radiation per HCE obtained from the flux map processing
+can be easily fed into the absorber model. The processing of the flux maps into incident radiation distributions along the absorber length is shown in
+Fig. A1.
+D. D’Souza et al.
+
+Applied Thermal Engineering 266 (2025) 125634
+14
+Fig. A1. Irradiance map processing to determine incident radiation on each HCE for the different peak flux levels used in the experimental campaign. (Left) Flux map
+with receiver marked in white rectangle, and (right) incident radiation per HCE from absorber inlet to outlet. (a, b) 200 kW/m2
+, (c, d) 300 kW/m2
+; (e, f) 400 kW/m2
+;
+and (g, h) 500 kW/m2
+.
+D. D’Souza et al.
+
+Applied Thermal Engineering 266 (2025) 125634
+15
+Fig. A1. (continued).
+(2) Roughness of flow channel walls
+The original numerical model facilitates the use of whichever empirical or semi-empirical correlation best suits the situation at hand. In the case of
+the experimental absorbers, it was clear from the off that the ‘smooth channel’ assumption employed earlier would not be suitable assurface roughness
+and imperfections due to additive manufacturing is a well-documented phenomenon [67,68]. Previous studies on the roughness of AISI 316L steel
+pieces produced by 3D printing reported roughness values (ε) of around 15 µm [59,60].
+The addition of channel wall roughness to the model increases the pressure drop of the HTF due to increased friction with the channel but this
+increased friction and turbulence also results in better heat transfer to the HTF [69]. New correlations for the pressure drop and heat transfer
+modelling must be implemented in the numerical model to account for the surface roughness.
+The pressure drop correlation used is the Nikuradse equation [70] which is given in Eq. (4);
+D. D’Souza et al.
+
+Applied Thermal Engineering 266 (2025) 125634
+16
+1
+̅̅̅̅
+fD
+√ = 3.48 − 1.737 log( ε
+rh
+)
+, (4)
+where fD is the Darcy friction factor, ε is the surface roughness value (Ra) and rh is the hydraulic radius.
+The heat transfer correlation used is the Martinelli equation [71] which is expressed in Eq. (5);
+Nu = Re Pr ̅̅̅̅̅̅̅̅̅̅ fF/2 √
+5
+⎡
+⎢
+⎢
+⎣
+Pr + log(1 + 5 Pr) + 0.5log
+⎛
+⎜⎜⎝
+Re
+̅̅̅
+f
+F
+2
+√
+60
+⎞
+⎟⎟⎠
+⎤
+⎥
+⎥
+⎦
+, (5)
+where Nu is the Nusselt number, Pr is the Prandtl number, Re is the Reynolds number and fF is the Fanning friction factor.
+(3) Time-dependent absorptivity
+At elevated temperatures, an oxide layer develops on absorber surface which drastically alters its absorptivity. To quantify this, absorption
+measurements were conducted on the inlet, central and outlet sections of the absorber before starting after concluding the experiments. Hemispherical
+absorptance measurements were performed using a spectrophotometer UV–Vis-IR Lambda 1050 and integrating sphere 150 mm InGaAs (Perkin
+Elmer). The result of such a measurement on an unoxidised absorber sample, tested as received from the supplier i.e. before any high temperature
+experiment had been performed on it, can be seen in Fig. A2.
+Fig. A2. Absorptivity of unoxidised receiver sample as received from supplier.
+Combining the absorptivity measurements with the xenon arc lamp emission spectrum, shown in Fig. A3.(a), results in the absorbed radiation
+profile plotted in Fig. A3.(b). The term absorptance, henceforth, refers to the weighted Xenon arc spectrum absorptance. Three repetitions of spec￾troscopy tests were performed resulting in three absorptance values the average of which is chosen as the final value. The results of these tests are
+given in Table A.1.
+Table A1
+Absorptance of unoxidised absorber.
+Test No. Absorptance (¡)
+1 0.2631
+2 0.2602
+3 0.2592
+Average absorptance 0.2608
+Standard deviation 0.0020
+D. D’Souza et al.
+
+Applied Thermal Engineering 266 (2025) 125634
+17
+Fig. A3. Absorbed radiation analysis: (top) Xenon emission spectrum, (bottom) Absorbed radiation
+After this absorptance is measured, it is multiplied with the incident radiation on the absorber to determine the absorbed radiation.
+(4) Additional pressure drops
+Referring to the pressurised receiver testbed layout in Fig. 2, there are additional sources of loss of pressure in the system, in addition to the
+absorber itself, from the inlet pressure sensor to the outlet pressure sensor. These are the pipe sections and sudden contraction and expansion zones at
+the absorber inlet and outlet respectively which can be estimated [72] by Eq. (6):
+Δp = Δppipe + Δpc + Δpe = 1
+2 ρ v2
+(
+fD
+Lpipe
+Dhpipe
++ Kc + Ke
+)
+, (6)
+where Δppipe refers to the pressure drop in the pipe section; Δpc and Δpe are the pressure drop due to contraction and expansion, respectively; Lpipe
+refers to the length of the pipe section; and Kc and Ke are the contraction and expansion coefficients [72]. While most variables in Eq. (5) varied with
+operating conditions, the geometric parameters of the pipe length between absorber inlet/outlet and pressure sensor and hydraulic diameter were
+constant at 20 cm and 10 mm respectively.
+A.2 General experiment operating procedure
+The experimentation was performed following the operating procedure shown in Fig. A4, after the precautionary and preparatory measures have
+been done as detailed in [51].
+D. D’Souza et al.
+
+Applied Thermal Engineering 266 (2025) 125634
+18
+Fig. A4. Experiment procedure for normal experiment run on pressurised receiver testbed.
+Data availability
+Additional data has been shared in Appendix. Furthermore, there is a
+reference to PhD thesis which contains additional data on experimental
+and numerical work besides more elaborate explanation.
+References
+[1] C.K. Ho, B.D. Iverson, Review of high-temperature central receiver designs for
+concentrating solar power, Renew. Sustain. Energy Rev. 29 (2014) 835–846,
+https://doi.org/10.1016/j.rser.2013.08.099.
+[2] C.K. Ho, J.D. Ortega, J.M. Christian, J.E. Yellowhair, D.A. Ray, J.W. Kelton,
+G. Peacock, C.E. Andraka, S. Shinde, Fractal-Like Materials Design with Optimized
+Radiative Properties for High-Efficiency Solar Energy Conversion, in:
+SAND2016–9526, 2016, https://doi.org/10.2172/1431480.
+[3] R. Thonig, J. Lilliestam, CSP.Guru 2022-07-01, 2022. https://doi.org/10.
+5281/ZENODO.7010643.
+D. D’Souza et al.
+
+Applied Thermal Engineering 266 (2025) 125634
+19
+[4] P.W. Heller (Ed.), The Performance of Concentrated Solar Power (CSP) Systems:
+Analysis, Measurement and Assessment, Woodhead Publishing, an imprint of
+Elsevier, Cambridge MA, 2017.
+[5] M. Mehos, C. Turchi, J. Vidal, M. Wagner, Z. Ma, Concentrating solar power gen3
+demonstration roadmap, Renew. Energy (2017) 140.
+[6] C.A. Schoeneberger, C.A. McMillan, P. Kurup, S. Akar, R. Margolis, E. Masanet,
+Solar for industrial process heat: A review of technologies, analysis approaches,
+and potential applications in the united states, Energy 206 (2020) 118083, https://
+doi.org/10.1016/j.energy.2020.118083.
+[7] M. Blanco, L. Ramirez Santigosa (Eds.), Advances in Concentrating Solar Thermal
+Research and Technology, Woodhead Publishing, Oxford, 2017.
+[8] S. Bell, T. Steinberg, G. Will, Corrosion mechanisms in molten salt thermal energy
+storage for concentrating solar power, Renew. Sustain. Energy Rev. 114 (2019)
+109328, https://doi.org/10.1016/j.rser.2019.109328.
+[9] A. Palacios, M.E. Navarro, Z. Jiang, A. Avila, G. Qiao, E. Mura, Y. Ding, High￾temperature corrosion behaviour of metal alloys in commercial molten salts, Sol.
+Energy 201 (2020) 437–452, https://doi.org/10.1016/j.solener.2020.03.010.
+[10] O. Chakraborty, B. Das, R. Gupta, Performance of parabolic trough collector having
+rotating receiver: Effect of elliptical insert and hybrid nanofluid, Int. J. Energy Res.
+46 (11) (2022) 15254–15275, https://doi.org/10.1002/er.8225.
+[11] O. Chakraborty, B. Das, R. Gupta, Performance of parabolic trough solar collector
+with spinning star inserts in receiver tube with hybrid nanofluid, Proc. Inst. Mech.
+Eng. Part E J. Process Mech. Eng. 238 (4) (2024) 1687–1699, https://doi.org/
+10.1177/09544089231158507.
+[12] A. Ahmad, O. Prakash, R. Kausher, G. Kumar, S. Pandey, S.M.M. Hasnain, Parabolic
+trough solar collectors: A sustainable and efficient energy source, Mater. Sci.
+Energy Technol. 7 (2024) 99–106, https://doi.org/10.1016/j.mset.2023.08.002.
+[13] O. Chakraborty, B. Das, R. Gupta, S. Debbarma, Heat transfer enhancement
+analysis of parabolic trough collector with straight and helical absorber tube,
+Therm. Sci. Eng. Prog. 20 (2020) 100718, https://doi.org/10.1016/j.
+tsep.2020.100718.
+[14] C.K. Ho, Advances in central receivers for concentrating solar applications, Sol.
+Energy 152 (2017) 38–56, https://doi.org/10.1016/j.solener.2017.03.048.
+[15] M. Sedighi, R. Vasquez Padilla, M. Lake, A. Rose, Y.Y. Lim, J.P. Novak, R.A. Taylor,
+Design of high-temperature atmospheric and pressurised gas-phase solar receivers:
+A comprehensive review on numerical modelling and performance parameters,
+Sol. Energy 201 (2020) 701–723, https://doi.org/10.1016/j.solener.2020.03.025.
+[16] F. Gomez-Garcia, J. Gonz´
+alez-Aguilar, G. Olalde, M. Romero, Thermal and
+hydrodynamic behavior of ceramic volumetric absorbers for central receiver solar
+power plants: A review, Renew. Sustain. Energy Rev. 57 (2016) 648–658, https://
+doi.org/10.1016/j.rser.2015.12.106.
+[17] R. Capuano, T. Fend, P. Schwarzbozl, ¨ O. Smirnova, H. Stadler, B. Hoffschmidt,
+R. Pitz-Paal, Numerical Models of Advanced Ceramic Absorbers for Volumetric
+Solar Receivers, Renew. Sustain. Energy Rev. 58 (2016) 656–665, https://doi.org/
+10.1016/j.rser.2015.12.068.
+[18] M.J. Montes, R. Guedez, J.I. Linares, M.A. Reyes-Belmonte, Advances in solar
+thermal power plants based on pressurised central receivers and supercritical
+power cycles, Energy Convers. Manag. 293 (2023) 117454, https://doi.org/
+10.1016/j.enconman.2023.117454.
+[19] M. Sedighi, R.V. Padilla, R.A. Taylor, M. Lake, I. Izadgoshasb, A. Rose, High￾temperature, point-focus, pressurised gas-phase solar receivers: A comprehensive
+review, Energy Convers. Manag. 185 (2019) 678–717, https://doi.org/10.1016/j.
+enconman.2019.02.020.
+[20] B. Das, Jagadish (Eds.), Evolutionary Methods Based Modeling and Analysis of
+Solar Thermal Systems: A Case Studies Approach, Springer International
+Publishing, Cham, 2023, https://doi.org/10.1007/978-3-031-27635-4.
+[21] European Commission and Directorate General for Research, SOLGATE: Solar
+Hybrid Gas Turbine Electric Power System, EUR-OP, Luxembourg, 2005.
+[22] European Commission, SOLHYCO (Solar-Hybrid Power and Cogeneration Plants),
+2011.
+[23] E. Bellos, C. Tzivanidis, K.A. Antonopoulos, I. Daniil, The Use of Gas Working
+Fluids in Parabolic Trough Collectors – An Energetic and Exergetic Analysis, Appl.
+Therm. Eng. 109 (2016) 1–14, https://doi.org/10.1016/j.
+applthermaleng.2016.08.043.
+[24] E. Bellos, C. Tzivanidis, K.A. Antonopoulos, A detailed working fluid investigation
+for solar parabolic trough collectors, Appl. Therm. Eng. 114 (2017) 374–386,
+https://doi.org/10.1016/j.applthermaleng.2016.11.201.
+[25] M.J. Montes, R. Guedez, D. D’Souza, J.I. Linares, Thermoeconomic analysis of
+concentrated solar power plants based on supercritical power cycles, Appl. Sci. 13
+(13) (2023) 7836, https://doi.org/10.3390/app13137836.
+[26] S.M. Besarati, D. Yogi Goswami, E.K. Stefanakos, Development of a solar receiver
+based on compact heat exchanger technology for supercritical carbon dioxide
+power cycles, J. Sol. Energy Eng. 137 (3) (2015) 031018, https://doi.org/10.1115/
+1.4029861.
+[27] M.J. Montes, R. Gu´edez, D. D’Souza, J.I. Linares, J. Gonz´
+alez-Aguilar, M. Romero,
+Proposal of a new design of central solar receiver for pressurised gases and
+supercritical fluids, Int. J. Therm. Sci. 194 (2023) 108586, https://doi.org/
+10.1016/j.ijthermalsci.2023.108586.
+[28] J. Karni, A. Kribus, B. Ostraich, E. Kochavi, A high-pressure window for volumetric
+solar receivers, J. Sol. Energy Eng. 120 (2) (1998) 101–107, https://doi.org/
+10.1115/1.2888051.
+[29] J.D. Ortega, J.M. Christian, C.K. Ho, Design and Testing of a Novel Bladed
+Receiver, in: ASME 2017 11th International Conference on Energy Sustainability,
+American Society of Mechanical Engineers, Charlotte, North Carolina, USA, 2017,
+https://doi.org/10.1115/ES2017-3524 p. V001T05A007.
+[30] R. Korzynietz, J.A. Brioso, A. del Río, M. Quero, M. Gallas, R. Uhlig, M. Ebert,
+R. Buck, D. Teraji, Solugas – Comprehensive analysis of the solar hybrid brayton
+plant, Sol. Energy 135 (2016) 578–589, https://doi.org/10.1016/j.
+solener.2016.06.020.
+[31] H.-S. Cho, H.-J. Lee, J.-K. Kim, S.-N. Lee, Y.-H. Kang, Design and performance
+evaluation of solar air receivers, J. Korean Sol. Energy Soc. 32 (spc3) (2012)
+207–212, https://doi.org/10.7836/kses.2012.32.spc3.207.
+[32] W. Wang, H. Xu, B. Laumert, T. Strand, An inverse design method for a cavity
+receiver used in solar dish brayton system, Sol. Energy 110 (2014) 745–755,
+https://doi.org/10.1016/j.solener.2014.10.019.
+[33] W. Wang, B. Laumert, H. Xu, T. Strand, Conjugate heat transfer analysis of an
+impinging receiver design for a dish-brayton system, Sol. Energy 119 (2015)
+298–309, https://doi.org/10.1016/j.solener.2015.07.013.
+[34] W. Wang, B. Wang, L. Li, B. Laumert, T. Strand, The effect of the cooling nozzle
+arrangement to the thermal performance of a solar impinging receiver, Sol. Energy
+131 (2016) 222–234, https://doi.org/10.1016/j.solener.2016.02.052.
+[35] I. Hischier, D. Hess, W. Lipinski, ´ M. Modest, A. Steinfeld, Heat transfer analysis of a
+novel pressurized air receiver for concentrated solar power via combined cycles,
+J. Therm. Sci. Eng. Appl. 1 (4) (2009) 041002, https://doi.org/10.1115/
+1.4001259.
+[36] I. Hischier, P. Leumann, A. Steinfeld, Experimental and numerical analyses of a
+pressurized air receiver for solar-driven gas turbines, J. Sol. Energy Eng. 134 (2)
+(2012) 021003, https://doi.org/10.1115/1.4005446.
+[37] P. Poˇzivil, N. Ettlin, F. Stucker, A. Steinfeld, Modular design and experimental
+testing of a 50 kwth pressurized-air solar receiver for gas turbines, J. Sol. Energy
+Eng. 137 (3) (2015) 031002, https://doi.org/10.1115/1.4028918.
+[38] Q. Li, G. Flamant, X. Yuan, P. Neveu, L. Luo, Compact heat exchangers: A review
+and future applications for a new generation of high temperature solar receivers,
+Renew. Sustain. Energy Rev. 15 (9) (2011) 4855–4875, https://doi.org/10.1016/j.
+rser.2011.07.066.
+[39] Q. Li, N.G. de Tourville, I. Yadroitsev, X. Yuan, G. Flamant, Micro-channel
+pressurized-air solar receiver based on compact heat exchanger concept, Sol.
+Energy 91 (2013) 186–195, https://doi.org/10.1016/j.solener.2013.02.004.
+[40] W. Wang, A. Malmquist, L. Aichmayer, B. Laumert, Transient performance of an
+impinging receiver: An indoor experimental study, Energy Convers. Manag. 158
+(2018) 193–200, https://doi.org/10.1016/j.enconman.2017.12.070.
+[41] S. Sullivan, High-Efficiency low-cost solar receiver for use in a supercritical CO2
+recompression cycle brayton, Brayton Energy, LLC, Portsmouth, NH, 2016,
+p. 03842.
+[42] T. L’Estrange, Experimental characterization of a supercritical carbon dioxide
+microchannel solar thermal receiver, Oregon State, 2015.
+[43] M.K.W., L.L.A., Compact Heat Exchangers (3rd Edition), 2018. [Online]. Available:
+https://app.knovel.com/hotlink/toc/id:kpCHEE0002/compact-heat-exchangers.
+[Accessed: 16-Aug-2021].
+[44] K. Drost, High flux microchannel receiver development with adap-tive flow
+control, Final Report (2015), https://doi.org/10.2172/1347906.
+[45] D. D’Souza, M.J. Montes, M. Romero, J. Gonz´
+alez-Aguilar, Energy and exergy
+analysis of microchannel central solar receivers for pressurised fluids, Appl. Therm.
+Eng. 219 (2023) 119638, https://doi.org/10.1016/j.
+applthermaleng.2022.119638.
+[46] J. Li, J. Gonzalez-Aguilar, C. P´erez-Rabago, ´ H. Zeaiter, M. Romero, Optical analysis
+of a hexagonal 42kwe high-flux solar simulator, Energy Procedia 57 (2014)
+590–596, https://doi.org/10.1016/j.egypro.2014.10.213.
+[47] J. Li, J. Gonzalez-Aguilar, M. Romero, Line-concentrating flux analysis of 42kwe
+high-flux solar simulator, Energy Procedia 69 (2015) 132–137, https://doi.org/
+10.1016/j.egypro.2015.03.016.
+[48] A. Gallo, A. Marzo, E. Fuentealba, E. Alonso, High flux solar simulators for
+concentrated solar thermal research: A review, Renew. Sustain. Energy Rev. 77
+(2017) 1385–1402, https://doi.org/10.1016/j.rser.2017.01.056.
+[49] J. Sarwar, G. Georgakis, R. LaChance, N. Ozalp, Description and characterization of
+an adjustable flux solar simulator for solar thermal, thermochemical and
+photovoltaic applications, Sol. Energy 100 (2014) 179–194, https://doi.org/
+10.1016/j.solener.2013.12.008.
+[50] M. Huber, A. Harvey, E. Lemmon, G. Hardin, I. Bell, M. McLinden, NIST Reference
+Fluid Thermodynamic and Transport Properties Database (REFPROP) Version 10 -
+SRD 23, 2018. https://doi.org/10.18434/T4/1502528.
+[51] D.J. D’Souza, Application of compact flow channel geometries to pressurised solar
+receivers: A numerical and experimental analysis, Universidad Nacional de
+Educacion´ a Distancia, 2023. [Online]. Available: https://rgdoi.net/10.13140
+/RG.2.2.17832.55041. [Accessed: 19-Nov-2023].
+[52] R. Bitter, T. Mohiuddin, M. Nawrocki, LabVIEW: Advanced Programming
+Techniques, Crc Press, 2006.
+[53] MathWorks Inc, MATLAB Version: 9.13.0 (R2022b) [Online], 2022. Available:
+https://www.mathworks.com.
+[54] M. Dana, I. Zetkova, P. Hanzl, O. Hronek, Accuracy of Holes Created by 3D Printing
+(DMLS), DAAAM International0473, Vienna, 2017, p. 0467, https://doi.org/
+10.2507/28th.daaam.proceedings.065.
+[55] 2021 ASME Boiler & Pressure Vessel Code, American Societ of Mechanical
+Engineers, New York, NY, 2021.
+[56] S.A. Ashrafizadeh, Application of second law analysis in heat exchanger systems,
+Entropy 21 (6) (2019) 606, https://doi.org/10.3390/e21060606.
+[57] A. Bejan, The thermodynamic design of heat and mass transfer processes and
+devices, Int. J. Heat Fluid Flow 8 (4) (1987) 258–276, https://doi.org/10.1016/
+0142-727X(87)90062-2.
+D. D’Souza et al.
+
+Applied Thermal Engineering 266 (2025) 125634
+20
+[58] A. Bejan, Entropy generation minimization: The new thermodynamics of finite-size
+devices and finite-time processes, J. Appl. Phys. 79 (3) (1996) 1191–1218, https://
+doi.org/10.1063/1.362674.
+[59] P. Masek, T. Fornusek, P. Zeman, M. Bucko, J. Smolik, P. Heinrich, Machinability
+the AISI 316 stainless steel after processing by various methods of 3D printing, MM
+Sci. J. 04 (2019) 3338–3346, https://doi.org/10.17973/MMSJ.2019_11_2019091.
+[60] P. Tyagi, T. Goulet, C. Riso, F. Garcia-Moreno, Reducing surface roughness by
+chemical polishing of additively manufactured 3D printed 316 stainless steel
+components, Int. J. Adv. Manuf. Technol. 100 (9–12) (2019) 2895–2900, https://
+doi.org/10.1007/s00170-018-2890-0.
+[61] T. Tanabe, S. Imoto, Surface oxidation of type 316 stainless steel, Trans. Jpn. Inst.
+Met. 20 (9) (1979) 507–515, https://doi.org/10.2320/matertrans1960.20.507.
+[62] R. Wonneberger, M. Seyring, K. Freiberg, A. Carlsson, J. Rensberg, B. Abendroth,
+H. Stocker, ¨ M. Rettenmayr, A. Undisz, Oxidation of stainless steel 316L – oxide
+grains with pronounced inhomogeneous composition, Corros. Sci. 149 (2019)
+178–184, https://doi.org/10.1016/j.corsci.2018.12.035.
+[63] F.N. Al Zubaidi, K.L. Walton, R.V. Tompson, T.K. Ghosh, S.K. Loyalka, The effect of
+long-term oxidation on the total hemispherical emissivity of type 316L stainless
+steel, Nucl. Technol. 205 (6) (2019) 790–800, https://doi.org/10.1080/
+00295450.2018.1542257.
+[64] T.S. Hunnewell, K.L. Walton, S. Sharma, T.K. Ghosh, R.V. Tompson, D.
+S. Viswanath, S.K. Loyalka, Total hemispherical emissivity of SS 316L with
+simulated very high temperature reactor surface conditions, Nucl. Technol. 198 (3)
+(2017) 293–305, https://doi.org/10.1080/00295450.2017.1311120.
+[65] H.W. Coleman, W.G. Steele, Experimentation, Validation, and Uncertainty Analysis
+for Engineers, Wiley, Hoboken, NJ, USA, 2018.
+[66] ISO/IEC Guide 98:1993 Guide to the Expression of Uncertainty in Measurement
+(GUM), 1993.
+[67] I. Gibson, D. Rosen, B. Stucker, Additive Manufacturing Technologies, Springer
+New York (2015), https://doi.org/10.1007/978-1-4939-2113-3.
+[68] R.J. Hebert, Viewpoint: Metallurgical aspects of powder bed metal additive
+manufacturing, J. Mater. Sci. 51 (3) (2016) 1165–1175, https://doi.org/10.1007/
+s10853-015-9479-x.
+[69] J.P. Holman, Heat Transfer, McGraw Hill Higher Education, Boston, 2010.
+[70] J. Nikuradse, Laws of flow in rough pipes, 1933.
+[71] W.M. Rohsenow, J.P. Hartnett, Y.I. Cho (Eds.), Handbook of Heat Transfer,
+McGraw-Hill, New York, 1998.
+[72] W.M. Kays, A.L. London, Compact Heat Exchangers, 1984. [Online]. Available:
+https://www.osti.gov/biblio/6132549. [Accessed: 29-Jun-2021].
+D. D’Souza et al.

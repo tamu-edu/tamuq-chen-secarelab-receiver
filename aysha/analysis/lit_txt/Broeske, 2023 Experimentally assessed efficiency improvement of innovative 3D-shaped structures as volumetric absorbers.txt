@@ -1,0 +1,1074 @@
+Renewable Energy 218 (2023) 119220
+Available online 24 August 2023
+0960-1481/© 2023 Elsevier Ltd. All rights reserved.
+Contents lists available at ScienceDirect
+Renewable Energy
+journal homepage: www.elsevier.com/locate/renene
+Experimentally assessed efficiency improvement of innovative 3D-shaped
+structures as volumetric absorbers
+Robin Tim Broeske a,b,∗
+, Peter Schwarzbözl c
+, Lisa Birkigt d
+, Srdan Vasic d
+, Sebastian Dung e
+,
+Till Doerbeck f
+, Bernhard Hoffschmidt c,b
+a DLR, Institute of Solar Research, Prof.-Rehm-Straße 1, 52428 Jülich, Germany
+b RWTH Aachen University, Chair for Solar Components, Linder Höhe, 51147 Köln, Germany
+c DLR, Institute of Solar Research, Linder Höhe, 51147 Köln, Germany
+d Exentis Technology GmbH, Otto-Schott-Straße 15, 07745 Jena, Germany
+e Vitesco Technologies Emitec GmbH, Hauptstraße 128, 53797 Lohmar, Germany
+f Kraftanlagen Energies & Services GmbH, Ridlerstraße 31c, 80339 München, Germany
+A R T I C L E I N F O
+Keywords:
+Concentrated solar power
+Open volumetric receiver
+Porous absorbers
+Experimental efficiency evaluation
+A B S T R A C T
+Solar tower plants are predicted to take on a significant role in the ongoing global energy transition. The open
+volumetric air receiver technology can provide an alternative to molten salt receivers due to its proven and
+effective storage capabilities. The key component of this technology are porous absorber structures which are
+responsible for the absorption of the solar irradiation. Research of porous structures has consistently shown
+that 3D-shaped absorber designs offer the highest efficiency potential. The realization of such designs is made
+possible by newer manufacturing techniques.
+In this publication, experimental results for two groups of new volumetric absorbers are presented. The
+StepRec absorber is manufactured via ceramic 3D screen printing, its characteristic step-pin sections allow for
+deep penetration of the solar irradiation. Additionally, metallic foil absorbers were evaluated, they exhibit
+particularly high specific surface areas due to low wall thicknesses. The new absorbers were tested for flux
+densities up to 650 kW
+m2 and air exit temperatures up to 735 °C. The experiments successfully confirmed the new
+absorbers’ great potential: They outperformed the HiTRec reference, a ceramic honeycomb structure, for all
+air temperatures. At 650 °C, thermal efficiencies up to 91.8% were recorded, an improvement of 6.5%-points
+w.r.t. to the HiTRec result.
+1. Introduction
+CSP and especially solar power tower plants are expected to play
+an important role in the ongoing global energy transition [1]. With its
+proven and effective storage, the open volumetric air receiver is a real
+alternative to the currently prevailing molten salt receiver technology,
+as was already stated 1993 in the Second Generation Study [2]. Advan￾tages of the air receiver technology lie in the simplicity of design, the
+robustness of operation and the virtually unlimited temperature range
+of air as heat transfer medium. Therefore, since many years, continuing
+effort has been put into the development of the key component of this
+technology, porous structures as volumetric absorbers of concentrated
+sunlight. A comprehensive overview of this technology development
+can be found in the detailed review by Ávila-Marín [3].
+∗ Corresponding author at: DLR, Institute of Solar Research, Prof.-Rehm-Straße 1, 52428 Jülich, Germany.
+E-mail address: robin.broeske@dlr.de (R.T. Broeske).
+1.1. First generation of absorber structures
+Volumetric absorbers allow the radiation to penetrate deep into
+their volume to be absorbed and transferred as heat to the parallel
+gas flow by the large inner surface. Unsurprisingly, woven or knitted
+meshes of thin metal wires from temperature resistant steel alloys
+dominated the first steps of this development [3]. Fricker [4] shall be
+mentioned here, who pioneered with a seven-layer wire mesh absorber
+made of 0.71 mm heat-resisting CrNi steel wire in 1985 which lead to
+the 2.5 MWth TSA receiver tested in the Spanish Plataforma Solar (PSA)
+in 1993, composed of hexagonal absorber modules packed with rolled
+layers of knitted Inconel® wire [5].
+Further structures examined in the early phase of development
+were either regular channel-like geometries or isotropic reticulated
+https://doi.org/10.1016/j.renene.2023.119220
+Received 13 March 2023; Received in revised form 28 July 2023; Accepted 21 August 2023
+
+Renewable Energy 218 (2023) 119220
+2
+R.T. Broeske et al.
+Nomenclature
+Acronyms
+CFD Computational Fluid Dynamics
+CSP Concentrated Solar Power
+DLR German Aerospace Center
+HiTRec High Temperature Receiver
+OVR Open Volumetric Receiver
+reSiC reaction-bound silicon carbide
+SiSiC siliconized silicon carbide
+Greek Symbols
+𝛼 Absorptivity (−)
+𝛿 Stochastic uncertainty variable (unit
+varies)
+𝜂 Efficiency (−)
+𝜆 Wavelength (m)
+𝜇 Mean/expected value (unit varies)
+𝜌 Reflectivity (−)
+𝜎
+2 Variance (unit varies)
+Roman Symbols
+𝑐 Coefficient (−)
+𝒅 Direction vector (−)
+𝐼 Incident irradiance ( W
+m2
+)
+𝒏 Normal vector (−)
+𝑛 Number/quantity (−)
+𝒑 Position vector (−)
+̇𝑞 Heat flux ( W
+m2
+)
+𝑇 Temperature (K)
+𝑡𝑖 Tilt angle (°)
+𝑢 Uncertainty (unit varies)
+𝑣 Rel. measurement value (−)
+𝑤 Weight (−)
+Subscripts
+abs Absorption
+adj Adjusted
+air Air
+amb Ambient
+avg Average
+BL Base-line
+dir Direction
+emi Emission
+IR Infrared
+j/k/l Running index
+loss Loss
+meas. Measured
+pos Position
+rand Random
+rect Rectified
+refl Reflection
+s.w. Solar-weighted
+sim. Simulated
+sol Solar
+th Thermal
+TR Test rig
+ZL Zero-line
+Fig. 1. Foil-rod absorber by DLR and Hoechst CeramTech (image A, image source:
+[9], units given in millimeters) and the titanium–aluminum demonstrator absorber as
+described in Capuano et al. [10] (image B, image source: DLR).
+foam structures [6,7]. Channel-like absorbers were made from metal by
+stacking alternately corrugated and non-corrugated metal foils, similar
+to catalyst carriers deployed in the automotive sector [7]. These ab￾sorbers feature extremely fine wall structures (50 μm) and a high open
+porosity (cf. Section 2.2). The proposed ceramic channel structures
+were either composed of extruded ceramic foils and rods or directly
+fabricated as extruded channel monoliths [7]. Silicon Carbide ceramics
+of different composition and structure (reSiC, SiSiC) was (and is) the
+prevailing material used. While ceramic material naturally exhibits
+excellent temperature resistance, production by extrusion allows only
+comparatively coarse structures with wall thicknesses in the range
+0.4 − 0.8 mm. Ceramic foam structures are usually produced by mold￾ing an open-pore polymer foam with ceramic slurry. The polymer is
+completely vaporized during the firing process, resulting in a hollow
+core for the struts [6,8].
+1.2. Variation of structural geometry along the flow direction
+The structures of this first phase of development have in common
+that they almost exclusively exhibit uniform geometric parameters
+throughout the volume, i.e. single wall size, channel width, mesh size
+etc. But, some first attempts can be found in literature to alter the
+design of the frontal structure, with the purpose to change geometric,
+optical or heat-transfer related parameters in flow direction.
+Bechtel tested a wire mesh absorber composed of several layers of
+thin 0.1 mm wire followed by layers with thicker 0.2 mm wires [11].
+DLR and Hoechst CeramTec developed and tested a ceramic channel
+structure composed of foils and rods where in the front section every
+second foil and every second rod were shortened [9] (cf. Fig. 1). Fend
+et al. [12] tested the combination of a thin front layer of an 80 ppi
+ceramic foam covering a thicker main absorber of 20 ppi foam of the
+same material. All these attempts tried to reduce thermal losses by
+offering a higher porosity at the front resulting in deeper penetration
+of the radiation into the volume of the structure.
+After these early, rather exploratory design variations, attempts
+were made to vary the geometry of porous absorber structures more
+purposefully. Roldán et al. [13] used a 2-dimensional CFD-model for
+the comparison of ceramic honeycombs of varying porosity in radial
+and axial direction with reference to a structure of constant porosity,
+finding decreasing porosity in flow direction to be the best performing
+structure. Ávila-Marín et al. [14,15] experimentally investigated the
+performance of gradual porosity absorbers consisting of combinations
+of wire meshes with different geometrical properties, concluding that
+double layer meshes with the front layer having the highest possible
+porosity and the second layer having the highest possible specific
+surface area give the best results. Zaversky et al. [16] numerically and
+experimentally evaluated single and multi-layer ceramic foams as solar
+
+Renewable Energy 218 (2023) 119220
+3
+R.T. Broeske et al.
+absorbers and found out that the front structure should have the highest
+possible porosity and that multi-layer structures show no significant
+advantage in efficiency. Finally, Capuano et al. [17] proposed an inno￾vative channel structure with a gradual decrease of porosity achieved
+with deep cuts in the channel walls. An additionally high inner surface
+area was realized through a staggered second channel layer. Due to
+its delicate structure, this absorber could not be realized from the
+usual target material for solar application (ceramics or temperature
+resistant steel alloys) but had to be made as a demonstrator from a
+titanium–aluminum alloy through additive manufacturing in a scale of
+3:1 to the original proposed geometry [10] (cf. Fig. 1). Nevertheless,
+this demonstrator could be tested under irradiation of 760 kW
+m2 up to a
+temperature of 590 °C, showing a thermal efficiency of about 82%.
+1.3. Structural design adapted to manufacturing processes
+This work is based on the idea of incorporating the possibilities
+and limitations of the chosen manufacturing methods and materials
+into the design process. Therefore, specialists from the manufacturing
+companies were involved in the development of the specific structural
+designs. The work focused on two production technologies:
+• innovative ceramic honeycomb structures manufactured by screen
+printing out of SiSiC
+• channel structures made from pairs of planar and corrugated
+metal sheets, similar to those presented by Pabst et al. [18]
+A new simulation model was applied as part of the design process. This
+model and related simulation results are described in detail in Broeske
+et al. [19]. From the most promising geometries, several design varia￾tions were produced and tested under close-to-real experimental con￾ditions in DLR’s large solar simulator Synlight® [20]. As a benchmark,
+the state of the art of the so-called HiTRec technology was used: an
+extruded honeycomb monolith made from SiSiC ceramics with a 2.0 mm
+channel width and a 0.8 mm wall thickness as it is deployed in the
+Solar Tower in Jülich (Germany), where the technology of the open
+volumetric receiver is demonstrated as a power plant system since
+2009 [21].
+In the next section the chosen manufacturing methods and the
+implications and limitations on the design process are presented. After￾wards, the test setup and the experimental parameters are described to
+assess the conditions of the measurement procedure. The experimental
+results are presented and discussed in the subsequent chapter. Finally,
+the findings are summarized and conclusions drawn.
+2. Absorber structures
+2.1. Screen printed ceramics
+The first new absorber design is manufactured via a 3D screen
+printing process developed by the company Exentis Group AG [22].
+As with 2D screen printing, 3D screen printing is based on constructing
+a stencil on a fine mesh screen and pushing a special paste through
+the printing screen to create an imprint of the design on the surface
+beneath. To extend this concept into 3D parts, this process is repeated
+continuously while the printing screen is moved upwards. This causes
+the printed part to ‘‘grow’’ layer by layer. Depending on paste and
+printing parameters, each layer is usually between 7 − 40 μm thick. For
+very precise and filigree parts, a small layer increment is preferred
+whereas larger increments lead to faster growing parts and therefore
+a decrease in process time. To change the geometry in the z-axis
+direction, a switch of the printing screen is necessary. In theory, using a
+new screen for each layer would be possible for maximum geometrical
+flexibility, but this is not practical when taking economic feasibility into
+account. Therefore, the volumetric receiver proposed by Capuano et al.
+[10] with sloped pins was adjusted to better fit the 3D screen printing
+Fig. 2. The StepRec absorber design: geometric single channel model (image A) and
+3D printed absorber sample (image D: full absorber matrix, images B + C: zoomed
+views).
+technology: The sloped pins were replaced by three ‘‘step’’-like sections
+(cf. Fig. 2) giving name to the so called StepRec design.
+Despite the simple concept of 3D screen printing, the actual printing
+of 3D parts is quite complex. It requires highly developed machines,
+paste, screens and printing parameters, all of which must be fine￾tuned to each other. The flexibility in material selection is possible
+due to applying pastes, which usually combine the desired material
+in powder form with binder and other additives. In case of the solar
+absorbers, a specialized paste containing silicon carbide and carbon
+powder as the base material, binders to realize sufficient green body
+stability, a fluid carrier medium and rheology additives was developed.
+The additives serve to optimize the rheological behavior of the 3D
+screen printing paste. Usually, a shear-thinning behavior is desirable
+to prevent unwanted seep when the sieve is flooded with paste, while
+still allowing for smooth flow when moved by the squeegee.
+The StepRec design consists of five different layers, two for the
+base with offset square channels and the three step-like pin layers. The
+channels itself are no challenge to print. A challenge arises from the
+fact that the channels are offset on top of each other, since a new
+layer can only be built on an underlying foundation. Depending on
+the existing structure and gap width, it is possible to build an arched
+bridge, because the paste sticks to the before printed structures and
+narrows the gap with each layer. Unfortunately, this often reduces the
+stability of the green body and therefore can lead to problems with
+increasing gap width and the height on top. The better solution in this
+case was printing layer one and layer two to five separately and then
+join them together with a small amount of paste as adhesive that was
+printed on layer one.
+After being printed, the absorber samples are sintered in a combined
+thermal process [22]. During this process, the organic binder materials
+are removed, before the solar absorber is infiltrated with molten silicon.
+The additional silicon fills remaining pore structures within the ab￾sorber material and partially reacts with free carbon to secondary SiC.
+
+Renewable Energy 218 (2023) 119220
+4
+R.T. Broeske et al.
+Fig. 3. The EmiRec absorber design: geometric channel model (image A) and a full-size
+absorber module (images B + C).
+This reaction bonded silicon carbide allows for very low porosity with
+almost no shrinkage during thermal processing and therefore reduces
+warpage and inner strain compared to sintered silicon carbide.
+2.2. Soldered metal sheets
+The evaluated metallic solar absorbers were manufactured by the
+company Vitesco Technologies Emitec, utilizing the company’s long￾standing experience and know-how from the automotive exhaust gas af￾tertreatment industry. These absorbers, hereafter referred to as EmiRec
+absorbers, are made of a modified high-temperature iron-based al￾loy specially developed for corrosive high-temperature applications
+(1.4767 MOD - iron–chromium–aluminum alloy). The material has
+the property of forming a protective aluminum oxide layer during
+operation at high temperatures, which prevents oxidation of the inner
+material core.
+The matrix structure of the EmiRec absorbers consists of thin cut￾to-length sheet foils, which are stacked alternately from a corrugated
+layer and a smooth layer to form a package and inserted into a square
+tube (cf. Fig. 3). At defined contact points between the sheet foils and
+between the matrix package and the square tube, a material-to-material
+bond is produced by means of the vacuum brazing technology. The
+connections between the sheet foils and between the matrix package
+and the tube provide mechanical strength while at the same time being
+flexible enough to compensate for stresses in the material and prevent
+plastic deformation under high thermal shock loads. High thermal
+shock loads occur especially during cloud passages when the heliostats
+are suddenly shaded.
+The square design of the EmiRec solar absorbers makes optimum use
+of the available installation space in the receiver field on the solar tower
+and can be individually adapted to the boundary conditions of different
+solar power plants. The high-temperature material used is processed in
+thin sheet metal strips, which are characterized in particular by good
+heating behavior, low heat capacity and very good axial and radial
+thermal conductivity. The low wall thickness of the metal foils allows
+a high porosity despite a large specific surface in direct comparison
+with the state of the art SiSiC absorber. For the tests in the Synlight
+facility, the solar absorbers were pre-oxidized in a high-temperature
+furnace, which darkens the surface of the high-temperature material.
+The darkened surface improves the absorptivity and thus increases the
+thermal efficiency of the solar absorbers. During operation on a solar
+power plant, the reaction with oxygen takes place and forms the oxide
+layer after a short period of operation.
+In upstream production tests, various design approaches for increas￾ing the inlet porosity of the metallic EmiRec solar absorbers were
+investigated. Eventually, it was decided to shorten or retract the smooth
+layer and set it flush with the gas outlet side (cf. Fig. 3, image A). By
+shortening the smooth layer in the matrix package, the axial porosity
+can be adjusted in relation to the angle of incidence of the solar
+irradiation. As part of the Synlight test campaign, a number of designs
+were evaluated to test various manufacturing characteristics. However,
+this publication will focus on the three most promising designs: The first
+two, EmiRec 300 cpsi and EmiRec 600 cpsi, are standard designs with
+the smooth layers shortened by 10 mm and differ only regarding the
+channel density. For the third design, EmiRec 600 cpsi MOD, not only
+the smooth layers were shortened, but every second corrugated layer
+was also shortened by 10 mm. This change further increases the inlet
+porosity.
+3. Experimental setup
+3.1. Synlight test setup
+The test rig was designed and built by the German company Kraftan￾lagen Energies and Services GmbH, images of the rig are shown in
+Fig. 4. It is based on the HiTRec open volumetric receiver technology,
+i.e. the same technology which forms the receiver of the Solar Tower
+Jülich power plant. A total of sixteen, full-sized (140 mm by 140 mm)
+absorber modules can be evaluated simultaneously. An air return sys￾tem was not implemented. The test rig was also used in a previous
+test campaign where absorber samples with a reduced size (60 mm by
+60 mm) were evaluated [23].
+For the measurement of the air exit temperatures, the test rig was
+equipped with thermocouples placed directly behind each of the sixteen
+absorber (matrix) positions. Individual mass flow measurements for
+each absorber were impossible due to space constraints. The absorber
+efficiencies were therefore evaluated via a radiative energy balance,
+rather than via the air enthalpy flow. A similar approach has been
+previously used by Pabst et al. [18] to experimentally assess absorber
+efficiencies. During the experiments in the Synlight facility, thermal
+emissions of the absorber probes were recorded using an infrared
+camera, which was placed between the Synlight lamps viewing the test
+rig at an angle of around 20 degrees. From the infrared recordings, the
+thermal radiation losses per unit area ̇𝑞𝑙𝑜𝑠𝑠,𝑒𝑚𝑖 were derived for each
+
+Renewable Energy 218 (2023) 119220
+5
+R.T. Broeske et al.
+Fig. 4. Experimental test rig for the Synlight campaign. Shown are a rear view (image
+A), a front view with installed HiTRec 80 cpsi absorbers (image B), and a schematic
+top-down view (image C, not to scale).
+absorber probe and temperature level. The corresponding air exit tem￾perature 𝑇𝑎𝑖𝑟 was determined by taking the average of the thermocouple
+data around the IR-image time-stamps. The average incident flux den￾sity 𝐼𝑎𝑣𝑔 was measured with DLR’s FMAS system [24]. The reflection
+losses of each absorber were computed from measurements with a
+spectrometer (cf. Section 3.2) leading to a solar-weighted absorptivity
+value 𝛼𝑠.𝑤.. The absorber efficiency is then given by:
+𝜂𝑡ℎ (
+𝑇𝑎𝑖𝑟)
+= 𝛼𝑠.𝑤. −
+̇𝑞𝑙𝑜𝑠𝑠,𝑒𝑚𝑖 (
+𝑇𝑎𝑖𝑟)
+𝐼𝑎𝑣𝑔
+(1)
+The thermal radiation measured on the absorber surface by means of
+an IR camera unfortunately also contains a certain amount of reflected
+IR radiation from the electric Synlight lamps. This is unintended as
+the reflection losses are already accounted for in the solar-weighted
+absorptivity. To compensate, these reflections ̇𝑞𝑟𝑒𝑓 𝑙,𝐼𝑅 were estimated
+based on Eq. (2). The thermal efficiencies were extrapolated for air
+exit temperatures equal to the ambient temperature assuming that
+the efficiencies should asymptotically trend towards the solar-weighted
+absorptivity. The observed differences were then interpreted as the
+unintentionally measured reflections and rectified thermal efficiencies
+were defined as shown in Eq. (4).
+̇𝑞𝑟𝑒𝑓 𝑙,𝐼𝑅 = 𝐼𝑎𝑣𝑔 (
+𝛼𝑠.𝑤. − lim
+𝑇 →𝑇𝑎𝑚𝑏
+𝜂𝑡ℎ (𝑇 )
+)
+(2)
+̇𝑞𝑙𝑜𝑠𝑠,𝑒𝑚𝑖,𝑟𝑒𝑐𝑡 (
+𝑇𝑎𝑖𝑟)
+= ̇𝑞𝑙𝑜𝑠𝑠,𝑒𝑚𝑖 (
+𝑇𝑎𝑖𝑟)
+− ̇𝑞𝑟𝑒𝑓 𝑙,𝐼𝑅 (3)
+𝜂𝑡ℎ,𝑟𝑒𝑐𝑡 (
+𝑇𝑎𝑖𝑟)
+= 𝛼𝑠.𝑤. −
+̇𝑞𝑙𝑜𝑠𝑠,𝑒𝑚𝑖,𝑟𝑒𝑐𝑡 (
+𝑇𝑎𝑖𝑟)
+𝐼𝑎𝑣𝑔
+= 𝛼𝑠.𝑤. −
+̇𝑞𝑙𝑜𝑠𝑠,𝑒𝑚𝑖 (
+𝑇𝑎𝑖𝑟)
+− ̇𝑞𝑟𝑒𝑓 𝑙,𝐼𝑅
+𝐼𝑎𝑣𝑔
+(4)
+3.2. Solar-weighted absorptivity measurements
+The solar-weighted absorptivities were determined for each ab￾sorber sample based on separate measurements with a Perkin Elmer
+Lambda 950 spectrometer conducted at the DLR location in Cologne,
+Germany. The spectrometer measurement themselves first yielded spec￾tral reflectivity values, which were then converted to the solar-weighted
+absorptivity. Data was recorded for wavelengths between 250 nm and
+2500 nm with a 10 nm step size. For each absorber sample, three mea￾surements were conducted aiming to reduce random errors, e.g. caused
+by the sample placement. To further improve the accuracy, wavelength￾dependent data was also recorded for a reference material1 with known
+spectral reflectivity values, called the ‘‘base-line’’, and another run
+without any sample placed in the spectrometer yielding the ‘‘zero-line’’.
+The spectral reflectivity for each wavelength 𝜆 of an absorber sample
+was then calculated as shown in Eq. (5) Here, 𝑣𝑎𝑣𝑔,𝜆 represents the
+wavelength-dependent data average of the three sample measurements,
+𝑣𝑍𝐿,𝜆 the zero-line data, 𝑣𝐵𝐿,𝜆 the base-line data and 𝜌𝐵𝐿,𝜆 the base-line
+spectral reflectivities. Finally, the solar-weighted absorptivity 𝛼𝑠.𝑤. of
+each sample is the weighted average of the spectral absorptivities, the
+spectral weights 𝑤𝜆 are defined based on a standard solar spectrum
+(E891):
+𝜌𝜆 = 𝜌𝐵𝐿,𝜆 ⋅
+(𝑣𝑎𝑣𝑔,𝜆 − 𝑣𝑍𝐿,𝜆
+𝑣𝐵𝐿,𝜆 − 𝑣𝑍𝐿,𝜆 )
+(5)
+𝛼𝑠.𝑤. =
+2500 nm ∑
+𝜆=250 nm
+𝑤𝜆
+(
+1 − 𝜌𝜆
+)
+(6)
+3.3. Test procedure
+The main test campaign was carried out at the high-flux solar
+simulator facility Synlight® of the DLR in Jülich, Germany. The core
+of the campaign then consisted of a series of test days, where data
+was recorded for one absorber configuration set and one flux density
+distribution during one test day (cf. Section 3.4).
+The goal was to determine the thermal efficiency of the different
+absorbers at steady state operation. To achieve this, a series of different
+temperature target levels were evaluated over the course of one test day
+in a ‘‘pyramid’’-pattern from low to high to low. The temperature levels
+were controlled via the total air mass flow through the test rig. The ac￾tual outlet temperatures varied between the sixteen absorber samples,
+in part because of their different efficiencies. Hence, the temperature
+levels served only as target values. For each level, the actual evaluation
+period started once the temperature gradients of all absorbers dropped
+and stayed below 2
+K
+min for ten minutes. The duration of the evaluation
+periods was then also set as ten minutes, during this time at least
+three infrared images were recorded. The air exit temperatures were
+recorded continuously by the test rig. In total, the highest recorded
+1 The used reference material is called ‘‘Spectralon’’ (LBS-SRS-05-020 (SRS
+3644)) manufactured by the company Labsphere.
+
+Renewable Energy 218 (2023) 119220
+6
+R.T. Broeske et al.
+Fig. 5. Flux density measurement results for the first (‘‘Distribution 1’’, top) and the
+third (‘‘Distribution 3’’, bottom) distribution. Black squares and numbers indicate the
+sixteen absorber positions.
+air exit temperatures were 715 °C for the ceramic StepRec samples and
+725 °C for the metallic EmiRec absorbers. Higher temperatures were not
+possible due to the temperature limits of subsequent components of the
+test rig.
+3.4. Absorber positioning and flux density measurements
+During the test campaign, four different sets of absorber configu￾rations were used. Each set consisted of sixteen absorber samples and
+each sample was assigned to one of the sixteen positions within the
+test rig. The metallic and ceramic absorbers were evaluated separately.
+The first set consisted of only HiTRec 80 cpsi reference samples, the
+second of the Exentis samples plus HiTRec samples to fill the remaining
+positions. The third and fourth absorber set then were fully composed
+of the metallic EmiRec geometries. The positions of the five absorber
+geometries whose results are presented in this publication are listed in
+Table 1. The numbering of the absorber positions is shown as part of
+the flux distribution visualization in Fig. 5.
+Three different flux distributions were used during the experimental
+campaign, all with the same target level of 600 kW
+m2
+to 650 kW
+m2
+. The
+first and third distribution are visualized in Fig. 5. The average flux
+density values for the positions of the selected absorbers designs are
+given in Table 2. For the configuration of the Synlight lamps’ alignment,
+the priority was placed on achieving a homogeneous flux distribution
+for the inner positions (6, 7, 10, 11). Distribution 2, which is not
+shown in Table 2 due to its similarity to distribution 1, was used as a
+temporary distribution for a single test day. Compared to distribution 1,
+the slightly modified distribution 2 allowed different absorbers to reach
+Table 1
+Set and position assignments for the selected 5 absorber geometries.
+Absorber Sample 1 Sample 2
+Set Pos. Set Pos.
+HiTRec 80 cpsi Set 1 + Pos. 1 − 16
+StepRec 2 6 2 10
+EmiRec 300 cpsi 4 7 4 15
+EmiRec 600 cpsi 3 7 4 14
+EmiRec 600 cpsi MOD 3 10 4 12
+Table 2
+Average flux density for the three flux distributions and selected absorber positions.
+Position 6 7 8 10
+Distr. 1 [
+kW∕m2 ] 628.7 637.2 591.8 635.0
+Distr. 2 [
+kW∕m2 ] 624.0 634.5 593.3 615.9
+Distr. 3 [
+kW∕m2 ] 593.1 641.5 583.9 639.0
+Position 11 12 14 15
+Distr. 1 [
+kW∕m2 ] 632.2 611.8 597.7 586.5
+Distr. 2 [
+kW∕m2 ] 618.0 604.9 505.0 530.7
+Distr. 3 [
+kW∕m2 ] 644.0 613.3 602.3 605.5
+a maximal air exit temperature. The third distribution had to be used
+during the latter portion of the test campaign due to the unavailability
+of some lamps. The absorber set 1 ( Table 1) was evaluated with
+distribution 1, set 2 with distributions 1 and 2, and sets 3 and 4 with
+distribution 3.
+3.5. Uncertainty analysis
+The uncertainty of the conducted experiments has been analyzed
+based on the methodology described in the ‘‘GUM: Guide to the Ex￾pression of Uncertainty in Measurement’’ [25].
+Based on the manufacturer specifications for the thermocouples
+(type N, TMH [26]), the maximum temperature uncertainty can be ex￾pected to be below ±3 °C. Compared to the other sources of uncertainty,
+this is considered as negligible.
+The general uncertainty of the FMAS measurement system under
+ideal conditions is up to three percent [24], a more conservative uncer￾tainty 𝛿𝐹𝑀𝐴𝑆 of up to six percent is assumed here based on experience
+from other DLR experiments. Deviations between the expected position￾ing and the actual positioning of the absorber samples within the test
+rig were considered as an additional uncertainty for the evaluation of
+the flux density 𝐼𝑎𝑣𝑔 and the emission losses ̇𝑞𝑙𝑜𝑠𝑠,𝑒𝑚𝑖. These uncertainties
+𝛿𝑝𝑜𝑠,𝑠𝑜𝑙 and 𝛿𝑝𝑜𝑠,𝑒𝑚𝑖 were estimated via two sensitivity studies testing
+differences of up to 1 cm in any direction. Regarding the emission
+losses, the positioning of the IR camera relative to the test rig and the
+general accuracy of the IR camera were discussed as further sources of
+uncertainty, but their influence could not be quantified.
+The evaluation process of the solar-weighted absorptivity is specif￾ically designed to reduce random errors (cf. Section 3.2). As an es￾timator of the random errors (e.g. geometric sample impurities), the
+solar-weighted absorptivity evaluated based on the averaged measure￾ments was compared to the absorptivity values calculated from each
+individual measurement. This comparison resulted in an uncertainty
+𝛿𝑎𝑏𝑠,𝑟𝑎𝑛𝑑 of up to one percentage point. Systemic deviations between
+the measurements with the spectrometer and the irradiation tests in the
+Synlight were considered w.r.t. the irradiation direction. The spectrom￾eter measures the sample reflectivity for a shallow incident angle of
+eight to ten degrees. For the Synlight facility, higher incident angles are
+possible depending on which lamps are used. This uncertainty 𝛿𝑎𝑏𝑠,𝑑𝑖𝑟
+was quantified based on a comparison of raytracing simulations, this is
+explained in Appendix A. Deviations of the spectral light distribution
+between the Synlight lamps and spectrometer evaluation were consid￾ered, but deemed negligible as the Synlight facility was specifically
+designed to mimic real solar irradiation conditions.
+
+Renewable Energy 218 (2023) 119220
+7
+R.T. Broeske et al.
+Table 3
+Solar-weighted absorptivity results for the different absorber samples.
+For the HiTRec 80 cpsi absorbers, the range for the samples placed on
+the inner positions (6, 7, 10, 11) is shown.
+Absorber Sample 1 Sample 2
+HiTRec 80 cpsi 90.4%–91.1%
+StepRec 97.2% 97.2%
+EmiRec 300 cpsi 96.2% 96.2%
+EmiRec 600 cpsi 94.8% 94.8%
+EmiRec 600 cpsi MOD 96.2% 96.2%
+The five quantified uncertainties lead to the following evaluation
+function:
+𝜂𝑡ℎ,𝑟𝑒𝑐𝑡 (
+𝑇𝑎𝑖𝑟)
+= 𝛼𝑠.𝑤. + 𝛿𝑎𝑏𝑠,𝑟𝑎𝑛𝑑 + 𝛿𝑎𝑏𝑠,𝑑𝑖𝑟
+−
+̇𝑞𝑙𝑜𝑠𝑠,𝑒𝑚𝑖 (
+𝑇𝑎𝑖𝑟)
++ 𝛿𝑝𝑜𝑠,𝑒𝑚𝑖 − ̇𝑞𝑟𝑒𝑓 𝑙,𝐼𝑅
+𝐼𝑎𝑣𝑔 + 𝛿𝐹𝑀𝐴𝑆 + 𝛿𝑝𝑜𝑠,𝑠𝑜𝑙
+(7)
+The uncertainties 𝛿𝑎𝑏𝑠,𝑟𝑎𝑛𝑑 , 𝛿𝑝𝑜𝑠,𝑒𝑚𝑖, 𝛿𝐹𝑀𝐴𝑆 and 𝛿𝑝𝑜𝑠,𝑠𝑜𝑙 are all evaluated
+via method B of the GUM [25], i.e. they are assumed to be uniformly
+distributed uncertainties, while the directional uncertainty 𝛿𝑎𝑏𝑠,𝑑𝑖𝑟 is
+instead evaluated via method A as detailed in Appendix A. Following
+the GUM, the uncertainty propagation is then given by:
+𝑢𝜂𝑡ℎ,𝑟𝑒𝑐
+=
+√√√√∑
+𝛿
+(
+𝜕𝜂𝑡ℎ,𝑟𝑒𝑐
+𝜕𝛿
+𝑢𝛿
+)2
+(8)
+Here, variables 𝑢 denote the standard deviation of each stochastic
+uncertainty variable 𝛿 resp. of the thermal efficiency. The results of
+the uncertainty propagation will be shown in Section 4.3 after the
+presentation of the efficiency results, because it has to be evaluated
+individually for each data set, i.e. for a specific air exit temperature
+level.
+4. Results and discussion
+4.1. Solar-weighted absorptivity
+Needed for the evaluation of the absorber efficiencies, the solar￾weighted absorptivity of each sample was determined with the method￾ology described in Section 3.2. The solar weighted absorptivity results
+for the different absorber samples are presented in Table 3. Three
+separate measurements were averaged for each absorber sample. In
+Table 3, the potential of the new 3D-shaped absorbers is already visible.
+The two StepRec samples absorb 6.1 percentage points more of the
+incoming irradiation than the reference HiTRec absorber, while the
+EmiRec designs absorb up to 5.1 percentage points more. During previ￾ous test campaigns, darkening of the metallic EmiRec absorbers caused
+by oxidation was observed. Because this proved beneficial w.r.t. the
+absorptivity, the manufacturer decided to forcibly oxidize the new ab￾sorber modules before this test campaign. The coarser 300 cpsi samples
+outperform the finer 600 cpsi channel density, because the increasing
+channel density (combined with the fixed wall strength) leads to a
+decreasing porosity. However, the additional retraction of every second
+corrugated layer allows the EmiRec 600 cpsi MOD design to reach the
+absorptivity level of the coarse absorbers.
+4.2. Thermal efficiency
+For each absorber and each temperature level of each test day,
+the taken infrared images were averaged. Then, the absorber posi￾tions within the infrared pictures were determined for each absorber
+set and each test day allowing the evaluation of the emission losses
+̇𝑞𝑙𝑜𝑠𝑠,𝑒𝑚𝑖. Together with the average flux density 𝐼𝑎𝑣𝑔 and solar-weighted
+absorptivity values, the absorber efficiencies were calculated using
+Eqs. (1)–(4). The rectified thermal efficiency results are visualized in
+Table 4
+Rectified absorber efficiency interpolated for an air exit temperature of 650 °C for each
+absorber sample. For the HiTRec 80 cpsi absorbers, the results for the inner positions
+(6, 7, 10, 11) are shown. (D.S. = data set).
+Absorber Sample 1 Sample 2
+D. S. 1 D. S. 2 D. S. 1 D. S. 2
+HiTRec 80 cpsi 84.8% 85.3% 84.9% 84.6%
+StepRec 91.7% 91.7% 91.5% 91.2%
+EmiRec 300 cpsi 91.8% 91.6% 89.4% 90.1%
+EmiRec 600 cpsi 90.6% – 89.0% 89.3%
+EmiRec 600 cpsi MOD 90.8% 91.0% 91.2% –
+Table 5
+Uncertainty propagation for an air exit temperature of 650 °C and each absorber sample.
+All values are given as percentage points of the corresponding average flux density.
+(D.S. = data set).
+Absorber Sam. D. S. 𝜂𝑡ℎ,𝑟𝑒𝑐𝑡 𝜂
+𝑎𝑑𝑗
+𝑡ℎ,𝑟𝑒𝑐𝑡 𝑢
+(1)
+𝜂𝑡ℎ,𝑟𝑒𝑐𝑡
+𝑢
+(2)
+𝜂𝑡ℎ,𝑟𝑒𝑐𝑡
+HiTRec
+80 cpsi
+1 1 84.8% 83.9% 0.36% 0.68%
+2 1 85.3% 84.4% 0.32% 0.66%
+3 1 84.9% 84.0% 0.74% 0.94%
+4 1 84.6% 83.7% 0.47% 0.74%
+StepRec
+1 1 91.7% 91.2% 0.23% 0.43%
+1 2 91.7% 91.2% 0.25% 0.44%
+2 1 91.5% 91.0% 0.24% 0.43%
+2 2 91.2% 90.7% 0.26% 0.44%
+EmiRec
+300 cpsi
+1 1 91.8% 89.3% 0.25% 1.61%
+1 2 91.6% 89.1% 0.25% 1.61%
+2 1 89.4% 86.9% 0.42% 1.65%
+2 2 90.1% 87.6% 0.31% 1.62%
+EmiRec
+600 cpsi
+1 1 90.6% 88.2% 0.40% 1.59%
+2 1 89.0% 86.6% 0.50% 1.62%
+2 2 89.3% 86.9% 0.46% 1.61%
+EmiRec
+600 cpsi
+MOD
+1 1 90.8% 88.4% 0.29% 1.57%
+1 2 91.0% 88.6% 0.28% 1.56%
+2 1 91.2% 88.8% 0.40% 1.59%
+Fig. 6 over the air exit temperatures, while Table 4 lists the efficiency
+values interpolated for an air exit temperature of 650 °C.
+Both Fig. 6 and Table 4 clearly show that all new absorber de￾signs outperform the reference HiTRec 80 cpsi absorber. As has to be
+expected, the efficiency of all absorbers decreases with an increasing
+air exit temperature, because the emission losses increase. Still, the
+higher potential of the new designs holds for all evaluated air exit
+temperatures. In Table 4 interpolated efficiency values are given for
+an air exit temperature of 650 °C, since this is the target operating
+temperature for e.g. the Solar Tower Jülich power plant [21]. At this
+temperature level, the highest recorded efficiencies are 91.8% for the
+metallic EmiRec 300 cpsi and 91.7% for the ceramic StepRec design. This
+corresponds to an improvement of 6.5 resp. 6.4 percentage points over
+the HiTRec reference. The finer EmiRec absorbers also outperform the
+HiTRec design by at least five percentage points, while the differences
+between the three metallic designs are relatively small.
+The ability of the new designs to outperform the HiTRec reference
+can be explained via a geometric comparison. The (average) porosity
+of each EmiRec design (86%–91%) is significantly higher than the 51%
+porosity of the HiTRec absorber, while the specific surface area is
+between two to four times as large as for the HiTRec absorber. The
+StepRec design also has a higher average porosity (78%) and a spec.
+surface area similar to HiTRec, but the step-pin front sections allow
+for a much deeper penetration of the solar irradiation. Overall, this
+enables the new designs to reach the measured high efficiency levels
+and outperform the state-of-the-art absorber.
+4.3. Uncertainty analysis
+The uncertainty analysis methodology which was described in Sec￾tion 3.5 has been applied to the absorber efficiency results for an air
+
+Renewable Energy 218 (2023) 119220
+8
+R.T. Broeske et al.
+Fig. 6. Rectified absorber efficiency as a function of the air exit temperature for the five
+absorber geometries. Markers represent experimental data points, lines are regression
+functions based on the experimental data. For the HiTRec 80 cpsi design, the results for
+the samples placed on the inner positions (6, 7, 10, 11) are shown.
+exit temperature of 650 °C. The results are listed in Table 5 and visual￾ized in Fig. 7. The uncertainty propagation was first carried out without
+considering the irradiation direction uncertainty 𝛿𝑎𝑏𝑠,𝑑𝑖𝑟 resulting in the
+total uncertainty for the absorber efficiency 𝑢
+(1)
+𝜂𝑡ℎ,𝑟𝑒𝑐𝑡 . The propagation
+calculation was then repeated while including the irradiation direc￾tion uncertainty, leading to the total uncertainty 𝑢
+(2)
+𝜂𝑡ℎ,𝑟𝑒𝑐𝑡 . The direction
+uncertainty was given this special treatment, because it differs from
+the other four considered sources of uncertainty. While the other four
+uncertainties are symmetric with expected values of zero, the direction
+uncertainty is one-sided for all absorbers with negative expected values
+(cf. Appendix A). For the second uncertainty propagation, the direction
+uncertainty was therefore transformed into a symmetric uncertainty by
+Fig. 7. Comparison of absorber efficiency and uncertainty for an air exit temperature
+of 650 °C and each absorber sample. All values are given as percentage points of the
+corresponding average flux density. (Sam. = sample, D.S. = data set).
+defining an adjusted absorber efficiency:
+𝜂
+𝑎𝑑𝑗
+𝑡ℎ,𝑟𝑒𝑐𝑡 = 𝜂𝑡ℎ,𝑟𝑒𝑐𝑡 − 𝜇𝛿𝑎𝑏𝑠,𝑑𝑖𝑟
+(9)
+Here, 𝜇𝛿𝑎𝑏𝑠,𝑑𝑖𝑟
+is the expected value of the irradiation direction uncer￾tainty. Relative to the adjusted efficiency, the direction uncertainty
+is then a normally distributed uncertainty with zero mean and the
+standard deviations as specified in Table A.2.
+Without considering the direction uncertainty, the estimated stan￾dard deviation of the thermal efficiency is below one percentage point
+for all absorber geometries. The largest, individual source of uncer￾tainty for this case is the general FMAS uncertainty 𝛿𝐹𝑀𝐴𝑆 (cf. Sec￾tion 3.5). However, the absorber efficiency is determined via a radiative
+energy balance, rather than a balance of the air enthalpy flow. This
+is beneficial for the uncertainty propagation of the FMAS uncertainty,
+because it only affects the emission loss fraction in Eq. (7), but not
+the solar-weighted absorptivity. Since the solar-weighted absorptivity
+is significantly larger than the (relative) emission losses, the effect of
+the FMAS uncertainty on the absorber efficiency is small.
+The inclusion of the direction uncertainty leads to different results
+for evaluated absorber geometries. For the HiTRec and StepRec designs,
+the total uncertainty is still below one percentage point and the effi￾ciency values are only reduced by 0.91 resp. 0.51 percentage points.
+In contrast, the efficiency uncertainty for the three EmiRec designs
+is increased to around 1.6 percentage points and the adjusted effi￾ciencies are around 2.5 percentage points lower than the non-adjusted
+values. Standard deviations of less than two percentage points for all
+absorbers are considered good results for the experimental accuracy.
+The efficiency adjustments mean that the EmiRec absorbers now fall
+short of the efficiency level of the StepRec design, similar to numerical
+
+Renewable Energy 218 (2023) 119220
+9
+R.T. Broeske et al.
+results previously published in Broeske et al. [19]. But even with the
+adjustments, both new absorber types still outperform the reference
+HiTRec absorber by a clear margin of six (StepRec) resp. four (EmiRec)
+percentage points.
+5. Conclusion and outlook
+An experimental test campaign testing new 3D-shaped volumetric
+absorbers has been successfully conducted at DLR’s high-flux solar
+simulator facility Synlight. The new designs included ceramic 3D screen
+printed absorbers manufactured by the company Exentis Technology
+GmbH and metallic foil absorbers from Vitesco Technologies Emitec
+GmbH. The new 3D-shaped porous absorber geometries showed the
+great potential for their use as part of open volumetric receivers:
+At air exit temperatures of 650 °C, (rectified) absorber efficiencies of
+up to 91.8% were recorded for the new designs. This represents an
+improvement of up to 6.5 percentage points compared to the state￾of-the-art, ceramic HiTRec absorbers, which were also evaluated as
+reference. The absorber samples were tested for average flux densities
+of up to 650 kW
+m2
+(second campaign) and air exit temperatures of up to
+725 °C. The shown efficiency improvement of the new absorbers also
+extended to lower temperatures and the solar-weighted absorptivity,
+which was determined via auxiliary measurements. As the next step,
+a economical analysis of the new absorber designs will be conducted
+within the associated research project.
+CRediT authorship contribution statement
+Robin Tim Broeske: Conceptualization, Methodology, Formal anal￾ysis, Investigation, Writing – original draft, Writing – review & edit￾ing, Visualization. Peter Schwarzbözl: Conceptualization, Methodol￾ogy, Resources, Writing – original draft, Supervision, Project admin￾istration, Funding acquisition. Lisa Birkigt: Investigation, Resources,
+Writing – original draft. Srdan Vasic: Resources, Supervision. Se￾bastian Dung: Investigation, Resources, Writing – original draft. Till
+Doerbeck: Methodology, Resources, Project administration. Bernhard
+Hoffschmidt: Resources, Supervision.
+Declaration of competing interest
+The authors declare that they have no known competing finan￾cial interests or personal relationships that could have appeared to
+influence the work reported in this paper.
+Acknowledgment
+This work was supported by the German Federal Ministry for Eco￾nomic Affairs and Energy on the basis of a decision by the German
+Bundestag, reference number 0324300.
+Appendix A. Estimation of the irradiation direction uncertainty
+During the uncertainty quantification in Sections 3.5 and 4.3, sys￾tematic deviations of the irradiation direction(s) were considered as one
+source of uncertainty. The spectrometer, which was used to derive the
+solar-weighted absorptivity results, measures the sample reflectivity for
+a shallow incident angle of eight to ten degrees, while higher incident
+angles are possible for the Synlight facility. The resulting uncertainty
+𝛿𝑎𝑏𝑠,𝑑𝑖𝑟 was estimated via a comparison based on raytracing simulations,
+this approach is explained in the following.
+A total of 84 lamps of the Synlight facility were used during the test
+campaign. While the positions of each lamp relative to the test rig’s
+position are known, the locations of their focal points within the test
+rig aperture are unknown. Similarly, the flux distributions are known
+based on the FMAS measurements (cf. Section 3.4), but the individual
+contribution of a single lamp to each absorber position’s flux level is not
+available. Consequently, some simplifying assumptions are made for
+the uncertainty estimation. To start, the focal points of all lamps are as￾sumed to be located at the center of the test rig aperture, which is given
+by the position vector 𝒑𝑇 𝑅. The (average) direction of the irradiation
+of the test rig which originates from lamp 𝑙 is then calculated as:
+𝒅𝑙 = 𝒑𝑇 𝑅 − 𝒑𝑙
+(A.1)
+Here, 𝒑𝑙
+represents the position vector of lamp 𝑙. The tilt angle 𝑡𝑖𝑙 of
+each lamp is set as the angle between the average direction vector 𝒅𝑙
+and the normal vector of the test rig aperture 𝒏𝑇 𝑅:
+𝑡𝑖𝑙 = arccos (
+𝒅𝑙
+⋅
+(
+−𝒏𝑇 𝑅)
+‖𝒅𝑙‖2
+⋅ ‖𝒏𝑇 𝑅‖2
+)
+(A.2)
+The inverted aperture normal is used here, because it points into the
+test rig and as such corresponds to the main axis of the absorber
+channels. For the 84 lamps, the calculated tilt angles range from 7.8° to
+53.8°. Similar to a histogram, the lamps are sorted into 11 groups based
+on their tilt angles. Each group 𝑗 covers a width of five degrees and is
+represented by its average tilt angle 𝑡𝑖𝑗
+, e.g. the third group contains
+all lamps with tilt angles between 10.0° and 15.0°, and is represented
+by the angle 𝑡𝑖3 = 12.5°. A relative weight 𝑤𝑗
+is assigned to each group
+based on the number of lamps in the group 𝑛𝑗 and the cosine of its
+representative angle:
+𝑤𝑗 =
+cos (
+𝑡𝑖𝑗
+)
+𝑛𝑗
+∑11
+𝑘=1 cos (
+𝑡𝑖𝑘
+)
+𝑛𝑘
+(A.3)
+The cosine factor is used to account for the effect that lamps at a steeper
+tilt angle contribute less to the incident flux level compared to the same
+number of lamps with a shallower tilt angle. As a simplification, the
+solar-weighted absorptivity of each absorber is assumed to depend only
+the tilt angle, but not on the radial direction component. Based on the
+symmetry properties of the absorber structures, this assumption allows
+the histogram-like grouping of the lamps solely based on the tilt angle.
+Table A.1 lists the eleven tilt angle groups and their corresponding
+weights.
+Using the raytracing software FEMRay [cf.27,28], the dependence
+of the solar-weighted absorptivity on the tilt angle was calculated for
+each absorber geometries. Per geometry, one raytracing simulation was
+carried out for each tilt angle group, except group one due to its
+zero weight. The irradiation was modeled as a cone with the average
+inclination set to the representative angle 𝑡𝑖𝑗 of the respective group.
+The opening angle of each lamp was estimated based on the radius
+of the lamp and the distance between the lamp and the test rig. This
+results in opening angles between 3.3° to 3.5° for all lamps, the opening
+angle of the irradiation cone was therefore set to 3.4° for all simulations.
+Before the tilt angle evaluation, additional raytracing simulations
+were used to determine the surface/material absorptivity for each
+geometry. For a irradiation configuration meant to mimic the spec￾trometer measurements (parallel light at an inclination of ten degrees),
+the surface absorptivities were iteratively adjusted2 until the simulated
+solar-weighted absorptivity matched the measured values (cf. Table 3).
+In Fig. A.1, the simulated, solar-weighted absorptivity values are
+plotted over the tilt angle, while the spectrometer measurements are
+given as a reference. It can be observed that the StepRec absorber is
+least affected by the irradiation inclination due to its open step-pin
+design. Even for the highest, simulated tilt angle of 52.5°, the StepRec
+2 This lead to a surface absorptivity of 82% for HiTRec, 80% for StepRec and
+60% for both EmiRec designs. For the EmiRec absorbers, the reflectivity was
+modeled as half specular and half diffusive, as this led to a closer agreement
+with measurements of 55% material absorptivity for the metal alloy. It should
+be noted that all three values potentially include implicit corrections for
+the uncertainties of the raytracing models, e.g. differences between absorber
+geometry model and the real sample geometry.
+
+Renewable Energy 218 (2023) 119220
+10
+R.T. Broeske et al.
+Fig. A.1. Solar-weighted absorptivity values as a function of the tilt angle. Solid lines
+represent raytracing simulation results, dotted lines the spectrometer measurements.
+Table A.1
+Discrete tilt angle distribution.
+𝑗 𝑡𝑖𝑗
+𝑛𝑗
+cos (
+𝑡𝑖𝑗
+)
+𝑤𝑗
+1 2.5° 0 0.999 0.0%
+2 7.5° 5 0.991 7.1%
+3 12.5° 5 0.976 7.0%
+4 17.5° 6 0.954 8.3%
+5 22.5° 15 0.924 19.9%
+6 27.5° 12 0.887 15.0%
+7 32.5° 3 0.843 3.6%
+8 37.5° 14 0.793 15.9%
+9 42.5° 6 0.737 6.2%
+10 47.5° 13 0.676 12.7%
+11 52.5° 5 0.609 4.3%
+absorptivity drops only 1.1 percentage point relative to the spectrome￾ter measurement. The closed channels of the HiTRec absorber result in
+a stronger dependence on the tilt angle of up to two percentage points.
+Significantly stronger affected are the EmiRec absorbers with the much
+more finer absorber channels, the EmiRec 600 cpsi absorptivity drops
+up to 7.5 percentage points.
+Based on the comparison of the simulation results to the spec￾trometer measurements, the irradiation direction uncertainty 𝛿𝑎𝑏𝑠,𝑑𝑖𝑟 is
+modeled as a normally distributed uncertainty with the mean 𝜇 and the
+variance 𝜎
+2 given as:
+𝜇 =
+∑11
+𝑗=1
+𝑤𝑗
+(
+𝛼𝑠.𝑤.,𝑠𝑖𝑚. (
+𝑡𝑖𝑗
+)
+− 𝛼𝑠.𝑤.,𝑚𝑒𝑎𝑠.)
+(A.4)
+𝜎
+2 =
+∑11
+𝑗=1
+𝑤𝑗
+(
+𝛼𝑠.𝑤.,𝑠𝑖𝑚. (
+𝑡𝑖𝑗
+)
+− 𝛼𝑠.𝑤.,𝑚𝑒𝑎𝑠. − 𝜇
+)2
+(A.5)
+The resulting values for each of the four geometries are listed in
+Table A.2. The EmiRec 600 cpsi MOD design was not simulated, but
+is instead assigned the uncertainty of the similar EmiRec 600 cpsi vari￾ant. The effect of the irradiation direction uncertainty is discussed in
+Section 4.3.
+Appendix B. Geometric absorber data
+The HiTRec 80 cpsi absorber consists of simple square channels with
+a channel width of 2 mm, a wall thickness of 0.8 mm, and a depth of
+40 mm to 50 mm. A square channel form is also the basis for the StepRec
+design with a constant wall strength of 0.44 mm and channel width of
+2.29 mm. This design is however made up of five sections along the main
+Table A.2
+Mean and standard deviation of the irradiation direction uncertainty for
+each geometry.
+Absorber 𝜇 𝜎
+HiTRec 80 cpsi −0.0091 0.0058
+StepRec −0.0051 0.0036
+EmiRec 300 cpsi −0.025 0.016
+EmiRec 600 cpsi −0.024 0.015
+channel axis, within each section the geometric cross-section is constant
+(cf. part A of Fig. 2). Starting from the irradiated front, the five sections
+are:
+• the first pin section: length 6.5 mm, relative width 25%
+• the second pin section: length 6.5 mm, relative width 50%
+• the third pin section: length 6.5 mm, relative width 75%
+• the base channel: length 3.5 mm
+• the shifted base channel: length 17.0 mm.
+The width of the pins is defined relative to the total width of the
+StepRec absorber unit cell (2.73 mm, wall thickness + channel width).
+This means that, e.g., the each pin in the first section has the form of
+a plus-sign where both ‘‘lines’’ of the plus-sign are 0.25 ∗ 2.73 mm =
+0.6825 mm long and 0.44 mm thick.
+As described in Section 2.2, the metallic EmiRec absorbers are
+formed from alternating corrugated and smooth layers of thin sheets.
+For all three EmiRec variations, metal sheets with a fixed thickness
+of only 65 μm are used. The corrugated layers can be geometrically
+approximated as a wave function. For the 300 cpsi variant, the wave
+amplitude is 1.92 mm and the wave period 3.32 mm, while both 600 cpsi
+versions have an amplitude of 1.32 mm and a period of 2.38 mm. To
+increase porosity, the smooth sheet layers were shortened by 10 mm out
+of the total absorber depth of 40 mm (cf. part A of Fig. 3). In case of the
+EmiRec 600 cpsi MOD variant, every second corrugated layer was also
+shortened by 10 mm to further increase the porosity at the irradiated
+front.
+References
+[1] World Bank, Concentrating Solar Power: Clean Power on Demand 24/7, World
+Bank, Washington DC, 2021.
+[2] M. Becker, P. Klimas, Second Generation Central Receiver Technologies: A Status
+Report, Technical Report, 1993, URL: https://elib.dlr.de/31267/.
+[3] A. Ávila-Marín, Volumetric receivers in solar thermal power plants with central
+receiver system technology: A review, Sol. Energy 85 (5) (2011) 891–910,
+http://dx.doi.org/10.1016/j.solener.2011.02.002.
+[4] H. Fricker, Tests with a small volumetric wire receiver, in: M. Becker (Ed.),
+Proceedings of the Third International Workshop on Solar Thermal Central
+Receiver Systems, Springer-Verlag, Konstanz, Berlin, Heidelberg, New York,
+1986.
+[5] M. Becker, 2.5 MW volumetric receiver project, in: M. Becker, M. Böhmer (Eds.),
+Proceedings of Fourth Meeting of SSPS - Task III - Working Group on ‘‘High
+Temperature Receiver-Technology’’ - SSPS Technical Report No. 1/88, Denver,
+Co, 1988.
+[6] B. Hoffschmidt, Vergleichende Bewertung verschiedener Konzepte volumetrischer
+Strahlungsempfaenger (Ph.D. thesis), DLR, 1997, URL: https://elib.dlr.de/
+31097/.
+[7] W. Meinecke, E. von Unger, Volumetric Receiver Evaluation, Deutsche
+Forschungsanstalt für Luft-u. Raumfahrt, 1989.
+[8] T. Fend, B. Hoffschmidt, R. Pitz-Paal, O. Reutter, P. Rietbrock, Porous materials
+as open volumetric solar receivers: Experimental determination of thermophysical
+and heat transfer properties, Energy 29 (5–6) (2004) 823–833, http://dx.doi.org/
+10.1016/s0360-5442(03/00188-9, URL: https://elib.dlr.de/2850/.
+[9] M. Böhmer, W. Meinecke, Proceedings of the Volumetric Receiver Workshop,
+Koeln, February 13th–15th, 1991, SSPS Technical Report, SSPS-TR 2/91, 1991,
+URL: https://elib.dlr.de/31155/.
+[10] R. Capuano, T. Fend, H. Stadler, B. Hoffschmidt, R. Pitz-Paal, Optimized
+volumetric solar receiver: Thermal performance prediction and experimental
+validation, Renew. Energy 114 (2017) 556–566, http://dx.doi.org/10.1016/
+j.renene.2017.07.071, URL: https://elib.dlr.de/113854/.
+
+Renewable Energy 218 (2023) 119220
+11
+R.T. Broeske et al.
+[11] T. Hellmuth, L. Matthews, J. Chavez, C. Hale, Performance of a wire mesh solar
+volumetric air receiver, Sol. Eng. (1994).
+[12] T. Fend, R. Pitz-Paal, O. Reutter, J. Bauer, B. Hoffschmidt, Two novel
+high-porosity materials as volumetric receivers for concentrated solar radia￾tion, Sol. Energy Mater. Sol. Cells (2004) http://dx.doi.org/10.1016/s0927-
+0248(04/00177-1, URL: https://elib.dlr.de/2959/.
+[13] M.I. Roldán, O. Smirnova, T. Fend, J.L. Casas, E. Zarza, Thermal analysis and
+design of a volumetric solar absorber depending on the porosity, Renew. Energy
+62 (2014) 116–128, http://dx.doi.org/10.1016/j.renene.2013.06.043.
+[14] A. Ávila-Marín, M. Alvarez-Lara, J. Fernández-Reche, Experimental results of
+gradual porosity wire mesh absorber for volumetric receivers, Energy Procedia
+49 (2014) 275–283, http://dx.doi.org/10.1016/j.egypro.2014.03.030.
+[15] A. Ávila-Marín, M.A. de Lara, J. Fernandez-Reche, Experimental results of
+gradual porosity volumetric air receivers with wire meshes, Renew. Energy 122
+(2018) 339–353, http://dx.doi.org/10.1016/j.renene.2018.01.073.
+[16] F. Zaversky, L. Aldaz, M. Sánchez, A. Ávila-Marín, M.I. Roldán, J. Fernández￾Reche, A. Füssel, W. Beckert, J. Adler, Numerical and experimental evaluation
+and optimization of ceramic foam as solar absorber – single-layer vs multi-layer
+configurations, Appl. Energy 210 (2018) 351–375, http://dx.doi.org/10.1016/
+j.apenergy.2017.11.003.
+[17] R. Capuano, T. Fend, B. Hoffschmidt, R. Pitz-Paal, Innovative solar receiver
+micro-design based on numerical predictions, in: ASME 2015 IMECE, 2015,
+http://dx.doi.org/10.1115/IMECE2015-50597, URL: https://elib.dlr.de/101217/.
+[18] C. Pabst, G. Feckler, S. Schmitz, O. Smirnova, R. Capuano, P. Hirth, T. Fend,
+Experimental performance of an advanced metal volumetric air receiver for
+solar towers, Renew. Energy 106 (2017) 91–98, http://dx.doi.org/10.1016/
+j.renene.2017.01.016.
+[19] R.T. Broeske, P. Schwarzbözl, B. Hoffschmidt, A new partitioned 1D LTNE
+continuum model for the simulation of 3D-shaped honeycomb absorbers, Sol.
+Energy 236 (2022) 533–547, http://dx.doi.org/10.1016/j.solener.2022.02.024,
+URL: https://elib.dlr.de/186694/.
+[20] K. Wieghardt, D. Laaber, V. Dohmen, P. Hilger, D. Korber, K.-H. Funken, B.
+Hoffschmidt, Synlight - a new facility for large-scale testing in CSP and solar
+chemistry, in: Proceedings of the 23rd SolarPACES Conference, vol. 2033, 2018,
+http://dx.doi.org/10.1063/1.5067078, URL: https://elib.dlr.de/115336/.
+[21] G. Koll, P. Schwarzbözl, K. Hennecke, T. Hartz, M. Schmitz, B. Hoffschmidt,
+The solar tower jülich - a research and demonstration plant for central receiver
+systems, in: Proceedings of the 15th SolarPACES Conference, 2009, URL: https:
+//elib.dlr.de/60306/.
+[22] L. Birkigt, J. Hennicke, R. Kirchner, 3D screen printing of solar absorbers made
+of SiSiC, sintered in an efficient high-performance furnace, in: Cfi/Ber. DKG 99
+(2022), 2022.
+[23] R.T. Broeske, P. Schwarzbözl, L. Birkigt, S. Dung, B. Müller, T. Doerbeck,
+Innovative 3D-shaped structures as volumetric absorbers (oral presentation), in:
+27th SolarPACES Conference, 2021, URL: https://elib.dlr.de/189060/.
+[24] M. Thelen, C. Raeder, C. Willsch, H.-G. Dibowski, A high-resolution optical
+measurement system for rapid acquisition of radiation flux density maps, in:
+SolarPACES Conference 2016, 2017, URL: https://elib.dlr.de/108355/.
+[25] JCGM, GUM: Guide to the expression of uncertainty in measurement, 2008, https:
+//www.bipm.org/en/committees/jc/jcgm/publications. (Accessed 18 January
+2023).
+[26] TMH, TMH - Katalog, Temperatur Messelemente Hettstedt GmbH, 2022,
+https://temperaturmesstechnik.de/fileadmin/user_upload/pdf/tmh-katalog.pdf.
+(Accessed 31 August 2022).
+[27] L. Amsbeck, R. Buck, P. Heller, J. Jedamski, R. Uhlig, Development of a tube
+receiver for a solar-hybrid microturbine system, in: 14th Biennial CSP Solarpaces
+Symposium 2008, 2008, URL: https://elib.dlr.de/54223/.
+[28] P. Schwarzbözl, B. Belhomme, R. Buck, R. Uhlig, L. Amsbeck, M. Schmitz,
+Simulation solarer turmsysteme, in: 11. Kölner Sonnenkolloquium, 2008, URL:
+https://elib.dlr.de/56356/.

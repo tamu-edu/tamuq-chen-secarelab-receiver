@@ -1,0 +1,594 @@
+Transient response performances and control strategy of porous volumetric
+solar receivers with different heat transfer fluids
+Shen Du , Ya-Ling He *
+, Meng-Jie Li , Zhan-Bin Liu
+National Innovation Platform (Center) for Industry-Education Integration of Energy Storage Technology, Key Laboratory of Thermo-Fluid Science and Engineering of
+Ministry of Education, Xi’an Jiaotong University, Xi’an, Shaanxi 710049, China
+ARTICLE INFO
+Keywords:
+Porous volumetric solar receiver
+Transient response
+PID control
+Pore-scale simulation
+ABSTRACT
+The transient behavior of solar receivers significantly impacts start-up, shutdown, and fluid outlet temperature
+stability. This study investigates the transient behaviors of porous volumetric solar receivers using various heat
+transfer fluids under step increases and actual solar radiation. The porous domain is reconstructed using the unit
+cell structure of Weaire-Phelan. The implementation of the solar radiation process, coupled flow and heat
+transfer, as well as control algorithm leverages Monte Carlo ray tracing, pore-scale simulation, and PID control,
+respectively. Results demonstrate that air and molten salt porous receivers display concave and s-shaped
+response curves when exposed to a step increase in solar radiation. Molten salt’s higher heat capacity compared
+to that of air causes a delayed response to solar radiation variations with an average time constant of 45.9 s,
+whereas the air receiver’s time constant is only 7.0 s. Furthermore, the time constant increases by 129 % as the
+mass flow rate decreases from 9 × 10− 5 to 3 × 10− 5 kg/s. The PID algorithm effectively reduces temperature
+fluctuation amplitudes caused by solar radiation variation. The maximum temperature offsets for air and molten
+salt porous receivers are 5.9 K and 31.4 K, respectively.
+1. Introduction
+Solar energy is widely regarded as the paramount source for future
+human societies. Concentrating Solar Power (CSP) technology offers an
+efficient mechanism for the high-temperature and large-scale utilization
+of solar energy [1,2]. However, the diurnal and intermittent nature of
+solar energy poses challenges to the stable operation of CSP systems [3].
+The transient performance of the solar receiver, a core component
+responsible for solar-to-thermal energy conversion, plays a crucial role
+in determining the temperature of the heat transfer fluid and the overall
+thermal efficiency of the system. Furthermore, the high temperature and
+steep temperature gradient significantly affects the long-term safe
+operation of the receivers [4].
+Volumetric absorption stands out as a promising approach for effi￾ciently absorbing and converting solar radiation by mitigating thermal
+radiation loss [5]. Nevertheless, the complex flow and coupled heat
+transfer processes within porous media present challenges in precisely
+characterizing thermal performances, especially concerning the tran￾sient response performance of porous volumetric solar receivers.
+In comparison to the volume-averaging simulation method, pore￾scale simulation proves to be an effective tool for analyzing the
+intricate and detailed energy transfer processes within porous struc￾tures. Zhu and Xuan [6] conducted simulations on packed bed porous
+media, investigating the influence of geometrical parameters on radia￾tion propagation, pressure drop, and thermal efficiency. A hybrid ge￾ometry with reduced front surface temperature was proposed. Du et al.
+[7,8] employed X-ray computed tomography to reconstruct porous ge￾ometry and developed image processing procedures to adjust geomet￾rical parameters such as porosity and pore size. Monte Carlo ray tracing
+and pore-scale simulation methods were applied to examine the steady￾state flow and thermal performance of porous volumetric solar receivers
+under intensified solar irradiance. According to the spectrally selective
+absorption concept, Du et al. [9] further designed a porous receiver with
+molten salt as heat transfer fluid. The flow and thermal performances
+were compared to the air porous receivers with pore-scale simulation
+method, and the low flow resistance and high thermal efficiency were
+characterized. Navalho and Pereira [10] simulated the entire solar ra￾diation transfer process, encompassing solar energy concentration in a
+parabolic dish and radiation transfer within the porous foam. Chen et al.
+[11] investigated influences of the optical configurations on the thermal
+performance of the receiver. The decreasing absorptivity and spectrally
+selective absorption designs were beneficial for improving the energy
+conversion efficiency. Additionally, based on the adjoint algorithm and
+* Corresponding author.
+E-mail address: yalinghe@mail.xjtu.edu.cn (Y.-L. He).
+Contents lists available at ScienceDirect
+Solar Energy
+journal homepage: www.elsevier.com/locate/solener
+https://doi.org/10.1016/j.solener.2024.112984
+Received 11 April 2024; Received in revised form 17 July 2024; Accepted 1 October 2024
+Solar Energy 283 (2024) 112984
+Available online 10 October 2024
+0038-092X/© 2024 International Solar Energy Society. Published by Elsevier Ltd. All rights are reserved, including those for text and data mining, AI training, and
+similar technologies.
+
+pore-scale reconstruction, Liu et al. [12] and Fan et al. [13] optimized
+the radiative heat transfer process and flow resistance characteristics of
+the porous receivers, respectively. An improvement in absorption effi￾ciency of about 20 % and a maximum pressure drop reduction of 43 %
+were achieved, respectively.
+Several transient experimental tests on porous volumetric solar re￾ceivers were conducted in the early studies [14–16]. However, numer￾ical simulations provide effective tools for a detailed examination of
+transient thermal performance. Wu and Wang [17] developed a tran￾sient model for porous volumetric solar receivers, considering sudden
+heat flux, sudden loss of heat flux, and heat flux step changes. The results
+demonstrated that the reaction time of the receiver’s outlet temperature
+fell within the range of tens of seconds, and a smooth change in tem￾perature and pressure drop occurred even during sudden variations in
+solar radiation. In a study by Wang et al. [18], the influences of fluid
+type and thermal conductivity of porous material on the transient per￾formance of porous receivers were investigated. It was observed that
+fluid type had a slight impact on the inlet temperature of the porous
+skeleton but significantly affected the heat transfer process of the outlet
+porous temperature. Ribeiro and Lemos [19] utilized the volume￾averaging method with a local thermal non-equilibrium model to
+explore the transient temperature response of porous receivers. The
+findings indicated that low porosity and decreasing Darcy number
+facilitated effective heat exchange between phases, leading to a quicker
+stabilization of outlet temperature. Sharma and Talukdar [20] approx￾imated various operational scenarios involving linearly changing solar
+flux, including start-up, shutdown, and cloud passage for porous re￾ceivers. The temperature variations over time were recorded, revealing
+a delayed response at the rear part of the porous receiver. Additionally,
+Cagnoli et al. [21] proposed a multi-scale analysis method, spanning
+from micro-scale to macro-scale, for porous volumetric solar receivers.
+The simulation of the cloud passage process involved imposing zero
+solar heat flux for 20 s. Macro-scale numerical results indicated an im￾mediate response of the front surface of the porous receiver to variations
+in solar heat flux, with a rapid temperature change rate of approximately
+15 K/s. Similar quick temperature variation rates exceeding 20 K/s were
+also observed by Reddy and Nataraj [22].
+On the other hand, diverse control strategies have been employed to
+regulate the temperature of solar receivers and stabilize transient per￾formance in various solar thermal applications. This involves manipu￾lating the heliostat field, receiver aperture size, and mass flow rate of the
+heat transfer fluid. In a study by Popp et al. [23], a comparison was
+made between model predictive control (MPC) and a PID-based control
+method for regulating the temperature of a molten salt solar receiver by
+adjusting fluid mass flow. Results across various cases indicated that
+MPC exhibited superior performance in terms of temperature deviation
+and compliance with safety standards. However, thermal efficiencies of
+the receiver were nearly identical when using both MPC and PID control
+methods. Abuseada and Ozalp [24] employed both PID and MPC
+methods to regulate the apertures of a cavity solar receiver, aiming to
+stabilize its temperature under fluctuating solar radiation. Experimental
+findings demonstrated that both control methods effectively maintained
+the receiver’s temperature within 5℃ of the set point under actual solar
+irradiation. To address the inherent delay characteristic of PID control,
+Lu et al. [25] and Wang et al. [26] applied feedforward-feedback control
+strategies in parabolic trough and solar tower receivers, respectively. Lu
+et al. [25] introduced a hybrid control strategy incorporating model￾based feedforward and PI feedback controllers. This strategy compen￾sated for various disturbances such as changes in solar position, ambient
+temperature, and wind speed, resulting in an approximate 0.5–1 % in￾crease in thermal efficiency. Wang et al. [26] integrated an artificial
+neural network (ANN)-based feedback controller with the PID feedback
+controller to enhance the response speed of the solar tower receiver to
+variations in solar irradiation. The hybrid control strategy effectively
+limited outlet temperature fluctuations to 5℃ under actual Direct
+Normal Irradiance (DNI) data, whereas this value exceeded 30℃ in the
+PID-controlled system.
+Through the preceding literature reviews, it becomes evident that
+the transient behaviors of porous receivers with various heat transfer
+fluids remain unexplored, and a comprehensive understanding of the
+transient performance of porous volumetric solar receivers under actual
+solar irradiance is yet to be attained. Additionally, the response char￾acteristics of porous receivers to controlling algorithms require further
+Nomenclature
+cp specific heat (J/(kg•K))
+e temperature difference (K)
+Kp proportional coefficient in PID controller
+m˙ mass flow rate (kg/s)
+p pressure (Pa)
+Sr energy source term (W)
+T temperature (K)
+Tsampling derivative coefficient in PID controller
+Td derivative coefficient in PID controller
+Ti integral coefficient in PID controller
+u velocity (m/s)
+x coordinate (m)
+Greek symbols
+λ thermal conductivity (W/(m⋅K))
+μ dynamic viscosity (Pa⋅s)
+ρ density (kg/(m3
+))
+τt thermal tortuosity
+Subscripts
+f fluid
+s solid
+Fig. 1. Illustration of porous receiver with Weaire-Phelan structure as unit cell.
+S. Du et al. Solar Energy 283 (2024) 112984
+2
+
+investigation. Notably, prior numerical tools predominantly utilized the
+volume-averaging simulation method, while a demand for transient
+studies relying on pore-scale structures, capable of capturing finer de￾tails, persists. Consequently, this study aims to comprehensively explore
+the transient response performances of porous volumetric solar receivers
+utilizing different heat transfer fluids, both with and without regulation.
+The porous structure reconstruction, solar radiation calculation, and the
+PID control methods are illustrated in the Section 2. The pore-scale
+simulation method for the porous receivers with different heat transfer
+fluids is presented in Section 3. Transient response performances under
+the step change and actual solar flux as well as the influence of con￾trolling algorithm are analyzed in Section 4.
+2. Methodology
+2.1. Weaire-Phelan porous model reconstruction
+Pore-scale simulation is conducted by directly reconstructing a three￾dimensional porous structure, as shown in Fig. 1. The Weaire-Phelan
+porous model is chosen and reconstructed using the periodic unit cell
+reconstruction method, mainly to mitigate the substantial computa￾tional resource demands during transient simulation.
+Firstly, the unit cell of Weaire-Phelan structure including its vertices’
+positions and connection information is obtained based on the built-in
+model of the software Surface Evolver. Then, the geometrical data of
+the Weaire-Phelan structure is imported to the CAD design software such
+as Inventor to create the three-dimensional entity. The 3D sketch is
+drawn by the VB macros and the porous skeleton is formed using the
+Insert Frame function. Finally, the Miter function is applied to mend the
+gaps between the skeletons and the porosity of the porous structure is
+controlled by changing the skeleton thickness. The porosity, pore
+diameter, strut thickness, and specific surface area of the reconstructed
+Weaire-Phelan porous model used for the following simulation are 0.8,
+2.3 mm, 0.55 mm, and 1.4 mm− 1
+, respectively.
+2.2. Monte Carlo ray tracing method
+The solar radiation penetration and solar flux distribution inside the
+porous structure significantly influence the flow and heat transfer per￾formance of the receiver. Before launching the Monte Carlo ray tracing
+method, the initial state of the solar radiation is determined according to
+the previous study of Qiu et al. [27]. It is shown that the incident angle
+varies from 0 to about 45◦. Therefore, the solar flux distribution inside
+the receiver is a weighted average of distributions under different inci￾dent angles.
+When considering the solar radiation penetration inside the receiver,
+the MCRT method is applied due to its flexibility to the complex three￾dimensional structures. The basic concept of MCRT method is to
+simulate the radiation transfer process by statically analyze the behav￾iors of a large number of independent photons. Based on the geometrical
+optics assumption, the behaviors of the photons such as reflection, ab￾sorption, and transmission can be captured. The reflections in the
+interface of the porous structure and the side wall of the receiver are
+assured to be specular and the absorption of solar radiation only hap￾pens at the porous surface.
+2.3. PID control method
+PID is a commonly used controller in various fields in industry. In
+order to stabilize the thermal performance of the solar receiver under
+the changing weather condition, the PID control method is applied. The
+basic equation showing the PID algorithm is shown by Equation(1). In
+the equation, m˙ represents the mass flow rate in the inlet of the receiver
+and it is the key parameter to regulate for adjusting the outlet temper￾ature. e is denoted as the temperature difference between the current
+outlet temperature and the set temperature. Kp, Ti, and Td are the co￾efficients to scale the proportional, integral, and derivative controllers,
+respectively.
+m˙(t + 1) = m˙(t)−
+[
+Kpe(t + 1) +
+KpTsampling
+Ti
+∑K
+n=0
+e(n) +
+KpTd
+Tsampling
+(e(t + 1)
+− e(t))]
+(1)
+The Zeigler-Nichols closed-loop method is adopted to tune the
+aforementioned PID parameters. A small disturbance of the outlet
+temperature is induced by changing the set temperature. Then, the
+proportional gain is adjusted until the oscillation presents a constant
+amplitude, which derives the critical gain and period of oscillation.
+Finally, the tuned PID parameters can be determined according to
+Ref. [26], and the evaluation process is illustrated in Fig. 2.
+3. Numerical modeling
+3.1. Governing equations
+Inside the porous receiver, the fluid flow, heat conduction, convec￾tive heat transfer, and thermal radiation transfer processes should be
+solved simultaneously. The governing equations with transient terms
+including continuity, momentum, and energy conservations equations
+are presented as follows.
+∂ρ
+∂t
++
+∂
+∂xj
+(ρuj) = 0 (2)
+Fig. 2. Transient performance evaluation and PID regulation procedures.
+S. Du et al. Solar Energy 283 (2024) 112984
+3
+
+∂ui
+∂t
++
+∂
+∂xj
+(
+ρuiuj
+)
+= − ∂p
+∂xi
++
+∂
+∂xj
+(
+μ
+∂ui
+∂xj
+)
+(i = 1, 2, 3) (3)
+∂(ρTf)
+∂t
++
+∂
+∂xj
+(
+ρujTf
+)
+= ∂
+∂xj
+(λf
+cp
+∂Tf
+∂xj
+)
+(4)
+∂(ρscpTs)
+∂t = ∂
+∂xj
+(λs
+∂Ts
+∂xj
+) + Sr (5)
+In the equations, u, p, and T stand for velocity, pressure, and tem￾perature, which are the parameters to be solved. The bulk material
+properties of the fluid and porous skeleton are applied where ρ, μ, cp, and
+λ represent density, viscosity, specific heat, and thermal conductivity,
+respectively. Sr is the energy source term applied to the porous skeleton
+due to solar and thermal radiation. Thermal radiation heat transfer oc￾curs on the surface of porous media which is determined by discrete
+ordinates (DO) model. The Monte Carlo ray tracing method to determine
+the solar radiative heat flux have been validated in the previous studies
+[7,28]. The numerical model to describe the flow and heat transfer
+within the porous receivers have been previously checked, which can be
+referenced from Ref. [7,8,29]. Notably, the numerical method presented
+above can only reflect the transient behaviors of the porous structure
+without considering the thermal inertia of other structures, such as fluid
+channels.
+3.2. Boundary conditions and thermophysical properties
+In the inlet of the receiver, the mass-flow-inlet boundary condition is
+applied, and the mass flow of the fluid is the essential factor to regulate
+the outlet temperature of the receivers. The constant inlet temperature
+of air and Hitec molten salt is set to 300 K and 420 K, respectively. Hitec
+molten salt, a eutectic mixture of potassium nitrate, sodium nitrite, and
+sodium nitrate in the proportions of 53 %, 40 %, and 7 % by weight,
+respectively, is widely used in CSP systems. The incident solar flux
+distribution is also assumed to constant and the radiant intensity is
+Table 1
+Convective heat transfer coefficient correlations of porous volumetric solar receivers.
+Materials Density
+kg/m3
+Viscosity
+Pa⋅s
+Specific heat
+J/(kg⋅K)
+Thermal conductivity
+W/(m2
+⋅K)
+Silicon carbide [30] 3200 / 750 80
+Stainless steel [31] 7090 / 500 21.5
+Air [30] Ideal-gas law Sutherland law Equation(6) Equation(7)
+Hitec [32] − 0.733T+2280.22 Equation(8) 1560 Equation(9)
+Fig. 3. Temperature variation of porous skeleton and outlet fluid of (a) air and (b) Hitec receivers (m˙=5 × 10− 5 kg/s).
+Fig. 4. Temperature fields porous receivers with air and Hitec as heat transfer fluids.
+S. Du et al. Solar Energy 283 (2024) 112984
+4
+
+variable. In the outlet of the receiver, the pressure-outlet boundary
+condition is applied. In the interface of the fluid and porous skeleton, the
+non-slip and coupled wall boundary condition is used. The emissivity of
+the porous skeleton is fixed to 0.95. The side walls of the flow channel do
+not participate in the thermal radiation heat exchange.
+In order to reveal the transient response performances of porous
+volumetric solar receivers of all types, various materials for the porous
+skeleton and fluid are selected. High temperature alloys and refractory
+ceramics are commonly used in the solar radiation absorption at
+elevated temperature. The air is generally selected as heat transfer fluid
+for the porous volumetric solar receiver. Moreover, the molten salt is
+also proposed due to it spectrally selective absorption property which
+can limit the thermal radiation loss [9]. Therefore, the thermophysical
+properties of silicon carbide, 316 stainless steel, air, and Hitec molten
+salt are summarized in Table 1.
+cp,Air = 1.93 × 10− 10T4 − 8 × 10− 7T3 + 1.14 × 10− 3T2 − 4.49
+× 10− 1T + 1.06 × 103 (6)
+λAir = 1.52 × 10− 11T3 − 4.86 × 10− 8T2 + 1.02 × 10− 4T − 3.93 × 10− 3
+(7)
+4. Results and discussions
+4.1. Transient response performances under the step change of solar flux
+The initialization process of the porous volumetric solar receivers is
+simulated by applying a step increase in solar radiation from 0 to 1 MW/
+m2
+. The outlet temperature of the heat transfer fluid and the average
+temperature of the porous structure are plotted over time, depicted in
+Fig. 3.
+Noticeably, the outlet temperature responses differ significantly be￾tween the porous receivers using air and Hitec. The air receiver dem￾onstrates a concave response curve, indicating an immediate
+temperature increase in response to the abrupt change in solar radiation.
+Conversely, the Hitec receiver exhibits a delayed response with an s￾shaped curve. Quantitatively, the air receiver reaches its maximum
+Fig. 5. Time constant of various porous receivers with different fluids, porous materials, and inlet mass flow.
+μHitec =
+⎧
+⎪⎪⎪⎪⎪⎪⎨
+⎪⎪⎪⎪⎪⎪⎩
+− 1.742173 × 10− 6T3 + 2.27615 × 10− 3T2
+− 0.99143T + 143.9826 , 420K⩽T < 440 K
+− 7.2058 × 10− 9T3 + 1.08225 × 10− 5T2
+− 5.4754 × 10− 3T + 0.93845 , 440K⩽T < 500 K
+8.507 × 10− 13T4 − 2.4331 × 10− 9T3 + 2.6275 × 10− 6T2
+− 1.2768 × 10− 3T + 0.23816 , 500K⩽T⩽800K
+(8)
+λHitec =
+{ − 1.863 × 10− 8T3 + 2.551 × 10− 5T2 − 1.176 × 10− 2T + 2.263, 420K⩽T < 536 K
+− 6.47 × 10− 4T + 0.7663 , 536 K < T⩽800K (9)
+S. Du et al. Solar Energy 283 (2024) 112984
+5
+
+outlet temperature in about 20 s, whereas this duration extends to
+approximately 90 s for the Hitec receiver. The primary reason for this
+temperature response disparity is that the heat capacity of Hitec is
+significantly higher than that of air. The visual representation in Fig. 4
+clarifies that the temperature field of the air receiver reaches steady
+state at 20 s compared to that at 60 s. However, the thermal stability of
+Hitec is not achieved at 20 s, and the overall fluid temperature still in￾creases over time.
+Significant temperature differences between the porous structure
+and air temperature are observable in Fig. 3(a) and Fig. 4(a). Due to the
+inefficiency of convective heat transfer, the temperature gap between
+outlet air and the porous surface reaches about 80.7 K upon reaching a
+steady state. In contrast, substituting air with Hitec enables the thermal
+equilibrium between the heat transfer fluid and the porous structure at
+the receiver outlet. Fig. 4(b) indicates a slight temperature difference at
+the rear of the Hitec receiver.
+4.2. Parametric study of the transient response performance of the porous
+receivers
+The transient behavior of the porous receivers is influenced by
+various factors, including the thermophysical properties and mass flow
+rate. The frequently utilized porous materials, such as silicon carbide
+and stainless steel, are applied to the porous structures. Both air and
+Hitec porous receivers under varying mass flow rates are analyzed. The
+time constant which is defined as the required time to reach 63.2 % of its
+steady state temperature is selected as the evaluation index for the re￾ceiver’s transient response performance.
+Fig. 5 exhibits a notable difference in time constants, indicating
+quicker responses of air receivers to solar radiation variation. Within the
+same inlet mass flow rate range, the average time constant for air re￾ceivers is 7.0 s, which significantly increases to 45.9 s for Hitec receivers.
+Furthermore, the fluid’s mass flow rate influences the receiver’s overall
+temperature, with lower mass flow rates resulting in higher fluid and
+Fig. 6. Temperature variation under mass flow inlet of (a) air receivers (b) Hitec receivers.
+Fig. 7. (a) DNI variation (b) Temperature offset of air and Hitec porous receivers.
+Table 2
+Temperature offset of the air and Hitec porous receivers with and without PID control.
+Materials Maximum temperature offset
+K
+Minimum temperature offset
+K
+Standard deviation
+K
+Air receiver without PID 44.8 − 51.8 22.1
+Air receiver with PID 5.9 − 4.5 0.9
+Hitec receiver without PID 38.2 − 41.2 18.0
+Hitec receiver with PID 34.1 − 27.9 15.7
+S. Du et al. Solar Energy 283 (2024) 112984
+6
+
+porous skeleton temperatures. As the mass flow rate decreases, the
+temperature increasing rate becomes smaller. The time constant signif￾icantly increases by 129 % as the mass flow rate shifts from 9 × 10− 5 kg/
+s to 3 × 10− 5 kg/s. Moreover, the temperature variations over time
+under different mass flow rate are plotted in Fig. 6. It is demonstrated
+that the transient response curve shape is consistent for both air and
+Hitec receivers, with the mass flow rate’s impact more evident in the
+Hitec system. Simulation results between silicon carbide and stainless
+steel show slight differences in the porous materials. The maximum
+difference resulting from porous material selection is found in the air
+receiver, with relative and absolute differences of 35.9 % and 4.4 s,
+respectively. It’s noteworthy that the time constant in receivers with
+silicon carbide is consistently smaller due to its relatively smaller heat
+capacity compared to stainless steel.
+4.3. PID regulation of porous volumetric solar receiver under variant
+incident flux
+Under real situations, the variation of incident solar radiation for the
+receivers becomes more complex. Fig. 7(a) records the DNI variation
+within a day, and dramatic changes can be observed due to the cloud
+cover. DNI data spanning 1500 s is extracted and used to calculate the
+solar radiation intensity at the receiver inlet, as shown in the enclosed
+illustration of Fig. 7(a). The peak, lowest, and mean DNI values are
+1084.0, 910.0, and 997.2 W/m2
+, respectively.
+The simulation of the outlet temperature for the porous receivers
+under actual solar radiation conditions is presented, and the tempera￾ture deviation from the steady-state temperature is illustrated in Fig. 7
+(b). Absent a regulation algorithm, the temperature fluctuation curves
+mirror the fluctuations in DNI, displaying consistent peaks and troughs
+in both DNI and temperature profiles. In comparison to the air receiver,
+a notable delay in temperature response to solar radiation is evident,
+resulting in an average delay of 56 s. Additionally, several minor crests
+and troughs in the air temperature profile are excluded due to the rapid
+changes in solar radiation and the delayed response of Hitec. Moreover,
+the magnitude of the temperature oscillation for both air and Hitec re￾ceivers is detailed in Table 2. It is noted that the temperature fluctua￾tions are more evident in the air receiver.
+Furthermore, the PID controller is applied to stabilize the outlet fluid
+temperature by the automatic regulation of the inlet mass flow rate for
+both air and Hitec porous receivers, and the temperature offsets are
+illustrated in Fig. 8. Evidently, the PID algorithm demonstrates effective
+control of the air receiver, showcasing only small variations with the
+maximum and minimum temperature offsets at 5.9 K and − 4.5 K,
+respectively. However, regarding the Hitec receiver, the PID controller
+offers restricted regulation. Comparing the temperature profile in Fig. 7
+(b), it is noted that the values of temperature offset decrease, with the
+maximum reduction reaching 13.3 K. Hence, more effective controlling
+algorithm such as feedforward-feedback control strategy may be
+necessary.
+5. Conclusions
+Transient response performances of different types of porous re￾ceivers under step change and actual solar radiation are investigated.
+The conclusions are derived as follows:
+(1) Air and molten salt porous receivers exhibit concave and s-shaped
+response curves, respectively, when subjected to a step increase
+in solar radiation. The higher heat capacity of molten salt results
+in a delayed response to solar radiation variation and prolongs
+the duration to reach a steady state.
+(2) The transient response of the porous receivers is significantly
+influenced by the heat transfer fluid’s thermophysical properties
+and mass flow rate, while the effect of types of porous materials is
+not evident. The average time constant for air and molten salt
+receivers are 7.0 s and 45.9 s, respectively. Within the range of 9
+× 10− 5 to 3 × 10− 5 kg/s, the lower mass flow rate increases the
+time constant by 129 %.
+(3) Temperature profilesfollow the variation of actualsolar radiation
+for both air and molten salt porous receivers, while a delay of 56 s
+is observed for the molten salt receiver. The PID algorithm can
+effectively reduce the amplitude of temperature fluctuation,
+particularly for the air receiver. The maximum temperature off￾sets for air and molten salt porous receivers are 5.9 K and 31.4 K,
+respectively.
+CRediT authorship contribution statement
+Shen Du: Writing – original draft, Visualization, Validation, Re￾sources, Project administration, Methodology, Investigation, Funding
+acquisition, Data curation, Conceptualization. Ya-Ling He: Writing –
+review & editing, Supervision, Resources, Project administration,
+Funding acquisition, Conceptualization. Meng-Jie Li: Writing – review
+& editing, Visualization, Investigation, Formal analysis. Zhan-Bin Liu:
+Writing – review & editing, Validation, Software, Formal analysis.
+Declaration of competing interest
+The authors declare that they have no known competing financial
+interests or personal relationships that could have appeared to influence
+the work reported in this paper.
+Fig. 8. Temperature offset of air and Hitec porous receivers with PID regulation.
+S. Du et al. Solar Energy 283 (2024) 112984
+7
+
+Acknowledgements
+This study is supported by the National Natural Science Foundation
+of China (Nos. 52306272 and 52341601).
+The authors would also like to thank the Postdoctoral Research
+Project Funding in Shaanxi Province (No. 2023BSHYDZZ40).
+References
+[1] Y.-L. He, Y. Qiu, K. Wang, et al., Perspective of concentrating solar power[J],
+Energy 198 (2020) 117373.
+[2] J.-Q. Guo, M.-J. Li, Y.-L. He, et al., A systematic review of supercritical carbon
+dioxide(S-CO2) power cycle for energy industries: technologies, key issues, and
+potential prospects[J], Energy Convers. Manage. 258 (2022) 115437.
+[3] Y.-L. He, K. Wang, Y. Qiu, et al., Review of the solar flux distribution in
+concentrated solar power: non-uniform features, challenges, and solutions[J],
+Appl. Therm. Eng. 149 (2019) 448–474.
+[4] T. Conroy, M.N. Collins, R. Grimes, A review of steady-state thermal and
+mechanical modelling on tubular solar receivers[J], Renew. Sustain. Energy Rev.
+119 (2020) 109591.
+[5] Y.-L. He, S. Du, S. Shen, Advances in porous volumetric solar receivers and
+enhancement of volumetric absorption[J], Energy Rev. 2 (3) (2023) 100035.
+[6] Q. Zhu, Y. Xuan, Pore scale numerical simulation of heat transfer and flow in
+porous volumetric solar receivers[J], Appl. Therm. Eng. 120 (2017) 150–159.
+[7] S. Du, M.-J. Li, Q. Ren, et al., Pore-scale numerical simulation of fully coupled heat
+transfer process in porous volumetric solar receiver[J], Energy 140 (2017)
+1267–1275.
+[8] S. Du, Z.-X. Tong, H.-H. Zhang, et al., Tomography-based determination of Nusselt
+number correlation for the porous volumetric solar receiver with different
+geometrical parameters[J], Renew. Energy 135 (2019) 711–718.
+[9] S. Du, M.-J. Li, Y.-L. He, et al., Conceptual design of porous volumetric solar
+receiver using molten salt as heat transfer fluid[J], Appl. Energy 301 (2021)
+117400.
+[10] J.E.P. Navalho, J.C.F. Pereira, A comprehensive and fully predictive discrete
+methodology for volumetric solar receivers: application to a functional parabolic
+dish solar collector system[J], Appl. Energy 267 (2020) 114781.
+[11] X. Chen, J. Lyu, C. Sun, et al., Pore-scale evaluation on a volumetric solar receiver
+with different optical property control strategies[J], Energy 278 (2023) 128006.
+[12] M. Liu, K. Matsubara, Y. Hasegawa, Adjoint-based shape optimization for radiative
+transfer in porous structure for volumetric solar receiver[J], Appl. Therm. Eng. 246
+(2024) 122899.
+[13] C. Fan, X.-L. Xia, Y. Li, et al., Tomography based pore-level structural optimization
+for reducing pressure drop of porous volumetric solar receiver[J], Sol. Energy
+Mater. Sol. Cells 251 (2023) 112117.
+[14] B. Hoffschmidt, F.M. Tellez, A. Valverde, et al., Performance evaluation of the 200-
+kWth HiTRec-II open volumetric air receiver[J], J. Sol. Energy Eng. 125 (1) (2003)
+87–94.
+[15] A. Kribus, P. Doron, R. Rubin, et al., Performance of the directly-irradiated annular
+pressurized receiver (DIAPR) operating at 20 bar and 1,200◦C[J], J. Sol. Energy
+Eng. 123 (1) (2000) 10–17.
+[16] F. T´ellez, M. Romero, P. Heller, et al. Thermal performance of SolAir 3000 kWth
+ceramic volumetric solar receiver[C]. 12th International Symposium Solar Power
+and Chemical Energy Systems, Oaxaca, Mexico, 2004.
+[17] Z. Wu, Z. Wang, Fully coupled transient modeling of ceramic foam volumetric solar
+air receiver[J], Sol. Energy 89 (Supplement C) (2013) 122–133.
+[18] F. Wang, Z. Guan, J. Tan, et al., Transient thermal performance response
+characteristics of porous-medium receiver heated by multi-dish concentrator[J],
+Int. Commun. Heat Mass Transfer 75 (Supplement C) (2016) 36–41.
+[19] R.R. Ribeiro, M.J.S. de Lemos, Transient behavior and thermal efficiency of
+volumetric heat receivers[J], Int. J. Heat Mass Transf. 149 (2020) 119128.
+[20] S. Sharma, P. Talukdar, Dynamic performance characteristics of a porous
+volumetric solar receiver under transient flux conditions[J], J. Sol. Energy Eng.
+145 (4) (2023) 041009.
+[21] M. Cagnoli, A. Froio, L. Savoldi, et al., Multi-scale modular analysis of open
+volumetric receivers for central tower CSP systems[J], Sol. Energy 190 (2019)
+195–211.
+[22] K.S. Reddy, S. Nataraj, Thermal analysis of porous volumetric receivers of
+concentrated solar dish and tower systems[J], Renew. Energy 132 (2019) 786–797.
+[23] R. Popp, K. Iding, P. Schwarzbozl, ¨ et al., A comparison between model predictive
+and PID-based control of a molten salt solar tower receiver[J], AIP Conf. Proc.
+2815 (1) (2023) 030016.
+[24] M. Abuseada, N. Ozalp, Experimental and numerical study on heat transfer driven
+dynamics and control of transient variations in a solar receiver[J], Sol. Energy 211
+(2020) 700–711.
+[25] L. Li, Y. Li, H. Yu, et al., A feedforward-feedback hybrid control strategy towards
+ordered utilization of concentrating solar energy[J], Renew. Energy 154 (2020)
+305–315.
+[26] W.-Q. Wang, M.-J. Li, J.-Q. Guo, et al., A feedforward-feedback control strategy
+based on artificial neural network for solar receivers[J], Appl. Therm. Eng. 224
+(2023) 120069.
+[27] Y. Qiu, M.-J. Li, Y.-L. He, et al. Optical performance analysis of a porous open
+volumetric air receiver in a solar power tower[C]. 2nd Thermal and Fluid
+Engineering Conference (TFEC2017) and 4th International Workshop on Heat
+Transfer (IWHT2017), Las Vegas, NV, USA, 2017.
+[28] S. Du, Y.-L. He, P. Li. Numerical study on the optical and radiative properties of the
+gradually-varied volumetric solar receiver[C]. 2016 International Conference on
+Applied Energy(ICAE2016), Beijing, China, 2016.
+[29] S. Du, D. Li, M.-J. Li, et al., Numerical study on the effective thermal conductivity
+and thermal tortuosity of porous media with different morphologies[J], Sci. China
+Technol. Sci. 67 (2024) 1685–1694.
+[30] S. Du, Y.-L. He, W.-W. Yang, et al., Optimization method for the porous volumetric
+solar receiver coupling genetic algorithm and heat transfer analysis[J], Int. J. Heat
+Mass Transf. 122 (2018) 383–390.
+[31] B.-C. Du, Y.-L. He, Z.-J. Zheng, et al., Analysis of thermal stress and fatigue fracture
+for the solar tower molten salt receiver[J], Appl. Therm. Eng. 99 (2016) 741–750.
+[32] Y. Qiu, M.-J. Li, W.-Q. Wang, et al., An experimental study on the heat transfer
+performance of a prototype molten-salt rod baffle heat exchanger for concentrated
+solar power[J], Energy 156 (2018) 63–72.
+S. Du et al. Solar Energy 283 (2024) 112984
+8

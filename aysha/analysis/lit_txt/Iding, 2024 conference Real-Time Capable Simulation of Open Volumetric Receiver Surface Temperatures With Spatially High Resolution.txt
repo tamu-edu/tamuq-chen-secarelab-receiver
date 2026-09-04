@@ -1,0 +1,331 @@
+SolarPACES 2022, 28th International Conference on Concentrating Solar Power and Chemical Energy Systems
+Analysis and Simulation of CSP and Hybridized Systems 
+https://doi.org/10.52825/solarpaces.v1i.885
+© Authors. This work is licensed under a Creative Commons Attribution 4.0 International License
+Published: 01 Mar. 2024
+A Real-Time Capable Simulation of Open Volumetric 
+Receiver Surface Temperatures with Spatially High 
+Resolution
+Kevin Iding1,2[https://orcid.org/0000-0001-7968-5134]
+, David Zanger1,2[https://orcid.org/0000-0002-6111-7531]
+, Daniel 
+Maldonado Quinto1[https://orcid.org/0000-0003-2929-8667], and Robert Pitz-Paal1,2[https://orcid.org/ 0000-0002-3542-
+3391]
+1 Institute of Solar Research, German Aerospace Center (DLR), Germany
+2 Chair of Solar Technology, RWTH Aachen University, Germany
+Abstract. The performance of open volumetric receivers can profit from advanced control of 
+the heliostat aim points and the air mass flow. Advanced control techniques like model predic￾tive control and state observer are based on dynamic system models. A suitable model for this 
+purpose is introduced and validated with data recorded at the solar tower Jülich. The model 
+shows good performance with respect to the dynamics of individual absorber cups. The simu￾lation of the whole receiver requires an advanced optimization of the model parameters. 
+Keywords: Open Volumetric Receiver, Solar Tower, Simulation
+1. Introduction
+The surface temperature, its gradients, and transients determine the operational limits of solar 
+thermal receivers. For convenience, these quantities are translated into allowable flux densities 
+that may be supplied by the heliostat field. The allowable flux density is typically calculated in 
+advance as a function of the heat transfer fluid mass flow under steady state conditions. Con￾trol strategies for the heliostat field consequently focus on maintaining these flux limits while 
+minimizing spillage losses to increase the plant efficiency, assuming a steady state of the re￾ceiver.
+The mass flow controller of the receiver, on the other hand, tries to achieve the desired 
+outlet temperature while considering changes in the incident solar power as disturbances. 
+While closed-loop mass flow controllers are state of the art, closed-loop control of the heliostat 
+field is still under development [1]. This is due to the large number of aim points to be controlled 
+and the difficulty of measuring the solar flux density at the receiver surface [2]. 
+In control theory, a state estimator is a well-known concept for determining quantities 
+that are difficult or impossible to measure. Therefore, we propose using a state estimator in￾stead of relying on the solar flux density measurement or ray tracing. The state estimator can 
+incorporate various measurements and simulations of quantities - such as flux density, surface 
+temperature and output temperature - to determine a more reliable system state. However, 
+this requires a sufficiently accurate and fast model of the receiver. Since the model would have
+to predict the thermal behavior of the receiver, this would provide an additional opportunity to 
+overcome the steady-state limits of the allowable flux density. Instead the temperature limits 
+at the receiver surface can be used as constraints for the aim point control. This is particularly
+useful for controlling transient conditions such as clouds, where a static allowable flux density 
+1
+
+Iding et al. | SolarPACES Conf Proc 1 (2022) "SolarPACES 2022, 28th International Conference on Concentrating 
+Solar Power and Chemical Energy Systems" 
+is not appropriate. This contribution focuses on developing and verifying a suitable model 
+which can be used for a state estimator or an enhanced aim point control strategy.
+2. Dynamic Receiver Model
+Figure 1. Single absorber cup (left) and absorber cups and headers (right). 
+2.1 Receiver Design
+This work models the open volumetric receiver at the solar tower in Jülich and is based on the 
+model developed by Jan Gall [3]. The receiver front consists of individual absorber cups. These 
+absorber cups are divided into four sectors. Each sector has its own header element, which 
+mixes the air flowing through the cups to homogenize the temperature. After mixing in the four 
+primary headers, the resulting air flows are further combined in a secondary header. The out 
+flowing air from the secondary header is then directed to either the heat storage or the power 
+block and cooled down. The temperature remains significantly above ambient levels. Conse￾quently the air is rerouted to the receiver and blown through gaps between the absorber cups 
+in front of the receiver, to recover some of the remaining thermal energy. 
+To develop a fast dynamic model, the model is greatly simplified using the following 
+assumptions: 1. Only temperatures are used as state variables. 2. A constant pressure is as￾sumed (isobaric). 3. Heat transfer occurs exclusively within a cup and not between neighboring
+cups. 4. The air temperature within balance spaces is uniform and changes discretely at the 
+boundaries of these spaces. 5. The absorber comb is the only component that stores thermal 
+energy. 
+To model the receiver, the receiver is divided into the absorber cups and the headers.
+2.2 Absorber Cup
+A single absorber consists of three components: a comb structure that provides a large heat 
+transfer surface, a funnel that collects the air behind the comb, and a piece of tubing. The 
+absorber comb is a porous ceramic structure that absorbs the concentrated solar radiation, 
+converts it into thermal energy, and stores it as internal energy. The air flowing through the 
+porous structure acts as a heat transfer medium. It absorbs the energy, transferred by the 
+ceramic and transports it through the air circuit. The funnel has roughly the shape of a trun￾cated pyramid with a square base and a round outlet. It is solid and made of the same material 
+as the comb. The tubing incorporates the end piece of the funnel, some insulation and a steel 
+pipe. This structure must be adequately considered when calculating the heat transmission. 
+From the cylindrical tube, the air flows into the headers.
+2
+
+Iding et al. | SolarPACES Conf Proc 1 (2022) "SolarPACES 2022, 28th International Conference on Concentrating 
+Solar Power and Chemical Energy Systems" 
+2.3 Energy balances 
+Fig. 1 illustrates the energy balances of a single absorber. The absorber cup is discretized into 
+a heating zone and a transport zone. The heating zone represents the absorber comb which 
+absorbs the solar irradiation. The transport zone consists of the absorber tub and the two pipe 
+sections. It would also be possible to treat each part as an individual balance space. However, 
+since the temperature does not change along these components, one balance space combines 
+these three parts.
+Since the absorber surface heats up faster than the back, the comb is discretized into 
+two parts. The front part and the back part. The energy balance around the front part (see 
+Fig. 1) yields the following equation
+U̇
+abs,front =Q̇
+sol -Q̇
+loss, conv -Q̇
+loss,rad -Q̇
+comb,front -Q̇
+cond (1)
+Here, 𝑈𝑈̇
+abs,front describes the change in internal energy of the comb, Q̇
+comb,front the heat transfer 
+between the absorber comb and the incoming air and Q̇
+sol the solar irradiation absorbed by 
+the comb. The loss terms Q̇
+loss,conv and Q̇
+loss,rad represent the thermal loss due to wind and 
+radiation respectively. Q̇
+cond considers the conductive heat transfer to the back comb. The 
+internal energy rate can be expressed as
+U̇
+abs=mabscabs
+dTabs
+dt (2)
+with mabs and cabs describing the absorber mass and heat capacity respectively.
+Q̇
+sol=ξsol αsol
+Psol=ξsolαsolAabsF (3)
+Where ξsol is the fraction of the total absorbed energy absorbed by the front part of the comb. 
+Correspondingly �1 − ξsol� is the fraction which is absorbed in the back part. The amount de￾pends on the comb geometry of the comb and the angle of incidence of the concentrated 
+sunlight. On the other hand, αsol is material dependent and denotes the absorption coeffi￾cient. The quantity F is the flux density and multiplied by the absorber front surface Aabs re￾sults in the solar power Psol. The loss due to convection Q̇
+loss,conv cannot be clearly distin￾guished from a low air return ratio which is described below, as the air in front of the receiver 
+is sucked into it. Furthermore, modelling of wind disturbance and its influence on convective 
+heat losses and the air return ratio is highly complex and subject to current research. Conse￾quently, the convective loss is set to zero and only implicitly considered within the air return 
+ratio.
+The loss due to the radiation of the hot absorber cup can be described by the 
+Stefan-Boltzmann law
+Q̇
+loss,rad=ϵσAabs�Tabs,front
+4 -Tamb
+4 � (4) 
+with the Stefan-Boltzmann constant σ and the ambient temperature Tamb . To keep the model 
+simple αsol and emission coefficient ϵ are set equally. 
+Furthermore, Q̇
+comb,front can be written as the differences of the enthalpy of the incom￾ing air with Tinlet,1 and the air leaving the front comb with Tinlet,1b.
+Q̇
+comb,front =Ḣ
+inlet,1b-Ḣ
+inlet,1
+=ṁ abs⋅�hinlet,1b-hinlet ,1�=αcomb,front Acomb,front�Tabs,front-Tm,front�, (5) 
+3
+
+Iding et al. | SolarPACES Conf Proc 1 (2022) "SolarPACES 2022, 28th International Conference on Concentrating 
+Solar Power and Chemical Energy Systems" 
+where αcomb,front is the heat transfer coefficient and Acomb,front is the contact area between the 
+absorber comb and air. The convective air temperature is calculated from the incoming Tinlet,1 
+and outgoing Tinlet,1b air temperature by
+Tm,front=�1-wT,front�Tinlet,1+wT,backTinlet,1b (6) 
+wT,front represents an adjustable parameter. Finally, Q̇
+cond can be expressed by 
+Q̇
+cond=λcomb⋅
+Asolid⋅�Tabs,front-Tabs,back�
+lcomb/2 (7)
+Where Asolid is the solid surface area between front and back lcomb the depth of the absorber
+and λcomb is the heat conduction coefficient of the ceramic.
+Tinlet ,1 can be derived from an energy balance around the air in front of the comb (see Fig. 1).
+Hinlet ,1=arr⋅hreturn,1+(1-arr)⋅hamb (8) 
+where arr is the air return ratio, which indicates the fraction of returned air that flows back into 
+the absorber. One could also rewrite the specific enthalpy as the product of the heat capacity 
+and the temperature h=cp(T)T. However, to save computational costs the function h(T) and its 
+inverse T(h) is approximated by a third-order polynomial for all air streams. 
+Analogously, the equations for Tabs,back can be derived. However, for the back no radi￾ation loss is considered. The new unknown hreturn,1 can be calculated from energy balances 
+around the transport zone. 
+2.4 Transport Zone
+The energy balance around the transport zone of the returned air (see Fig. 1) yields
+ṁ abshreturn,1 =ṁ abshreturn, 2+Q̇
+loss,i→r (9) 
+Here, Q̇
+loss,i→r is the heat flow from the hot inlet air to the return air, which is described by
+Q̇
+loss,i→r=αi→r⋅Ai→r⋅�Tinlet,2-Treturn,3� (10) 
+where αi→r is the heat transfer coefficient and Ai→r the corresponding area for the heat trans￾fer. To reduce computational costs the coefficient αi→r is approximated by a third-order poly￾nomial fitted to a detailed model of the radial heat transfer through the pipe and insulation 
+and using the Nusselt correlation for annular gaps and pipes. The polynomial depends only
+on the mass flow and the inlet temperature Tinlet ,2. Thus, the polynomial does not depend on 
+the temperature Treturn,3 as it was found to have a rather small influence in the considered op￾erating temperature range. 
+The temperature of the return air Treturn,3 is a measured variable in the power plant and 
+therefore known. The last unknowns are Tinlet,1b and Tinlet,2, which can be derived from an en￾ergy balance around the air in the absorber comb
+0=ṁ abs�hinlet,1-hinlet,1b�+Q̇
+comb,front (11) 
+0=ṁ abs�hinlet,1b-hinlet,2�+Q̇
+comb,back (12) 
+Combining all the stated equations results in a differential-algebraic equation system with two
+ordinary differential equations and two algebraic equations. With Tabs, front and Tabs, back as the 
+4
+
+Iding et al. | SolarPACES Conf Proc 1 (2022) "SolarPACES 2022, 28th International Conference on Concentrating 
+Solar Power and Chemical Energy Systems" 
+states, and Tinlet,1b and Tinlet,2 as the algebraic variables. When solving this system, the out￾going air temperature Tinlet,3 can be calculated by an energy balance around the transport zone 
+of the inlet air by
+hinlet ,3=hinlet ,2-
+Q̇
+loss ,i→r
+ṁ abs
+(13) 
+The temperature Tinlet,3 can then be calculated from the inverse function T(h). 
+With all these equations, the whole absorber cup is defined. To compute the output for 
+an array of absorber cups each output can be calculated individually. To increase the perfor￾mance, the output of the individual cups can be computed in parallel. The output temperature 
+Tinlet,3 is then used in the equations for the header modules.
+2.5 Header
+The outflowing air of each cup is mixed in one of the four primary headers. Each primary 
+header has a rectangular form and takes the air from the same amount of absorber cups. The 
+enthalpy of the mixture is given by
+Ḣ
+inlet,3,mixed = ∑i ṁ abs,i⋅hinlet,3,I (14) 
+The enthalpy flow of the outflowing air can be derived from an energy balance around the 
+header, given by
+Ḣ
+inlet,4=Ḣ
+inlet,3,mixed +Q̇
+loss,header,1 (15) 
+with Q̇
+loss, header,1 being the heat losses through the header walls, given by 
+Q̇
+loss,header,1=αheader,1⋅Aheader,1⋅�Tinlet,3,mixed-Tamb�. (16) 
+With the heat transfer coefficient αheader,1 and the respective heat transfer surface Aheader,1.
+αheader,1 is calculated by converting the funnel-shaped header into an equivalent cylindrical 
+shape. The equations for the secondary header can be derived analogously. The resulting 
+energy balances yield an equation for the output temperature of the whole receiver Tinlet,5.
+The final missing element is how to calculate the individual mass flows of each ab￾sorber cup from the mass flow through the whole receiver, which can be measured. To calcu￾late the individual mass flows it has to be considered that each absorber cup has an individual 
+orifice plate, which was optimized for a predefined flux density distribution. As no pressure 
+state is considered and also the Reynolds number is sufficiently high enough for the consid￾ered mass flow ranges, the actual mass flow of each absorber cup is proportional to the square 
+of the orifice diameter, i.e.
+ṁ ~ dplate 
+2 (17) 
+Hence, the mass flow of one absorber cup can be calculated explicitly from the total mass flow 
+through the whole receiver ṁ rec using the formula
+ṁ abs,i=ṁ rec⋅ dplate,i
+2
+∑ncups 
+j dplate ,j
+2 . (18) 
+5
+
+Iding et al. | SolarPACES Conf Proc 1 (2022) "SolarPACES 2022, 28th International Conference on Concentrating 
+Solar Power and Chemical Energy Systems" 
+3. Results
+3.1 Test Setup
+For the parametrization and validation of the receiver model, test data were recorded at the 
+solar tower Jülich. The surface temperature and the solar flux on the receiver were measured 
+with camera based systems [2]. The air temperatures were taken from the distributed control 
+system. 
+Figure 2. Results of the simulation of a single absorber cup depicting the temperature of the 
+absorber surface and the air temperature directly behind the absorber cup.
+Figure 3. Results of the simulation of the whole receiver depicting the average front temper￾ature of the absorber surface and the air temperature behind the secondary header.
+The test data were recorded during a time slot with almost constant direct normal irradiation 
+and without cloud transients. Transients were introduced by defocusing and refocusing of he￾liostats. The mass flow was controlled with a feedback controller using the temperature behind 
+the secondary header. 
+6
+
+Iding et al. | SolarPACES Conf Proc 1 (2022) "SolarPACES 2022, 28th International Conference on Concentrating 
+Solar Power and Chemical Energy Systems" 
+3.2 Validation 
+In order to reduce modelling inaccuracies, parameters susceptible to high uncertainties are 
+estimated using a gradient based technique starting from reasonable initial values and con￾strained within reasonable limits, prior to model application. At the solar tower Jülich, only a 
+small number of absorber cups provide a temperature measurement directly behind the ab￾sorber cup that corresponds to the temperature Tinlet,3 of the introduced model. Therefore, 
+simulations of single absorber cups as well as simulations of the whole receiver are presented.
+The single absorber cup is simulated with a temporal resolution of 1 second, resulting 
+in 1300 time steps for a time slot of about 22 minutes. The time slot starts from approximately 
+steady state conditions at a mass flow of 8 kg/s and an air temperature of 750 K. The solar flux 
+decreases two times for a short and a long period of time, resulting in lower temperatures and 
+due to the mass flow controller, a decreasing mass flow.
+The results of a simulation of a single cup are compared with the corresponding meas￾urements in Fig. 2. The front temperature Tabs,front as well as the temperature Tinlet,3 of the air 
+directly behind the cup show good agreement. The root mean square error (rmse) of the front 
+temperature is 6.78 K, while the rmse of the simulated air temperature is 7.51 K.
+The entire receiver, consisting of 1080 absorber cups, is simulated with a temporal 
+resolution of 10 seconds. The same time slot as before is chosen. The mean flux on the re￾ceiver surface is shown in Fig. 3, which is below the measured flux on the chosen cup in Fig. 
+2. The mean values of the averaged absorber cup front temperature show a significantly higher 
+deviation between simulation and measurements. The root mean square error is 75.5 K. The 
+air mixture temperature shows a better agreement between simulation and measurements, 
+resulting in a root mean square error of 11.7 K.
+3.3 Real Time Capability 
+By decoupling the dynamics of individual absorber cups, the partial differential equations for 
+each absorber cup can be integrated individually before the resulting air mixture temperature 
+is calculated. This way, a state observer could profit from multiple processor cores. First ex￾periments with a moving horizon estimator showed that one absorber cup can be simulated 
+for 10 steps in around 50 ms on an Intel Core i7-10850H. Thus, using 8 cores would result in 
+around 6 s simulation time for the whole receiver.
+4. Conclusion
+The accuracy of the model is very good when simulating of a single absorber cup, but the 
+model performs significantly worse when all receiver cups are considered. Since Fig. 2 and 3 
+do not show significantly different dynamics, the authors conclude that the model should be 
+suitable for predicting the dynamics of the whole system. Reasons for the divergence are dis￾cussed below. 
+ The parameters for the simulation of a single absorber cup are optimized only for that
+single cup. In contrast, the simulation of the entire receiver is performed with a constant set of
+parameters for all absorber cups. However, an inhomogeneous parameter set may be appro￾priate. The mass flow is highly inhomogeneous due to different orifice diameters in the air flow 
+behind the absorber cup. Furthermore, the mass flow in every single absorber cup can only be 
+approximated with Eq. 18, as there are additional flow resistances. The mass flow obviously 
+affects the energy balances mentioned above. In addition, Tiddens et al. [4] showed that the 
+air return ratio is mass flow dependent with respect to the entire receiver. This is likely to be 
+true for individual absorber cups as well. Furthermore, the original design of the receiver was 
+adopted with an external air return system to improve the performance [5]. This may also result 
+7
+
+Iding et al. | SolarPACES Conf Proc 1 (2022) "SolarPACES 2022, 28th International Conference on Concentrating 
+Solar Power and Chemical Energy Systems" 
+in inhomogeneous air return ratios regarding the location of individual absorber cups. Finally, 
+the heat transfer coefficients are affected by the air flow, which may also result in different 
+correction factors for the applied Nusselt correlations.
+This study also aimed at developing a model of the open volumetric receiver with high
+spatial resolution while keeping the computational complexity low, in order to be applicable for 
+state estimation and model predictive control. Using a moving horizon estimator with a horizon
+of 10 steps results in a simulation time of 6 s. This may be appropriate for non-transient sce￾narios and many transient cloud scenarios. However, for some fast-moving clouds, the simu￾lation time may be too long. 
+5. Outlook
+The authors plan to optimize the parameters of the model, which should result in mean square 
+errors for the whole receiver being in the same range as for the single absorber cup. Further￾more, the authors plan to use the model within a moving horizon estimator for state estimation. 
+Finally, the model will be used within an improved heliostat field control that incorporates pre￾dictions of temperature gradients on the receiver surface and respects the corresponding lim￾its. Additionally, the performance of the open volumetric receiver could benefit from homoge￾nous temperatures of the air leaving the absorber cups. This would reduce exergy losses due 
+to mixing of different temperature flows and avoid unnecessarily high radiative losses. How￾ever, this temperature is not known for every single cup. The presented model allows to deduce 
+this quantity and consider it within the control of the heliostat aimpoints.
+Data availability statement
+The data are not published due to legal issues. In case of interest, please consult the corre￾sponding author (kevin.iding@dlr.de).
+Author contributions
+Conceptualization, methodology, formal analysis, software, investigation, writing - original draft 
+and visualization: K.I. and D.Z.; writing - review and editing: D.M.Q.; supervision: D.M.Q and 
+R.P.-P.
+Competing interests
+The authors declare that they have no competing interests.
+References
+1. D. Acosta, J. Garcia, M. Sanjuan, L. Oberkirsch, and P. Schwarzbözl, “Flux-feedback as 
+a fast alternative to control groups of aiming points in molten salt power towers,” Solar 
+Energy, vol. 215, pp. 12–25, doi: 10.1016/j.solener.2020.12.028.
+2. M. Offergeld, M. Röger, H. Stadler, P. Gorzalka, and B. Hoffschmidt, “Flux density 
+measurement for industrial-scale solar power towers using the reflection off the ab￾sorber,” in SOLARPACES 2018: International Conference on Concentrating Solar 
+Power and Chemical Energy Systems, Casablanca, Morocco, 2019, p. 110002.
+3. J. Gall, “Betriebsführung und -optimierung eines solarthermischen Turmkraftwerkes,” 
+RWTH, IRT, Düsseldorf, 2012.
+8
+
+Iding et al. | SolarPACES Conf Proc 1 (2022) "SolarPACES 2022, 28th International Conference on Concentrating 
+Solar Power and Chemical Energy Systems" 
+4. A. Tiddens, M. Röger, H. Stadler, and B. Hoffschmidt, “Air return ratio measurements at 
+the solar tower Jülich using a tracer gas method,” Solar Energy, vol. 146, pp. 351–358, 
+2017, doi: 10.1016/j.solener.2017.02.027.
+5. H. Stadler, A. Tiddens, P. Schwarzbözl, F. Göhring, T. Baumann, and J. Trautner, “Im￾proved performance of open volumetric receivers by employing an external air return 
+system,” Solar Energy, vol. 155, pp. 1157–1164, 2017, doi: 
+10.1016/j.solener.2017.07.050.
+9

@@ -1,0 +1,2144 @@
+Full Review Article
+Advances in porous volumetric solar receivers and enhancement of
+volumetric absorption
+Ya-Ling He a,*
+, Shen Du a
+, Sheng Shen b
+a Key Laboratory of Thermo-Fluid Science and Engineering of Ministry of Education, School of Energy and Power Engineering, Xi'an Jiaotong University, Xi'an, Shaanxi,
+710049, China
+b Department of Mechanical Engineering, Carnegie Mellon University, Pittsburgh, PA, 15213, USA
+ARTICLE INFO
+Keywords:
+Porous media
+Volumetric solar receiver
+Experiment progress
+Direct pore-scale simulation
+Volume averaging simulation
+Volumetric absorption enhancement
+ABSTRACT
+Porous volumetric solar receivers are one type of solar receivers that can volumetrically absorb solar radiation and
+achieve efficient solar-to-thermal energy conversion. Porous volumetric solar receivers have been developed since
+1980s. In this review, we focus on the development progress of the atmospheric and pressurized porous volu￾metric solar receivers, in which the structural designs, the material selections, the experimental research methods,
+the comparison of thermal performance, and the transient response characteristic of the receivers were reviewed.
+On the other hand, the theoretical research methods including the direct pore-scale and volume averaging sim￾ulations were introduced. The pore-scale reconstruction method and the procedure to investigate the fluid flow
+and heat transfer processes at the pore-scale were presented. For the volume averaging method, detailed de￾scriptions for the selection of empirical parameters in the governing equations to be solved were summarized.
+Typical research results based on these methods were presented and research limitations were also pointed out.
+Furthermore, the methods for the enhancement of volumetric absorption and the improvement of thermal effi￾ciency of the receivers have been comprehensively reviewed. Two methods including geometrical parameters
+optimization and spectrally selective absorption were presented in detail. This review will provide a better un￾derstanding of the development and research methods for porous volumetric solar receivers, and inspire future
+studies for the performance improvement of the receivers.
+1. Introduction
+The large-scale application of clean, low-carbon renewable energies
+has become a global consensus to resolve pressing issues such as climate
+change, environmental pollution, and energy shortage. Among various
+types of renewable energies, solar energy has a bright prospect due to its
+vast amount, clean utilization and easy access. In order to overcome the
+major problems associated with solar energy harvesting such as low
+energy density and inefficient energy conversion, concentrating solar
+power (CSP) technology has become one of important methods to
+convert solar energy to electricity. Based on the CSP Gen3 demonstration
+roadmap, the operation temperature of the system should be further
+elevated to above 700 C for realizing the targeted 50% solar-to￾electricity conversion efficiency [1,2]. However, there still exist many
+challenges in the solar receiver design, high temperature material se￾lection, energy storage subsystem optimization. In a CSP system, the solar
+receiver is directly irradiated by solar radiation and its safe and
+high-efficiency operation is the key to increase the overall
+solar-to-electricity conversion efficiency and reduce the levelized cost of
+energy (LCOE) [3,4].
+Based on the solar absorption process, solar receivers could be mainly
+divided into three types: tubular receiver, volumetric receiver, and par￾ticle receiver. The tubular receiver absorbs solar radiation on its outer
+surface and conducted the thermal energy to the heat transfer fluid inside
+the tube. The low thermal conductivity of high temperature alloy and the
+low convective heat transfer coefficient between tube and heat transfer
+fluid create a large thermal resistance, which leads to high receiver
+temperature and large thermal radiative loss [5,6]. Despite using the
+fluid to absorb and transfer heat, the particle receiver converts and stores
+solar energy based on solid particles. Depending on the flow direction of
+the solid particles, the particle receiver could be further divided into
+downflow, upflow, and horizontal flow types. The light leakage, particle
+flow control, and corrosion issues should be examined to improve the
+performance of the particle receiver [7,8]. On the other hand, the volu￾metric solar receiver distributes the incoming solar radiation into a three
+* Corresponding author.
+E-mail address: yalinghe@mail.xjtu.edu.cn (Y.-L. He).
+Contents lists available at ScienceDirect
+Energy Reviews
+journal homepage: www.journals.elsevier.com/energy-reviews
+https://doi.org/10.1016/j.enrev.2023.100035
+Received 18 March 2023; Received in revised form 16 June 2023; Accepted 16 June 2023
+2772-9702/© 2023 The Authors. Published by Elsevier Ltd on behalf of Shenzhen City Clean Energy Research Institute, Shenzhen University. This is an open access
+article under the CC BY-NC-ND license (http://creativecommons.org/licenses/by-nc-nd/4.0/).
+Energy Reviews 2 (2023) 100035
+
+dimensional space. The concentration of solar flux on the receiver surface
+is reduced and the maximum allowable solar flux on the aperture of the
+receiver is increased.
+In general, the volumetric absorption of solar radiation could be
+implemented by both the heat transfer fluid and porous media. The
+commonly used heat transfer fluids have low extinction coefficients to
+solar radiation and nanoparticles made of metals, nonmetallic oxides,
+and carbon materials are usually introduced [9,10] to form nanofluids, as
+shown in Fig. 1(a). By changing the particle type, size, and concentration,
+the optical properties of the nanofluids could be adjusted and the solar
+radiation could be gradually absorbed. In order to overcome the stability
+issue of nanofluids, the concentrated solar power on demand (CSPonD)
+[11,12] proposed a collocated receiver and storage system based on the
+solar radiation absorption by molten salt as shown in Fig. 1(b). Due to the
+low extinction of molten salt, the entire depth of the molten salt tank
+should be over several meters.
+On the other hand, porous materials are widely used for solar ab￾sorption due to its large porosity and interconnected porous skeleton.
+The common porous structures include honeycombs, wire meshes,
+packed beds, and foams made from metallic or ceramic materials. The
+solar absorption and conversion processes inside the porous media are
+illustrated in Fig. 1(c). The concentrated solar radiation penetrates into
+the porous structure and is gradually absorbed. The heat transfer fluid
+(normally air) passes through the porous structure and exchange heat
+with the high temperature porous skeleton. In the ideal case, the fluid
+and porous medium temperature increases gradually along the main flow
+direction, which means that the receiver surface temperature is greatly
+reduced and this phenomenon is known as a volumetric effect [16,17].
+Porous volumetric solar receivers show potential for increasing the
+solar-to-thermal conversion efficiency, but the heat transfer character￾istics such as strong coupling, multiscale, and multimode pose challenges
+in experimental and numerical analyses. Firstly, a set of parameters such
+as geometries, optical and thermophysical properties of the porous media
+as well as the incident solar radiation distribution simultaneously influ￾ence the fluid flow and heat transfer processes in porous volumetric solar
+receivers. Secondly, the small scale of porous channels and the large scale
+of CSP systems require multiscale modeling of fluid flow and heat
+transfer in the porous volumetric solar receiver. Thirdly, multiple heat
+transfer mechanisms such as solar radiation transfer, heat conduction in
+the porous media, convective heat transfer between the porous skeleton
+and the heat transfer fluid, and radiative heat transfer create difficulties
+in evaluating the performances of the porous volumetric solar receiver.
+Therefore, many efforts have been taken on the porous volumetric solar
+receiver to delve deeply into the heat transfer process and put forward
+new methods for enhancing volumetric absorption.
+In this review, the development of porous volumetric solar receivers
+is elaborated and the progresses in experimental and numerical studies
+are thoroughly reviewed. The methods to enhance the volumetric ab￾sorption and improve the thermal performance of porous volumetric
+solar receivers are comprehensively summarized.
+2. Advances in experiment research on porous volumetric solar
+receivers
+The porous volumetric solar receiver could be categorized as atmo￾spheric (open) and pressurized types, and the main difference is the
+operating pressure of the heat transfer fluid. The major component of
+these two types of receivers is a porous structure, which usually uses high
+temperature resistant materials such as nicked-based superalloy (Inconel
+600, Inconel 601, Alloy 230) and refractory ceramics (SiSiC, reSiC).
+Based on the intrinsic absorption or coating material, the incident solar
+radiation can be efficiently and gradually absorbed inside the porous
+structure. The typical structures of atmospheric and pressurized porous
+volumetric solar receivers are presented in Fig. 2. Atmospheric porous
+volumetric solar receivers have the porous structure, supporting struc￾ture, and air channel. The porous structure is directly exposed to the
+Nomenclature
+a absorption coefficient
+cf inertia coefficient
+Dp particle diameter (m)
+d diameter (m)
+g asymmetry factor
+h convective heat transfer coefficient (W/(m2
+⋅K))
+K permeability (m2
+)
+Nu Nusselt number
+n refractive index
+Pr Prandtl number
+p pressure (Pa)
+q Heat flux (W/m2
+)
+Re Reynolds number
+T temperature (K)
+U superficial velocity (m/s)
+Greek symbols
+β extinction coefficient (m-1)
+ε porosity
+λ thermal conductivity (W/(m⋅K))
+μ dynamic viscosity (Pa⋅s)
+σ λ Stefan-Boltzmann constant
+σs scattering coefficient
+Subscripts
+c cell
+d diameter
+eff effective value
+f fluid
+h hydraulic
+r radiation
+s solid
+Fig. 1. Volumetric absorption of solar energy (a)Nanofluids (Reproduced with permission [13]. Copyright 2012, Elsevier); (b)Molten salts (Reproduced with
+permission [14]. Copyright 2018, Elsevier); (c)Porous media (Adapted with permission [15]. Copyright 2020, Elsevier).
+Y.-L. He et al. Energy Reviews 2 (2023) 100035
+2
+
+incident solar radiation in atmosphere, and the ambient air is directly
+sucked into the receiver. In order to scale up the system and conveniently
+replace the damaged porous structure, the large-scale atmospheric
+porous volumetric solar receiver usually adopts a modular design.
+As for the pressurized porous volumetric solar receiver, more complex
+structures need to be designed for maintaining the high operating pres￾sure, which could reach up to 2 MPa. In general, a highly transparent
+window is necessary for sealing the cavity and allowing the solar radia￾tion to pass through. It should endure high temperature, large thermal
+stress, and high pressure while having high transparency in the solar
+spectrum. For efficiently reducing the window temperature, the inlet air
+is usually directed to the window to cool it down and the preheated air is
+beneficial for increasing the overall thermal efficiency. The secondary
+concentrator is usually equipped to the pressurized porous volumetric
+solar receiver, which offers possibility to further increase the air outlet
+temperature to above 1000 C. However, the poor design and limited
+machining precision may lead to non-uniform solar flux distribution and
+large thermal stress. For example, the poor adhesive between the mirror
+and background may cause breakage in the mirrors from overheating.
+Additional water-cooling subsystem is needed to reduce the high tem￾perature of the secondary concentrator which increases the complexity
+and unreliability of the system.
+2.1. Development progress in the porous volumetric solar receivers
+Experimental research on porous volumetric solar receivers began in
+the 1980s. Fricker applied a wire mesh as the absorber and installed it on
+the solar dish [20]. The air passed through the wire mesh and reached
+842 C at the outlet of the receiver. Based on this solar thermal energy
+utilization method, the porous volumetric solar receiver has been
+extensively studied. Sulzer 1 and Sulzer 2 were the pilot receivers with
+output power over 200 kWth, which were both integrated into the CSP
+system at Plataforma Solar de Almeria (PSA) [20,21]. Despite the lower
+thermal efficiency compared with the estimated value, the Sulzer tech￾nology has accumulated experience in system operation and receiver
+transient performance testing. In 1993, Phoebus-TSA was tested at PSA
+which was the first megawatt-scale atmospheric porous volumetric solar
+receiver [22]. Its modular receiver was in the hexagon shape with a
+diameter of 280 mm and the entire aperture diameter of the receiver was
+3400 mm. The outlet air temperature and the output power of the
+receiver reached 700 C and 2.9 MW, respectively. The Phoebus-TSA also
+introduced the air-return system to reutilize the thermal energy of the
+exhaled air. The thermal efficiency reached 85% when the air return ratio
+and the outlet temperature were 60% and 700 C, respectively. More￾over, the Phoebus-TSA attempted to integrate thermal storage, steam
+generator, and electric power generation subsystems. The steam tem￾perature and pressure ranges were 480-540 C and 3.5-15 MPa, respec￾tively [20,23]. It is known that the outlet temperature of air is usually
+limited by the maximum allowable temperature of the porous media.
+Therefore, German Aerospace Center (DLR) promoted the application of
+ceramic materials for the porous volumetric solar receiver. In the same
+period of Sulzer, the CeramTec made of SiSiC was designed by DLR which
+had a staggered layout of the front. The reduced front surface decreased
+the reflective loss such that the maximum outlet air temperature reached
+782 C[24]. Hereafter, many ceramic atmospheric porous volumetric
+solar receivers were designed and tested, in which HiTRec and SOLAIR
+made this technology mature [25]. The honeycomb SiC porous structure
+was selected by HiTRec [26] and SOLAIR [27], and the modular design
+concept and air return system were adopted. The outlet air temperature
+of 800 C was achieved with the thermal efficiency exceeding 80% for
+HiTRec I, HiTRec II, and SOLAIR 200. Compared with SOLAIR 200, the
+SOLAIR 3000 system further raised the number of modular receivers
+from 36 to 270, and the incident solar power reached 2950 kW [20,28].
+In 2009, Solar Tower Jülich shown in Fig. 3 applied the technology of
+HiTRec and was in solar operation for a long period of time [29,30].
+Under the solar only operation mode, the outlet air temperature achieved
+650 C and a 1 MW electric power was delivered to the regional grid.
+On the other hand, coupling the CSP system with the combined cycle
+can improve solar energy utilization efficiency and reduce the LCOE,
+which promotes the development of the pressurized porous volumetric
+solar receiver. DLR developed PLVRCs (Pressure Loaded Volumetric
+Ceramic Receiver) with rated thermal power of 5 kW and 500 kW and put
+them into test in the solar furnace of Sandia and PSA, respectively [19].
+The outlet air temperature of PLVRC-5 achieved 1000 C while the air
+pressure was kept at 0.42 MPa. However, the performance of PLVRC-500
+deviated largely from the design condition due to the insufficient cooling
+in the secondary concentrator and the non-uniform air mass flow dis￾tribution. REFOS [32,33] applied wire meshes as the absorber and
+improved the secondary concentrator design to improve the optical ef￾ficiency. During the test in PSA, the outlet air temperature achieved 800
+C but the cracks in the transparent window was also observed.
+Directly-Irradiated Annular Pressurized Receiver (DIAPR) [34] designed
+by Weizmann Institute of Science utilized a frustum-like high-pressure
+window, which improved the capability of withstanding high pressure
+(1.7-2.0 MPa). It arranged the absorbers with porcupine blocks, and the
+enhanced convective heat transfer led to a high outlet air temperature of
+1200 C with a thermal efficiency of 71%. Based on the technologies of
+REFOS and DIAPR, SOLGATE [35] and DIAPR multistage [20] connected
+the cavity receiver and the pressurized porous volumetric solar receiver
+for efficient utilization of solar radiation with different intensities. For
+example, SOLGATE arranged the low temperature receiver and the high
+temperature receiver in series and preheated the air in the low temper￾ature receiver. The outlet air temperature achieved 800 C, which
+generated electric power of 230 kW. Despite that Soltrec [36] and other
+studies [37,38] conducted at the lab-scale further investigated the per￾formance of pressurized porous volumetric solar receivers, the develop￾ment of this type of receivers was slow and no receiver at large scale was
+built. Considering for the high efficiency of combined cycle and the
+simple scheme of atmospheric porous volumetric solar receivers, the
+CAPTure project introduced regenerative heat exchangers and combined
+these two technologies [39]. The atmospheric heating and pressurized
+cooling processes were separated as shown in Fig. 4, and the
+Fig. 2. Schematics of porous volumetric solar receivers (a)HiTRec type [18] Reproduced under the terms of the CC-BY licenses; (b) PLVCR500 (Reproduced with
+permission [19]. Copyright 1991, Elsevier).
+Y.-L. He et al. Energy Reviews 2 (2023) 100035
+3
+
+solar-to-electric efficiency of the solar combined cycle was 29.6% under
+500 suns. Recently, Zaversky et al. [40,41] presented that the combined
+cycle introduced by CAPTure project was not economically competitive
+and in-field test encountered critical issues related to the turbine start-up.
+A hybrid CSP power plant coupled with compressed air energy storage
+was proposed which showed potential to increase the shares of renew￾ables for the future power grid.
+2.2. Thermal efficiency analysis of porous volumetric solar receivers
+The outlet air temperature and the thermal efficiency are the two key
+indicators to evaluate solar receivers. The outlet air temperature is
+determined by many factors such as the intensity and distribution of
+incident solar radiation, the air mass flow rate and distribution, as well as
+the structure and geometrical parameters of the porous media. The
+higher the outlet air temperature is, the more efficient the power cycle is.
+The higher thermal efficiency of the receiver could be achieved by
+limiting the thermally conductive, convective and radiative losses. A
+higher thermal efficiency means that the solar radiation is effectively
+captured, absorbed and converted.
+The thermal efficiency of a receiver is defined as the ratio of absorbed
+energy by the heat transfer fluid and the total incident solar energy. As
+for the absorbed energy by the receiver, the direct or indirect measure￾ments could be used. The inlet and outlet air temperatures can be
+monitored by the thermocouples, and the absorbed energy can be
+calculated by temperature increase and air mass flow rate. In the ex￾periments, the non-uniform distribution of solar radiation usually leads
+to a non-uniform distribution of air temperature. Therefore, more ther￾mocouples are needed for measuring the air temperature distribution. On
+the other hand, the indirect method based on the energy conservation
+could also be applied to evaluated the thermal efficiency. Despite
+monitoring the fluid temperature, the indirect method measures the
+absorbed energy by the heat transfer fluid by applying a heat exchanger
+to cool down the air, which can be evaluated based on the temperature
+variation and efficiency of the heat exchanger. Ideally, the absorbed
+energy by the heat transfer fluid can be all removed by the heat
+exchanger. One advantage of the indirect method is that the measure￾ment of air mass flow rate is no longer needed.
+The incident solar radiation distribution could also be measured by
+direct and indirect methods. The direct method applied heat flux gage to
+measure the solar flux in the aperture of the receiver. In order to capture
+the solar flux map, multiple gages arranged regularly are usually needed.
+In these studies [21,24,42,43], multiple heat flux gages were placed in a
+cross shape and the solar flux in the two perpendicular directions is
+captured. This measurement presents a small deviation as the solar flux
+distribution is centrosymmetric. In HiTRec II, a special heat flux gage
+with a quick response time was adopted and installed on a mobile bar
+[26]. The mobile bar swept through the receiver aperture and quickly
+recorded solar flux data at different positions. Apparently, this quick
+response heat flux gage offered a higher spatial resolution but required
+delicate system design and components coordination. At the lab scale, the
+diameter of solar flux is relatively small and the heat flux gage could be
+precisely moved by the mapping system [44]. The indirect method uses
+the Lambertian target and CCD camera to capture the grey level image of
+solar radiation. The intensity of solar radiation is linked to the grey level
+of the image which is calibrated by the heat flux gage at one fixed po￾sition, such as HERMES and ProHERMES [45]. In this method, the
+Lambertian target can be a large plate which covers the entire receiver
+Fig. 3. Solar Tower Jülich volumetric solar receiver (Reproduced with permission [31]. Copyright 2017, Elsevier).
+Fig. 4. CAPTure project solar combined cycle (Reproduced with permission [40]. Copyright 2022, AIP Publishing).
+Y.-L. He et al. Energy Reviews 2 (2023) 100035
+4
+
+aperture or a small mobile plate which cooperates with the camera for
+continuous shooting. For the large scale solar receiver where the Lam￾bertian target is not easy to be placed, the surface of the solar receiver can
+be used as the target as presented in the Solar Tower Jülich system [29].
+Compared with the direct method, the indirect method offers a high
+spatial resolution and quick measurement. But the calibration of the
+measurement systems has become a major difficulty due to the non-linear
+relationship between the grey level image and the heat flux map as well
+as the spectral reflectivity of the target.
+Fig. 5 summarized the experimental tests results including the outlet
+air temperature and the thermal efficiency of porous volumetric solar
+receivers since 1980s. The porous volumetric solar receiver was catego￾rized into three groups as follows: receiver with no air return system or
+preheating, receiver with air return system, and receiver with preheating.
+In general, the atmospheric porous volumetric solar receiver with air
+return system can increase the air outlet temperature while giving a
+higher thermal efficiency. In HiTRec, SOLAIR, and TSA, the air return
+ratio was controlled in the range of 40%-60%. It was estimated that the
+thermal efficiency could be improved by 8% when the air return ratio
+increases from 60% to 80% when maintaining the air outlet temperature
+at 650 C[31]. Most of the receivers with preheating were the pressur￾ized type, and only Bechtel atmospheric porous volumetric solar receiver
+was designed to have a Pyrex globe for preheating the inlet air. Under
+different experimental cases, the temperature increases of air due to the
+preheating could account for 20%-30% of the total air temperature in￾crease [43]. With regards to the pressurized porous volumetric solar
+receiver, the outlet air temperature was generally higher due to the
+concentrated solar radiation and air preheating. The outlet air tempera￾ture of the pressurized porous volumetric solar receiver PLVCR-5 and
+DIAPR exceeded 1000 C. The maximum outlet air temperature for the
+atmospheric porous volumetric solar receiver was achieved by
+Mey-Cloutier et al. [46], in which the incident solar radiation was ho￾mogenized by a homogenizer and the outlet air temperature reached 958
+C. Moreover, it is seen from Fig. 5 that the ranges of the outlet air
+temperature and thermal efficiency are large, so it is difficult to directly
+compare two receivers under different test conditions. Despite that some
+studies [26,27] recommended to use air outlet temperature-mass specific
+energy graphic for comparing the receivers, it is still hard to evaluate
+different receivers under different test conditions (e.g. solar radiation
+intensity, distribution, air mass flow).
+2.3. Transient performance of porous volumetric solar receivers
+The porous volumetric solar receiver has a quick transient response
+time and small thermal inertia due to the shorter flow path of the heat
+transfer fluid. Up to now, there is no standard for the receiver transient
+performance and many studies adopted time constant to restabilize the
+system after changing the solar radiation intensity. In the transient test of
+Sulzer [21], the number of mirrors in the heliostat was reduced when the
+outlet air temperature was stable. The incident solar energy was reduced
+by 20%, and the outlet air temperature was correspondingly decreased.
+By monitoring the variation of the outlet air temperature, it was found
+that it took 6 min to restabilize the system and the time constant was
+about 90 s. With a similar test method, the time constants for Sandia foam
+[47], CeramTec [24], and HiTRec II [26] are 365 s, 660 s, and 70 s,
+respectively. The parametric and non-parametric methods were both
+adopted for SOLAIR [28] and the time constant of the receiver was
+determined to 600-840 s. In the test of DIAPR [34], the receiver regained
+90% of the temperature drop within less than 5 min after reopening the
+shutter. Besides, some studies used the temperature increasing rate to
+evaluate the transient performance of the porous volumetric solar
+receiver. The temperature increasing rate of PLVCR-5 [19] was measured
+which achieved 80 C/s. Zhu et al. [37] measured the outlet air tem￾perature increase process and found that time to stabilize the system was
+about 30 min.
+From the above studies, the time constant for porous volumetric solar
+receivers is usually in the range of tens of seconds to hundreds of seconds.
+Comparing the metallic and ceramic receivers, the transient response
+time is normally smaller for the metallic receiver because of the higher
+thermal conductivity. The quicker transient response time of porous
+volumetric solar receivers is beneficial of fast start-up, but it needs higher
+requirements in maintaining the stability of the outlet air temperature
+and formulating system control strategies.
+3. Advances in theoretical research on porous volumetric solar
+receivers
+To investigate the detailed fluid flow and heat transfer processes, the
+multiscale simulation methods are applied. When the sophisticated
+porous structures are considered, the simulation studies are performed at
+pore-scale. The primary task is to reconstruct the porous geometry based
+on the periodic unit cell, random, or X-ray CT reconstruction methods.
+Then the solar radiation transfer and coupled heat transfer could be
+solved based on direct pore-scale simulation method. On the other hand,
+the porous domain can be treated at Representative Elementary Volume
+(REV) scale. The influences of porous skeleton to the fluid flow and heat
+transfer of the fluid are introduced by empirical parameters. Generally,
+the direct pore-scale numerical simulation gives a precise result but re￾quires more computing resource. The volume-averaging simulation
+method provide a quick performance evaluation, but its accuracy is
+largely dependent on the proper determination of empirical parameters.
+3.1. Direct pore-scale numerical simulation method
+Direct pore-scale numerical simulation methods investigate the fluid
+flow and heat transfer processes based on the detailed reconstructed
+models of the porous media. It is an effective simulation method to reveal
+the transport process inside the porous media and to determine the
+empirical parameters. The reconstruction of the porous media and the
+establishment of the heat transfer model for porous volumetric solar
+receivers are presented as follows.
+3.1.1. Pore-scale model reconstruction of the porous media
+The porous media with different structures have been widely used as
+porous volumetric solar receivers, such as honeycombs, wire meshes, and
+foams. In order to enlarge the penetration depth of solar radiation, the
+porous media usually have large porosity and interconnected channels.
+Therefore, the pore-scale model of high porosity porous media is pre￾sented and the reconstruction method for the low porosity porous media
+Fig. 5. Thermal efficiency of porous volumetric solar receivers. such as packed beds and rocks is not the focus of this study. Based on the
+Y.-L. He et al. Energy Reviews 2 (2023) 100035
+5
+
+structure of the porous media, the pore-scale reconstruction method can
+be divided into periodic unit cell reconstruction method, random
+reconstruction method, and X-ray CT reconstruction method.
+3.1.1.1. Periodic unit cell reconstruction method. Since many porous
+media have certain periodic characteristics, the periodic unit cell
+reconstruction method simplifies the porous skeleton into a spatial array
+of ideal structural units. For example, honeycombs and wire meshes have
+strict periodicities as shown in Fig. 6(a) and (b). The periodic unit
+structure can be easily extracted and the model reconstruction of these
+types of porous media are not introduced. For the porous foam, it shows
+some randomness as illustrated in Fig. 6(c), but it does have some peri￾odicities in analogy with aggregation of soap bubbles. The parameters
+such as unit cell diameter, pore diameter, number of vertexes and edges
+can be used to describe the porous structures.
+Some studies [53,54] adopted a simple cube as the unit cell as shown
+in Fig. 7(a). It simplifies the porous foam to a large extent, ignoring the
+arrangement of the porous skeleton in other directions. By adjusting the
+cell size and skeleton thickness, this model could control the pore density
+and porosity of the reconstructed porous media. Moreover, the process￾ing characteristics during the fabrication of the porous media and more
+structural features are included in the reconstruction process. For
+graphite porous media, it has an approximately circular pore structure,
+thus Yu et al. [55] and Karimian et al. [56] used a sphere-centered cube
+as the unit cell as shown in Fig. 7(b). Similarly, the cell diameter and pore
+diameter can be adjusted by changing the edge size and sphere diameter
+in the unit cell. In the foaming process, the formation of bubble aggre￾gates is usually controlled by surface tension which leads to a lower
+surface energy of each bubble. Therefore, the Kelvin structure has been
+widely applied for the reconstruction of porous foams as illustrated in
+Fig. 7(c). The Kelvin structure is formed by the truncated octahedron
+with 6 square faces and 8 hexagonal faces, which has been considered to
+be the unit body to equally divide the space with the smallest surface
+area. Krishnan et al. [57,58] subtracted the cube with a sphere and got a
+Kelvin structure with round pores in the faces. Bai and Chung [59]
+subtracted the truncated octahedron with a sphere, and a similar Kelvin
+structure was obtained. Compared with the Kelvin structure of Krishnan
+et al., the Kelvin structure of Bai and Chung had straight edges. It is
+noticed that the porous skeleton constructed by the above two methods is
+thicker near the vertex and smaller at the center, showing the charac￾teristics of the skeleton thickness change caused during fabrication pro￾cess. In 1994, Weaire and Phelan [60] proposed a unit body that divides
+the space better than the Kelvin structure and further minimizes the
+surface area by 0.3%. As shown in Fig. 7(d), it is composed of six 14-sided
+polyhedra and two 12-sided polyhedra. Boomsma [61] applied the
+software of Surface Evolver to gradually minimize the surface energy of
+the Weaire-Phelan structure and obtained the porous skeleton with
+triangular cross section.
+It is seen that the unit cell reconstruction method is simple and
+effective and can capture the structural characteristics of the porous
+media to a certain extent. However, this method ignores the randomness
+of the porous media such as the distribution of pore size. Moreover, some
+unit cells, such as simple cube and Kelvin structure, construct isotropic
+porous structures which are different from real anisotropic porous foams.
+3.1.1.2. Random reconstruction method. In order to introduce random￾ness in the reconstruction process of the porous media, several random
+reconstruction methods have been proposed, and the representative one
+is Voronoi tessellation, which is a method of dividing a plane or space
+into specific areas based on a set of specific points. The distance from any
+position in each area to the specific point is smaller than the distance to
+the specific point in other areas. The areas in the Voronoi tessellation
+method could be viewed as cells in the porous media, and the random
+distribution creates the randomness of the reconstructed porous model.
+Based on the random point generation method and whether the random
+points are weighted or not, different Voronoi tessellations such as
+Laguerre-Voronoi tessellation and Poisson-Voronoi tessellation were
+built. The Laguerre-Voronoi tessellation method assigns weights for each
+points which can be used to control the distribution of pore diameter
+[62], and the reconstruction procedure based on this method is illus￾trated in Fig. 8. Firstly, the lognormal distribution was used to set the
+pore size distribution of the porous media. Subsequently, spheres with
+varying diameters were randomly and closely generated in the space
+based on the pore size distribution. Finally, the Laguerre-Voronoi
+tessellation of these random spheres was obtained, the solid structure
+and the surface structure were deleted, and the remaining boundary
+structures formed the porous skeleton. The study conducted by Wejrza￾nowski et al. [63] pointed out that the average number of faces per foam
+cell of the reconstructed porous models was in the range of 13.7-14.5,
+which was close to that of the actual porous media. The study of Nie
+Fig. 6. Pore-scale models and porous volumetric solar receivers (a)Honeycomb (Adapted with permission [48]. Copyright 2013, Elsevier [49]; Copyright 2017,
+Elsevier); (b)Wire mesh (Reproduced with permission [50]. Copyright 2014, Elsevier [51]; Copyright 2018, Elsevier); (c)Foam (Adapted with permission [52].
+Copyright 2011, Elsevier).
+Fig. 7. Periodic structures of porous media (a)Simple cube; (b) Sphere-centered
+cube; (c)Kelvin; (d)Weaire-Phelan.
+Y.-L. He et al. Energy Reviews 2 (2023) 100035
+6
+
+et al. [62] showed that different lognormal distributions could effectively
+control the cell volume of the reconstructed porous media. The average
+porosity and specific surface area can be adjusted by changing the ratio of
+skeleton thickness and sphere diameter.
+Furthermore, different random construction methods were proposed
+based on the structural characteristics of the porous media. Kırca et al.
+[64] proposed a reconstruction method using the random sphere gen￾eration for carbon foam porous media. Similar to the Laguerre-Voronoi
+tessellation reconstruction process, a closely packed random spheres
+were firstly generated, and structural parameters such as the porosity and
+pore size distribution of the porous media were adjusted by controlling
+the sphere center distance and the sphere diameter distribution. Subse￾quently, the closely packed spheres were directly subtracted from the
+cube space, and the remaining part could be regarded as the porous
+skeleton, as illustrated in Fig. 9(a).
+Considering for the conciseness of the Kelvin structure and its lack of
+randomness, Habisreuther et al. [65] proposed a random Kelvin structure
+by relocating the nodes position of the ordered structure. Fig. 9(b)
+compared the regular and random Kelvin structures. The node position
+was stochastically relocated but the maximum distance was limited to
+retain the original topological structure. However, compared with the
+porous model reconstructed by Magnetic Resonance Imaging (MRI),
+Habisreuther et al. found that the calculated pressure drop and tortuosity
+in the random Kelvin structure was relatively small. Besides, numerical
+methods such as multiple-point statistics [66], quartet structure
+generation set [67] and other random reconstruction methods [68] have
+been proposed for the reconstruction of the porous media with low
+porosity such as rocks. These methods are not used in the field of porous
+volumetric solar receivers and detailed description is no longer carried
+out.
+3.1.1.3. X-ray CT reconstruction method. With the application of imaging
+technology and the improvement of computing capability, it is possible to
+accurately capture and digitize the real three-dimensional structure of
+the porous media. The X-ray computed tomography (CT) technology is
+widely applied which is a nondestructive imaging technique with high
+spatial resolution. The porous media reconstruction method based on the
+X-ray CT scan is presented in Fig. 10. Firstly, the suitable CT scanner and
+scan resolution should be determined. For the porous volumetric solar
+receiver, the pore diameter and strut thickness are usually at the milli￾meter scale, and the reported scan resolution for the porous foam
+reconstruction were normally in the range of 15-40 μm[69–79]. Several
+studies tried to capture the finer structure of the porous skeleton and
+utilized a higher scan resolution. For example, the scan resolutions in the
+study of Ambrosio et al. [80] and Haussener et al. [81] were 4 μm and
+0.37 μm, respectively. It should be pointed out that the high-resolution
+scan is not compatible with a larger scan area and efficient numerical
+calculations. Therefore, it is necessary to evaluate the size of the porous
+media required for the numerical calculation and the current calculation
+capability, and carefully choose the scan resolution. The reconstructed
+Fig. 8. Procedures for foam structure generation based on the Laguerre-Voronoi tessellation (Reproduced with permission [62]. Copyright 2017, Elsevier).
+Fig. 9. Random reconstruction methods (a)Random spherical bubbles method (Reproduced with permission [64]. Copyright 2007, Elsevier); (b)Random Kelvin
+(Reproduced with permission [65]. Copyright 2009, Elsevier).
+Y.-L. He et al. Energy Reviews 2 (2023) 100035
+7
+
+porous media for numerical calculation in literature have been tens of
+millimeters. Subsequently, the image processing such as noise reduction,
+sharpening, and contrast enhancement were needed for the scan images
+so as to better distinguish the porous skeleton from the background.
+These images could then be binarized and are ready for
+three-dimensional rendering. During the fabrication process of the
+porous media, the small hollow structures can be noticed at the center of
+the porous skeleton. In order to facilitate the subsequent mesh generation
+and numerical calculation, these small hollow structures need to be filled.
+Wang et al. [78] found that such filling processing had little effect on the
+structural parameters of the reconstructed porous media. The relative
+change of the porosity of the reconstructed porous media before and after
+filling was only 0.47%. Furthermore, the softwares such as Simpleware、
+VGStudio MAX、AVIZO、Mimics,and ImageJ could be applied for
+three-dimensional rendering and geometry repair. Finally, the
+three-dimensional model of the porous media could be exported to mesh
+generation softwares such as ANSYS ICEM and Simpleware ScanFE.
+Based on the above studies, periodic unit cell reconstruction method
+can be directly selected for the reconstruction of honeycomb and wire
+mesh structures. For the porous foam, the periodic unit cell reconstruc￾tion method and random generation method can capture some of the
+structural characteristics of the porous structures and complexity of the
+reconstruction process is relatively low. The X-ray CT reconstruction
+method restores a more realistic three-dimensional structure of the
+porous media, but the reconstruction steps are relatively cumbersome
+and require higher computational resources.
+3.1.2. Direct pore-scale numerical simulation of fluid flow and heat transfer
+Based on the reconstructed porous models, the fluid flow and heat
+transfer inside the porous media could be directly solved at pore-scale.
+Direct pore-scale numerical simulation was mostly used in honeycomb
+porous volumetric solar receivers, and a few studies have investigated the
+porous volumetric solar receiver with packed bed and foam structures.
+The solar radiation transport and fluid flow and heat transfer processes
+inside the receivers are usually solved respectively because air is
+considered as a non-participating material and the optical properties of
+the porous media in the solar and infrared spectra are different. In the
+studies of Nakakura et al. [82,83], the radiative properties such as
+emissivity of the porous media were considered as constants and irrele￾vant to the spectrum. The incident solar radiation was adopted as the
+inlet boundary condition to the radiative transfer equation. Taking into
+account the solution methods of most studies, the solar radiation trans￾port and fluid flow and heat transfer processes are introduced
+respectively.
+3.1.2.1. Solar radiation transport in porous volumetric solar receivers. Po￾rous volumetric solar receivers are typically integrated into solar tower
+and solar dish CSP systems. The different layouts of the CSP systems such
+as the heliostat field distribution and focusing strategy lead to different
+solar radiation intensities and distributions on the aperture of the re￾ceivers. Taking the solar tower CSP system as an example, researchers
+have developed a series of methods such as Monte Carlo ray tracing
+(MCRT) method and convolution method to investigate the solar radia￾tion transport in the heliostat field and inside the receiver [84]. Based on
+the geometrical optics assumption, the MCRT method treats the solar
+radiation transport as the behaviors of a series of random processes of a
+large number of independent photons. The solar radiation distribution
+could be obtained by counting the reflection, absorption and distribution
+characteristics of photons. The implementation of the MCRT method is
+flexible and suitable for complex geometries, and it is widely used in the
+field of CSP. A series of commercial and open source programs have been
+developed such as MIRVAL, SolTrace, Tonatiuh, and SPTOPTIC [84,85].
+The research group of He has applied the MCRT method to develop the
+optical models of different CSP systems, and the incident solar flux dis￾tribution and the optical properties have been determined [86–89].
+Using the MATLAB toolbox developed by CIEMAT, Sanchez et al. [90]
+tracing the solar radiation transport in the solar dish system with
+different rim angles. Cagnoli et al. [49] and Ali et al. [91] applied
+Tonatiuh to study the solar radiation transport in the solar furnace and
+the solar tower system, respectively.
+Distinguished from tubular solar receivers, the incident solar radia￾tion penetrates, transfers, reflects, and absorbs inside the porous volu￾metric solar receiver. These processes can also be studied by the MCRT
+method and the implementation steps are shown in Fig. 11.
+Considering that the pore-scale model of the porous volumetric solar
+receiver is small, the studies adopted uniformly distribution solar radi￾ation with perpendicular irradiation or incident at a certain angle [79,82,
+83,92]. Subsequently, a photon goes through several processes such as
+reflection and absorption until it is no longer exist. The reflection de￾scribes the interaction of a photon with the porous skeleton and both
+constant reflectivity and local reflectivity models can be used to update
+the position and direction of the photon. The local reflectivity model
+applies Snell's law and Fresnel equations to calculate the reflectivity, and
+determines whether the photon is absorbed or not by comparing the local
+reflectivity to a random number [93,94]. The updated direction of the
+photon can be calculated based on diffuse or specular reflection laws. As
+for the honeycomb porous volumetric solar receiver, Sanchez et al. [90]
+and Cagnoli et al. [49] compared solar radiation distribution and optical
+properties with diffuse and specular channels. The diffuse walls aggra￾vated the reflection loss in the front of the receiver, while the specular
+walls increased the penetration depth of solar radiation. These studies
+also pointed out that the actual reflection in the channels was a mixture
+of diffuse and specular reflections. As for the porous foam, Guevelou et al.
+[95] stated that the ratio of the surface roughness of the porous skeleton
+to the radiation wavelength determines the reflection characteristics of
+the radiation. When this ratio is low, the reflection can be regarded as
+specular. Du et al. [79] applied the MCRT method to determine the solar
+flux distribution insider the porous volumetric solar receiver. The inlet
+distribution of solar radiation was simplified to be uniform. Furthermore,
+Navalho and Pereira [15] investigated the solar radiation transport from
+the solar dish concentrator to the porous volumetric solar receiver, and
+the solar flux distribution were presented in Fig. 12. In order to simplify
+the ray tracing process, some studies treated the porous media as a uni￾form participating material and applied Beer's law to determine the solar
+radiation distribution [48,96].
+3.1.2.2. Fluid flow and heat transfer in porous volumetric solar recei￾vers. The direct pore-scale numerical simulation method does not
+introduce any empirical parameters and the detailed fluid flow and heat
+transfer processes could be captured by solving the governing equations.
+For the fluid flow process, the surface of the porous skeleton forms the
+fluid channel which is usually set as non-slip boundary in the numerical
+model. The inlet boundary condition of the receiver is usually set with
+constant and uniform velocity or mass flow rate. For the flow state inside
+Fig. 10. Procedure of porous media reconstruction based on the X-ray computed tomography technique.
+Y.-L. He et al. Energy Reviews 2 (2023) 100035
+8
+
+the receiver, the turbulent model could be added according to the
+simulation conditions. For example, the honeycomb porous volumetric
+solar receiver has straight flow channels and the critical Reynolds num￾ber from laminar flow to turbulent flow is 2300 [49]. Moreover, Dybbs
+and Edwards [97] conducted visualization studies for the packed spheres
+and rods porous structures, and divided four flow regimes as follows:
+Darcy flow (Red < 1), inertia flow (1-10<Red < 150), unsteady laminar
+flow (150<Red < 300) and fully turbulent flow (Red > 300).
+For the heat transfer process, the porous skeleton is irradiated by solar
+radiation and exchanges heat to the heat transfer fluid. Due to the non￾uniform distribution and elevated temperature, the thermal radiation
+transfer in the porous skeleton should also be considered. The inlet air
+temperature is set to be constant and the solar flux calculated by the
+MCRT method is treated as heat flux on the surface or energy source in
+the porous skeleton. For example, Sanchez et al. [90], Cagnoli et al. [49]
+and Zhu and Xuan [92] treated the solar flux as second-type boundary
+condition on the surface of the porous skeleton. Ali et al. [91] extracted
+the volume mesh and set solar radiation as the energy source to the en￾ergy governing equation of the porous media. For radiative heat transfer,
+the heat transfer fluid (air) is a non-participating material and the radi￾ative loss and radiative heat exchange between porous skeletons should
+be studied. The commonly used radiation models in porous volumetric
+solar receivers are Surface-to-Surface (S2S) model [49,91] and Discrete
+Ordinates (DO) method [82,83].
+Based on the above direct pore-scale numerical method, Cagnoli et al.
+[49] analyzed the influence of tilt angle, channel size, and inlet air ve￾locity on the optical and thermal performances of the honeycomb porous
+volumetric solar receiver. The typical temperature field of the honey￾comb porous volumetric solar receiver was shown in Fig. 13(a). The
+variation of tilt angle of incident solar radiation led to different solar flux
+distributions in the channels but it has little effect on the thermal effi￾ciency. Higher inlet air velocity and larger channel size were beneficial
+for improving the thermal efficiency. Zhu and Xuan [92] investigated the
+packed bed porous volumetric solar receiver with different unit cells. The
+MCRT method was applied to analyze the solar radiation penetration and
+the influence of incident angle. Due to lower porosity and large absorp￾tivity of the porous material, the penetration depth was limited. The body
+centered cubic packed bed had smaller porosity which enhanced the
+convective heat transfer but increased the pressure resistance. The
+thermal efficiency of this type of porous volumetric solar receivers was
+relatively higher due to the lower temperature in the front surface of the
+receiver. The temperature fields under different inlet velocities were
+Fig. 11. Procedure of Monte Carlo ray tracing.
+Fig. 12. Normalized solar irradiation heat flux distribution on the receiver (Reproduced with permission [15]. Copyright 2020, Elsevier).
+Y.-L. He et al. Energy Reviews 2 (2023) 100035
+9
+
+presented in Fig. 13(b). Du et al. [79] utilized the X-ray CT scan recon￾struction method and built the real three-dimensional model of the
+porous foam. The MCRT method was applied to calculate the solar flux
+distribution inside the porous media which was then treated as the source
+term to the energy conservation equation. By solving the governing
+equations of fluid low and heat transfer, the detailed temperature field in
+the porous volumetric solar receiver was obtained in Fig. 13(c).
+Furthermore, based on the X-ray CT scan and image processing tech￾niques, the porous models with controllable geometrical parameters
+were reconstructed by Du et al. [98]. The influence of geometrical pa￾rameters on the performance of the porous volumetric solar receiver was
+studied, and the Nusselt number correlation was derived.
+3.2. Volume averaging simulation method
+Different from the direct pore-scale numerical simulation method, the
+volume averaging simulation method does not consider the detailed
+structure of the porous media. It views the porous zone as two continuous
+solid phase and liquid phase regions, which represent the porous skeleton
+and the fluid, respectively. The interaction between the porous media
+and the fluid is introduced by effective properties and source terms in the
+governing equations. The volume averaging simulation method requires
+less computational resources and has been widely used to analyze and
+optimize the porous volumetric solar receiver. The accuracy of the vol￾ume averaging simulation method is greatly influenced by the selection
+of empirical parameters, and the determination of these parameters and
+correlations are presented as follows.
+3.2.1. Fluid flow in the porous media
+The porous skeleton impedes the fluid flow and flow resistance
+should be determined in the porous media. Darcy's law [99] is the
+theoretical basis which links the pressure drop with the superficial ve￾locity by introducing permeability, as shown in Equation (1).
+Δp
+ΔL ¼ μ
+K
+U (1)
+where p is the pressure, μ is the dynamic viscosity, K represents the
+permeability of the porous media, and U is the superficial velocity.
+Permeability reflects the capacity of porous media that allows the fluid to
+pass through, and the larger value means that the fluid could more easily
+flow in the porous media. Darcy's law is suitable for low Reynolds
+number fluid flow, and the inertia force becomes evident with the in￾crease of flow velocity. Many equations have been proposed by consid￾ering the inertia effect based on Darcy's law, such as Darcy-Forchheimer
+equation as shown in Equation (2) and Darcy-Brinkman equation [99].
+Δp
+ΔL ¼ μ
+K
+U  ρcf
+ffiffiffiffi
+K p U2 (2)
+Ergun and Orning [100] considered the Poiseuille equation and
+capillary flow and theoretically derived the pressure drop correlation of
+the packed bed porous media. Based on the experimental data of various
+fluids in different structures of the porous media, Ergun [101] deter￾mined the empirical parameters of the pressure drop equation, as shown
+in Equation (3).
+Δp
+ΔL ¼ 150 ð1  εÞ
+2
+ε3
+μU
+D2
+P
+þ 1:75 ð1  εÞ
+ε3
+ρU2
+DP
+(3)
+In the equation, ε and DP are porosity and effective particle diameter
+of the porous media, respectively. This equation was derived for the
+porous media with small porosity but many researchers still adopted it to
+predict the pressure drop for the porous foam.
+In order to characterize the pressure drop and calculate the perme￾ability, experimental measurement and direct pore-scale numerical
+simulation method could be applied. Taking the research from Dietrich
+[102] as an example, a typical experimental set-up was shown in Fig. 14,
+which mainly includes a test sample, flow control devices, and data
+acquisition devices. During the test, the flow velocity was controlled by
+the blower and the pressure drop was measured by a sensitive manom￾eter. By adding a heating device, the fluid temperature in the set-up could
+be precisely controlled, and the thermophysical properties could be
+calculated. Based on the derived data, the relationship between pressure
+drop and velocity could be established and the empirical parameters in
+the correlation could be derived. Madani et al. [103] pointed out that the
+inlet and outlet effects of the porous media influenced the pressure
+measurement. It was suggested to arrange the pressure measuring device
+inside the porous media along the fluid direction for precise
+measurements.
+In Section 3.1, it is noticed that the direct pore-scale numerical
+method can obtain the detailed velocity field inside the porous media.
+Therefore, this method can be used to capture the pressure drop and
+velocity. Diani et al. [74] applied the X-ray CT reconstruction method
+and built porous foam models with different pore densities. The fluid
+flow of air inside the porous foams was simulated and the typical flow
+field was shown in Fig. 15(a). Wu et al. [104] used the periodic unit cell
+reconstruction method and built Kelvin models with different geomet￾rical parameters. The pressure drop of different porous models was
+summarized in Fig. 15(b), and the relationship between pressure, ve￾locity, porosity, and thermophysical properties of air was established. In
+the velocity range of 0.5-5 m/s, the correlation agreed well with the
+experimental data. Similarly, Nie et al. [105] reconstructed the porous
+models with the Laguerre-Voronoi tessellation, a pressure drop correla￾tion with a larger applicable range of pore density and porosity was built.
+Although many studies have been conducted for the pressure drop of
+the porous media, but different correlations deviate with each other and
+a direct comparison is hard. The main reasons for such a problem are
+summarized as follows: the measurement and data processing methods,
+and the selection of characteristic lengths of the porous media are not
+consistent, and the geometrical parameters of the porous media are not in
+the same range. Firstly, the pressure is usually measured at the inlet and
+outlet of the porous media. Considering that the thickness along the flow
+Fig. 13. Temperature fields in porous volumetric solar receivers (a)Honeycomb (Reproduced with permission [49]. Copyright 2017, Elsevier); (b)Packed bed
+(Reproduced with permission [92]. Copyright 2017, Elsevier); (c)Foam (Reproduced with permission [79]. Copyright 2017, Elsevier).
+Y.-L. He et al. Energy Reviews 2 (2023) 100035
+10
+
+direction of the porous media is different in these studies, it is difficult to
+evaluate the difference in measurements caused by the inlet and outlet
+effects. Secondly, Kumar and Topin [106] summarized many studies and
+pointed out that correlating the experimental data by Darcy-Forchheimer
+equation without distinguishing the flow regime causes errors in the
+calculation of empirical parameters. The appropriate way to fit the
+experimental data is to find the seepage flow regime at first. Finally, the
+characteristic lengths of the porous media were selected differently in the
+studies. The commonly selected characteristic lengths include pore
+diameter, hydraulic diameter, and square root of permeability, which
+makes the direct comparison between different correlations more diffi￾cult. It should be noted that the problem of characteristic length selection
+also exists for the correlations of convective heat transfer coefficients.
+The proposed pressure drop correlations were thoroughly summarized in
+Refs. [106,107], and the correlations used for porous volumetric solar
+receivers are presented in Table 1.
+From Tables 1 and it is seen that the Ergun equation was also used for
+the porous volumetric solar receiver despite that it was derived for the
+porous media with small porosity. In order to retain the form of the Ergun
+equation, Lacroix et al. [121] modified it for the porous foam by
+substituting the particle diameter in the original equation. The modified
+equation was suitable for the porosity in the range of 0.75-0.92, which
+agreed well with the experimental data when the velocity was under 6
+m/s. Dietrich et al. [102] conducted experiments for the ceramic porous
+samples with different pore densities and porosities. The derived pres￾sure drop correlation was compared with more than 2500 data in ref￾erences and derivation was within 40% [123]. The most widely used
+pressure drop correlation for the porous volumetric solar receiver was
+proposed by Wu et al. [104]. The Kelvin structures with different
+geometrical parameters were built, and the direct pore-scale numerical
+simulation method was applied. One good advantage for Wu's equation
+was the large applicable range of porosity and the Reynolds number.
+3.2.2. Heat transfer in the porous media
+In order to obtain the heat transfer characteristics in the porous
+media, both the local thermal equilibrium (LTE) model and the local
+thermal non-equilibrium (LTNE) model can be applied. The main dif￾ference between these two models is whether the temperature difference
+between the porous media and the heat transfer fluid exists or not.
+Considering for the large difference in thermal conductivity of air and
+porous media, the LTNE model has been widely accepted [124,125]. This
+model solves the energy conservations equations in both the porous
+media and the heat transfer fluid regions, and uses source terms to
+represent the energy exchange between the two regions.
+3.2.2.1. Solar radiation transport in porous volumetric solar receivers. The
+process of solar radiation transport and the solar energy coupling method
+are summarized in Fig. 16. The solar radiation transport before entering
+the porous volumetric solar receiver can be calculated by the MCRT
+method, which has been introduced in the above section. For simplicity,
+some studies adopted uniform or Gaussian distribution of the incident
+solar radiation at the inlet of the porous volumetric solar receiver [112,
+115,117,118,126,127].
+When the solar radiation distribution in the aperture of the solar
+Fig. 14. Schematic of the experimental set-up for pressure drop measurements (Reproduced with permission [102]. Copyright 2009, Elsevier).
+Fig. 15. Fluid flow and pressure drop characteristics based on the direct pore-scale numerical simulation (a)Flow field (Reproduced with permission [74]. Copyright
+2015, Elsevier); (b)Pressure drop characteristic (Reproduced with permission [104]. Copyright 2010, Elsevier).
+Table 1
+Pressure drop correlations of porous volumetric solar receivers.
+Authors Correlation Application Citing
+Ergun
+[101]
+Δp
+ΔL ¼ 150 ð1  εÞ
+2
+ε3
+μU
+D2
+P
+þ
+1:75 ð1  εÞ
+ε3
+ρU2
+DP
+Derived for the packed
+porous media with low
+porosity
+[108–111]
+Wu et al.
+[104]
+Δp
+ΔL ¼ ð1039  1002εÞ
+d2
+c
+μU þ
+0:5138ε5:739
+dc
+ρU2
+10<Re<400
+0.66<ε<0.93
+[112–120]
+Lacroix
+et al.
+[121]
+Δp
+ΔL ¼ 150 ð1  εÞ
+2
+ε3
+μU
+d2
+P
+þ
+1:75 ð1  εÞ
+ε3
+ρU2
+dP
+Ergun equation with
+modified characteristic
+length
+[122]
+Dietrich
+et al.
+[102]
+Δp
+ΔL ¼ 110 μ
+ε  d2
+h
+U þ
+1:45 ρ
+ε2  dh
+U2
+10<Re<3900 [18]
+Y.-L. He et al. Energy Reviews 2 (2023) 100035
+11
+
+receiver is determined, the solar radiation transport inside the porous
+media should be analyzed. Some studies considered that the optical
+thickness of the porous media is large, and the solar radiation absorption
+occurs within a short distance from the front surface of the receiver.
+Therefore, solar radiation is simplified as the heat flux boundary condi￾tion for the energy conservation equation or radiative transfer equation
+[108,110,111,113]. On the other hand, some researchers thought that it
+was necessary to consider the solar radiation penetration process. The
+MCRT method and the ideal exponential decay based on Beer's law could
+be applied, and the solar energy inside the porous volumetric solar
+receiver were treated as a source term to the energy conservation equa￾tion or radiative transfer equation [18,109,112,114,115,117,119,120,
+126].
+Different from the implementation of MCRT in the direct pore-scale
+numerical simulation method, the MCRT method in the volume aver￾aging simulation method does not consider the real interaction between
+the porous skeleton and photon. The photon propagation length and
+scattering models are implemented with random processes which
+correspond to the radiative properties of the porous media and the heat
+transfer fluid. In order to determine the propagation length Δs of the
+photon between two collisions, the extinction coefficient β and the
+random number ξ are used to establish the relationship as Δs¼-lnξ/β. The
+extinction coefficient could be measured by a spectrometer or calculated
+by the direct pore-scale numerical simulation. One typical correlation for
+the extinction coefficient of the porous media is shown in Equation (4).
+Based on the geometric optics approximation [128] and the experimental
+data by Hendricks and Howell [129], the constant coefficient in Equation
+(4) is 3 and 4.8, respectively.
+β ¼ Cð1  εÞ
+dp
+(4)
+The scattering process inside the porous media is determined by the
+scattering phase function, which gives the method to calculate the
+azimuthal angle. Taking the Henyey-Greenstein phase function as an
+example, the equation for the azimuthal angle with anisotropic scattering
+is given by Equation (5). The range for asymmetry factor g is 1~1, and
+value of 0 means the isotropic scattering and Equation (6) should be used
+[130]. Chen et al. [131] and Qiu et al. [132] treated the porous volu￾metric solar receiver as the uniform scattering material and investigated
+the solar radiation transport process and the influence of geometrical
+parameters on the solar flux distribution. Barreto et al. [133] solved the
+inverse problem with experimental data of hemispherical diffuse reflec￾tance, and it was found that that the solar radiation scattering in the SiC
+ceramic foams is slightly backwards and the best value of asymmetry
+factor was 0.25. The detailed photon transport inside the porous media
+could refer to Refs. [134,135].
+cos θ ¼ 1
+2g
+(
+1 þ g2 
+ 1  g2
+1  g þ 2gξ
+2
+)
+(5)
+cos θ ¼ 2ξ  1 (6)
+Chen et al. [116] compared the thermal performances of the porous
+volumetric solar receiver when treating the solar radiation as the heat
+flux boundary condition or energy source term. The volumetric absorp￾tion was ignored when using heat flux boundary condition which leads to
+a higher surface temperature and larger thermal radiative losses. It was
+also shown that the temperature distribution was slightly influenced by
+the incident angle of the solar radiation, and the largest deviation in
+temperature was 3.4%.
+3.2.2.2. Coupled heat transfer in porous volumetric solar receivers
+3.2.2.2.1. Heat conduction. According to the LTNE model, the effec￾tive thermal conductivities of the porous media and the heat transfer
+fluid are necessary for simulating the heat conduction. The effective
+thermal conductivities of packed beds and porous foams have been
+widely investigated and the commonly used methods include asymptotic
+models, experimental measurements, theoretical models and direct pore￾scale numerical simulation.
+Based on the one dimensional heat conduction assumption, the most
+commonly used parallel and series models of thermal conductivities are
+present in Equation (7) and Equation (8), which show the lower and
+upper bounds for the thermal conductivity of the porous media. In the
+parallel model, the contribution of the porous media and the heat transfer
+fluid can be easily separated and it has been adopted in many studies of
+porous volumetric solar receivers. Besides, many other asymptotic
+models were proposed such as the Maxwell-Eucken model and the Miller
+model [136]. The asymptotic models not only give the estimation of
+upper and lower bounds but also provide ideas for the construction of
+effective thermal conductivity correlations. For example, Calmidi and
+Mahajan [137] modified the Equation (7) and introduced two co￾efficients for better fitting with the experimental data. Dul'nev and Zar￾ichnyak as well as Chaudhary and Bhandari combined the parallel and
+series models linearly and by production [136].
+λk ¼ ελf þð1  εÞλs (7)
+λ? ¼
+ ε
+λf
+þ
+1  ε
+λs
+1
+(8)
+Secondly, experimental measurements can give an accurate value of
+the effective thermal conductivity based on Fourier's law. Fig. 17 presents
+the typical experimental set-up for the effective thermal conductivity
+measurement in the study of Paek et al. [138]. The experimental set-ups
+used the water bath to generate the temperature difference on the two
+sides of the porous media, and uses thermocouples to measure the tem￾peratures at different positions in the test sections. In order to acquire the
+heat flux passes through the porous media, Calmidi and Mahajan [137]
+assumed that the heat loss could be neglect due to the thermal insulation
+material and all the heat generated by the electric heating flowed
+through the porous media. Bhattacharya et al. [139] further measured
+Fig. 16. Solar radiation transfer and solar energy coupling method.
+Fig. 17. Schematic of experimental set-ups for effective thermal conductivity
+measurements of Paek et al. (Reproduced with permission [138]. Copyright
+2000, Springer Nature).
+Y.-L. He et al. Energy Reviews 2 (2023) 100035
+12
+
+the temperature distribution inside the thermal insulation material and
+estimated the heat loss to the environment. Paek et al. [138] and
+Schmierer et al. [140] arranged a stainless steel plate with known ther￾mal conductivity and the porous sample in series. Based on the
+assumption of heat flux continuity, the temperatures on the two sides of
+the stainless steel plate could be used to calculate the heat flux flowing
+through the porous media. It should be mentioned that the thermal
+contact resistance influences the experimental measurement due to the
+high porosity and irregular structure of the porous media. Sadeghi et al.
+[141] measured the effective thermal conductivity of porous samples
+with different thicknesses, and the thermal contact resistance could be
+determined by assuming that it is constant. Fiedler et al. [142] further
+pointed out that the thermal contact resistance could change under
+different experimental conditions. It could be accurately calculated by
+analyzing the experimental data with numerical simulation. Moreover,
+Vicente et al. [143] derived the effective thermal conductivity by
+capturing the temperature response of the porous media to the radiative
+heat flux by a thermal imaging camera. Some studies directly measured
+the effective thermal conductivity by the transient plane source tech￾nique with a hot disk [144–146].
+Thirdly, the theoretical models simplify the porous media to the ar￾rays of periodic unit cells, such as hexagons in the two-dimensional space
+and the Kelvin structure in the three-dimensional space. The idealized
+porous structures could be divided into multiple zones along the heat flux
+direction and the theory of thermal resistance could be applied to
+calculate the effective thermal conductivity. Calmidi and Mahajan [137]
+simplified the porous media with hexagonal periodic units and a square
+block structure was added at the vertices of the hexagon to reflect the
+larger thickness in the connection of the porous skeleton. The represen￾tative unit in the hexagonal structure was extracted and the porous
+structure was divided into multiple layers along the heat flux direction. In
+each layer, the porous skeleton was in parallel with the heat transfer
+fluid, and the effective thermal conductivity was calculated by Equation
+(7). The effective thermal conductivity of the entire porous media was
+the serial combination of multiple layers which was calculated with
+Equation (8). Finally, the calculated effective thermal conductivity was
+compared with experimental data to determine the value of undeter￾mined constants in the correlation. Based on this study, some researchers
+further modified the shape of the block in the skeleton intersection [136]
+which was not presented in detail.
+Lastly, the direct pore-scale numerical simulation is an effective
+method to calculate the effective thermal conductivity of the porous
+media because the temperature field inside the porous media can be
+easily obtained. Many studies investigated the effective thermal con￾ductivity of the porous media with different geometries [57,105,147].
+Despite that many correlations for the effective thermal conductivity
+have been established, there still exist certain limitations. Kumar and
+Topin [148] as well as Dietrich et al. [149]pointed out that the thermal
+conductivity of the porous skeleton was different from the intrinsic
+thermal conductivity of the material that make up the porous media. Due
+to different processing techniques and impurities, deviations exist be￾tween the thermophysical properties of the framework and the intrinsic
+thermophysical properties of the material. Moreover, Ranut [136] found
+that using a detailed and complex structure of the porous medium model
+does not guarantee a more accurate prediction of the equivalent thermal
+conductivity. Introducing the undetermined constants in the correlation
+was beneficial for the curve fitting with the experimental data. Finally,
+some correlations have a mutual term of both the heat transfer fluid and
+porous media. When it is hard to distinguish the contribution of the
+porous media and the heat transfer fluid to the thermal conductivity,
+such correlations can not be applied for the LTNE model.
+Based on the above analysis, the studies for porous volumetric solar
+receivers generally used the parallel model or the Schuetz-Glicksman
+correlation in the LTNE model [150], which are presented in Table 2.
+It should be noted that the original Schuetz-Glicksman correlation was
+proposed for the porous media with large porosity and the contribution
+of the heat transfer fluid to the thermal conductivity was not considered
+[151].
+3.2.2.2.2. Convective heat transfer. In the volume averaging simula￾tion method, the convective heat transfer between the porous media and
+the heat transfer fluid is set as a source term in the energy conservation
+equations. Therefore, accurate evaluation of the convective heat transfer
+coefficient has become the key to investigate the convective heat transfer
+process in the porous media. The commonly used methods include the
+single blow method and the direct pore-scale numerical simulation
+method.
+The basic principle of the single blow method is to measure the
+temperature variation of the fluid when it flows through the porous
+media with different temperatures, and the inverse problem is solved
+based on experimental data and numerical simulation. In the experi￾ments, the inlet and outlet fluid temperatures are monitored and the
+experimental process can be either heating or cooling the fluid. An
+experimental set-up for the porous media cooling the high temperature
+fluid is presented in Fig. 18(a). In the first stage of the experiment, the
+heat transfer fluid passed through the heating device and the test section.
+The experimental system reached a steady state and the temperature of
+the porous media and the heat transfer fluid was no longer changed. In
+the second stage, the high temperature porous sample was quickly
+replaced by un unheated porous sample. Due to the temperature differ￾ence, the cooling process of the heat transfer fluid could be monitored by
+thermocouples at the outlet. Based on the experimental conditions, the
+transient LTNE model of the porous media with the heat transfer fluid
+was established, and the boundary conditions as well as the thermo￾physical properties maintained the same with the experiment. By
+adjusting the value of convective heat transfer coefficient in the nu￾merical model, the difference between the numerical simulation results
+and the experimental data was gradually reduced and finally the
+convective heat transfer coefficient was obtained.
+The implementations of the single blow method are different in the
+studies. In order to adjust the temperature of the heat transfer fluid, many
+researchers adopted electric heating devices. But Giani et al. [154] mixed
+hydrogen into the fluid, and the hydrogen reacted with the catalyst to
+heat the fluid. Dietrich [153] designed the high temperature and low
+temperature flow paths, which could be switched to change the tem￾perature of the fluid that passed through the porous media, as shown in
+Fig. 18(b). A similar two flow paths design was also used by Lu et al.
+[155]. Besides, many studies monitored both inlet and outlet tempera￾tures of the heat transfer fluid and did not maintain the constant tem￾perature inlet boundary condition [156–158]. In the numerical models,
+the measured fluid temperature in the inlet was set as the time-dependent
+boundary condition, and the calculated outlet temperature was used for
+the comparison with experimental data. The single blow method is a
+transient measurement method, and some researchers also applied
+steady methods to evaluate the convective heat transfer coefficient.
+Ichimiya [159] utilized the side wall to heat the porous sample and let it
+heat the low temperature heat transfer fluid. The temperature of the side
+wall and the fluid could be measured which were then used to calculate
+the convective heat transfer coefficient at the wall. This parameter was
+selected as the indicator in the inverse problem.
+On the other hand, the direct pore-scale numerical simulation method
+has been widely used to investigate the convective heat transfer in the
+porous media. Iasiello et al. [71] compared the convective heat transfer
+coefficient of real porous foams with the Kelvin structure. When the two
+porous models had the similar porosity, cell diameter, and strut
+Table 2
+Effective thermal conductivity correlations of porous volumetric solar receivers.
+Models λf,eff λs,eff Citing
+Parallel model ε⋅λf (1-ε)⋅λs [108,110,114]
+Schuetz-Glicksman correlation [150] ε⋅λf (1-ε)⋅λs/
+3
+[18,111–113,
+115–120]
+Y.-L. He et al. Energy Reviews 2 (2023) 100035
+13
+
+thickness, the Kelvin structure had a larger volumetric convective heat
+transfer coefficient due to the larger specific surface area. Meinicke et al.
+[160] further compared the porous foam, the Kelvin structure, the
+Weaire-Phelan structure, the simple cube periodic structure. The porous
+foam had more tortuous flow channels which led to a larger convective
+heat transfer coefficient. It should be pointed out that the boundary
+conditions used in the direct pore-scale numerical simulations were
+different. Some studies [69,75,161] used the constant temperature
+boundary condition on the surface of the porous media, while other
+studies [71,74] adopted the constant heat flux boundary condition.
+Ranut et al. [72] compared the simulation results under these two
+boundary conditions and found that the constant heat flux boundary led
+to larger convective heat transfer coefficient under the same Reynolds
+number. Du et al. [162] further compared these two boundary conditions
+with the non-uniform solar flux distribution. It was shown that the
+calculated Nusselt number was a good approximation to that of the
+porous volumetric solar receiver when utilizing the constant temperature
+boundary condition.
+Based on the above research methods, a large number of correlations
+of the convective heat transfer coefficients of the porous media have been
+proposed. However, differences in the correlation forms and applicable
+ranges still exist. Firstly, most studies adopted the correlation form as
+Nu¼f(Re,Pr), and some studies introduced the influence of porosity [52,
+152,156] and the ratio of thickness of the porous media and the pore size
+[152,163]. Secondly, as stated above, the selection of the characteristic
+length was not consistent which makes it difficult for direct comparison.
+Lastly, the LTNE model should be solved when applying single-blow
+method. The selection of other empirical parameters such as perme￾ability and effective thermal conductivity influence the calculation of the
+convective heat transfer coefficient. Table 3 summarized the convective
+heat transfer coefficient correlations of porous volumetric solar receivers.
+Wu et al. [52] and Du et al. [98] applied the direct pore-scale nu￾merical simulation method and obtained the convective heat transfer
+coefficient for the porous foam. Dietrich et al. [153] conducted a single
+blow experiment for the porous foams and correlated the convective heat
+transfer coefficient with hydraulic diameter. The correlations of Hwang
+Fig. 18. Schematics of experimental setups of convective heat transfer coefficient measurements (a) Younis and Viskanta (Reproduced with permission [152].
+Copyright 1993, Elsevier); (b)Dietrich (Reproduced with permission [153]. Copyright 2013, Elsevier).
+Table 3
+Convective heat transfer coefficient correlations of porous volumetric solar receivers.
+Author Correlation Notes Citing
+Wu et al. [52] h ¼ λfð32:504ε0:38  109:94ε1:38 þ 166:65ε2:38  86:98ε3:38ÞRe0:438
+c =d2
+c Porous foam
+70<Rec<800
+0.66<ε<0.93
+[112–120]
+Du et al. [98] Nu ¼ 2:785 þ 1:261  ε0:8859  Re0:5237
+d Porous foam
+3<Red<233
+0.74<ε<0.89
+[164,165]
+Hwang et al. [166]
+h ¼
+8
+>>><
+>>>:
+0:004
+dvoid
+dpar 0:35 kf
+dpar
+Pr0:33Re1:35
+par ; Repar  75
+1:064 kf
+dpar
+Pr0:33Re0:59
+par ; Repar  300
+Packed bed
+Interpolation of h when 75<Repar<300
+[109,110]
+Wakao et al. [167] h ¼ λfð2 þ 1:1Pr1=3Re0:6Þ=dpar Packed bed 15<Repar<8500 [111]
+Dietrich et al. [153] h ¼ λfð0:57  CRe  Cgeo  Re2=3
+h Pr1=3Þ=dh Porous foam
+60<Reh<1000
+0.66<ε<0.93
+[18]
+Y.-L. He et al. Energy Reviews 2 (2023) 100035
+14
+
+et al. [166] and Wakao et al. [167] were initially for the packed bed
+porous media but not for the porous volumetric solar receiver.
+3.2.2.2.3. Radiative heat transfer. The radiative heat transfer be￾comes evident in solar receivers as the temperature goes higher. Because
+it is difficult to completely solve the radiation transfer equation, the
+simplifications should be made based on the radiative properties of the
+porous media and the heat transfer fluid. The commonly used methods
+include Rosseland approximation and P1 model [168].
+The porous volumetric solar receiver is generally considered as the
+optically thick semi-transparent medium, and the transmission distance
+of radiation inside it is relatively short. Therefore, the radiative heat
+exchange usually depends on the state of the adjacent area, and the
+radiative heat transfer tend to be the same as the heat conduction. Based
+on this characteristic, the Rosseland approximation is applied, the radi￾ation transfer equation can be simplified, and the radiative heat flux is
+calculated by Equation (9) [168].
+qr ¼ 16n2σT3
+s
+3β 
+dTs
+dx ¼λr 
+dTs
+dx (9)
+where n is the refractive index, σ is the Stefan-Boltzmann constant which
+equals 5.67610-5 W/(m2
+⋅K4
+), and λr stands for the equivalent radiative
+conductivity. Based on the Rosseland approximation, the influence of
+radiative heat transfer can be added to the heat conduction term in the
+energy conservation equation.
+Some studies have pointed out that the application of the Rosseland
+approximation causes relatively large errors at the boundary [113].
+Therefore, the P1 model is applied which is a simplification of PN model.
+The P1 model considers the scattering process and the radiation transfer
+equation is shown by Equation (10) [112].
+r   1
+3ða þ σsÞ
+rG
+
+¼ a
+
+4σT4
+s  G
+
+þ S (10)
+In this equation, a and σs are the absorption and scattering co￾efficients, respectively. The radiative heat flux added to the energy
+conservation equation can be calculated by Equation (11).
+r  qr ¼ a
+
+4σT4
+s  G
+ (11)
+Except the extinction coefficient, the scattering coefficient is neces￾sary for the calculation. Based on the geometric optics, the absorption
+and scattering coefficients depend on the geometrical parameters of the
+porous media and the emissivity, which are shown in Equation (12) and
+Equation (13) [112].
+a ¼ 1:5εeð1  εÞ
+	
+dp (12)
+σs ¼ 1:5ð2  εeÞð1  εÞ
+	
+dp (13)
+It should be noted that the Equation (10) is only valid for the uniform
+scattering, and an anisotropic phase function coefficient can be further
+considered [169]. Moreover, other radiation models such as the DO
+model could also be used for porous volumetric solar receivers.
+Mey et al. [113] compared the thermal performances of porous
+volumetric solar receivers calculated by the Rosseland approximation,
+the P1 model, and the two-flux approximation. When applying the Ros￾seland approximation, the solar flux was added as the heat flux boundary
+condition in the energy conservation equation. While in the P1 model, the
+solar flux was treated as the heat flux boundary condition to the radiation
+transfer equation. It was found that the Rosseland approximation led to a
+high temperature at the inlet of the receiver but the temperature inside
+the receiver and at the outlet were close to that calculated by the two-flux
+approximation. Wang et al. [114] compared the Rosseland approxima￾tion and the modified P1 model for porous volumetric solar receivers.
+When treating solar energy as the energy source term in the energy
+conservation equation, the Rosseland approximation and the modified P1
+model gave similar simulation results and the largest deviation was
+4.97%. Zaversky et al. [18] compared the Rosseland approximation and
+the DO model and found that the Rosseland approximation was better
+when treating solar energy as the source term in the energy conservation
+equation. Therefore, the treatment of solar energy and the selection of
+radiation models both influence the calculation of radiation heat transfer.
+Based on the volume averaging simulation method, a large number of
+studies have carried out to investigate the influence of geometrical pa￾rameters and operating conditions on the thermal performance of porous
+volumetric solar receivers. Wang et al. [114], Chen et al. [116] and
+Barreto et al. [119] investigated the solar radiation transport in the he￾liostat field coupled with the fluid flow and heat transfer processes inside
+porous volumetric solar receivers. Wu and Wang [170] as well as Wang
+et al. [171] established transient heat transfer models for porous volu￾metric solar receivers and analyzed the response time of the receivers
+under the transient heat flux boundaries with different thermophysical
+properties. Du et al. [127] coupled the genetic algorithm and the volume
+averaging simulation method which served as an efficient tool to opti￾mize the geometrical parameters and operating conditions of porous
+volumetric solar receivers.
+4. Advances in volumetric absorption enhancement
+Based on above experimental and numerical methods, studies have
+been carried out for the performance optimization of porous volumetric
+solar receivers. The volumetric absorption enhancement and thermal
+efficient improvement of receivers could be realized by geometrical
+parameter optimization and spectrally selective absorption.
+4.1. Geometrical parameter optimization
+The porous media prepared by conventional processing technologies
+usually have a relatively uniform pore structures, and therefore have
+relatively uniform optical and radiative properties as well as uniform
+fluid flow and heat transfer characteristics. However, the energy transfer
+in porous volumetric solar receivers is non-uniform. For example, the
+penetration depth of solar radiation is limited due to the larger extinction
+coefficient of the porous media. The absorption of solar radiation occurs
+at the front of the receiver, which is contrary to the concept of volumetric
+absorption by the porous media. Secondly, the incident solar radiation
+distribution is non-uniform due to the concentrating process in the he￾liostat field. The uniform heat transfer capability of the porous media
+does not match up with the non-uniform solar energy, which leads to
+local overheating and deterioration in thermal efficiency. Therefore, the
+concept of functionally graded material is used in the design of porous
+volumetric solar receiver.
+Multi-cavity volumetric receiver [42] was an earlier attempt that
+adjusted the local geometrical parameters to improve the performance of
+porous volumetric solar receivers. This receiver was built by horizontal
+foils and side-bars, which formed cavities to absorb solar radiation. In
+order to reduce the front surface area, a staggered layout of the front was
+proposed as shown in Fig. 19(a). However, the experimental studies did
+not indicate the performance improvement by the staggered design as
+compared with the uniform structure. Fend et al.2 combined the porous
+materials with different pore densities which had a larger pore density in
+the front as presented in Fig. 19(b). The smaller pore size (80 PPI) of the
+porous media could efficiently absorb the solar radiation while
+enhancing the convective heat transfer. The larger pore size (20 PPI) in
+the rear was beneficial for reducing the flow resistance. The double-layer
+design improved the thermal efficiency by 10%, as compared to the
+uniform porous media with a 20 PPI. Since then, the porous volumetric
+solar receivers with double, triple or multilayer structure have been
+extensively studied. Roldan et al. [126] and Chen et al. [115] established
+the numerical model for the triple-layer and double-layer porous volu￾metric solar receivers, respectively. Both studies revealed that the
+receiver with decreasing porosity distribution could improve the overall
+thermal efficiency, which outperforms the traditional uniform porous
+Y.-L. He et al. Energy Reviews 2 (2023) 100035
+15
+
+receivers with porosity of 0.7-0.9. The larger porosity in the front could
+increase the penetration depth of solar radiation, reduce the surface
+temperature, and limit the thermal radiative loss. Chen et al. further
+investigated the influence of thickness ratio of the two layers on the
+outlet temperature of the receiver. It is shown that the improvement in
+thermal efficiency disappeared when the thickness of the front layer
+reached a certain value. When the thickness of the front layer was too
+small, the volumetric absorption of t solar radiation was weakened. The
+optimized thickness ratio for the double-layer porous volumetric solar
+receiver was 3:7. Avila-Marin et al. [172,173] and Zaversky et al. [18]
+conducted experimental studies for the triple-layer wire mesh and silicon
+carbide foam porous volumetric solar receivers, as presented in
+Fig. 19(c). Avila-Marin et al. found that the optimized double-layer
+receiver had a large front porosity and a large specific surface area in
+the rear. Besides, the triple-layer receiver could not further improve the
+thermal performance as compared with the optimized double-layer
+receiver. However, in the experiment of Zaversky et al., no evident
+improvement was observed by the double-layer or triple-layer designs. It
+was concluded that a careful selection of the single-layer configuration
+was sufficient to optimize the performance of the receiver. Based on the
+developed numerical model, the optimized thickness ratio calculated by
+Zaversky et al. was also 3:7, which was in agreement with the result of
+Chen et al. [115].
+Furthermore, the porous volumetric solar receivers with multilayers
+and gradually-varied structures have also been proposed. Luque et al.
+[175] designed the hierarchically-layered fractal-like porous volumetric
+solar receivers based on additive manufacturing techniques as shown in
+Fig. 19(d). The results showed that the volumetric effect could be obtained
+but the thermal efficiency was relatively low. Capuano et al. [176] also
+applied additive manufacturing techniques and fabricated the porous
+media having a pin zone with gradually changed structures, as shown in
+Fig. 19(e). Compared with HiTRec-II with uniform honeycomb structure,
+the thermal performance was improved while the volumetric effect was
+obtained. Du et al. [165] developed a replica method with the multilayer
+recoating technique, and the silicon carbide porous ceramic with
+linear-changed geometrical parameters was fabricated as presented in
+Fig. 19(f). The experimental study showed that the thermal efficiency
+could be improved by 1.46% with the gradually-varied design, compared
+with the best uniform porous structure with an average porosity of 0.52.
+Based on the 3D printing and replica method, the uniform and gradual cell
+size porous receivers with different periodic cellular structures were
+fabricated and tested by Avila-Marin et al. [177], as shown in Fig. 19(g).
+The experimental results presented that Voronoi porous receiver with
+gradually increasing cell size exhibited better thermal performance due to
+lower solid temperature. Moreover, 3D printing technique has also been
+adopted by different researchers for the fabrication of porous receivers
+with graded pore geometries and complex lattice structures [178,179].
+On the other hand, some studies focused on the porous volumetric
+solar receivers with radial graded structures. The radial graded porous
+media can improve the thermal performance of the receivers by adjusting
+the air mass flow distribution under non-uniform solar radiation. Roldan
+et al. [126] designed the porous volumetric solar receivers with
+decreasing or increasing porosity distribution and analyzed the perfor￾mance with the LTE model. Arranging the porous structure with large
+porosity at the center of the receiver was beneficial to increase the
+average outlet temperature, but the temperature gradient of the receiver
+also increased. Chen et al. [117] proposed a porous volumetric solar
+receiver with composite structures. A small zone in the inlet near-wall
+region was arranged with the porous media having smaller porosity
+and pore size. The increased flow resistance compelled the fluid to move
+into the center region with a higher solar flux, and the solid temperature
+gradient in the front could be reduced. Based on the X-ray CT recon￾struction and 3D printing techniques, Du et al. [164] experimentally
+investigated the fluid flow and heat transfer performances of the radially
+graded porous volumetric solar receiver, as shown in Fig. 20. The results
+showed that the thermal efficiency was relatively improved by 4.1%
+while the flow resistance decreased relatively by 8.6%, compared with
+the optimized uniform porous volumetric solar receiver with 20 PPI. By
+utilizing the volume averaging simulation method, the flow and tem￾perature fields inside the porous volumetric solar receivers were visual￾ized as illustrated in Fig. 21. It was found that the local overheating
+existed in the uniform porous volumetric solar receivers due to the fact
+that the air viscosity increases as the temperature goes higher. The
+smaller porosity at the center of the radially graded porous volumetric
+solar receiver decreased the flow resistance at the high temperature re￾gion, which led to more heat transfer fluid to absorb the concentrated
+solar radiation.
+4.2. Spectrally selective absorption
+From the viewpoint of energy balance, the key to improve the
+receiver thermal efficiency is to increase the solar radiation absorption
+and reduce energy losses. The thermal radiative loss at the front of the
+receivers becomes the major energy loss under high temperature oper￾ation condition. Therefore, many researchers tried to adjust the radiative
+properties of the materials and structure in order to increase the ab￾sorptivity in the solar spectrum while reducing the emissivity in the
+infrared spectrum. The commonly investigated spectrally selective
+Fig. 19. Porous volumetric solar receivers with varying geometries along the axis (a)Multi-cavity (Reproduced with permission [42]. Copyright 1993, Elsevier); (b)
+Fend et al. (Adapted with permission [174]. Copyright 2004, Elsevier); (c) Avila-Marin et al. (Reproduced with permission [172]. Copyright 2018, Elsevier); (d)Luque
+et al. (Adapted with permission [175]. Copyright 2018, Elsevier); (e)Capuano et al. (Reproduced with permission [176]. Copyright 2017, Elsevier); (f)Du et al.
+(Reproduced with permission [165]. Copyright 2020, Springer Nature); (g)Avila-Marin et al. (Reproduced with permission [177]. Copyright 2022, Elsevier).
+Y.-L. He et al. Energy Reviews 2 (2023) 100035
+16
+
+materials include intrinsic materials, semiconductor-metal tandems,
+multilayer structures, cermets, surface texturing, and photonic crystals
+based designs [180]. Considering for the high working temperature in
+the CSP system, the spectrally selective receiver mainly focuses on the
+application of intrinsic materials or multilayer structures.
+Olalde et al. [181] designed two spectrally selective porous volu￾metric solar receivers that both had gradually-varied radiative proper￾ties. One receiver was a honeycomb structure with transparent matrix,
+and the absorptivity was gradually increased by controlling the deposit
+thickness of chemical vapor deposition. The other receiver was con￾structed by a packed bed which was a mixed composition of particles
+with different radiative properties. The front layer was designed to be
+transparent in the solar spectrum while the absorptivity was progres￾sively increased by adding more absorptive particles in the rear. The
+thermal radiative loss was limited because the transparent matrix had a
+larger absorptivity in the infrared spectrum. Pitz-Paal et al. [182] pro￾posed a double-layer porous volumetric solar receiver with quartz glass
+in the front of the SiSiC ceramic as shown in Fig. 22(a). The quartz glass
+was transparent to solar radiation and the SiSiC ceramic can volumetri￾cally absorbed solar energy. The thermal radiation emitted by the high
+temperature ceramic was reabsorbed by the quartz glass because it could
+effectively absorb the infrared emission. It was demonstrated that the
+thermal efficiency could be improved from 68.5% to 75.0% using this
+double-layer design when the outlet air temperature reached above 900
+C.
+Similarly, Menigault et al. [183] also developed double-layer spec￾trally selective porous volumetric solar receivers. The solar radiation
+absorption layer was placed in the rear which was composed of SiC
+particles as shown in Fig. 22(b). The front layer consisted of glass spheres
+or pure silica honeycomb structures, which can absorb the thermal
+emission from the SiC particles. For the receiver with glass spheres, the
+outlet air temperature was lower than 500 C due to the temperature
+limitation of glass. However, by fitting the experimental data from the
+high temperature zone, it was shown that the double-layer receiver
+outperformed when the outlet air temperature reached above 600 C. For
+the double-layer receiver with silica honeycomb structures, the outlet air
+temperature can achieve 600 C, and the thermal efficiency was
+improved from 71% to 76%, compared with the pure SiC porous volu￾metric solar receiver. Sedighi et al. [184] further designed and investi￾gated the packed bed volumetric solar receiver with spheres of different
+transmittance. In order to improve the penetration depth and achieve the
+volumetric effect, the quartz spheres with high transmittance were
+installed in the front of the receiver. Meanwhile, the ceramic spheres
+which have large absorptance were located in the rear of the receiver to
+prevent the transmission loss. The outlet temperature of the variable
+transmittance quartz packed bed was significantly increased compared
+with the quartz and ceramic packed beds, and a high index of volumetric
+effect of 1.45 was achieved.
+Moreover, investigations on the application of intrinsic spectrally
+selective materials for porous volumetric solar receivers have been car￾ried out. Zhu and Xuan [185] numerically investigated a porous volu￾metric porous solar receiver with a MoSi2-Si3N4 spectrally selective
+coating. This coating was compared with the ideal coating material with
+a cut-off wavelength of 2 μm. Compared with the regular receivers, the
+receivers with the MoSi2-Si3N4 coating and the ideal coating could
+improve the thermal efficiency by 1.2% and 2.9%, respectively. Some
+studies focused on the radiative properties of ultra-high temperature
+ceramics such as HfB2 and TaC [186,187], but few studies applied these
+ceramics to porous volumetric solar receivers and investigated the per￾formance improvement. Rousseau et al. [188] utilized the pore-scale
+reconstruction and ray tracing methods to analyzed the emissivity of
+the porous skeleton with TaC, ZrC, and ZrB2 coatings. Compared with SiC
+which has a large emissivity in the infrared spectrum, the ZrB2 coating
+can largely achieve the spectrally selective absorption, and the emissivity
+in the infrared spectrum and absorptivity in the solar spectrum were 0.31
+and 0.81, respectively. Recently, Du et al. [189] proposed the porous
+volumetric solar receiver based on molten salt as a heat transfer fluid, and
+the Hitec and air receivers were compared based on the direct pore-scale
+numerical simulation method. By utilizing the intrinsic spectrally selec￾tive absorptivity, the molten salt could be regarded as the transparent
+window to solar radiation which absorbs the thermal radiation emitted
+by the porous structure. The results showed that the thermal efficiency of
+the Hitec porous volumetric solar receiver could be improved by 9.6% at
+receiver's outlet temperature of 1000 K as compared with the air porous
+volumetric solar receiver.
+5. Conclusions and outlooks
+Since the 1980s, the experimental studies have accumulated experi￾ence in material selection, structural design, and system operation of
+porous volumetric solar receivers. The ceramic materials have become a
+better choice due to the higher upper temperature limit and oxidation
+resistance. Silicon carbide has been widely used due to their good ab￾sorption performance in the solar spectrum and high temperature resis￾tance characteristics. For the atmospheric porous volumetric solar
+receiver, Solar Tower Jülich demonstrated the mature design which
+utilized the modular design concept and air return system. Such design
+could be easily scale-up and the overall thermal efficiency was high. For
+the pressurized porous volumetric solar receiver, problems exist for the
+secondary concentrator and transparent window. The non-uniform and
+Fig. 20. Radially graded porous media fabricated by 3D printing (Adapted with
+permission [164]. Copyright 2020, Elsevier).
+Fig. 21. Temperature distribution in the porous volumetric solar receiver (a)
+Uniform porous media; (b)Radial graded porous media (Adapted with permis￾sion [164]. Copyright 2020, Elsevier).
+Y.-L. He et al. Energy Reviews 2 (2023) 100035
+17
+
+high temperature working condition severely influence the thermal ef￾ficiency and long-term usage of the entire system. Hence, it is crucial to
+test the long-term stability of the receiver, and establish a large-scale CSP
+system based on a porous volumetric solar receiver to assess its
+compatibility with various power cycles.
+Due to the complex structure of the porous media, limited experi￾mental measurement conditions, and high experimental costs, numerical
+simulation methods have become an important means for analyzing the
+fluid flow and heat transfer performance of porous volumetric solar re￾ceivers. The direct pore-scale numerical simulation method could restore
+the detailed structure of the porous media and accurately reveal the fluid
+flow and heat transfer processes inside the receiver. However, this
+method requires a lot of computational resources and a full-scale nu￾merical model considering the solar radiation transfer and coupled heat
+transfer is difficult to build. On the other hand, the volume averaging
+simulation method can realize the rapid evaluation of the thermal per￾formance of porous volumetric solar receivers which becomes the main
+tool to conduct parametric sensitivity analysis and optimization design.
+However, the accuracy of the simulation results of this method depends
+on the rational selection of the empirical parameters. Therefore, it is
+necessary to establish a full-scale direct pore-scale model to investigate
+the morphologies of the porous skeleton and the transient performance of
+the porous volumetric solar receiver. At the REV scale, a more efficient
+optimization algorithm can be integrated into the volume-averaging
+simulation method to consider irregular shapes of porous structures
+and complex air flow paths, thereby optimizing the overall performance
+of the porous volumetric solar receivers.
+In order to enhance the volumetric absorption of the porous media,
+many studies have focused on the geometrical parameters optimization
+especially along the axial direction. However, different studies have not
+achieved consistent results in the thermal efficiency improvement of the
+multilayer design. Furthermore, although the 3D printing technique has
+been utilized for fabricating porous media with non-uniform structures,
+the experimental validation of the design concept remains incomplete. It
+is essential to propose a general evaluation index and summarize an
+optimization roadmap. On the other hand, many numerical and experi￾mental studies have proved the high efficiency of the spectrally selective
+absorption concept. But experimental work is still needed for the accu￾rate measurements of radiative properties of the porous media and heat
+transfer fluid. Further experiments are necessary to verify the excellent
+thermal performance of the spectrally selective porous volumetric solar
+receiver.
+Declaration of competing interest
+The authors declare that they have no known competing financial
+interests or personal relationships that could have appeared to influence
+the work reported in this paper.
+Acknowledgements
+This study is supported by the National Key Research and Develop￾ment Program of China(2022YFB3304001)and the Key R&D Program of
+Shaanxi province of China (No. 2022GXLH-01-04).
+References
+[1] M. Mehos, C. Turchi, J. Vidal, et al., Concentrating Solar Power Gen3
+Demonstration Roadmap, National Renewable Energy Lab, 2017.
+[2] Y.-L. He, Y. Qiu, K. Wang, et al., Perspective of concentrating solar power, Energy
+198 (2020), 117373, https://doi.org/10.1016/j.energy.2020.117373.
+[3] M.-J. Li, W.-Q. Tao, Review of methodologies and polices for evaluation of energy
+efficiency in high energy-consuming industry, Appl. Energy 187 (2017) 203–215,
+https://doi.org/10.1016/j.apenergy.2016.11.039.
+[4] A.W. Dowling, T. Zheng, V.M. Zavala, Economic assessment of concentrated solar
+power technologies: a review, Renewable Sustainable Energy Rev. 72 (2017)
+1019–1032, https://doi.org/10.1016/j.rser.2017.01.006.
+[5] C.K. Ho, B.D. Iverson, Review of high-temperature central receiver designs for
+concentrating solar power, Renewable Sustainable Energy Rev. 29 (2014)
+835–846, https://doi.org/10.1016/j.rser.2013.08.099.
+[6] A.A. Hachicha, B.A.A. Yousef, Z. Said, et al., A review study on the modeling of
+high-temperature solar thermal collector systems, Renewable Sustainable Energy
+Rev. 112 (2019) 280–298, https://doi.org/10.1016/j.rser.2019.05.056.
+[7] K. Jiang, X. Du, Y. Kong, et al., A comprehensive review on solid particle receivers
+of concentrated solar power, Renewable Sustainable Energy Rev. 116 (2019),
+109463, https://doi.org/10.1016/j.rser.2019.109463.
+[8] F. Nie, F. Bai, Z. Wang, et al., Solid particle solar receivers in the next-generation
+concentrated solar power plant, EcoMat 4 (5) (2022), e12207, https://doi.org/
+10.1002/eom2.12207.
+Fig. 22. Double-layer porous volumetric solar receivers with spectral selective absorption (a)Pitz-Paal et al. (Reproduced with permission [182]. Copyright 1991,
+Elsevier); (b)Menigault et al. (Reproduced with permission [183]. Copyright 1991, Elsevier); (c)Reproduced from Sedighi et al. (Adapted with permission [184].
+Copyright 2020, Elsevier).
+Y.-L. He et al. Energy Reviews 2 (2023) 100035
+18
+
+[9] S.P. Tembhare, D.P. Barai, B.A. Bhanvase, Performance evaluation of nanofluids in
+solar thermal and solar photovoltaic systems: a comprehensive review, Renewable
+Sustainable Energy Rev. 153 (2022), 111738, https://doi.org/10.1016/
+j.rser.2021.111738.
+[10] W. Chamsa-Ard, S. Brundavanam, C.C. Fung, et al., Nanofluid types, their
+synthesis, properties and incorporation in direct solar thermal collectors: a review,
+Nanomaterials 7 (6) (2017) 131, https://doi.org/10.3390/nano7060131.
+[11] A. Gil, B. Grange, V.G. Perez, et al., CSPonD Demonstrative Project: Start-Up
+Process of a 25 kW Prototype, AIP Conference Proceedings, 2017.
+[12] A.H. Slocum, D.S. Codd, J. Buongiorno, et al., Concentrated solar power on
+demand, Sol. Energy 85 (7) (2011) 1519–1529, https://doi.org/10.1016/
+j.solener.2011.04.010.
+[13] A. Lenert, E.N. Wang, Optimization of nanofluid volumetric receivers for solar
+thermal energy conversion, Sol. Energy 86 (1) (2012) 253–265, https://doi.org/
+10.1016/j.solener.2011.09.029.
+[14] M. Tetreault-Friend, M. Diago, T.A. Cooper, et al., A floating modular cover for
+high temperature open-tank molten salt solar-thermal volumetric receivers, Sol.
+Energy 176 (2018) 465–482, https://doi.org/10.1016/j.solener.2018.10.047.
+[15] J.E.P. Navalho, J.C.F. Pereira, A comprehensive and fully predictive discrete
+methodology for volumetric solar receivers: application to a functional parabolic
+dish solar collector system, Appl. Energy 267 (2020), 114781, https://doi.org/
+10.1016/j.apenergy.2020.114781.
+[16] A. Kribus, M. Grijnevich, Y. Gray, et al., Parametric study of volumetric absorber
+performance, Energy Proc. 49 (2014) 408–417, https://doi.org/10.1016/
+j.egypro.2014.03.044.
+[17] A. Kribus, Y. Gray, M. Grijnevich, et al., The promise and challenge of solar
+volumetric absorbers, Sol. Energy 110 (2014) 463–481, https://doi.org/10.1016/
+j.solener.2014.09.035.
+[18] F. Zaversky, L. Aldaz, M. Sanchez, et al., Numerical and experimental evaluation
+and optimization of ceramic foam as solar absorber – single-layer vs multi-layer
+configurations, Appl. Energy 210 (2018) 351–375, https://doi.org/10.1016/
+j.apenergy.2017.11.003.
+[19] W.E.C. Pritzkow, Pressure loaded volumetric ceramic receiver, Sol. Energy Mater.
+24 (1) (1991) 498–507, https://doi.org/10.1016/0165-1633(91)90086-Z.
+[20] A.L. Avila-Marín, Volumetric receivers in solar thermal power plants with central 
+receiver system technology: a review, Sol. Energy 85 (5) (2011) 891–910, https://
+doi.org/10.1016/j.solener.2011.02.002.
+[21] M. Silva, H. Fricker, C. Winkler, et al., Design and Test Result of Wire Receiver
+Experiment – Almeria, 4th International Solar Energy Conference, Santa Fe, NM,
+USA, 1988.
+[22] W. Grasse, PHOEBUS: international 30 MWe solar tower plant, Sol. Energy Mater.
+24 (1-4) (1991) 82–94, https://doi.org/10.1016/0165-1633(91)90050-U.
+[23] A. Finker, M. Schmitz-Goeb, D. Streuber, Phoebus tests successful, Mod. Power
+Syst. 13 (10) (1993) 21–25.
+[24] M. Bohmer, C. Chaza, The ceramic foil volumetric receiver, Sol. Energy Mater. 24 €
+(1) (1991) 182–191, https://doi.org/10.1016/0165-1633(91)90058-S.
+[25] B. Hoffschmidt, V. Fernandez, A. Konstandopoulos, et al., Development of Ceramic
+Volumetric Receiver Technology, 5th Cologne Solar Symposium, Cologne, 2001.
+[26] B. Hoffschmidt, F.M. Tellez, A. Valverde, et al., Performance evaluation of the
+200-kWth HiTRec-II open volumetric air receiver, J. Sol. Energy Eng. 125 (1)
+(2003) 87–94, https://doi.org/10.1115/1.1530627.
+[27] F Tellez Sufrategui, Thermal Performance Evaluation of the 200kWth SolAir
+Volumetric Solar Receiver, Plataforma Solar de Almería, 2003.
+[28] F. Tellez, M. Romero, P. Heller, et al., Thermal Performance of SolAir 3000 kWth
+Ceramic Volumetric Solar Receiver, 12th International Symposium Solar Power
+and Chemical Energy Systems, Oaxaca, Mexico, 2004.
+[29] S. Pomp, P. Schwarzbozl, G. Koll, et al., The Solar Tower Jülich € –first operational
+experiences and test results, in: Proceedings. SolarPACES 2010 Conference,
+Perpignan, Frankreich, 2010.
+[30] G. Koll, P. Schwarzbozl, K. Hennecke, et al., The Solar Tower Jülich-A Research €
+and Demonstration Plant for Central Receiver Systems, SolarPACES 2009, Berlin,
+Germany, 2009.
+[31] A. Tiddens, M. Roger, H. Stadler, et al., Air return ratio measurements at the solar €
+tower Jülich using a tracer gas method, Sol. Energy 146 (2017) 351–358, https://
+doi.org/10.1016/j.solener.2017.02.027.
+[32] R. Buck, M. Abele, J. Kunberger, et al., Receiver for solar-hybrid gas turbine and
+combined cycle systems, J. Phys. IV 9 (3) (1999) 537–544, https://doi.org/
+10.1051/jp4:1999385.
+[33] R. Buck, T. Brauning, T. Denk, et al., Solar-hybrid gas turbine-based power tower
+systems (REFOS), J. Sol. Energy Eng. 124 (1) (2001) 2–9, https://doi.org/
+10.1115/1.1445444.
+[34] A. Kribus, P. Doron, R. Rubin, et al., Performance of the directly-irradiated annular
+pressurized receiver (DIAPR) operating at 20 bar and 1,200C, J. Sol. Energy Eng.
+123 (1) (2000) 10–17, https://doi.org/10.1115/1.1345844.
+[35] P. Heller, M. Pf€ander, T. Denk, et al., Test and evaluation of a solar powered gas
+turbine system, Sol. Energy 80 (10) (2006) 1225–1230, https://doi.org/10.1016/
+j.solener.2005.04.020.
+[36] A. del Río, R. Korzynietz, J.A. Brioso, et al., Soltrec – pressurized volumetric solar
+air receiver technology, Energy Proc. 69 (2015) 360–368, https://doi.org/
+10.1016/j.egypro.2015.03.042.
+[37] J. Zhu, K. Wang, G. Li, et al., Experimental study of the energy and exergy
+performance for a pressurized volumetric solar receiver, Appl. Therm. Eng. 104
+(2016) 212–221, https://doi.org/10.1016/j.applthermaleng.2016.05.075.
+[38] L. Aichmayer, J. Garrido, W. Wang, et al., Experimental evaluation of a novel solar
+receiver for a micro gas-turbine based solar dish system in the KTH high-flux solar
+simulator, Energy 159 (2018) 184–195, https://doi.org/10.1016/
+j.energy.2018.06.120.
+[39] F. Zaversky, Competitive Solar Power Towers – the Potential and Challenge of
+Solar Powered Combined Cycles – Next Development Steps, 2019.
+[40] F. Zaversky, F. Cabello, A. Bernardos, et al., A novel high-efficiency solar thermal
+power plant featuring electricity storage - ideal for the future power grid with high
+shares of renewables, AIP Conf. Proc. 2445 (1) (2022), 060008, https://doi.org/
+10.1063/5.0085718.
+[41] F. Zaversky, J. Fernandez-Reche, M. Casanova, et al., Experimental testing of a
+300 kWth open volumetric air receiver (OVAR) coupled with a small-scale brayton
+cycle. Operating experience and lessons learnt, SolarPACES (2021) 2021.
+[42] A. Carotenuto, F. Reale, G. Ruocco, et al., Thermal behaviour of a multi-cavity
+volumetric solar receiver: design and tests results, Sol. Energy 50 (2) (1993)
+113–121, https://doi.org/10.1016/0038-092X(93)90082-Y.
+[43] T. Hellmuth, L. Matthews, Experimental characterization of a high-temperature,
+high-flux, solar volumetric receiver, Exp. Heat Tran. 10 (2) (1997) 141–163,
+https://doi.org/10.1080/08916159708946540.
+[44] Q. Zhu, Y. Xuan, X. Liu, et al., A 130 kWe solar simulator with tunable ultra-high
+flux and characterization using direct multiple lamps mapping, Appl. Energy 270
+(2020), 115165, https://doi.org/10.1016/j.apenergy.2020.115165.
+[45] M. Roger, P. Herrmann, S. Ulmer, et al., Techniques to measure solar € flux density
+distribution on large-scale receivers, J. Sol. Energy Eng. 136 (3) (2014), 031013,
+https://doi.org/10.1115/1.4027261.
+[46] S. Mey-Cloutier, C. Caliot, A. Kribus, et al., Experimental study of ceramic foams
+used as high temperature volumetric solar absorber, Sol. Energy 136 (2016)
+226–235, https://doi.org/10.1016/j.solener.2016.06.066.
+[47] J.M. Chavez, C. Chaza, Testing of a porous ceramic absorber for a volumetric air
+receiver, Sol. Energy Mater. 24 (1) (1991) 172–181, https://doi.org/10.1016/
+0165-1633(91)90057-R.
+[48] T. Fend, P. Schwarzbozl, O. Smirnova, et al., Numerical investigation of € flow and
+heat transfer in a volumetric solar receiver, Renew. Energy 60 (2013) 655–661,
+https://doi.org/10.1016/j.renene.2013.06.001.
+[49] M. Cagnoli, L. Savoldi, R. Zanino, et al., Coupled optical and CFD parametric
+analysis of an open volumetric air receiver of honeycomb type for central tower
+CSP plants, Sol. Energy 155 (2017) 523–536, https://doi.org/10.1016/
+j.solener.2017.06.038.
+[50] A.L. Avila-Marin, M. Alvarez-Lara, J. Fernandez-Reche, Experimental results of
+gradual porosity wire mesh absorber for volumetric receivers, Energy Proc. 49
+(2014) 275–283, https://doi.org/10.1016/j.egypro.2014.03.030.
+[51] A.L. Avila-Marin, C. Caliot, G. Flamant, et al., Numerical determination of the heat
+transfer coefficient for volumetric air receivers with wire meshes, Sol. Energy 162
+(2018) 317–329, https://doi.org/10.1016/j.solener.2018.01.034.
+[52] Z. Wu, C. Caliot, G. Flamant, et al., Numerical simulation of convective heat
+transfer between air flow and ceramic foams to optimise volumetric solar air
+receiver performances, Int. J. Heat Mass Tran. 54 (7) (2011) 1527–1537, https://
+doi.org/10.1016/j.ijheatmasstransfer.2010.11.037.
+[53] T.J. Lu, H.A. Stone, M.F. Ashby, Heat transfer in open-cell metal foams, Acta
+Mater. 46 (10) (1998) 3619–3635, https://doi.org/10.1016/S1359-6454(98)
+00031-7.
+[54] I. Ghosh, Heat-transfer analysis of high porosity open-cell metal foam, J. Heat
+Tran. 130 (3) (2008), 034501, https://doi.org/10.1115/1.2804941.
+[55] Q. Yu, B.E. Thompson, A.G. Straatman, A unit cube-based model for heat transfer
+and fluid flow in porous carbon foam, J. Heat Tran. 128 (4) (2005) 352–360,
+https://doi.org/10.1115/1.2165203.
+[56] S.A.M. Karimian, A.G. Straatman, CFD study of the hydraulic and thermal
+behavior of spherical-void-phase porous materials, Int. J. Heat Fluid Flow 29 (1)
+(2008) 292–305, https://doi.org/10.1016/j.ijheatfluidflow.2007.07.003.
+[57] S. Krishnan, J.Y. Murthy, S.V. Garimella, Direct simulation of transport in open￾cell metal foam, J. Heat Tran. 128 (8) (2006) 793–799, https://doi.org/10.1115/
+1.2227038.
+[58] S. Krishnan, S.V. Garimella, J.Y. Murthy, Simulation of thermal transport in open￾cell metal foams: effect of periodic unit-cell structure, J. Heat Tran. 130 (2)
+(2008), 024503, https://doi.org/10.1115/1.2789718.
+[59] M. Bai, J.N. Chung, Analytical and numerical prediction of heat transfer and
+pressure drop in open-cell metal foams, Int. J. Therm. Sci. 50 (6) (2011) 869–880,
+https://doi.org/10.1016/j.ijthermalsci.2011.01.007.
+[60] D. Weaire, R. Phelan, A counter-example to Kelvin's conjecture on minimal
+surfaces, Phil. Mag. Lett. 69 (2) (1994) 107–110, https://doi.org/10.1080/
+09500839408241577.
+[61] K. Boomsma, D. Poulikakos, Y. Ventikos, Simulations of flow through open cell
+metal foams using an idealized periodic cell structure, Int. J. Heat Fluid Flow 24
+(6) (2003) 825–834, https://doi.org/10.1016/j.ijheatfluidflow.2003.08.002.
+[62] Z. Nie, Y. Lin, Q. Tong, Modeling structures of open cell foams, Comput. Mater.
+Sci. 131 (2017) 160–169, https://doi.org/10.1016/j.commatsci.2017.01.029.
+[63] T. Wejrzanowski, J. Skibinski, J. Szumbarski, et al., Structure of foams modeled by
+Laguerre–Voronoi tessellations, Comput. Mater. Sci. 67 (2013) 216–221, https://
+doi.org/10.1016/j.commatsci.2012.08.046.
+[64] M. Kırca, A. Gül, E. Ekinci, et al., Computational modeling of micro-cellular carbon
+foams, Finite Elem. Anal. Des. 44 (1–2) (2007) 45–52, https://doi.org/10.1016/
+j.finel.2007.08.008.
+[65] P. Habisreuther, N. Djordjevic, N. Zarzalis, Statistical distribution of residence
+time and tortuosity of flow through open-cell foams, Chem. Eng. Sci. 64 (23)
+(2009) 4943–4954, https://doi.org/10.1016/j.ces.2009.07.033.
+[66] H. Okabe, M.J. Blunt, Pore space reconstruction using multiple-point statistics,
+J. Petrol. Sci. Eng. 46 (1) (2005) 121–137, https://doi.org/10.1016/
+j.petrol.2004.08.002.
+Y.-L. He et al. Energy Reviews 2 (2023) 100035
+19
+
+[67] M. Wang, J. Wang, N. Pan, et al., Mesoscopic predictions of the effective thermal
+conductivity for microscale random porous media, Phys. Rev. E 75 (3) (2007),
+036702, https://doi.org/10.1103/PhysRevE.75.036702.
+[68] Y.-L. He, T. Xie, Advances of thermal conductivity models of nanoscale silica
+aerogel insulation material, Appl. Therm. Eng. 81 (2015) 28–50, https://doi.org/
+10.1016/j.applthermaleng.2015.02.013.
+[69] J. Petrasch, F. Meier, H. Friess, et al., Tomography based determination of
+permeability, Dupuit–Forchheimer coefficient, and interfacial heat transfer
+coefficient in reticulate porous ceramics, Int. J. Heat Fluid Flow 29 (1) (2008)
+315–326, https://doi.org/10.1016/j.ijheatfluidflow.2007.09.001.
+[70] K.K. Bodla, J.Y. Murthy, S.V. Garimella, Microtomography-based simulation of
+transport through open-cell metal foams, Numer. Heat Tran., Part A: Applications
+58 (7) (2010) 527–544, https://doi.org/10.1080/10407782.2010.511987.
+[71] M. Iasiello, S. Cunsolo, M. Oliviero, et al., Numerical analysis of heat transfer and
+pressure drop in metal foams for different morphological models, J. Heat Tran.
+136 (11) (2014), 112601, https://doi.org/10.1115/1.4028113.
+[72] P. Ranut, E. Nobile, L. Mancini, High resolution microtomography-based CFD
+simulation of flow and heat transfer in aluminum metal foams, Appl. Therm. Eng.
+69 (1) (2014) 230–240, https://doi.org/10.1016/j.applthermaleng.2013.11.056.
+[73] S. Suter, A. Steinfeld, S. Haussener, Pore-level engineering of macroporous media
+for increased performance of solar-driven thermochemical fuel processing, Int. J.
+Heat Mass Tran. 78 (2014) 688–698, https://doi.org/10.1016/
+j.ijheatmasstransfer.2014.07.020.
+[74] A. Diani, K.K. Bodla, L. Rossetto, et al., Numerical investigation of pressure drop
+and heat transfer through reconstructed metal foams and comparison against
+experiments, Int. J. Heat Mass Tran. 88 (2015) 508–515, https://doi.org/
+10.1016/j.ijheatmasstransfer.2015.04.038.
+[75] M. Zafari, M. Panjepour, M. Davazdah Emami, et al., Microtomography-based
+numerical simulation of fluid flow and heat transfer in open cell metal foams,
+Appl. Therm. Eng. 80 (2015) 347–354, https://doi.org/10.1016/
+j.applthermaleng.2015.01.045.
+[76] T. Dixit, I. Ghosh, Simulation intricacies of open-cell metal foam fin subjected to
+convective flow, Appl. Therm. Eng. 137 (2018) 532–544, https://doi.org/
+10.1016/j.applthermaleng.2018.04.011.
+[77] C. Sinn, G.R. Pesch, J. Thoming, et al., Coupled conjugate heat transfer and heat €
+production in open-cell ceramic foams investigated using CFD, Int. J. Heat Mass
+Tran. 139 (2019) 600–612, https://doi.org/10.1016/
+j.ijheatmasstransfer.2019.05.042.
+[78] R. Wang, A. Hou, Z. Wu, Tomography-based investigation of flow and heat
+transfer inside reticulated porous ceramics, Appl. Therm. Eng. 184 (2021),
+116115, https://doi.org/10.1016/j.applthermaleng.2020.116115.
+[79] S. Du, M.-J. Li, Q. Ren, et al., Pore-scale numerical simulation of fully coupled heat
+transfer process in porous volumetric solar receiver, Energy 140 (2017)
+1267–1275, https://doi.org/10.1016/j.energy.2017.08.062.
+[80] G. Ambrosio, N. Bianco, W.K.S. Chiu, et al., The effect of open-cell metal foams
+strut shape on convection heat transfer and pressure drop, Appl. Therm. Eng. 103
+(2016) 333–343, https://doi.org/10.1016/j.applthermaleng.2016.04.085.
+[81] S. Haussener, P. Coray, W. Lipinski, et al., Tomography-based heat and mass 
+transfer characterization of reticulate porous ceramics for high-temperature
+processing, J. Heat Tran. 132 (2) (2009), 023305, https://doi.org/10.1115/
+HT2009-88031.
+[82] M. Nakakura, S. Bellan, K. Matsubara, et al., Conjugate radiation-convection￾conduction simulation of volumetric solar receivers with cut-back inlets, Sol.
+Energy 170 (2018) 606–617, https://doi.org/10.1016/j.solener.2018.06.006.
+[83] M. Nakakura, K. Matsubara, S. Bellan, et al., Direct simulation of a volumetric
+solar receiver with different cell sizes at high outlet temperatures (1,000–1,500 C), Renew. Energy 146 (2020) 1143–1152, https://doi.org/10.1016/
+j.renene.2019.07.039.
+[84] P. Garcia, A. Ferriere, J.-J. Bezian, Codes for solar flux calculation dedicated to
+central receiver system applications: a comparative review, Sol. Energy 82 (3)
+(2008) 189–197, https://doi.org/10.1016/j.solener.2007.08.004.
+[85] S.-J. Bode, P. Gauche, Review of optical software for use in concentrating solar
+power systems, in: Proceedings of South African Solar Energy Conference,
+Stellenbosch, South Africa, 2012.
+[86] Y. Qiu, Y.-L. He, Z.-D. Cheng, et al., Study on optical and thermal performance of a
+linear Fresnel solar reflector using molten salt as HTF with MCRT and FVM
+methods, Appl. Energy 146 (2015) 162–173, https://doi.org/10.1016/
+j.apenergy.2015.01.135.
+[87] Y.-L. He, F.-Q. Cui, Z.-D. Cheng, et al., Numerical simulation of solar radiation
+transmission process for the solar tower power plant: from the heliostat field to the
+pressurized volumetric receiver, Appl. Therm. Eng. 61 (2) (2013) 583–595,
+https://doi.org/10.1016/j.applthermaleng.2013.08.015.
+[88] F.-Q. Cui, Y.-L. He, Z.-D. Cheng, et al., Modeling of the dish receiver with the effect
+of inhomogeneous radiation flux distribution, Heat Tran. Eng. 35 (6-8) (2014)
+780–790, https://doi.org/10.1080/08832323.2013.838098.
+[89] Z.D. Cheng, Y.L. He, F.Q. Cui, et al., Comparative and sensitive analysis for
+parabolic trough solar collectors with a detailed Monte Carlo ray-tracing optical
+model, Appl. Energy 115 (2014) 559–572, https://doi.org/10.1016/
+j.apenergy.2013.11.001.
+[90] M. Sanchez, M. Marcos, M. Romero, et al., Design parameters influence on flux
+distribution through prismatic channels of volumetric absorbers, EuroSun2004, in:
+Proceedings of the 14th International Sonnenforum, Freiburg, Germany, 2004.
+[91] M. Ali, M. Rady, M.A.A. Attia, et al., Consistent coupled optical and thermal
+analysis of volumetric solar receivers with honeycomb absorbers, Renew. Energy
+145 (2020) 1849–1861, https://doi.org/10.1016/j.renene.2019.07.082.
+[92] Q. Zhu, Y. Xuan, Pore scale numerical simulation of heat transfer and flow in
+porous volumetric solar receivers, Appl. Therm. Eng. 120 (2017) 150–159,
+https://doi.org/10.1016/j.applthermaleng.2017.03.141.
+[93] Y. Zhao, G.H. Tang, Monte Carlo study on extinction coefficient of silicon carbide
+porous media used for solar receiver, Int. J. Heat Mass Tran. 92 (2016)
+1061–1065, https://doi.org/10.1016/j.ijheatmasstransfer.2015.08.105.
+[94] S. Du, Q. Ren, Y.-L. He, Optical and radiative properties analysis and optimization
+study of the gradually-varied volumetric solar receiver, Appl. Energy 207 (2017)
+27–35, https://doi.org/10.1016/j.apenergy.2017.05.165.
+[95] S. Guevelou, B. Rousseau, G. Domingues, et al., A simple expression for the normal
+spectral emittance of open-cell foams composed of optically thick and smooth
+struts, J. Quant. Spectrosc. Radiat. Transfer 189 (2017) 329–338, https://doi.org/
+10.1016/j.jqsrt.2016.12.011.
+[96] S.Z. Shuja, B.S. Yilbas, Innovative design of a solar volumetric receiver:
+arrangements of absorbing block configurations, Sol. Energy 146 (2017) 105–112,
+https://doi.org/10.1016/j.solener.2017.02.029.
+[97] A. Dybbs, R.V. Edwards, A new look at porous media fluid mechanics — Darcy to
+turbulent, in: J. Bear, M.Y. Corapcioglu (Eds.), Fundamentals of Transport
+Phenomena in Porous Media, Springer Netherlands, Dordrecht, 1984,
+pp. 199–256.
+[98] S. Du, Z.-X. Tong, H.-H. Zhang, et al., Tomography-based determination of Nusselt
+number correlation for the porous volumetric solar receiver with different
+geometrical parameters, Renew. Energy 135 (2019) 711–718, https://doi.org/
+10.1016/j.renene.2018.12.001.
+[99] W. Liu, A. Fan, X. Huang, Theory and Application of Heat and Mass Transfer in
+Porous Media China, Science Publishing & Media Ltd.(CSPM), 2006.
+[100] S. Ergun, A.A. Orning, Fluid flow through randomly packed columns and fluidized
+beds, Ind. Eng. Chem. 41 (6) (1949) 1179–1184, https://doi.org/10.1021/
+ie50474a011.
+[101] S. Ergun, Fluid flow through packed columns, Chem. Eng. Prog. 48 (1952) 89–94.
+[102] B. Dietrich, W. Schabel, M. Kind, et al., Pressure drop measurements of ceramic
+sponges—determining the hydraulic diameter, Chem. Eng. Sci. 64 (16) (2009)
+3633–3640, https://doi.org/10.1016/j.ces.2009.05.005.
+[103] B. Madani, F. Topin, F. Rigollet, et al., Flow laws in metallic foams: experimental
+determination of inertial and viscous contributions, J. Porous Media 10 (1) (2007)
+51–70, https://doi.org/10.1615/JPorMedia.v10.i1.40.
+[104] Z. Wu, C. Caliot, F. Bai, et al., Experimental and numerical studies of the pressure
+drop in ceramic foams for volumetric solar receiver applications, Appl, Energy 87
+(2) (2010) 504–513, https://doi.org/10.1016/j.apenergy.2009.08.009.
+[105] Z. Nie, Y. Lin, Q. Tong, Numerical investigation of pressure drop and heat transfer
+through open cell foams with 3D Laguerre-Voronoi model, Int. J. Heat Mass Tran.
+113 (2017) 819–839, https://doi.org/10.1016/j.ijheatmasstransfer.2017.05.119.
+[106] P. Kumar, F. Topin, State-of-the-Art of pressure drop in open-cell porous foams:
+review of experiments and correlations, J. Fluid Eng. 139 (11) (2017), 111401,
+https://doi.org/10.1115/1.4037034.
+[107] D. Edouard, M. Lacroix, C.P. Huu, et al., Pressure drop modeling on SOLID foam:
+state-of-the art correlation, Chem. Eng. J. 144 (2) (2008) 299–311, https://
+doi.org/10.1016/j.cej.2008.06.007.
+[108] C. Xu, Z. Song, L-d Chen, et al., Numerical investigation on porous media heat
+transfer in a solar tower receiver, Renew. Energy 36 (3) (2011) 1138–1144,
+https://doi.org/10.1016/j.renene.2010.09.017.
+[109] P. Wang, K. Vafai, Modeling and analysis of an efficient porous media for a solar
+porous absorber with a variable pore structure, J. Sol. Energy Eng. 139 (5) (2017),
+051005, https://doi.org/10.1115/1.4037161.
+[110] F. Wang, Y. Shuai, H. Tan, et al., Thermal performance analysis of porous media
+receiver with concentrated solar irradiation, Int. J. Heat Mass Tran. 62 (2013)
+247–254, https://doi.org/10.1016/j.ijheatmasstransfer.2013.03.003.
+[111] X-l Meng, X.- l Xia, N. Sellami, et al., Coupled heat transfer performance of a high
+temperature cup shaped porous absorber, Energy Convers. Manag. 110 (2016)
+327–337, https://doi.org/10.1016/j.enconman.2015.12.034.
+[112] Z. Wu, C. Caliot, G. Flamant, et al., Coupled radiation and flow modeling in
+ceramic foam volumetric solar air receivers, Sol. Energy 85 (9) (2011) 2374–2385,
+https://doi.org/10.1016/j.solener.2011.06.030.
+[113] S. Mey, C. Caliot, G. Flamant, et al., Optimization of high temperature SiC
+volumetric solar absorber, Energy Proc. 49 (2014) 478–487, https://doi.org/
+10.1016/j.egypro.2014.03.051.
+[114] F. Wang, J. Tan, S. Yong, et al., Thermal performance analyses of porous media
+solar receiver with different irradiative transfer models, Int. J. Heat Mass Tran. 78
+(Supplement C) (2014) 7–16, https://doi.org/10.1016/
+j.ijheatmasstransfer.2014.06.035.
+[115] X. Chen, X.-L. Xia, X.-L. Meng, et al., Thermal performance analysis on a
+volumetric solar receiver with double-layer ceramic foam, Energy Convers.
+Manag. 97 (2015) 282–289, https://doi.org/10.1016/j.enconman.2015.03.066.
+[116] X. Chen, X.-L. Xia, H. Liu, et al., Heat transfer analysis of a volumetric solar
+receiver by coupling the solar radiation transport and internal heat transfer,
+Energy Convers. Manag. 114 (2016) 20–27, https://doi.org/10.1016/
+j.enconman.2016.01.074.
+[117] X. Chen, X.-L. Xia, X.-W. Yan, et al., Heat transfer analysis of a volumetric solar
+receiver with composite porous structure, Energy Convers. Manag. 136 (2017)
+262–269, https://doi.org/10.1016/j.enconman.2017.01.018.
+[118] M.E. Nimvari, N.F. Jouybari, Q. Esmaili, A new approach to mitigate intense
+temperature gradients in ceramic foam solar receivers, Renew. Energy 122 (2018)
+206–215, https://doi.org/10.1016/j.renene.2018.01.117.
+[119] G. Barreto, P. Canhoto, M. Collares-Pereira, Three-dimensional CFD modelling and
+thermal performance analysis of porous volumetric receivers coupled to solar
+Y.-L. He et al. Energy Reviews 2 (2023) 100035
+20
+
+concentration systems, Appl. Energy 252 (2019), 113433, https://doi.org/
+10.1016/j.apenergy.2019.113433.
+[120] G. Barreto, P. Canhoto, M. Collares-Pereira, Parametric analysis and optimisation
+of porous volumetric solar receivers made of open-cell SiC ceramic foam, Energy
+200 (2020), 117476, https://doi.org/10.1016/j.energy.2020.117476.
+[121] M. Lacroix, P. Nguyen, D. Schweich, et al., Pressure drop measurements and
+modeling on SiC foams, Chem. Eng. Sci. 62 (12) (2007) 3259–3267, https://
+doi.org/10.1016/j.ces.2007.03.027.
+[122] F. Bai, One dimensional thermal analysis of silicon carbide ceramic foam used for
+solar air receiver, Int. J. Therm. Sci. 49 (12) (2010) 2400–2404, https://doi.org/
+10.1016/j.ijthermalsci.2010.08.010.
+[123] B. Dietrich, Pressure drop correlation for ceramic and metal sponges, Chem. Eng.
+Sci. 74 (2012) 192–199, https://doi.org/10.1016/j.ces.2012.02.047.
+[124] A.L. Avila-Marin, J. Fernandez-Reche, A. Martinez-Tarifa, Modelling strategies for
+porous structures as solar receivers in central receiver systems: a review,
+Renewable Sustainable Energy Rev. 111 (2019) 15–33, https://doi.org/10.1016/
+j.rser.2019.03.059.
+[125] P. Jiang, X. Ouyang, R. Xu, Discussions on Local Thermal Non-equilibrium Model
+for Convectional Heat Transfer in Porous Media, Chinese Congress of Theoretical
+and Applied Mechanics, 2011.
+[126] M.I. Roldan, O. Smirnova, T. Fend, et al., Thermal analysis and design of a
+volumetric solar absorber depending on the porosity, Renew. Energy 62 (2014)
+116–128, https://doi.org/10.1016/j.renene.2013.06.043.
+[127] S. Du, Y.-L. He, W.-W. Yang, et al., Optimization method for the porous volumetric
+solar receiver coupling genetic algorithm and heat transfer analysis, Int. J. Heat
+Mass Tran. 122 (2018) 383–390, https://doi.org/10.1016/
+j.ijheatmasstransfer.2018.01.120.
+[128] K. Vafai, Handbook of Porous Media, Crc Press, 2015.
+[129] T.J. Hendricks, J.R. Howell, Absorption/scattering coefficients and scattering
+phase functions in reticulated porous ceramics, J. Heat Tran. 118 (1) (1996)
+79–87, https://doi.org/10.1115/1.2824071.
+[130] L.G. Henyey, J.L. Greenstein, Diffuse radiation in the galaxy, Astrophys. J. 93
+(1941) 70–83, https://doi.org/10.1086/144246.
+[131] X. Chen, X.- l Xia, X.- h Dong, et al., Integrated analysis on the volumetric
+absorption characteristics and optical performance for a porous media receiver,
+Energy Convers. Manag. 105 (2015) 562–569, https://doi.org/10.1016/
+j.enconman.2015.08.028.
+[132] Y. Qiu, M.-J. Li, Y.-L. He, et al., Optical Performance Analysis of a Porous Open
+Volumetric Air Receiver in a Solar Power Tower, 2nd Thermal and Fluid
+Engineering Conference (TFEC2017) and 4th International Workshop on Heat
+Transfer (IWHT2017), Las Vegas, NV, USA, 2017.
+[133] G. Barreto, P. Canhoto, M. Collares-Pereira, Combined experimental and
+numerical determination of the asymmetry factor of scattering phase functions in
+porous volumetric solar receivers, Sol. Energy Mater. Sol. Cells 206 (2020),
+110327, https://doi.org/10.1016/j.solmat.2019.110327.
+[134] L. Wang, S.L. Jacques, L. Zheng, MCML—Monte Carlo modeling of light transport
+in multi-layered tissues, Comput, Methods Programs Biomed 47 (2) (1995)
+131–146, https://doi.org/10.1016/0169-2607(95)01640-F.
+[135] S.A. Prahl, M. Keijzer, S.L. Jacques, et al., A Monte Carlo Model of Light
+Propagation in Tissue, Dosimetry of Laser Radiation in Medicine and Biology,
+1989. Berlin, Germany.
+[136] P. Ranut, On the effective thermal conductivity of aluminum metal foams: review
+and improvement of the available empirical and analytical models, Appl. Therm.
+Eng. 101 (2016) 496–524, https://doi.org/10.1016/
+j.applthermaleng.2015.09.094.
+[137] V.V. Calmidi, R.L. Mahajan, The effective thermal conductivity of high porosity
+fibrous metal foams, J. Heat Tran. 121 (2) (1999) 466–471, https://doi.org/
+10.1115/1.2826001.
+[138] J.W. Paek, B.H. Kang, S.Y. Kim, et al., Effective thermal conductivity and
+permeability of aluminum foam Materials1, Int. J. Thermophys. 21 (2) (2000)
+453–464, https://doi.org/10.1023/A:1006643815323.
+[139] A. Bhattacharya, V.V. Calmidi, R.L. Mahajan, Thermophysical properties of high
+porosity metal foams, Int. J. Heat Mass Tran. 45 (5) (2002) 1017–1031, https://
+doi.org/10.1016/S0017-9310(01)00220-4.
+[140] E.N. Schmierer, J. Paquette, A. Razani, et al., Effective Thermal Conductivity of
+Fully-Saturated High Porosity Metal Foam, Heat Transfer Summer Conference,
+Charlotte, North Carolina, USA, 2004.
+[141] E. Sadeghi, S. Hsieh, M. Bahrami, Thermal conductivity and contact resistance of
+metal foams, J. Phys. D Appl. Phys. 44 (12) (2011), 125406, https://doi.org/
+10.1088/0022-3727/44/12/125406.
+[142] T. Fiedler, I.V. Belova, Murch Ge, Critical analysis of the experimental
+determination of the thermal resistance of metal foams, Int. J. Heat Mass Tran. 55
+(15) (2012) 4415–4420, https://doi.org/10.1016/
+j.ijheatmasstransfer.2012.04.010.
+[143] J. Vicente, J.-V. Daurelle, F. Rigollet, Thermal Conductivity of Metallic Foam:
+Simulation on Real X-Ray Tomographied Porous Medium and Photothermal
+Experiments, 13, International Heat Transfer Conference, Sydney, Australia, 2006.
+[144] T. Fiedler, E. Solorzano, F. Garcia-Moreno, et al., Lattice Monte Carlo and 
+experimental analyses of the thermal conductivity of random-shaped cellular
+aluminum, Adv. Eng. Mater. 11 (10) (2009) 843–847, https://doi.org/10.1002/
+adem.200900132.
+[145] E. Solorzano, J.A. Reglero, M.A. Rodríguez-P  erez, et al., An experimental study on
+the thermal conductivity of aluminium foams by using the transient plane source
+method, Int. J. Heat Mass Tran. 51 (25) (2008) 6259–6267, https://doi.org/
+10.1016/j.ijheatmasstransfer.2007.11.062.
+[146] R. Wulf, M.A.A. Mendes, V. Skibina, et al., Experimental and numerical
+determination of effective thermal conductivity of open cell FeCrAl-alloy metal
+foams, Int. J. Therm. Sci. 86 (2014) 95–103, https://doi.org/10.1016/
+j.ijthermalsci.2014.06.030.
+[147] M. Bracconi, M. Ambrosetti, M. Maestri, et al., A fundamental analysis of the
+influence of the geometrical properties on the effective thermal conductivity of
+open-cell foams, Chemical Engineering and Processing - Process Intensification
+129 (2018) 181–189, https://doi.org/10.1016/j.cep.2018.04.018.
+[148] P. Kumar, F. Topin, Simultaneous determination of intrinsic solid phase
+conductivity and effective thermal conductivity of Kelvin like foams, Appl. Therm.
+Eng. 71 (1) (2014) 536–547, https://doi.org/10.1016/
+j.applthermaleng.2014.06.058.
+[149] B. Dietrich, G. Schell, E.C. Bucharsky, et al., Determination of the thermal
+properties of ceramic sponges, Int. J. Heat Mass Tran. 53 (1) (2010) 198–205,
+https://doi.org/10.1016/j.ijheatmasstransfer.2009.09.041.
+[150] M. Schuetz, L.R. Glicksman, A basic study of heat transfer through foam insulation,
+J. Cell. Plast. 20 (2) (1984) 114–121, https://doi.org/10.1177/
+0021955X8402000203.
+[151] K. Kamiuto, Modeling of composite heat transfer in open-cellular porous materials
+at high temperatures, in: A. Ochsner, G.E. Murch, M.J.S.d. Lemos (Eds.), Cellular
+and Porous Materials, John Wiley & Sons, Ltd, Germany, 2008, pp. 165–198.
+[152] L.B. Younis, R. Viskanta, Experimental determination of the volumetric heat
+transfer coefficient between stream of air and ceramic foam, Int. J. Heat Mass
+Tran. 36 (6) (1993) 1425–1434, https://doi.org/10.1016/S0017-9310(05)80053-
+5.
+[153] B. Dietrich, Heat transfer coefficients for solid ceramic sponges–experimental
+results and correlation, Int. J. Heat Mass Tran. 61 (2013) 627–637, https://
+doi.org/10.1016/j.ijheatmasstransfer.2013.02.019.
+[154] L. Giani, G. Groppi, E. Tronconi, Heat transfer characterization of metallic foams,
+Ind. Eng. Chem. Res. 44 (24) (2005) 9078–9085, https://doi.org/10.1021/
+ie050598p.
+[155] H. Lu, L. Yang, Z. Wu, et al., Numerical and experimental study on convective heat
+transfer characteristics in foam materials, Energies 13 (2) (2020) 348, https://
+doi.org/10.3390/en13020348.
+[156] X.- l Xia, X. Chen, C. Sun, et al., Experiment on the convective heat transfer from
+airflow to skeleton in open-cell porous foams, Int. J. Heat Mass Tran. 106 (2017)
+83–90, https://doi.org/10.1016/j.ijheatmasstransfer.2016.10.053.
+[157] J.J. Hwang, G.J. Hwang, R.H. Yeh, et al., Measurement of interstitial convective
+heat transfer and frictional drag for flow across metal foams, J. Heat Tran. 124 (1)
+(2001) 120–129, https://doi.org/10.1115/1.1416690.
+[158] K. Ando, H. Hirai, Y. Sano, An accurate experimental determination of interstitial
+heat transfer coefficients of ceramic foams using the single blow method, Open
+Transport. Phenom. J. 5 (1) (2013) 7–12, https://doi.org/10.2174/
+1877729501305010007.
+[159] K. Ichimiya, A new method for evaluation of heat transfer between solid material
+and fluid in a porous medium, J. Heat Tran. 121 (4) (1999) 978–983, https://
+doi.org/10.1115/1.2826089.
+[160] S. Meinicke, B. Dietrich, T. Wetzel, Pore-scale Numerical Analysis of
+Hydrodynamics and Conjugate Heat Transfer in Solid Sponges, 16, International
+Heat Transfer Conference, Beijing, China, 2018.
+[161] Z. Liu, H. Wu, Pore-scale study on flow and heat transfer in 3D reconstructed
+porous media using micro-tomography images, Appl. Therm. Eng. 100 (2016)
+602–610, https://doi.org/10.1016/j.applthermaleng.2016.02.057.
+[162] S. Du, M.-J. Li, Z. Liu, et al., Pore-scale numerical study on the heat transfer
+process in porous media under different thermal conditions, in: 2018 International
+Heat Transfer Conference, IHTC-16), Beijing, China, 2018.
+[163] X. Fu, R. Viskanta, J. Gore, Measurement and correlation of volumetric heat
+transfer coefficients of cellular ceramics, Exp. Therm. Fluid Sci. 17 (4) (1998)
+285–293, https://doi.org/10.1016/S0894-1777(98)10002-X.
+[164] S. Du, T. Xia, Y.-L. He, et al., Experiment and optimization study on the radial
+graded porous volumetric solar receiver matching non-uniform solar flux
+distribution, Appl. Energy 275 (2020), 115343, https://doi.org/10.1016/
+j.apenergy.2020.115343.
+[165] S. Du, Z. Li, Y. He, et al., Experimental and numerical analysis of the hydraulic and
+thermal performances of the gradually-varied porous volumetric solar receiver,
+Sci. China Technol. Sci. 63 (7) (2020) 1224–1234, https://doi.org/10.1007/
+s11431-020-1580-2.
+[166] G.J. Hwang, C.C. Wu, C.H. Chao, Investigation of non-darcian forced convection in
+an asymmetrically heated sintered porous channel, J. Heat Tran. 117 (3) (1995)
+725–732, https://doi.org/10.1115/1.2822636.
+[167] N. Wakao, S. Kaguei, T. Funazkri, Effect of fluid dispersion coefficients on particle￾to-fluid heat transfer coefficients in packed beds: correlation of nusselt numbers,
+Chem. Eng. Sci. 34 (3) (1979) 325–336, https://doi.org/10.1016/0009-2509(79)
+85064-2.
+[168] J.R. Howell, M.P. Menguc, R. Siegel, Thermal Radiation Heat Transfer, CRC press,
+2010.
+[169] ANSYS Fluent UDF Manual. ANSYS Inc., 2013.
+[170] Z. Wu, Z. Wang, Fully coupled transient modeling of ceramic foam volumetric
+solar air receiver, Sol. Energy 89 (Supplement C) (2013) 122–133, https://
+doi.org/10.1016/j.solener.2012.12.016.
+[171] F. Wang, Z. Guan, J. Tan, et al., Transient thermal performance response
+characteristics of porous-medium receiver heated by multi-dish concentrator, Int.
+Commun. Heat Mass Tran. 75 (Supplement C) (2016) 36–41, https://doi.org/
+10.1016/j.icheatmasstransfer.2016.03.028.
+Y.-L. He et al. Energy Reviews 2 (2023) 100035
+21
+
+[172] A.L. Avila-Marin, M. Alvarez de Lara, J. Fernandez-Reche, Experimental results of
+gradual porosity volumetric air receivers with wire meshes, Renew. Energy 122
+(2018) 339–353, https://doi.org/10.1016/j.renene.2018.01.073.
+[173] A.L. Avila-Marin, CFD parametric analysis of wire meshes open volumetric
+receivers with axial-varied porosity and comparison with small-scale solar receiver
+tests, Renew. Energy 193 (2022) 1094–1105, https://doi.org/10.1016/
+j.renene.2022.05.060.
+[174] T. Fend, R. Pitz-Paal, O. Reutter, et al., Two novel high-porosity materials as
+volumetric receivers for concentrated solar radiation, Sol. Energy Mater. Sol. Cells
+84 (1-4) (2004) 291–304, https://doi.org/10.1016/j.solmat.2004.01.039.
+[175] S. Luque, G. Menendez, M. Roccabruna, et al., Exploiting volumetric effects in
+novel additively manufactured open solar receivers, Sol. Energy 174 (2018)
+342–351, https://doi.org/10.1016/j.solener.2018.09.030.
+[176] R. Capuano, T. Fend, H. Stadler, et al., Optimized volumetric solar receiver:
+thermal performance prediction and experimental validation, Renew. Energy 114
+(2017) 556–566, https://doi.org/10.1016/j.renene.2017.07.071.
+[177] A.L. Avila-Marin, J. Fernandez-Reche, S. Gianella, et al., Experimental study of
+innovative periodic cellular structures as air volumetric absorbers, Renew. Energy
+184 (2022) 391–404, https://doi.org/10.1016/j.renene.2021.11.021.
+[178] M. Hoes, S. Ackermann, D. Theiler, et al., Additive-Manufactured ordered porous
+structures made of ceria for concentrating solar applications, Energy Technol. 7
+(9) (2019), 1900484, https://doi.org/10.1002/ente.201900484.
+[179] C. Heisel, C. Caliot, T. Chartier, et al., Digital design and 3D printing of innovative
+SiC architectures for high temperature volumetric solar receivers, Sol. Energy
+Mater. Sol. Cells 232 (2021), 111336, https://doi.org/10.1016/
+j.solmat.2021.111336.
+[180] P. Bermel, J. Lee, J.D. Joannopoulos, et al., Selective solar absorbers, in: V. Prasad,
+Y. Jaluria, Z. Zhang (Eds.), Annual Review of Heat Transfer, BEGELL HOUSE Inc.,
+USA, 2012, pp. 231–254.
+[181] G. Olalde, G. Flamant, D. Schwander, et al., Advanced high temperature semi￾transparent solar absorbers, Sol. Energy Mater. 12 (6) (1985) 461–469, https://
+doi.org/10.1016/0165-1633(85)90039-5.
+[182] R. Pitz-Paal, J. Morhenne, M. Fiebig, A new concept of a selective solar receiver for
+high temperature applications, Sol. Energy Mater. 24 (1) (1991) 293–306, https://
+doi.org/10.1016/0165-1633(91)90070-2.
+[183] T. Menigault, G. Flamant, B. Rivoire, Advanced high-temperature two-slab
+selective volumetric receiver, Sol. Energy Mater. 24 (1) (1991) 192–203, https://
+doi.org/10.1016/0165-1633(91)90059-T.
+[184] M. Sedighi, R.V. Padilla, P. Alamdari, et al., A novel high-temperature (>700 C),
+volumetric receiver with a packed bed of transparent and absorbing spheres, Appl.
+Energy 264 (2020), 114705, https://doi.org/10.1016/j.apenergy.2020.114705.
+[185] Q. Zhu, Y. Xuan, Improving the performance of volumetric solar receivers with a
+spectrally selective gradual structure and swirling characteristics, Energy 172
+(2019) 467–476, https://doi.org/10.1016/j.energy.2019.01.166.
+[186] E. Sani, L. Mercatelli, P. Sansoni, et al., Spectrally selective ultra-high temperature
+ceramic absorbers for high-temperature solar plants, J. Renew. Sustain. Energy 4
+(3) (2012), 033104, https://doi.org/10.1063/1.4717515.
+[187] E. Sani, L. Mercatelli, J.-L. Sans, et al., Porous and dense hafnium and zirconium
+ultra-high temperature ceramics for solar receivers, Opt. Mater. 36 (2) (2013)
+163–168, https://doi.org/10.1016/j.optmat.2013.08.020.
+[188] B. Rousseau, S. Guevelou, J. Vicente, et al., Tuning the Spectral Selectivity of Sic￾Based Volumetric Solar Receivers with Ultra-high Temperature Ceramic Coatings,
+11th International Symposium on Ceramic Materials and Components for Energy
+and Environmental Applications, Canada, Vancouver, BC, 2016.
+[189] S. Du, M.-J. Li, Y.-L. He, et al., Conceptual design of porous volumetric solar
+receiver using molten salt as heat transfer fluid, Appl. Energy 301 (2021), 117400,
+https://doi.org/10.1016/j.apenergy.2021.117400.
+Y.-L. He et al. Energy Reviews 2 (2023) 100035
+22
