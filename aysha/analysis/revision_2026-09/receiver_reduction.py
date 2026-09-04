@@ -836,6 +836,61 @@ def write_tables(rep, dg, mc, P):
 # --------------------------------------------------------------------------
 # driver
 # --------------------------------------------------------------------------
+def write_supplementary_tables(rep, dg, P):
+    """Markdown tables for supplementary sections S3, S4 and S5.
+
+    Written by the pipeline so that no supplementary table is transcribed by
+    hand (2026-09-04, review v9). Values come from `rep`, which is the same
+    dict archived as results.json, and from the per-run groups frame.
+    """
+    hw, ss_ = rep["heating_window_sensitivity"], rep["sensor_selection_swing"]
+    T = ["| deficit window $u$ | $C_{\\rm eff}$ [J K$^{-1}$] | "
+         "$K_{\\rm loss}$ [W K$^{-1}$] | $r^2$ |", "|---|---:|---:|---:|"]
+    T += [f"| ({w['u_lo']:.2f}, {w['u_hi']:.2f}) | {w['C_eff']:.1f} | "
+          f"{w['K_loss']:.4f} | {w['r2']:.4f} |" for w in hw]
+    T += ["", f"Sensor selection: all six receiver probes give "
+              f"{ss_['C_all6']:.1f} J K$^{{-1}}$, the three deep and outlet probes "
+              f"{ss_['C_deep']:.1f} J K$^{{-1}}$, a ratio of {ss_['ratio']:.2f}."]
+    open(P("tableS3_heating_conditionality.md"), "w").write("\n".join(T) + "\n")
+
+    we = rep["wall_extrapolation"]
+    T = ["| Rear / front extrapolation | exponent | s.e. | runs | infeasible |",
+         "|---|---:|---:|---:|---|"]
+    for k in ("const_const", "const_linear", "half_const", "half_linear",
+              "linear_const", "linear_linear"):
+        v = we[k]
+        e = v.get("exponent")
+        lab = k.replace("_", " / ").replace("const", "constant")
+        T.append(f"| {lab} | {'—' if e is None else f'{e:+.4f}'} | "
+                 f"{'—' if v.get('stderr') is None else f'{v[chr(115)+chr(116)+chr(101)+chr(114)+chr(114)]:.4f}'} | "
+                 f"{v['n']} | {', '.join(v.get('infeasible') or []) or 'none'} |")
+    fp = rep["fixed_profile_test"]
+    T += ["", "| Family | nodes | RMS residual [K] | max abs [K] | "
+              "$r$ vs $\\ln Re$ | slope [K per e-fold] |",
+          "|---|---:|---:|---:|---:|---:|"]
+    for fam, lab in (("shared_h", "shared dimensional $h(z)$"),
+                     ("shared_Nu", "shared $Nu(z)$")):
+        for n in sorted(fp[fam], key=int):
+            v = fp[fam][n]
+            T.append(f"| {lab} | {n} | {v['rms_K']:.1f} | {v['max_abs_K']:.1f} | "
+                     f"{v['r_lnRe']:+.3f} | {v['slope_K_per_lnRe']:+.0f} |")
+    for grp in sorted(fp["per_flux"], key=int):
+        v = fp["per_flux"][grp]
+        T.append(f"| per-configuration, {grp} kW m$^{{-2}}$ | 5 | {v['rms_K']:.1f} | "
+                 f"{v['max_abs_K']:.1f} | {v['r_lnRe']:+.3f} | "
+                 f"{v['slope_K_per_lnRe']:+.0f} |")
+    open(P("tableS4_wall_and_falsification.md"), "w").write("\n".join(T) + "\n")
+
+    T = ["| Run | $G_0$ [kW m$^{-2}$] | $q$ [sL min$^{-1}$] | $Re_{\\rm nom}$ | "
+         "$Pr$ | $Gz_L$ | $x^*=1/Gz_L$ | $Re\\,Pr\\,L/D_h$ | $Bi$ | $N_{rc}$ |",
+         "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
+    for _, r in dg.iterrows():
+        T.append(f"| {r.ID} | {r.Io_kWm2:.0f} | {r.q_slpm:.2f} | {r.Re:.1f} | "
+                 f"{r.Pr:.4f} | {r.Gz_L:.3f} | {1.0 / r.Gz_L:.2f} | {r.Pe_LD:.0f} | "
+                 f"{r.Bi:.2e} | {r.N_rc:.2f} |")
+    open(P("tableS5_auxiliary_groups.md"), "w").write("\n".join(T) + "\n")
+
+
 def main(raw_dir, out_dir, n_mc=4000):
     os.makedirs(out_dir, exist_ok=True)
     P = lambda f: os.path.join(out_dir, f)
@@ -1122,6 +1177,7 @@ def main(raw_dir, out_dir, n_mc=4000):
     rep["wall_extrapolation"] = wall_extrapolation_sensitivity(dg)
     rep["monte_carlo"] = mc.to_dict("records")
     write_tables(rep, dg, mc, P)
+    write_supplementary_tables(rep, dg, P)
 
     with open(P("results.json"), "w") as fh:
         json.dump(rep, fh, indent=2, default=float)
