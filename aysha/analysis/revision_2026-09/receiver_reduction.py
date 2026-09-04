@@ -121,8 +121,44 @@ COOL_PROVENANCE = {"C69": "E69", "C80": "E80", "C81": "E81"}
 SENSORS = ["T2", "T3", "T8", "T9", "T10", "T11", "T12"]
 
 # uncertainty model constants (see monte_carlo docstring D1, D2)
-Q_REL_SD = 0.025        # relative 1-sigma on metered volumetric flow
+# D1b (2026-09-04, revised after review v9): the controller error is TWO-TERM.
+# The Aalborg GFC17 specification is +-1.0% of FULL SCALE over 0-100% of range
+# with +-0.5% FS repeatability -- an ADDITIVE bound, not a percent of reading.
+# The units were calibrated in situ against a bubble flowmeter because the
+# factory calibration is gas-specific, which removes the gas-conversion bias
+# (a percent-of-reading systematic) but cannot remove the unit's own zero,
+# linearity and repeatability floor. Both terms are therefore carried:
+#   sigma_unit = sqrt( (MFC_A_FS * MFC_FS)^2 + (MFC_B_REL * reading)^2 )
+# with the additive term from the specification and the proportional term from
+# the in-house calibration residual. A purely proportional model understates
+# the error at low flow and, because the two terms have opposite flow
+# dependence, the choice acts on a fitted exponent and not only on a prefactor.
+MFC_FS = 10.0           # per-unit full scale [sL/min]; GFC17 max air/N2 range
+MFC_A_FS = 0.0025       # additive 1-sigma as a fraction of FS (0.5% FS repeatability, 95% bound)
+MFC_B_REL = 0.025       # proportional 1-sigma of reading (bubble-flowmeter calibration residual)
+Q_REL_SD = MFC_B_REL    # retained name for the proportional term
 TOL_COVERAGE = 2.0      # IEC 60584 class-1 tolerance read as a 95% bound
+
+
+def mfc_sigma(reading):
+    """Per-unit 1-sigma absolute flow error [sL/min] at a given reading."""
+    r = np.asarray(reading, float)
+    return np.sqrt((MFC_A_FS * MFC_FS) ** 2 + (MFC_B_REL * r) ** 2)
+
+
+def mfc_rel_perturbation(shares, q_total, z_unit):
+    """Relative perturbation of a summed flow from persistent per-unit errors.
+
+    shares: (n, 4) measured share of each controller for each record.
+    q_total: (n,) metered total flow [sL/min].
+    z_unit: (4,) standard normal draws, persistent across records within one
+            Monte Carlo realization (one physical error per controller).
+    """
+    shares = np.asarray(shares, float)
+    q_total = np.asarray(q_total, float)
+    reading = shares * q_total[:, None]
+    dq = (mfc_sigma(reading) * np.asarray(z_unit, float)[None, :]).sum(axis=1)
+    return dq / q_total
 
 
 def load(raw_dir, fname):
@@ -399,10 +435,15 @@ def monte_carlo(ss, eig, n=4000, seed=20260902, rho=1.0):
         # four PERSISTENT unit errors, drawn once per realization. Each unit's
         # total sd is Q_REL_SD for any rho; rho only sets how much of it the
         # units share. Combined with each record's own measured shares.
-        e_unit = Q_REL_SD * (np.sqrt(rho) * rng.normal(0, 1)
-                             + np.sqrt(1.0 - rho) * rng.normal(0, 1, 4))
+        # four PERSISTENT standard-normal unit draws; rho sets how much of the
+        # error the units share. The magnitude each draw produces at a given
+        # setpoint follows the two-term model mfc_sigma(), so one physical unit
+        # error reaches every steady and transient record with the weight its
+        # own reading implies.
+        z_unit = (np.sqrt(rho) * rng.normal(0, 1)
+                  + np.sqrt(1.0 - rho) * rng.normal(0, 1, 4))
         F_ss = ss[[f"mfc_f{k+1}" for k in range(4)]].to_numpy(float)
-        o["q_slpm"] = o.q_slpm * (1.0 + F_ss @ e_unit)
+        o["q_slpm"] = o.q_slpm * (1.0 + mfc_rel_perturbation(F_ss, ss.q_slpm.values, z_unit))
         o["mdot_gs"] = RHO_STD * o.q_slpm / 60000.0 * 1e3
         o["Tw_K"] = sum(WTS[k] * o[f"{k}_ss"] for k in WTS)
         o["Q_gas_W"] = o.mdot_gs * 1e-3 * np.array(
@@ -445,7 +486,7 @@ def monte_carlo(ss, eig, n=4000, seed=20260902, rho=1.0):
         # the same four unit errors reach the transient records, weighted by
         # each cooling/heating run's own measured shares
         F_e = e[[f"mfc_f{k+1}" for k in range(4)]].to_numpy(float)
-        e["fq"] = 1.0 + F_e @ e_unit          # per-record flow factor
+        e["fq"] = 1.0 + mfc_rel_perturbation(F_e, e.q.values, z_unit)
         q_e = e.q.values * e.fq.values
         # D2: the T3 and ambient calibration offsets are the SAME sensors as in
         # the steady frame, so their per-sensor draws z_cal are reused here
@@ -578,6 +619,13 @@ def _Tg_exit_h(hz_nodes, nodes, r, hscale, rear="const", front="const", m=400):
     Tw = _wall_z(r, zt, rear, front)
     hz = np.interp(zt, nodes, hz_nodes) * hscale
     Tg, dz = r.Tamb, 1.0 / m
+    # The RK2 step is unstable for hz*dz > 2, and the multi-start optimizer
+    # does probe log-h values that far. Clip the local transfer-unit density at
+    # 1.5/dz, i.e. N ~ 600 per unit zeta: there the gas is already at the wall
+    # temperature to machine precision (1 - exp(-600)), so the clip changes no
+    # attainable outlet temperature while keeping the integration finite. This
+    # removes the optimizer overflow warnings without altering any result.
+    hz = np.clip(hz, 0.0, 1.5 / dz)
     for i in range(m):
         k1 = hz[i] * (Tw[i] - Tg)
         k2 = hz[i + 1] * (Tw[i + 1] - (Tg + dz * k1))
@@ -981,6 +1029,36 @@ def main(raw_dir, out_dir, n_mc=4000):
                                                                np.log(d2.NTU)).slope),
                                  eps_star=cr,
                                  eta_nom=[float(d2.eta_nom.min()), float(d2.eta_nom.max())])
+        # C7b (2026-09-04, review v9 item 2): the identified constants derive
+        # from T3 through the abscissa x = eps*mdot*cp, so the declared band
+        # must be carried through the identification as well, not only through
+        # the steady-state groups. eps is that of the provenance heating run,
+        # recomputed at this offset; c_p uses the cooling run's own tails,
+        # shifted by the same offset.
+        xm, xd = [], []
+        for _, cr_ in eig[eig.phase == "cool"].iterrows():
+            hh = d2[d2.ID == COOL_PROVENANCE[cr_.ID]].iloc[0]
+            xm.append(float(hh.eps) * (RHO_STD * float(cr_.q) / 60000.0)
+                      * float(cp_air(0.5 * (cr_.Tamb_e + cr_.T3_e + dT3))))
+        Cm3, Km3, r2m3, _ = identify(np.array(xm),
+                                     eig[eig.phase == "cool"].lam.values)
+        # the heating-branch abscissa uses the POOLED eps(q) fit, as the stored
+        # heating_deep identification does, refitted at this offset so the
+        # dT3 = 0 case reproduces the archived point estimate exactly
+        eq3 = np.polyfit(d2.q_slpm, d2.eps, 1)
+        eh = eig[eig.phase == "heat"].dropna(subset=["lam"])
+        for _, hr in eh.iterrows():
+            xd.append(float(np.polyval(eq3, hr.q)) * (RHO_STD * float(hr.q) / 60000.0)
+                      * float(cp_air(0.5 * (hr.Tamb_e + hr.T3_e + dT3))))
+        Cd3, Kd3, r2d3, _ = identify(np.array(xd), eh.lam.values)
+        t3[f"{dT3:+.0f}"]["identification"] = dict(
+            C_match=float(Cm3), K_match=float(Km3), r2_match=float(r2m3),
+            C_deep=float(Cd3), K_deep=float(Kd3), r2_deep=float(r2d3))
+    _offsets = list(t3.keys())
+    t3["band"] = {}
+    for q_ in ("C_match", "K_match", "C_deep", "K_deep"):
+        vals = [t3[k]["identification"][q_] for k in _offsets]
+        t3["band"][q_] = [float(min(vals)), float(max(vals))]
     rep["T3_sensitivity"] = t3
 
     # --- reference-probe sensitivity (C8)

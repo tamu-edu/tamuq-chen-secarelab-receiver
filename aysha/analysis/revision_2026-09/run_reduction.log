@@ -1,13 +1,3 @@
-/home/kkakosim/.claude-science/conda/envs/python/lib/python3.11/site-packages/scipy/optimize/_lsq/trf.py:527: RuntimeWarning: overflow encountered in dot
-  cost_new = 0.5 * np.dot(f_new, f_new)
-/mnt/d/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/analysis/revision_2026-09/receiver_reduction.py:583: RuntimeWarning: overflow encountered in scalar multiply
-  k2 = hz[i + 1] * (Tw[i + 1] - (Tg + dz * k1))
-/mnt/d/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/analysis/revision_2026-09/receiver_reduction.py:583: RuntimeWarning: invalid value encountered in scalar add
-  k2 = hz[i + 1] * (Tw[i + 1] - (Tg + dz * k1))
-/mnt/d/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/analysis/revision_2026-09/receiver_reduction.py:582: RuntimeWarning: overflow encountered in scalar multiply
-  k1 = hz[i] * (Tw[i] - Tg)
-/mnt/d/kkakosim/github/tamuq-chen-secarelab-receiver/aysha/analysis/revision_2026-09/receiver_reduction.py:584: RuntimeWarning: invalid value encountered in scalar add
-  Tg = Tg + dz * (k1 + k2) / 2.0
 {
   "geometry": {
     "side_mm": 19.0,
@@ -361,7 +351,15 @@
       "eta_nom": [
         0.22678404763389629,
         1.1350977753608964
-      ]
+      ],
+      "identification": {
+        "C_match": 271.66550781665046,
+        "K_match": 0.08438512320242243,
+        "r2_match": 0.9785784778373737,
+        "C_deep": 262.2184825026445,
+        "K_deep": 0.10732264410384368,
+        "r2_deep": 0.9035265918791651
+      }
     },
     "+0": {
       "eps": [
@@ -379,7 +377,15 @@
       "eta_nom": [
         0.2522042003572273,
         1.2235993466108535
-      ]
+      ],
+      "identification": {
+        "C_match": 275.9200557200525,
+        "K_match": 0.07979265606113911,
+        "r2_match": 0.9862292822565035,
+        "C_deep": 280.7345158861044,
+        "K_deep": 0.1136523188365605,
+        "r2_deep": 0.9033006281602888
+      }
     },
     "+25": {
       "eps": [
@@ -397,6 +403,32 @@
       "eta_nom": [
         0.2777526819064004,
         1.3126018901834895
+      ],
+      "identification": {
+        "C_match": 280.52309476190777,
+        "K_match": 0.07539341865382068,
+        "r2_match": 0.9919947407019578,
+        "C_deep": 299.3502854571762,
+        "K_deep": 0.12001686771896394,
+        "r2_deep": 0.9030996070412405
+      }
+    },
+    "band": {
+      "C_match": [
+        271.66550781665046,
+        280.52309476190777
+      ],
+      "K_match": [
+        0.07539341865382068,
+        0.08438512320242243
+      ],
+      "C_deep": [
+        262.2184825026445,
+        299.3502854571762
+      ],
+      "K_deep": [
+        0.10732264410384368,
+        0.12001686771896394
       ]
     }
   },
