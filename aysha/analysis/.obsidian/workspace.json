@@ -191,7 +191,14 @@
   },
   "active": "18cf12ebd3219e3e",
   "lastOpenFiles": [
+    "revision_2026-09/supplementary_review.html",
+    "revision_2026-09/review_response_v9.md",
+    "revision_2026-09/outputs/tableS5_auxiliary_groups.md",
+    "revision_2026-09/outputs/tableS4_wall_and_falsification.md",
+    "revision_2026-09/outputs/tableS3_heating_conditionality.md",
+    "revision_2026-09/manuscript_revised_v3_withfigures.md",
     "revision_2026-09/manuscript_revised_v3.md",
+    "revision_2026-09/manuscript_review.html",
     "revision_2026-09/manuscript_revised_v3.pdf",
     "manuscript/manuscript_full_draft.md",
     "revision_2026-09/uncertainty.csv",
@@ -208,7 +215,6 @@
     "revision_2026-09/reference_sensitivity.csv",
     "revision_2026-09/receiver_reduction.py",
     "revision_2026-09/pressure_drop.csv",
-    "revision_2026-09/outputs/uncertainty.csv",
     "revision_2026-09/outputs/table2_constants.md",
     "revision_2026-09/outputs/table1_envelope.md",
     "revision_2026-09/manuscript_revised_v3_GPTon_v1.md",
@@ -225,11 +231,6 @@
     "revision_2026-09/figures/fig3_assembly_limitation.png",
     "revision_2026-09/figures/fig2_steady_field.png",
     "revision_2026-09/README.md",
-    "revision_2026-09/README_reproduction.md",
-    "revision_2026-09/closeout_assessment.md",
-    "manuscript/data_analysis_sections.md",
-    "manuscript/literature_positioning.md",
-    "manuscript/_session_backups_2026-08/manuscript_pre_singlebasis.md",
-    "manuscript/manuscript_full_draft_2026-07-31_before_edits.md"
+    "revision_2026-09/README_reproduction.md"
   ]
 }
