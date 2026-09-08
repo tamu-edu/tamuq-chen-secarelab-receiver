@@ -95,6 +95,15 @@ def main():
 
     raw = word_diff(args.file, args.old, args.new)
     target = args.new or "working tree"
+    if not raw.strip() and args.new is None and args.old == "HEAD":
+        # Nothing uncommitted: the revisions were committed, so fall back to the
+        # last two commits that touched this file (2026-09-08).
+        revs = run(["git", "log", "--format=%H", "--", args.file]).stdout.split()
+        if len(revs) >= 2:
+            args.old, args.new = revs[1], revs[0]
+            target = args.new
+            raw = word_diff(args.file, args.old, args.new)
+            print("Working tree is clean; comparing the last two commits of this file.\n")
     if not raw.strip():
         print("No changes to %s (%s -> %s)." % (args.file, args.old, target))
         return
