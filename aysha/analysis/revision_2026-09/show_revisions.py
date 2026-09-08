@@ -74,6 +74,18 @@ def section_map(path, old):
     return out
 
 
+def citations(text):
+    """Bracketed citation markers, excluding numbers inside table rows.
+
+    Table 3 writes 95% confidence intervals as "[221, 367]", which the bare
+    bracket pattern reads as a citation to references 221 and 367. Markdown
+    table rows always begin with a pipe, so dropping those lines removes the
+    false positives without touching prose citations.
+    """
+    prose = "\n".join(ln for ln in text.split("\n") if not ln.lstrip().startswith("|"))
+    return set(CITE.findall(prose))
+
+
 def merge(spans, n):
     """Merge overlapping context windows so adjacent edits print once."""
     out = []
@@ -126,7 +138,7 @@ def main():
         removed = " ".join(re.findall(r"\[-(.*?)-\]", body, re.S))
         added = " ".join(re.findall(r"\{\+(.*?)\+\}", body, re.S))
         num_hit = sorted(data_numbers(removed) ^ data_numbers(added))
-        cite_hit = sorted(set(CITE.findall(removed)) ^ set(CITE.findall(added)))
+        cite_hit = sorted(citations(removed) ^ citations(added))
         n_num += len(num_hit)
         n_cite += len(cite_hit)
 
