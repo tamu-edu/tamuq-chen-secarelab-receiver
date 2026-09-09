@@ -112,7 +112,17 @@ def h_gas(T_lo, T_hi, n=64):
 # raw file handling
 # --------------------------------------------------------------------------
 COLS = dict(t=1, mfc=(6, 7, 8, 9), dp1=16, dp2=17,
-            T2=35, T3=36, T8=41, T9=42, T10=43, T11=44, T12=45, T15=48, T16=49)
+            T1=34, T2=35, T3=36, T4=37, T5=38, T6=39, T7=40,
+            T8=41, T9=42, T10=43, T11=44, T12=45, T15=48, T16=49)
+
+# Which logger channels define the receiver inlet reference T_amb. The
+# default pair are the two coolest, least drifting probes: across the 20
+# logged runs they warm by 1.6 and 1.8 K between the first two minutes and
+# the steady window, against 3.3 K for T5, which sits downstream of the
+# receiver, the water-cooled flange and the air-cooled coil and therefore
+# inherits part of the receiver's own heat. Overridable with --tamb so the
+# choice can be tested rather than assumed (2026-09-09).
+TAMB_CHANNELS = ("T15", "T16")
 RHO_MFC_CASES = (1.0, 0.0)   # fully correlated / independent controllers
 # Provenance of each cooling transient: the heating run it decays from. Fixed
 # by the experiment log, not inferred by flow proximity -- E81 and E76 differ
@@ -133,7 +143,17 @@ SENSORS = ["T2", "T3", "T8", "T9", "T10", "T11", "T12"]
 # the in-house calibration residual. A purely proportional model understates
 # the error at low flow and, because the two terms have opposite flow
 # dependence, the choice acts on a fitted exponent and not only on a prefactor.
-MFC_FS = 10.0           # per-unit full scale [sL/min]; GFC17 max air/N2 range
+# Each GFC17 is a nominal 0-5 unit. Three of the four carry a factory
+# calibration for a gas other than air, so in air-equivalent terms their range
+# is the nominal 5 sL/min scaled by that unit's gas-conversion factor; the
+# largest reaches 5.72 sL/min, which is why per-unit readings run above 5.
+# The datasheet's +-1.0% FS accuracy and +-0.5% FS repeatability are quoted on
+# the device's own scale, so the additive term in air-equivalent units scales
+# with the converted full scale. Lacking the four individual conversion
+# factors, all units are assigned the LARGEST converted range, which is
+# conservative: it over-states the additive term for the three narrower units.
+# Replace with a per-unit array once the factors are available (2026-09-09).
+MFC_FS = 5.722          # per-unit full scale [sL/min], air-equivalent (upper bound)
 MFC_A_FS = 0.0025       # additive 1-sigma as a fraction of FS (0.5% FS repeatability, 95% bound)
 MFC_B_REL = 0.025       # proportional 1-sigma of reading (bubble-flowmeter calibration residual)
 Q_REL_SD = MFC_B_REL    # retained name for the proportional term
@@ -174,7 +194,8 @@ def load(raw_dir, fname):
            "dp1": d.iloc[:, COLS["dp1"]].to_numpy(float),
            "dp2": d.iloc[:, COLS["dp2"]].to_numpy(float)}
     out.update({s: K(COLS[s]) for s in SENSORS})
-    out["Tamb"] = 0.5 * (K(COLS["T15"]) + K(COLS["T16"]))
+    out.update({s: K(COLS[s]) for s in ("T1", "T4", "T5", "T6", "T7")})
+    out["Tamb"] = np.mean([K(COLS[c]) for c in TAMB_CHANNELS], axis=0)
     return out
 
 
@@ -1197,7 +1218,10 @@ if __name__ == "__main__":
                                      "aysha/analysis/RAW")
     ap.add_argument("--out", default=".")
     ap.add_argument("--nmc", type=int, default=4000)
+    ap.add_argument("--tamb", default=",".join(TAMB_CHANNELS),
+                    help="comma-separated logger channels averaged for T_amb")
     A = ap.parse_args()
+    TAMB_CHANNELS = tuple(c.strip() for c in A.tamb.split(","))
     R = main(A.raw, A.out, A.nmc)[0]
     print(json.dumps({k: R[k] for k in
                       ["geometry", "nusselt", "ntu_structure", "identification",

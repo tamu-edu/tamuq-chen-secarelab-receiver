@@ -1,7 +1,7 @@
-"""Figures 2-6 for the SiC volumetric receiver manuscript.
+"""Figures 3-7 for the SiC volumetric receiver manuscript.
 
 Reads the outputs of receiver_reduction.py plus three trace files it exports,
-and writes figures/fig2..fig6. Run receiver_reduction.py first.
+and writes figures/fig3..fig7. Run receiver_reduction.py first.
 
 Usage:  python make_figures.py [--raw DIR] [--out DIR] [--fig FIGDIR]
 """
@@ -92,6 +92,24 @@ def export_traces(raw_dir, out_dir):
     pd.concat(out).to_csv(P("reference_points.csv"), index=False)
 
 
+def convert_apparatus(fig_dir):
+    """Write fig1_apparatus.png from the supplied Figure01_setup.tif.
+
+    Figure 1 is a photographic montage supplied by the authors, not a computed
+    plot, but browsers and most converters cannot render TIFF, so the manuscript
+    references a PNG. Converting here keeps everything the manuscript points at
+    reproducible from what is in the repository (2026-09-09).
+    """
+    src = os.path.join(fig_dir, "Figure01_setup.tif")
+    dst = os.path.join(fig_dir, "fig1_apparatus.png")
+    if not os.path.exists(src):
+        print("note: no Figure01_setup.tif; leaving", dst, "as is")
+        return
+    from PIL import Image
+    Image.open(src).convert("RGB").save(dst, dpi=(300, 300))
+    print("wrote fig1_apparatus.png from Figure01_setup.tif")
+
+
 def main(raw_dir, out_dir, fig_dir):
     style()
     os.makedirs(fig_dir, exist_ok=True)
@@ -126,7 +144,7 @@ def main(raw_dir, out_dir, fig_dir):
                   frameon=False, loc="lower left", handlelength=1.5)
     for ax, L in zip(axs, "abc"):
         panel_letter(ax, L)
-    fig.tight_layout(); fig.savefig(F("fig2_steady_field.png"), bbox_inches="tight")
+    fig.tight_layout(); fig.savefig(F("fig3_steady_field.png"), bbox_inches="tight")
     plt.close(fig)
 
     # ---- Figure 3: assembly-scale limitation
@@ -183,7 +201,7 @@ def main(raw_dir, out_dir, fig_dir):
     a2.text(102, 0.335, "conductance fixed in $z$,\n$\\propto Re^{-1}$", color="0.5", ha="right")
     for ax, L in ((a1, "a"), (a2, "b")):
         panel_letter(ax, L)
-    fig.tight_layout(); fig.savefig(F("fig3_assembly_limitation.png"), bbox_inches="tight")
+    fig.tight_layout(); fig.savefig(F("fig4_assembly_limitation.png"), bbox_inches="tight")
     plt.close(fig)
 
     # ---- Figure 4: inversion + nonequilibrium
@@ -217,7 +235,7 @@ def main(raw_dir, out_dir, fig_dir):
     a3.text(90, 0.040, "$\\Lambda_{58}$", ha="right", color="0.45")
     for ax, L in ((a1, "a"), (a2, "b"), (a3, "c")):
         panel_letter(ax, L)
-    fig.tight_layout(); fig.savefig(F("fig4_inversion_ltne.png"), bbox_inches="tight")
+    fig.tight_layout(); fig.savefig(F("fig5_inversion_ltne.png"), bbox_inches="tight")
     plt.close(fig)
 
     # ---- Figure 5: transient identification
@@ -262,7 +280,7 @@ def main(raw_dir, out_dir, fig_dir):
     b3.text(1.45, 0.26, "gas outlet", color="#c1666b")
     for ax, L in ((b1, "a"), (b2, "b"), (b3, "c")):
         panel_letter(ax, L)
-    fig.tight_layout(); fig.savefig(F("fig5_transient_identification.png"), bbox_inches="tight")
+    fig.tight_layout(); fig.savefig(F("fig6_transient_identification.png"), bbox_inches="tight")
     plt.close(fig)
 
     # ---- Figure 6: under-instrumentation
@@ -305,10 +323,11 @@ def main(raw_dir, out_dir, fig_dir):
     c2.set_title("Same runs, four defensible answers", loc="left")
     for ax, L in ((c1, "a"), (c2, "b")):
         panel_letter(ax, L)
-    fig.tight_layout(); fig.savefig(F("fig6_under_instrumentation.png"), bbox_inches="tight")
+    fig.tight_layout(); fig.savefig(F("fig7_under_instrumentation.png"), bbox_inches="tight")
     plt.close(fig)
 
-    print("wrote fig2-fig6 to", fig_dir)
+    convert_apparatus(fig_dir)
+    print("wrote fig3-fig7 to", fig_dir)
 
 
 if __name__ == "__main__":

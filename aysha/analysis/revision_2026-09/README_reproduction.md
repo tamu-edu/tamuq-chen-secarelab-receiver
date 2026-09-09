@@ -112,3 +112,12 @@ Python 3.11.16, NumPy 2.4.6, SciPy 1.17.1, pandas 2.3.3, Matplotlib 3.11.1.
 Both scripts are seeded. The multi-start optimizer in `fixed_profile_test`
 is the one step whose last digits may differ across BLAS builds; its
 reported statistics are stable well beyond the digits quoted.
+
+## Supplied (non-computed) figures
+
+`figures/Figure01_setup.tif` (photographic montage of the assembly) and
+`figures/Figure02_PID.png` (process and instrumentation diagram) are author-
+supplied source files, not pipeline output. `make_figures.py` converts the
+first to `fig1_apparatus.png` because browsers and most markdown converters
+cannot render TIFF; the manuscript references the PNG. Figure 2 is referenced
+at its supplied resolution.
