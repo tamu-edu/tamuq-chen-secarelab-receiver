@@ -28,7 +28,15 @@ python make_figures.py
 Runtime is roughly seven minutes for the reduction, dominated by the two 4000-realization Monte
 Carlo passes and the multi-start profile fits, and a few seconds for the figures. Reduce `--nmc`
 for a fast check; the point estimates do not depend on it. Requirements: Python 3.11 with numpy,
-pandas, scipy and matplotlib.
+pandas, scipy, matplotlib and CoolProp.
+
+Air properties are not tabulated in the script. `receiver_reduction.py` calls CoolProp for dry air
+at 1 atm — the Lemmon et al. (2000) equation of state for c_p and the Lemmon & Jacobsen (2004)
+correlations for viscosity and conductivity, the same formulations as REFPROP — evaluating them
+once on a 1 K grid over 200–1600 K at import and interpolating that grid at the call sites, which
+costs under 1e-6 relative error and keeps the runtime unchanged. The source and the CoolProp
+version are written into `results.json` under `air_properties`, so an archived run records which
+property release produced it.
 
 Both scripts are deterministic. Every stochastic step is seeded (`monte_carlo(seed=20260902)`,
 `fixed_profile_test(seed=20260904)`), so a rerun reproduces the archived outputs bit for bit.
@@ -108,8 +116,8 @@ measurement recommended in §5.3.
 
 ## Software stack of the archived run
 
-Python 3.11.16, NumPy 2.4.6, SciPy 1.17.1, pandas 2.3.3, Matplotlib 3.11.1.
-Both scripts are seeded. The multi-start optimizer in `fixed_profile_test`
+Python 3.11.16, NumPy 2.4.6, SciPy 1.17.1, pandas 2.3.3, Matplotlib 3.11.1,
+CoolProp 8.0.0. Both scripts are seeded. The multi-start optimizer in `fixed_profile_test`
 is the one step whose last digits may differ across BLAS builds; its
 reported statistics are stable well beyond the digits quoted.
 

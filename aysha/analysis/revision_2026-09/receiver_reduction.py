@@ -36,11 +36,18 @@ C9  Delivered aperture irradiance reported as an interval bracketed by the
     would reconcile them computed explicitly.
 C10 Pressure drop extracted from the raw logs and compared against the laminar
     square-duct prediction and the transducer resolution.
+C11 Air properties from CoolProp (Lemmon EOS and transport correlations, the
+    REFPROP formulations) rather than a hand-entered textbook table on a
+    100 K grid. The table's viscosity was 1.1-3.0% low above 600 K and its
+    conductivity up to 1.9% high between 400 and 700 K, which biased Re, Nu
+    and the laminar pressure-drop prediction; c_p and therefore Q_gas were
+    unaffected at the 0.1% level. The source and version are archived in
+    results.json.
 
 Usage:  python receiver_reduction.py [--raw DIR] [--out DIR]
 """
 from __future__ import annotations
-import argparse, json, os
+import argparse, json, os, warnings
 import numpy as np
 import pandas as pd
 from scipy.stats import linregress
@@ -92,14 +99,62 @@ _zw = [Z_WALL[k] for k in ("T8", "T12", "T11")]
 _bnd = [0.0] + [0.5 * (_zw[i] + _zw[i + 1]) for i in range(len(_zw) - 1)] + [L_REC]
 WTS = {k: (_bnd[i + 1] - _bnd[i]) / L_REC for i, k in enumerate(("T8", "T12", "T11"))}
 
-_T = np.array([300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300], float)
-_CP = np.array([1007, 1014, 1030, 1051, 1075, 1099, 1121, 1141, 1159, 1175, 1189], float)
-_MU = np.array([1.85, 2.30, 2.70, 3.06, 3.38, 3.69, 3.98, 4.25, 4.51, 4.75, 4.98]) * 1e-5
-_K = np.array([26.3, 33.8, 40.7, 46.9, 52.4, 57.3, 62.0, 66.7, 71.5, 76.3, 82.0]) * 1e-3
+# --------------------------------------------------------------------------
+# air properties (C11)
+# --------------------------------------------------------------------------
+# Dry air at 1 atm from CoolProp: the Lemmon et al. (2000) Helmholtz equation
+# of state for c_p and the Lemmon & Jacobsen (2004) correlations for mu and k,
+# i.e. the same formulations REFPROP uses. This replaces a hand-entered
+# textbook table on a 100 K grid whose viscosity ran 1.1 to 3.0% low above
+# 600 K and whose conductivity was up to 1.9% high between 400 and 700 K.
+#
+# PropsSI is a scalar call and the two 4000-realization Monte Carlo passes
+# evaluate these functions several million times, so CoolProp is evaluated
+# ONCE on a 1 K grid at import and the call sites interpolate that grid. The
+# interpolation error is below 1e-6 relative over 250-1500 K, five orders
+# below the uncertainty CoolProp itself carries for high-temperature air
+# transport properties, and the functions keep the array semantics the rest
+# of the pipeline relies on. The grid spans 200-1600 K, comfortably outside
+# the 294-1200 K range the campaign reaches, so no query is ever clamped;
+# one is warned about if it happens.
+P_AIR = 101325.0                     # all properties evaluated at 1 atm
+_TGRID = np.arange(200.0, 1601.0, 1.0)
+_CP_NAMES = ("CPMASS", "VISCOSITY", "CONDUCTIVITY")
 
-cp_air = lambda T: np.interp(T, _T, _CP)
-mu_air = lambda T: np.interp(T, _T, _MU)
-k_air = lambda T: np.interp(T, _T, _K)
+
+def _air_grid():
+    """Tabulate c_p, mu and k on _TGRID from CoolProp. Returns (version, dict)."""
+    try:
+        import CoolProp
+        from CoolProp.CoolProp import PropsSI
+    except ImportError as exc:                      # pragma: no cover
+        raise ImportError(
+            "receiver_reduction requires CoolProp for the air properties "
+            "(pip install CoolProp); the hand-entered table it replaced is in "
+            "the git history of this file") from exc
+    return CoolProp.__version__, {
+        n: np.array([PropsSI(n, "T", t, "P", P_AIR, "Air") for t in _TGRID])
+        for n in _CP_NAMES}
+
+
+COOLPROP_VERSION, _AIR = _air_grid()
+_CP, _MU, _K = (_AIR["CPMASS"], _AIR["VISCOSITY"], _AIR["CONDUCTIVITY"])
+
+
+def _air_lookup(T, table, name):
+    Ta = np.asarray(T, float)
+    if Ta.size and np.isfinite(Ta).any() and (
+            np.nanmin(Ta) < _TGRID[0] or np.nanmax(Ta) > _TGRID[-1]):
+        warnings.warn(
+            f"air {name} requested at {np.nanmin(Ta):.0f}-{np.nanmax(Ta):.0f} K, "
+            f"outside the {_TGRID[0]:.0f}-{_TGRID[-1]:.0f} K CoolProp grid; "
+            "end values used", RuntimeWarning, stacklevel=2)
+    return np.interp(T, _TGRID, table)
+
+
+cp_air = lambda T: _air_lookup(T, _CP, "c_p")
+mu_air = lambda T: _air_lookup(T, _MU, "mu")
+k_air = lambda T: _air_lookup(T, _K, "k")
 
 
 def h_gas(T_lo, T_hi, n=64):
@@ -659,7 +714,10 @@ def fixed_profile_test(dg, n_starts=40, seed=20260904):
     measured outlet temperatures?
 
     Three families are tested, all with non-negative piecewise-linear nodes and
-    multi-start least squares in log-h:
+    least squares in log-h from n_starts random starts plus two deterministic
+    ones: the uniform-conductance solution, and the next-coarser fit of the
+    same family interpolated onto the finer node set (the families are nested,
+    so this makes the rms residual monotone in node count by construction):
       shared_h    - one dimensional h(z) common to all fifteen runs
       per_flux    - one h(z) per irradiance configuration (five nodes), which
                     allows conductance to differ with lamp setting/temperature
@@ -677,7 +735,7 @@ def fixed_profile_test(dg, n_starts=40, seed=20260904):
     sc_nu = sc * kk / D_H                                    # Nu -> N
     lnRe = np.log(dg.Re.values)
 
-    def _fit(rows_idx, nn, scale):
+    def _fit(rows_idx, nn, scale, warm=None):
         nodes = np.linspace(0.0, 1.0, nn)
         sub = dg.iloc[rows_idx]
         # scale-aware starting range: the uniform-conductance solution for these
@@ -693,9 +751,24 @@ def fixed_profile_test(dg, n_starts=40, seed=20260904):
             return np.array([_Tg_exit_h(h, nodes, r, scale[j], "const", "const")
                              - r.T3_ss for r, j in zip(
                                  [sub.iloc[a] for a in range(len(sub))], rows_idx)])
+        # Deterministic starts first, random ones after. The node families are
+        # NESTED -- any nn-node profile is representable with nn+k nodes -- so
+        # the coarser solution interpolated onto the finer node set is a start
+        # from which the finer fit cannot do worse, which is what makes rms_K
+        # monotone in nn. Random starts alone do not guarantee this: at seven
+        # free nodes, 40 draws from the uniform-conductance scale missed the
+        # basin the five-node solution sits in, and a 1% shift in the property
+        # values was enough to flip which side of that failure the run landed
+        # on (rms 54.2 K against 99.5 K for the identical model family).
+        starts = [np.log(np.full(nn, c0))]
+        if warm is not None:
+            w_nodes, w_vals = warm
+            starts.append(np.log(np.maximum(
+                np.interp(nodes, w_nodes, w_vals), c0 * 1e-9)))
+        starts += [np.log(c0 * rng.uniform(0.1, 10.0, nn))
+                   for _ in range(n_starts)]
         best = None
-        for _ in range(n_starts):
-            x0 = np.log(c0 * rng.uniform(0.1, 10.0, nn))
+        for x0 in starts:
             try:
                 so = least_squares(res, x0=x0, xtol=1e-13, ftol=1e-13,
                                    max_nfev=3000)
@@ -709,17 +782,26 @@ def fixed_profile_test(dg, n_starts=40, seed=20260904):
     out = {"shared_h": {}, "per_flux": {}, "shared_Nu": {}}
     allidx = list(range(len(dg)))
     out["run_ids"] = [str(v) for v in dg.ID.values]
+    warm_h = None
     for nn in (2, 3, 5, 7):
-        h, rr = _fit(allidx, nn, sc)
+        h, rr = _fit(allidx, nn, sc, warm=warm_h)
+        warm_h = (np.linspace(0.0, 1.0, nn), h)
+        if nn == 5:
+            warm_h5 = (np.linspace(0.0, 1.0, nn), h)
         sl = linregress(lnRe, rr)
         out["shared_h"][str(nn)] = dict(
             nodes=[float(v) for v in h], rms_K=float(np.sqrt((rr ** 2).mean())),
             max_abs_K=float(np.abs(rr).max()), r_lnRe=float(sl.rvalue),
             slope_K_per_lnRe=float(sl.slope),
             residuals_K=[float(v) for v in rr])
+    _rms = [out["shared_h"][str(nn)]["rms_K"] for nn in (2, 3, 5, 7)]
+    if any(b > a + 1e-6 for a, b in zip(_rms, _rms[1:])):
+        warnings.warn(f"shared_h rms not monotone in node count: {_rms}; a "
+                      "nested family cannot fit worse with more nodes, so the "
+                      "multi-start has failed to converge", RuntimeWarning)
     for Io, g in dg.groupby("Io_kWm2"):
         idx = [allidx[i] for i in range(len(dg)) if dg.iloc[i].Io_kWm2 == Io]
-        h, rr = _fit(idx, 5, sc)
+        h, rr = _fit(idx, 5, sc, warm=warm_h5)
         sl = linregress(np.log(g.Re.values), rr)
         out["per_flux"][str(int(Io))] = dict(
             nodes=[float(v) for v in h], rms_K=float(np.sqrt((rr ** 2).mean())),
@@ -727,8 +809,10 @@ def fixed_profile_test(dg, n_starts=40, seed=20260904):
             slope_K_per_lnRe=float(sl.slope), n=int(len(g)),
             run_ids=[str(v) for v in g.ID.values],
             residuals_K=[float(v) for v in rr])
+    warm_nu = None
     for nn in (3, 5):
-        h, rr = _fit(allidx, nn, sc_nu)
+        h, rr = _fit(allidx, nn, sc_nu, warm=warm_nu)
+        warm_nu = (np.linspace(0.0, 1.0, nn), h)
         sl = linregress(lnRe, rr)
         out["shared_Nu"][str(nn)] = dict(
             nodes=[float(v) for v in h], rms_K=float(np.sqrt((rr ** 2).mean())),
@@ -931,6 +1015,12 @@ def main(raw_dir, out_dir, n_mc=4000):
     dg.to_csv(P("groups.csv"), index=False)
     dg_rep.to_csv(P("groups_replicates.csv"), index=False)
 
+    rep["air_properties"] = dict(
+        source="CoolProp 'Air' (Lemmon et al. 2000 EOS; Lemmon & Jacobsen 2004"
+               " transport)", coolprop_version=COOLPROP_VERSION,
+        pressure_Pa=P_AIR, grid_K=[float(_TGRID[0]), float(_TGRID[-1]),
+                                   float(_TGRID[1] - _TGRID[0])])
+
     rep["geometry"] = dict(side_mm=SIDE * 1e3, A_frt_cm2=A_FRT * 1e4, porosity=POROSITY,
                            A_solid_m2=A_SOLID, rho_eff=M_MONO / (A_SOLID * L_REC),
                            wall_weights={k: round(v, 4) for k, v in WTS.items()})
@@ -967,7 +1057,8 @@ def main(raw_dir, out_dir, n_mc=4000):
                           x_star_exit=[float(1.0 / dg.Gz_L.max()), float(1.0 / dg.Gz_L.min())])
     rep["ntu_profile"] = ntu_profile_corrected(dg)
     # the requirement is -1 only if properties are held fixed; computed from
-    # the measured k, c_p and mdot it is -0.9996 for a fixed Nusselt number
+    # the measured k, c_p and mdot it is -1.000 for a fixed Nusselt number
+    # (-1.0004) and -1.016 for a conductance independent of temperature too
     _kk = k_air(dg.Tg_bar.values)
     _req_Nu = float(linregress(np.log(dg.Re), np.log(_kk / (dg.mdot_ch * cp_air(dg.Tg_bar)))).slope)
     _req_h = float(linregress(np.log(dg.Re), -np.log(dg.mdot_ch)).slope)
