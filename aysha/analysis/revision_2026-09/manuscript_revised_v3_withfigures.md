@@ -53,7 +53,7 @@ Steady-state values are 120 s means at the end of each heating run. The length-a
 
 $$\bar T_w = 0.2518\,T_8 + 0.3504\,T_{12} + 0.3978\,T_{11},$$
 
-these being the exact trapezoid coefficients for probes at 11, 58 and 107 mm over 137 mm. Gas enthalpy differences are computed by trapezoidal integration of c_p(T) between T_amb and the relevant gas temperature rather than as c_p(T̄)ΔT.
+these being the exact trapezoid coefficients for probes at 11, 58 and 107 mm over 137 mm. Gas enthalpy differences are computed by trapezoidal integration of c_p(T) between T_amb and the relevant gas temperature rather than as c_p(T̄)ΔT. The measured conditions of the fifteen steady runs are collected in Table 1.
 
 ---
 
@@ -66,6 +66,28 @@ these being the exact trapezoid coefficients for probes at 11, 58 and 107 mm ove
 ![Figure 2](figures/Figure02_PID.png)
 
 **Figure 2.** Process and instrumentation diagram, with the letter codes given in the panel. The absorber is irradiated on the face at 0 mm, at the right; the gas path runs from that face through the monolith to the exit plenum at 137 mm, and on to the metering manifold of four mass-flow controllers MFC-1 to MFC-4, each with its own solenoid valve, check valve, controller and indicator. Fourteen temperature indicators appear here, of which nice enter this work: the side-wall chain TI-8, TI-12 and TI-11 at 11, 58 and 107 mm from the irradiated face, the interior flow-exposed pair TI-9 and TI-10 at 58 and 107 mm, TI-3 in the exit plenum, and TI-2 in the surrounding insulation. TI-4 and TI-5 lie on the return line, downstream of the cooled flange and of the gas cooler respectively, TI-6 and TI-7 span the cooling-water circuit, and TI-1 is irradiated; none of these five is used. The inlet reference T_amb is the mean of two further ambient probes, T15 and T16, which are placed behind and beside the cavity. PI-1 is the differential-pressure transducer of section 4.7, whose tapping points place the monolith in series with its inlet and outlet plumbing.
+
+---
+
+| Run | $G_0$ [kW m$^{-2}$] | $q$ [sL min$^{-1}$] | $T_{\rm amb}$ [K] | $\bar T_w$ [K] | $T_3$ [K] | $T_{12}-T_8$ [K] |
+|---|---:|---:|---:|---:|---:|---:|
+| E81 | 256 | 4.53 | 297.8 | 700 | 550 | -9.4 |
+| E80 | 256 | 6.61 | 296.6 | 686 | 561 | +25.8 |
+| E79 | 256 | 8.04 | 296.7 | 669 | 560 | +39.6 |
+| E78 | 256 | 10.01 | 298.1 | 643 | 554 | +54.0 |
+| E77 | 256 | 13.85 | 297.1 | 589 | 525 | +58.1 |
+| E76 | 304 | 4.53 | 296.4 | 908 | 647 | -97.9 |
+| E75 | 304 | 6.95 | 296.7 | 911 | 681 | -29.1 |
+| E74 | 304 | 9.03 | 296.5 | 896 | 697 | +13.8 |
+| E73 | 304 | 13.17 | 296.9 | 840 | 694 | +56.6 |
+| E72 | 304 | 18.32 | 296.4 | 757 | 653 | +60.7 |
+| E71 | 456 | 7.13 | 300.8 | 1047 | 753 | -83.5 |
+| E70 | 456 | 9.11 | 299.0 | 1045 | 779 | -31.1 |
+| E69 | 456 | 10.50 | 296.7 | 999 | 770 | +11.5 |
+| E68 | 456 | 12.50 | 298.7 | 979 | 773 | +35.1 |
+| E67 | 456 | 15.28 | 296.3 | 935 | 764 | +53.5 |
+
+**Table 1.** Measured campaign conditions: nominal aperture irradiance, metered total flow, inlet reference temperature, length-averaged wall temperature, outlet gas temperature and the front-to-mid wall difference, for the fifteen steady runs ordered by irradiance then flow. Every column is a directly measured quantity or a fixed average of measured probes; the quantities requiring the definitions of section 3 are collected separately in Table 2. Generated as `table_measured_envelope.md`.
 
 ---
 
@@ -125,27 +147,28 @@ All calculations were performed in cPython (version 3.11.15) utilizing mainly th
 
 ## 4. Results
 
-The campaign envelope, with every per-run dimensionless group and reduced quantity referred to below, is given in Table 1.
+The reduced quantities for every run, referred to throughout this section, are given in Table 2; the measured conditions they derive from are in Table 1.
 
-| Run | $G_0$ [kW m$^{-2}$] | $q$ [sL min$^{-1}$] | $Re_{\rm nom}$ | $Gz_L$ | $\bar T_w$ [K] | $T_3$ [K] | $\varepsilon$ | $NTU_{\rm app}$ | $N_{\rm prof}$ | $Nu_{\rm app}$ | $\Lambda_{58}$ | $\Lambda_{107}$ | $T_{12}-T_8$ [K] | $\eta_{\rm nom}$ |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| E81 | 256 | 4.53 | 25.2 | 0.190 | 700 | 550 | 0.628 | 0.988 | 1.065 | 0.0373 | 0.0472 | 0.0661 | -9.4 | 0.252 |
-| E80 | 256 | 6.61 | 36.5 | 0.274 | 686 | 561 | 0.680 | 1.138 | 1.213 | 0.0631 | 0.0505 | 0.0751 | +25.8 | 0.386 |
-| E79 | 256 | 8.04 | 44.4 | 0.334 | 669 | 560 | 0.707 | 1.227 | 1.296 | 0.0839 | 0.0528 | 0.0817 | +39.6 | 0.467 |
-| E78 | 256 | 10.01 | 55.5 | 0.418 | 643 | 554 | 0.742 | 1.355 | 1.408 | 0.1176 | 0.0576 | 0.0907 | +54.0 | 0.566 |
-| E77 | 256 | 13.85 | 78.8 | 0.594 | 589 | 525 | 0.781 | 1.518 | 1.540 | 0.1915 | 0.0635 | 0.1108 | +58.1 | 0.695 |
-| E76 | 304 | 4.53 | 23.3 | 0.175 | 908 | 647 | 0.573 | 0.851 | 0.925 | 0.0278 | 0.0343 | 0.0547 | -97.9 | 0.297 |
-| E75 | 304 | 6.95 | 34.9 | 0.261 | 911 | 681 | 0.625 | 0.982 | 1.058 | 0.0488 | 0.0374 | 0.0636 | -29.1 | 0.502 |
-| E74 | 304 | 9.03 | 44.8 | 0.335 | 896 | 697 | 0.669 | 1.106 | 1.179 | 0.0718 | 0.0404 | 0.0714 | +13.8 | 0.682 |
-| E73 | 304 | 13.17 | 65.5 | 0.490 | 840 | 694 | 0.731 | 1.314 | 1.369 | 0.1284 | 0.0455 | 0.0900 | +56.6 | 0.985 |
-| E72 | 304 | 18.32 | 94.0 | 0.704 | 757 | 653 | 0.773 | 1.481 | 1.512 | 0.2126 | 0.0531 | 0.1144 | +60.7 | 1.224 |
-| E71 | 456 | 7.13 | 34.0 | 0.254 | 1047 | 753 | 0.607 | 0.933 | 1.011 | 0.0444 | 0.0306 | 0.0608 | -83.5 | 0.408 |
-| E70 | 456 | 9.11 | 42.7 | 0.320 | 1045 | 779 | 0.644 | 1.032 | 1.109 | 0.0626 | 0.0322 | 0.0664 | -31.1 | 0.554 |
-| E69 | 456 | 10.50 | 49.6 | 0.372 | 999 | 770 | 0.674 | 1.120 | 1.192 | 0.0799 | 0.0340 | 0.0733 | +11.5 | 0.628 |
-| E68 | 456 | 12.50 | 58.9 | 0.441 | 979 | 773 | 0.697 | 1.192 | 1.257 | 0.1022 | 0.0357 | 0.0812 | +35.1 | 0.750 |
-| E67 | 456 | 15.28 | 72.6 | 0.543 | 935 | 764 | 0.731 | 1.315 | 1.369 | 0.1407 | 0.0374 | 0.0939 | +53.5 | 0.902 |
+| Run | $Re_{\rm nom}$ | $Gz_L$ | $\varepsilon$ | $NTU_{\rm app}$ | $N_{\rm prof}$ | $Nu_{\rm app}$ | $\Lambda_{58}$ | $\Lambda_{107}$ | $\eta_{\rm nom}$ |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| E81 | 25.1 | 0.192 | 0.628 | 0.988 | 1.065 | 0.0380 | 0.0472 | 0.0661 | 0.252 |
+| E80 | 36.3 | 0.277 | 0.680 | 1.138 | 1.213 | 0.0642 | 0.0505 | 0.0751 | 0.385 |
+| E79 | 44.2 | 0.338 | 0.707 | 1.227 | 1.296 | 0.0853 | 0.0528 | 0.0817 | 0.466 |
+| E78 | 55.3 | 0.422 | 0.742 | 1.355 | 1.408 | 0.1197 | 0.0576 | 0.0907 | 0.565 |
+| E77 | 78.5 | 0.600 | 0.781 | 1.518 | 1.540 | 0.1951 | 0.0635 | 0.1108 | 0.694 |
+| E76 | 23.2 | 0.178 | 0.573 | 0.851 | 0.925 | 0.0282 | 0.0343 | 0.0547 | 0.297 |
+| E75 | 34.7 | 0.266 | 0.625 | 0.982 | 1.058 | 0.0494 | 0.0374 | 0.0636 | 0.501 |
+| E74 | 44.6 | 0.341 | 0.669 | 1.106 | 1.179 | 0.0727 | 0.0404 | 0.0714 | 0.681 |
+| E73 | 65.2 | 0.499 | 0.731 | 1.314 | 1.369 | 0.1302 | 0.0455 | 0.0900 | 0.985 |
+| E72 | 93.6 | 0.715 | 0.773 | 1.481 | 1.512 | 0.2162 | 0.0531 | 0.1144 | 1.223 |
+| E71 | 33.8 | 0.259 | 0.607 | 0.933 | 1.011 | 0.0444 | 0.0306 | 0.0608 | 0.407 |
+| E70 | 42.5 | 0.326 | 0.644 | 1.032 | 1.109 | 0.0627 | 0.0322 | 0.0664 | 0.554 |
+| E69 | 49.4 | 0.378 | 0.674 | 1.120 | 1.192 | 0.0802 | 0.0340 | 0.0733 | 0.628 |
+| E68 | 58.6 | 0.449 | 0.697 | 1.192 | 1.257 | 0.1027 | 0.0357 | 0.0812 | 0.750 |
+| E67 | 72.2 | 0.553 | 0.731 | 1.315 | 1.369 | 0.1417 | 0.0374 | 0.0939 | 0.902 |
 
-**Table 1.** Campaign envelope: per-run flow, dimensionless groups, temperatures, effectiveness, transfer units, apparent Nusselt number, profile-corrected transfer units, wall-to-interior disequilibrium indices, inversion indicator and nominal-basis efficiency for all fifteen heating runs. Generated as `table1_envelope.md`.
+
+**Table 2.** Reduced envelope: the per-run quantities that follow from the definitions of section 3 — nominal Reynolds and Graetz numbers, effectiveness, transfer-unit count from the isothermal-wall identity, profile-corrected transfer-unit count, apparent Nusselt number, wall-to-interior disequilibrium indices at 58 and 107 mm, and nominal efficiency. Runs are ordered by irradiance then flow, as in Table 1. Generated as `table_reduced_envelope.md`.
 
 
 
@@ -160,7 +183,7 @@ The steady field against flow at each configuration is shown in Figure 3, and th
 **Figure 3.** Steady wall-chain and outlet gas temperatures against flow at the three lamp configurations. The response is strongly graded in depth: the front-face wall falls steeply with flow while the outlet gas is nearly invariant, so a single solid temperature cannot represent the field.
 
 
-The side-wall profile inverts as flow increases, crossing zero within the tested range at all three configurations (Figure 4a), and the crossings collapse when expressed in effectiveness rather than flow (Figure 4b). Two caveats apply: the indicator, a difference between two side-wall probes at 11 and 58 mm, detects a front-to-mid crossing along the instrumented wall chain rather than the three-dimensional solid temperature maximum, which under a Gaussian beam with radial gradients need not lie on the wall — the radial traverse of section 5.3 would settle that. The threshold is also convention-dependent: ε* is formed on the length-averaged wall temperature, and the sensitivity table of section 5.1 shows it moving between 0.57 and 0.79 as the reference probe changes. What follows is an operational criterion under the stated convention, not a receiver property. The located crossings are given in Table 2.
+The side-wall profile inverts as flow increases, crossing zero within the tested range at all three configurations (Figure 4a), and the crossings collapse when expressed in effectiveness rather than flow (Figure 4b). Two caveats apply: the indicator, a difference between two side-wall probes at 11 and 58 mm, detects a front-to-mid crossing along the instrumented wall chain rather than the three-dimensional solid temperature maximum, which under a Gaussian beam with radial gradients need not lie on the wall — the radial traverse of section 5.3 would settle that. The threshold is also convention-dependent: ε* is formed on the length-averaged wall temperature, and the sensitivity table of section 5.1 shows it moving between 0.57 and 0.79 as the reference probe changes. What follows is an operational criterion under the stated convention, not a receiver property. The located crossings are given in Table 3.
 
 | Nominal $G_0$ [kW m⁻²] | $q^*$ local [sL min⁻¹] | $\varepsilon^*$ local | $q^*$ global | $\varepsilon^*$ global |
 |---:|---:|---:|---:|---:|
@@ -168,7 +191,7 @@ The side-wall profile inverts as flow increases, crossing zero within the tested
 | 304 | 8.36 | 0.655 ± 0.002 | 10.32 | 0.673 |
 | 256 | 5.08 | 0.642 ± 0.003 | 3.69 | 0.628 |
 
-**Table 2.** Located inversion crossings at the three configurations, by interpolation between the bracketing runs and by global linear regression, with the effectiveness at crossing. Generated from `results.json`, key `crossings`.
+**Table 3.** Located inversion crossings at the three configurations, by interpolation between the bracketing runs and by global linear regression, with the effectiveness at crossing. Generated from `results.json`, key `crossings`.
 
 The two estimators disagree materially. At 256 kW m⁻² the global regression places the crossing at 3.69 sL min⁻¹, 18% below the lowest run at that flux; only one point in that group is negative and the indicator is strongly concave, so a global fit under-slopes near the bottom and pushes the crossing outside the data. Local bracketing keeps all three crossings inside the measured range and halves the ε* spread from 0.045 to 0.024. The defensible statement is that inversion occurs at ε* ≈ 0.65, with a weak monotonic increase from 0.642 to 0.666 over a 1.8-fold flux range; neither flux independence nor a resolved flux dependence is claimed, since the 0.024 spread exceeds the 0.002–0.003 Monte Carlo intervals yet is comparable to the estimator systematic. The criterion is robust in form: inversion is set by how much of the available wall-to-ambient temperature difference the gas has recovered, not by flow rate or flux separately. Under the δT3 = ±25 K band, ε* at 256 kW m⁻² moves from 0.579 to 0.704, so the threshold is conditional on outlet-probe calibration.
 
@@ -233,7 +256,7 @@ Whichever estimate is taken, C_eff exceeds the bare monolith capacitance of 42.0
 
 Transient behaviour has typically been characterized via a receiver time constant from outlet air temperature rather than by identifying the underlying capacitance. The same review reports time constants of about 90 s (Sulzer), 70 s (HiTRec II), 365 s (Sandia foam), 660 s (CeramTec) and 600–840 s (SOLAIR), noting no standard exists [46]. A time constant, C_eff/(x + K_loss), measured at one flow leaves numerator and denominator unseparated — the 70–840 s spread reflects that conflation. Here, separation comes from varying advective conductance, attributing the six- to sevenfold excess specifically to holder and insulation. Detailed resolution elsewhere has been computational: a coupled transient model for start-up, shut-down, clear-sky and cloud passage [41], and ray tracing with pore-scale simulation and PID control giving 7.0 s (air) versus 45.9 s (molten salt), rising 129% as mass flow falls threefold [42]. A predicted time constant implies a predicted capacitance—the factor found here cannot be captured unless holder and insulation are modelled explicitly.
 
-Table 3 collects these constants with their Monte Carlo intervals. The loss conductance is bracketed between 0.080 and 0.114 W K⁻¹, with the heating tangent exceeding the matched cooling secant by 1.41× — consistent with a partly radiative loss path, though only weak evidence for T³ dominance, and we claim no more than the sign. Carried through the δT3 = ±25 K band, the primary determination moves over 271.7 to 280.5 J K⁻¹ and 0.0754 to 0.0844 W K⁻¹, and the heating determination over 262.2 to 299.4 J K⁻¹ and 0.1073 to 0.1200 W K⁻¹, so the band widens the loss bracket to 0.075 to 0.120 W K⁻¹ while leaving the capacitance spread dominated by estimator choice rather than by outlet-probe bias.
+Table 4 collects these constants with their Monte Carlo intervals. The loss conductance is bracketed between 0.080 and 0.114 W K⁻¹, with the heating tangent exceeding the matched cooling secant by 1.41× — consistent with a partly radiative loss path, though only weak evidence for T³ dominance, and we claim no more than the sign. Carried through the δT3 = ±25 K band, the primary determination moves over 271.7 to 280.5 J K⁻¹ and 0.0754 to 0.0844 W K⁻¹, and the heating determination over 262.2 to 299.4 J K⁻¹ and 0.1073 to 0.1200 W K⁻¹, so the band widens the loss bracket to 0.075 to 0.120 W K⁻¹ while leaving the capacitance spread dominated by estimator choice rather than by outlet-probe bias.
 
 | Constant | Value | s.d. | 95% interval | Unit | Notes |
 |---|---|---|---|---|---|
@@ -254,7 +277,7 @@ Table 3 collects these constants with their Monte Carlo intervals. The loss cond
 | $K_{\rm loss}$, heating deep probes | 0.114 | 0.028 | [0.071, 0.181] | W K$^{-1}$ | tangent conductance |
 | Monolith capacitance (measured mass) | 42.0 – 46.8 | — | — | J K$^{-1}$ | 40 g $\times\,c_p$(600–900 K) |
 
-**Table 3.** Identified constants with Monte Carlo standard deviations, 95% percentile intervals and, for fitted slopes, the regression standard error alongside. Generated as `table2_constants.md`.
+**Table 4.** Identified constants with Monte Carlo standard deviations, 95% percentile intervals and, for fitted slopes, the regression standard error alongside. Generated as `table_constants.md`.
 
 
 
@@ -309,9 +332,9 @@ Which solid probe is called the solid temperature changes every identified coeff
 | interior probes (T9, T10) | 0.648 – 0.826 | 4.49×10⁻⁴ | 1.393 | 0.719 / 0.711 / 0.702 |
 | rear wall only (T11) | 0.771 – 0.823 | 1.72×10⁻³ | 1.092 | 0.787 / 0.787 / 0.791 |
 
-**Table 4.** The apparent Nusselt correlation and the inversion marker recomputed against five candidate solid reference temperatures from the same fifteen runs. Generated as `reference_sensitivity.csv`.
+**Table 5.** The apparent Nusselt correlation and the inversion marker recomputed against five candidate solid reference temperatures from the same fifteen runs. Generated as `reference_sensitivity.csv`.
 
-The prefactor spans a factor of 28.9, the exponent 1.09 to 1.84, the inversion threshold 0.57 to 0.79 (Table 4). Every row is a defensible unremarked choice, and every row is a different receiver. Interior and wall probes at the same depth differ by 21–55 K at 107 mm and 21–27 K at 58 mm, gaps growing with flow, so no single solid temperature represents the section. The same sensitivity is documented channel-side [17,19], but at assembly scale the effect is a factor of twenty-nine, not tens of percent. The transient identification is equally under-determined: the same eighteen transients yield C_eff of 122, 269, 276 or 281 J K⁻¹ depending on probe subset and fit window, the window alone spanning 200–295 J K⁻¹, with the coefficient of determination increasing as the estimate degrades (Figure 6b). This factor of 2.3 is the identifiability basin's width, not measurement scatter.
+The prefactor spans a factor of 28.9, the exponent 1.09 to 1.84, the inversion threshold 0.57 to 0.79 (Table 5). Every row is a defensible unremarked choice, and every row is a different receiver. Interior and wall probes at the same depth differ by 21–55 K at 107 mm and 21–27 K at 58 mm, gaps growing with flow, so no single solid temperature represents the section. The same sensitivity is documented channel-side [17,19], but at assembly scale the effect is a factor of twenty-nine, not tens of percent. The transient identification is equally under-determined: the same eighteen transients yield C_eff of 122, 269, 276 or 281 J K⁻¹ depending on probe subset and fit window, the window alone spanning 200–295 J K⁻¹, with the coefficient of determination increasing as the estimate degrades (Figure 6b). This factor of 2.3 is the identifiability basin's width, not measurement scatter.
 
 Agreement between a receiver model and a gas outlet temperature plus one or two solid temperatures is therefore not evidence of correct internal physics; the identified coefficient reflects sensor placement rather than the receiver, and will not transfer to a different geometry, scale or operating envelope. This offers a deflationary explanation for a two-decade puzzle: most tested volumetric absorbers underperformed predictions [1,3], four established models cluster within 25 K of each other and 80–100 K from experiment with mean-air-temperature measurement named a principal suspect [10], and the idealized equilibrium model is optimistic by over twenty efficiency points against practice [2]. If the calibration target does not constrain the internal field, models can be simultaneously well fitted and structurally wrong.
 

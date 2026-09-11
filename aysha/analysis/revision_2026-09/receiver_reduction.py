@@ -868,20 +868,34 @@ def write_tables(rep, dg, mc, P):
     # units are carried in the header cells rather than on a second header row:
     # a table may have only ONE header line before the delimiter row, and the
     # delimiter must have exactly as many cells as the header (2026-09-04).
-    _t1cols = ["Run", "$G_0$ [kW m$^{-2}$]", "$q$ [sL min$^{-1}$]", "$Re_{\\rm nom}$",
-               "$Gz_L$", "$\\bar T_w$ [K]", "$T_3$ [K]", "$\\varepsilon$",
-               "$NTU_{\\rm app}$", "$N_{\\rm prof}$", "$Nu_{\\rm app}$",
-               "$\\Lambda_{58}$", "$\\Lambda_{107}$", "$T_{12}-T_8$ [K]",
-               "$\\eta_{\\rm nom}$"]
-    T1 = ["| " + " | ".join(_t1cols) + " |",
-          "|" + "|".join(["---"] + ["---:"] * (len(_t1cols) - 1)) + "|"]
-    npf = rep["ntu_profile"]["NTU_corr"]
-    for (_, r), nv in zip(dg.sort_values(["Io_kWm2", "q_slpm"]).iterrows(),
-                          [npf[i] for i in dg.sort_values(["Io_kWm2", "q_slpm"]).index]):
-        T1.append(f"| {r.ID} | {r.Io_kWm2:.0f} | {r.q_slpm:.2f} | {r.Re:.1f} | {r.Gz_L:.3f} | "
-                  f"{r.Tw_K:.0f} | {r.T3_ss:.0f} | {r.eps:.3f} | {r.NTU:.3f} | {nv:.3f} | "
-                  f"{r.Nu:.4f} | {r.Lam58:.4f} | {r.Lam107:.4f} | {r.T12_ss - r.T8_ss:+.1f} | {r.eta_nom:.3f} |")
-    open(P("table1_envelope.md"), "w").write("\n".join(T1) + "\n")
+    # Two envelope tables, split on the measurement/reduction boundary
+    # (2026-09-09): the directly measured quantities belong with the
+    # experiment, the ones requiring the definitions of section 3 with the
+    # results. Units travel inside the single header row and the delimiter is
+    # built from the column list, so neither can drift.
+    _order = dg.sort_values(["Io_kWm2", "q_slpm"])
+    _npf = rep["ntu_profile"]["NTU_corr"]
+    _nvals = [_npf[i] for i in _order.index]
+
+    _meas = ["Run", "$G_0$ [kW m$^{-2}$]", "$q$ [sL min$^{-1}$]",
+             "$T_{\\rm amb}$ [K]", "$\\bar T_w$ [K]", "$T_3$ [K]",
+             "$T_{12}-T_8$ [K]"]
+    TM = ["| " + " | ".join(_meas) + " |",
+          "|" + "|".join(["---"] + ["---:"] * (len(_meas) - 1)) + "|"]
+    for _, r in _order.iterrows():
+        TM.append(f"| {r.ID} | {r.Io_kWm2:.0f} | {r.q_slpm:.2f} | {r.Tamb:.1f} | "
+                  f"{r.Tw_K:.0f} | {r.T3_ss:.0f} | {r.T12_ss - r.T8_ss:+.1f} |")
+    open(P("table_measured_envelope.md"), "w").write("\n".join(TM) + "\n")
+
+    _red = ["Run", "$Re_{\\rm nom}$", "$Gz_L$", "$\\varepsilon$",
+            "$NTU_{\\rm app}$", "$N_{\\rm prof}$", "$Nu_{\\rm app}$",
+            "$\\Lambda_{58}$", "$\\Lambda_{107}$", "$\\eta_{\\rm nom}$"]
+    TR = ["| " + " | ".join(_red) + " |",
+          "|" + "|".join(["---"] + ["---:"] * (len(_red) - 1)) + "|"]
+    for (_, r), nv in zip(_order.iterrows(), _nvals):
+        TR.append(f"| {r.ID} | {r.Re:.1f} | {r.Gz_L:.3f} | {r.eps:.3f} | {r.NTU:.3f} | "
+                  f"{nv:.3f} | {r.Nu:.4f} | {r.Lam58:.4f} | {r.Lam107:.4f} | {r.eta_nom:.3f} |")
+    open(P("table_reduced_envelope.md"), "w").write("\n".join(TR) + "\n")
 
     nu, pr = rep["nusselt"], rep["ntu_profile"]
     idn = rep["identification"]
@@ -941,7 +955,7 @@ def write_tables(rep, dg, mc, P):
     T2 = ["| Constant | Value | s.d. | 95% interval | Unit | Notes |",
           "|---|---|---|---|---|---|"]
     T2 += [f"| {r0} | {r1} | {r2} | {r3} | {r4} | {r5} |" for r0, r1, r2, r3, r4, r5 in rows]
-    open(P("table2_constants.md"), "w").write("\n".join(T2) + "\n")
+    open(P("table_constants.md"), "w").write("\n".join(T2) + "\n")
 
 # --------------------------------------------------------------------------
 # driver

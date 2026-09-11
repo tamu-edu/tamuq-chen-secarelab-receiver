@@ -55,7 +55,9 @@ Both scripts are deterministic. Every stochastic step is seeded (`monte_carlo(se
 | `cooling_decays.csv`, `master_curves.csv` | Transient traces for Figure 5 |
 | `pressure_drop.csv` | Installed differential pressure against the laminar prediction (§4.7) |
 | `flux_geometry.json` | Gauge spatial-averaging calculation (§4.6) |
-| `table1_envelope.md`, `table2_constants.md` | Manuscript tables, generated |
+| `table_measured_envelope.md` | Table 1, measured campaign conditions |
+| `table_reduced_envelope.md` | Table 2, per-run reduced quantities |
+| `table_constants.md` | Table 4, identified constants |
 
 Keys inside `results.json` worth naming, since they carry the paper's structural argument:
 
