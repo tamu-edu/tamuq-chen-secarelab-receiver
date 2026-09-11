@@ -44,8 +44,8 @@ Where a quantity is a fitted slope, its regression standard error is reported al
 The identified capacitance is thus the quantity least sensitive to the outlet-probe systematic — the primary determination moves by 1.6% over the whole band, against the 11% spread among estimators and the ±37 J K⁻¹ Monte Carlo standard deviation — while the loss bracket widens from 0.080–0.114 to 0.075–0.120 W K⁻¹. The structural result of section 5.2 is deliberately constructed to survive the band. Source: `results.json`, key `T3_sensitivity`.
 
 **Estimator choice** is propagated for the inversion threshold, where it dominates: section 4.1 reports ε* located both by interpolation between the bracketing runs and by a global linear regression, and carries the difference as a systematic.
-
 ---
+
 
 ## S3 Conditionality of the heating identification
 
