@@ -199,7 +199,7 @@ This is the experimental counterpart of a result the modelling literature has ap
 
 ### 4.2 Assembly-scale exchange, and a structural constraint
 
-The apparent Nusselt number follows a clean power law over the full campaign (Figure 3a),
+The apparent Nusselt number follows a clean power law over the full campaign (Figure 4a),
 
 ![Figure 4](figures/fig4_assembly_limitation.png)
 
