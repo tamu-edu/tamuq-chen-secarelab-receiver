@@ -64,7 +64,11 @@ def export_traces(raw_dir, out_dir):
             rows.append(pd.DataFrame(dict(ID=ID, sensor=s, t=t[::k], theta=th[::k])))
     pd.concat(rows).to_csv(P("cooling_decays.csv"), index=False)
 
-    C, K = 298.8, 0.0953
+    # pooled-eps cooling identification, read from the archive rather than
+    # hardcoded, so a property or reduction change propagates here too
+    _R = json.load(open(os.path.join(out_dir, "results.json")))
+    C = _R["identification"]["cooling"]["C_eff"]
+    K = _R["identification"]["cooling"]["K_loss"]
     rows = []
     for ID, (fn, Io) in rr.HEATING.items():
         d = rr.load(raw_dir, fn); t = d["t"]
@@ -115,7 +119,15 @@ def main(raw_dir, out_dir, fig_dir):
     os.makedirs(fig_dir, exist_ok=True)
     P = lambda f: os.path.join(out_dir, f)
     F = lambda f: os.path.join(fig_dir, f)
-    if not os.path.exists(P("cooling_decays.csv")):
+    # Regenerate the derived traces when any is missing OR older than the
+    # archive. The previous gate tested only whether cooling_decays.csv
+    # existed, so reference_points.csv silently served pre-CoolProp values to
+    # Figure 7 for two weeks while Table 5 carried the current ones
+    # (2026-09-24).
+    _derived = ["cooling_decays.csv", "master_curves.csv", "reference_points.csv"]
+    _stamp = os.path.getmtime(P("results.json"))
+    if any(not os.path.exists(P(x)) or os.path.getmtime(P(x)) < _stamp
+           for x in _derived):
         export_traces(raw_dir, out_dir)
 
     R = json.load(open(P("results.json")))
@@ -170,7 +182,7 @@ def main(raw_dir, out_dir, fig_dir):
             color="0.45", va="bottom", fontsize=7)
     a1.text(21.5, 1.55, f"grouped (primary, solid):\n$\\propto Re_{{\\rm nom}}^{{{GR['exponent']:.3f}}}$, "
             f"$r^2$={GR['r2']:.3f}\n"
-            f"pooled (dashed):\n${a*1e4:.2f}\\times10^{{-4}}Re_{{\\rm nom}}^{{{b:.2f}}}$, $r^2$=0.971",
+            f"pooled (dashed):\n${a*1e4:.2f}\\times10^{{-4}}Re_{{\\rm nom}}^{{{b:.2f}}}$, $r^2$={R['nusselt']['r2']:.3f}",
             color="0.15", ha="left", va="top", fontsize=7.5)
     a1.set_xscale("log"); a1.set_yscale("log"); a1.set_xlim(20, 110); a1.set_ylim(0.02, 6.5)
     a1.set_xticks([25, 50, 100]); a1.set_xticklabels(["25", "50", "100"])
