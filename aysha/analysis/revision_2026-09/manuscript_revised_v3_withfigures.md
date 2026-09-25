@@ -90,6 +90,8 @@ using the exact trapezoid coefficients for probes at 11, 58 and 107 mm over 137 
 
 ## 3. Analysis framework
 
+This section defines the quantities the campaign is reduced to. All are computed from the measured records by algebra or regression, with no receiver model in the loop: steady dimensionless groups treating the assembly as a single-stream heat exchanger (3.1), an effective capacitance and loss conductance identified from the transient decays (3.2), a rescaling that tests the lumped description those identifications presume (3.3), and the uncertainty accounting (3.4). Where a value depends on an estimator or a reference choice, that dependence is declared where it is introduced.
+
 ### 3.1 Dimensionless groups
 
 Per-channel mass flow is $ṁ_{ch} = ṁ/100$ and the hydraulic diameter is the channel side, $D_h$ = 1.5 mm. Gas properties are evaluated at $T̄_g = (T_{amb} + T_3)/2$ except the thermal conductivity in the Nusselt number, which uses the film temperature $(T̄_w + T̄_g)/2$ — as discussed earlier, because evaluating the Péclet number on an inlet rather than a local temperature shifts the apparent Nusselt–Graetz curve by 50% or more [17].
@@ -117,7 +119,7 @@ Finally, four dimensionless groups as used in section 5.2 to capture the physics
 
 ### 3.2 Transient identification
 
-After lamp shutdown, during cooling runs, the assembly's temperature decays with a single slow mode. For each sensor the late-window (ie over the second half of the record and above 5 K temperature difference with the ambient) excess temperature is regressed as $log(T − T_{amb})$ against time, and λ is the mean of the per-sensor slopes. Lumping the assembly's thermal behavior into one capacitance $C_{eff}$ losing heat to ambient through a conductance $K_{loss}$ while delivering enthalpy to the gas gives
+After lamp shutdown, during cooling runs, the assembly's temperature decays with a single slow mode. For each sensor the excess temperature over the second half of the record, and above 5 K, is regressed as log(T−Tamb​) against time, and λ is the mean of the per-sensor slopes. Lumping the assembly's thermal behavior into one capacitance $C_{eff}$ losing heat to ambient through a conductance $K_{loss}$ while delivering enthalpy to the gas gives
 
 $\lambda = \frac{\varepsilon \dot m c_p + K_{\rm loss}}{C_{\rm eff}}.$
 
@@ -125,9 +127,9 @@ So regressing λ against the gas advective conductance $x = ε ṁ c_p$ allow id
 
 Identifying a heat transfer property from a transient rather than from a steady balance is established practice for these materials with Fend et al. [4] showing how volumetric heat transfer coefficients of porous absorbers have been obtained by measuring how far a temperature wave is delayed and damped in passing through a sample. The same logic is applied here to the full assembly.
 
-The heating approach to steady state (ie. ss) decays with the same eigenvalue in principle, with $log(T_{ss} − T)$ regressed against $u = (T_{ss} − T)/(T_{ss} − T₀)$. <mark>That identification is conditional in two ways, on sensor selection and on the fit window.: the probe set alone changes $C_{eff}$ by more than a factor of two (section 4.4), and sweeping the deficit window from (0.05, 0.35) to (0.20, 0.70) moves $C_{eff}$ monotonically from 295 to 200 J K⁻¹ while r² improves from 0.84 to 0.97, so fit quality cannot select the window (supplementary section S3). </mark>
+In <mark>principle </mark>the heating branch decays with the same eigenvalue, and log(Tss​−T) is regressed against time in the same way. It differs in that the asymptote Tss​ is not measured but estimated from the tail of the same record, which forces a choice of fit window. We use the middle of the approach, 0.07<u<0.45, where u=(Tss​−T)/(Tss​−T0​) is the fraction of the total rise still to come — 1 at lamp-on, 0 at steady state. Earlier than u=0.45 the faster modes have not yet decayed; later than u=0.07 the remaining deficit is comparable to the uncertainty in Tss​ itself. The choice is consequential: sweeping the window from (0.05, 0.35) to (0.20, 0.70) moves Ceff​ monotonically from 295 to 200 J K⁻¹ while r2 improves from 0.84 to 0.97, so fit quality cannot select it (supplementary section S3). The probe set alone changes Ceff​ by more than a factor of two (section 4.4).
 
-We therefore report cooling as the primary identification, needing no sensor rule once the source is removed; heating as a conditional consistency check; and a joint fit to all eighteen eigenvalues as the overall estimate. Their disagreement is addressed in section 5.1.
+We therefore report cooling as the primary identification, since its asymptote is measured and it needs no sensor rule once the source is removed; heating as a conditional consistency check; and a joint fit to all eighteen eigenvalues as the overall estimate. Their disagreement is addressed in section 5.1.
 
 ### 3.3 Similarity rescaling
 
