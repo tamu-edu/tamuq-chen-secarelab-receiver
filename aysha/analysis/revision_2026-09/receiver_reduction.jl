@@ -674,205 +674,6 @@ begin # fixed-conductance falsification
     end
 end
 
-begin # reference-probe sensitivity
-    function reference_variants(ss)
-        variants = [
-            "wall quadrature (T8,T12,T11)" =>
-                (data -> sum(WTS[s] .* data[!, Symbol(s, "_ss")] for s in wall_sensor_order)),
-            "interior probes (T9,T10)" => (data -> 0.5 .* (data.T9_ss .+ data.T10_ss)),
-            "front wall only (T8)" => (data -> copy(data.T8_ss)),
-            "mid wall only (T12)" => (data -> copy(data.T12_ss)),
-            "rear wall only (T11)" => (data -> copy(data.T11_ss)),
-            "wall+interior mean" => (data -> 0.5 .* (
-                sum(WTS[s] .* data[!, Symbol(s, "_ss")] for s in wall_sensor_order) .+
-                0.5 .* (data.T9_ss .+ data.T10_ss))),
-        ]
-
-        rows = NamedTuple[]
-        for (name, reference_temperature) in variants
-            data = copy(ss)
-            data.Tw_K = reference_temperature(data)
-            groups = dimensionless(data)
-            fit = power_law_fit(groups.Re, groups.Nu)
-            crossing = Dict{Int,Float64}()
-            for group in groupby(groups, :Io_kWm2)
-                crossing[round(Int, group.Io_kWm2[1])] = crossings(DataFrame(group))["eps_local"]
-            end
-            push!(rows, (
-                reference=name,
-                eps_min=minimum(groups.eps), eps_max=maximum(groups.eps),
-                NTU_min=minimum(groups.NTU), NTU_max=maximum(groups.NTU),
-                Nu_min=minimum(groups.Nu), Nu_max=maximum(groups.Nu),
-                Nu_prefactor=fit.prefactor, Nu_exponent=fit.exponent,
-                eps_star_456=get(crossing, 456, NaN),
-                eps_star_304=get(crossing, 304, NaN),
-                eps_star_256=get(crossing, 256, NaN),
-            ))
-        end
-        return DataFrame(rows)
-    end
-end
-
-begin # eigenvalue table and sensitivity functions
-    function build_eigenvalues(raw_dir, groups)
-        eps_q = linear_fit(groups.q_slpm, groups.eps)
-        rows = NamedTuple[]
-
-        for (ID, (filename, irradiance)) in HEATING
-            data = load_data(raw_dir, filename)
-            time = data["t"]
-            flow = tail_mean(data["flow"], time)
-            ambient = tail_mean(data["Tamb"], time)
-            outlet = tail_mean(data["T3"], time)
-            mdot = RHO_STD * flow / 60000.0
-            effectiveness = eps_q.intercept + eps_q.slope * flow
-            exchange = effectiveness * mdot * cp_air(0.5 * (ambient + outlet))
-            controller_flow = [tail_mean(signal, time) for signal in data["mfc"]]
-            shares = sum(controller_flow) > 0 ? controller_flow ./ sum(controller_flow) : fill(0.25, 4)
-
-            for (phase, sensors) in (("heat", DEEP_SENS), ("heat6", COOL_SENS))
-                eigenvalue, deviation, count_sensors = eigen_heating(data, sensors)
-                push!(rows, (
-                    ID=ID, phase=phase, q=flow, x=exchange,
-                    lam=eigenvalue, lam_sd=deviation, n=count_sensors,
-                    Tamb_e=ambient, T3_e=outlet,
-                    mfc_f1=shares[1], mfc_f2=shares[2],
-                    mfc_f3=shares[3], mfc_f4=shares[4],
-                ))
-            end
-        end
-
-        for (ID, filename) in COOLING
-            data = load_data(raw_dir, filename)
-            time = data["t"]
-            flow = mean(data["flow"])
-            ambient = tail_mean(data["Tamb"], time)
-            outlet = tail_mean(data["T3"], time)
-            mdot = RHO_STD * flow / 60000.0
-            effectiveness = eps_q.intercept + eps_q.slope * flow
-            exchange = effectiveness * mdot * cp_air(0.5 * (ambient + outlet))
-            controller_flow = [mean(signal) for signal in data["mfc"]]
-            shares = sum(controller_flow) > 0 ? controller_flow ./ sum(controller_flow) : fill(0.25, 4)
-            eigenvalue, deviation, count_sensors = eigen_cooling(data)
-            push!(rows, (
-                ID=ID, phase="cool", q=flow, x=exchange,
-                lam=eigenvalue, lam_sd=deviation, n=count_sensors,
-                Tamb_e=ambient, T3_e=outlet,
-                mfc_f1=shares[1], mfc_f2=shares[2],
-                mfc_f3=shares[3], mfc_f4=shares[4],
-            ))
-        end
-
-        eigenvalues = DataFrame(rows)
-        eigenvalues.x_matched = fill(NaN, nrow(eigenvalues))
-        for index in findall(eigenvalues.phase .== "cool")
-            source_id = COOL_PROVENANCE[eigenvalues.ID[index]]
-            source = groups[findfirst(==(source_id), groups.ID), :]
-            eigenvalues.x_matched[index] = source.eps * RHO_STD *
-                eigenvalues.q[index] / 60000.0 *
-                cp_air(0.5 * (eigenvalues.Tamb_e[index] + eigenvalues.T3_e[index]))
-        end
-        return eigenvalues
-    end
-
-    function identify_all(eigenvalues)
-        output = Dict{String,Any}()
-        selections = [
-            "cooling" => (eigenvalues.phase .== "cool"),
-            "heating_deep" => (eigenvalues.phase .== "heat"),
-            "heating_all6" => (eigenvalues.phase .== "heat6"),
-            "joint" => in.(eigenvalues.phase, Ref(("cool", "heat"))),
-        ]
-        for (name, selected) in selections
-            selected .&= isfinite.(eigenvalues.lam) .& isfinite.(eigenvalues.x)
-            C_eff, K_loss, r2, _ = identify(eigenvalues.x[selected], eigenvalues.lam[selected])
-            output[name] = Dict("C_eff" => C_eff, "K_loss" => K_loss,
-                                "r2" => r2, "n" => count(selected),
-                                "dof" => count(selected) - 2)
-        end
-        selected = (eigenvalues.phase .== "cool") .& isfinite.(eigenvalues.lam) .&
-                   isfinite.(eigenvalues.x_matched)
-        C_eff, K_loss, r2, _ = identify(eigenvalues.x_matched[selected],
-                                        eigenvalues.lam[selected])
-        output["cooling_matched_eps"] = Dict(
-            "C_eff" => C_eff, "K_loss" => K_loss,
-            "r2" => r2, "n" => count(selected), "dof" => count(selected) - 2,
-        )
-        return output
-    end
-
-    function heating_window_sensitivity(raw_dir, eigenvalues)
-        output = Dict{String,Any}[]
-        base = eigenvalues[eigenvalues.phase .== "heat", :]
-        for (lower, upper) in ((0.05, 0.35), (0.07, 0.45), (0.10, 0.50),
-                               (0.15, 0.60), (0.20, 0.70))
-            estimates = Float64[]
-            for (ID, (filename, irradiance)) in HEATING
-                data = load_data(raw_dir, filename)
-                eigenvalue, _, _ = eigen_heating(data, DEEP_SENS; u_lo=lower, u_hi=upper)
-                push!(estimates, eigenvalue)
-            end
-            selected = isfinite.(estimates)
-            C_eff, K_loss, r2, _ = identify(base.x[selected], estimates[selected])
-            push!(output, Dict("u_lo" => lower, "u_hi" => upper,
-                               "C_eff" => C_eff, "K_loss" => K_loss, "r2" => r2))
-        end
-        return output
-    end
-
-    function T3_sensitivity(ss, eigenvalues)
-        output = Dict{String,Any}()
-        offsets = (-DT3_BAND, 0.0, DT3_BAND)
-        for offset in offsets
-            groups = dimensionless(ss; dT3=offset)
-            nusselt = power_law_fit(groups.Re, groups.Nu)
-            eps_star = Dict{String,Any}()
-            for group in groupby(groups, :Io_kWm2)
-                eps_star[string(round(Int, group.Io_kWm2[1]))] = crossings(DataFrame(group))["eps_local"]
-            end
-            entry = Dict{String,Any}(
-                "eps" => [minimum(groups.eps), maximum(groups.eps)],
-                "Nu_prefactor" => nusselt.prefactor,
-                "Nu_exponent" => nusselt.exponent,
-                "NTU_exponent" => power_law_fit(groups.Re, groups.NTU).exponent,
-                "eps_star" => eps_star,
-                "eta_nom" => [minimum(groups.eta_nom), maximum(groups.eta_nom)],
-            )
-
-            cooling = eigenvalues[eigenvalues.phase .== "cool", :]
-            matched_exchange = Float64[]
-            for row in eachrow(cooling)
-                source = groups[findfirst(==(COOL_PROVENANCE[row.ID]), groups.ID), :]
-                push!(matched_exchange,
-                      source.eps * RHO_STD * row.q / 60000.0 *
-                      cp_air(0.5 * (row.Tamb_e + row.T3_e + offset)))
-            end
-            C_match, K_match, r2_match, _ = identify(matched_exchange, cooling.lam)
-
-            heating = eigenvalues[(eigenvalues.phase .== "heat") .& isfinite.(eigenvalues.lam), :]
-            eps_q = linear_fit(groups.q_slpm, groups.eps)
-            deep_exchange = [(eps_q.intercept + eps_q.slope * row.q) *
-                             RHO_STD * row.q / 60000.0 *
-                             cp_air(0.5 * (row.Tamb_e + row.T3_e + offset))
-                             for row in eachrow(heating)]
-            C_deep, K_deep, r2_deep, _ = identify(deep_exchange, heating.lam)
-            entry["identification"] = Dict(
-                "C_match" => C_match, "K_match" => K_match, "r2_match" => r2_match,
-                "C_deep" => C_deep, "K_deep" => K_deep, "r2_deep" => r2_deep,
-            )
-            output[@sprintf("%+.0f", offset)] = entry
-        end
-
-        output["band"] = Dict{String,Any}()
-        for quantity in ("C_match", "K_match", "C_deep", "K_deep")
-            values = [output[@sprintf("%+.0f", offset)]["identification"][quantity]
-                      for offset in offsets]
-            output["band"][quantity] = [minimum(values), maximum(values)]
-        end
-        return output
-    end
-end
-
 begin # Monte Carlo uncertainty propagation
     mfc_sigma(reading) = sqrt.((MFC_A_FS * MFC_FS)^2 .+ (MFC_B_REL .* reading).^2)
 
@@ -882,7 +683,7 @@ begin # Monte Carlo uncertainty propagation
         return flow_error ./ total_flow
     end
 
-    function monte_carlo(ss, eigenvalues; n=4000, seed=20260902, rho=1.0)
+    function monte_carlo(ss, eigenvalues; n=40, seed=20260902, rho=1.0)
         rng = MersenneTwister(seed)
         quantity_names = [
             "Nu_a", "Nu_b", "Nu_b_grouped", "NTU_corr_b",
@@ -1001,106 +802,6 @@ begin # Monte Carlo uncertainty propagation
             ))
         end
         return DataFrame(rows)
-    end
-end
-
-begin # report helpers
-    function ltne_report(data)
-        output = Dict{String,Any}()
-        for column in (:Lam58, :Lam107)
-            pooled = linear_fit(data.Re, data[!, column])
-            per_flux = Dict{String,Any}()
-            for group in groupby(data, :Io_kWm2)
-                fit = linear_fit(group.Re, group[!, column])
-                per_flux[string(round(Int, group.Io_kWm2[1]))] = Dict(
-                    "slope" => fit.slope, "intercept" => fit.intercept,
-                    "r2" => fit.r2,
-                    "range" => [minimum(group[!, column]), maximum(group[!, column])],
-                )
-            end
-            output[string(column)] = Dict(
-                "pooled" => Dict("slope" => pooled.slope,
-                                  "intercept" => pooled.intercept,
-                                  "r2" => pooled.r2),
-                "per_flux" => per_flux,
-            )
-        end
-        return output
-    end
-
-    function delivered_power_report(data, identification)
-        K_lo = identification["cooling_matched_eps"]["K_loss"]
-        K_hi = identification["heating_deep"]["K_loss"]
-        per_flux = Dict{String,Any}()
-        for group in groupby(data, :Io_kWm2)
-            irradiance = group.Io_kWm2[1]
-            f_lo = mean(closure(group, K_lo))
-            f_hi = mean(closure(group, K_hi))
-            candidates = (irradiance, irradiance * f_lo, irradiance * f_hi)
-            per_flux[string(round(Int, irradiance))] = Dict(
-                "f_Klo" => f_lo, "f_Khi" => f_hi,
-                "G_closure_lo" => irradiance * f_lo,
-                "G_closure_hi" => irradiance * f_hi,
-                "G_nominal" => irradiance,
-                "G_interval" => [minimum(candidates), maximum(candidates)],
-                "eta_nom" => [minimum(group.eta_nom), maximum(group.eta_nom)],
-            )
-        end
-        return Dict("K_bracket" => [K_lo, K_hi], "per_flux" => per_flux,
-                    "reconciling_dT3" => reconciling_dT3(data, K_hi))
-    end
-
-    function pressure_drop_report(data)
-        pressure = select(data, :ID, :Io_kWm2, :q_slpm, :mdot_gs,
-                          :Tg_bar, :dp1_mbar, :dp2_mbar)
-        pressure.dp_pred_mbar = [dp_laminar(mass_flow, temperature)
-                                 for (mass_flow, temperature) in
-                                 zip(pressure.mdot_gs, pressure.Tg_bar)]
-        pressure.ratio = pressure.dp1_mbar ./ pressure.dp_pred_mbar
-        report = Dict(
-            "resolution_mbar" => DP_FS * DP_ACC,
-            "pred_range" => [minimum(pressure.dp_pred_mbar), maximum(pressure.dp_pred_mbar)],
-            "meas_range" => [minimum(pressure.dp1_mbar), maximum(pressure.dp1_mbar)],
-            "ratio_range" => [minimum(pressure.ratio), maximum(pressure.ratio)],
-            "dp2_range" => [minimum(pressure.dp2_mbar), maximum(pressure.dp2_mbar)],
-        )
-        return pressure, report
-    end
-
-    function similarity_report(raw_dir, groups, identification)
-        C_eff = identification["cooling_matched_eps"]["C_eff"]
-        K_loss = identification["cooling_matched_eps"]["K_loss"]
-        half_times = Dict("wall" => Float64[], "gas" => Float64[])
-        for (ID, (filename, irradiance)) in HEATING
-            data = load_data(raw_dir, filename)
-            time = data["t"]
-            flow = tail_mean(data["flow"], time)
-            mdot = RHO_STD * flow / 60000.0
-            ambient = tail_mean(data["Tamb"], time)
-            row = groups[findfirst(==(ID), groups.ID), :]
-            outlet = tail_mean(data["T3"], time)
-            tau = C_eff / (row.eps * mdot * cp_air(0.5 * (ambient + outlet)) + K_loss)
-            for (name, signal) in (("wall", wall_temperature(data)), ("gas", data["T3"]))
-                normalized = (signal .- signal[1]) ./ (tail_mean(signal, time) - signal[1])
-                index = findfirst(>=(0.5), normalized)
-                isnothing(index) || push!(half_times[name], time[index] / tau)
-            end
-        end
-        return Dict(name => Dict("t_half_mean" => mean(values),
-                                 "cv_percent" => 100 * std(values; corrected=false) / mean(values))
-                    for (name, values) in half_times)
-    end
-
-    function geometry_report()
-        return Dict(
-            "side_mm" => SIDE * 1e3,
-            "A_frt_cm2" => A_FRT * 1e4,
-            "porosity" => POROSITY,
-            "A_solid_m2" => A_SOLID,
-            "rho_eff" => M_MONO / (A_SOLID * L_REC),
-            "wall_weights" => Dict(sensor => round(WTS[sensor]; digits=4)
-                                   for sensor in wall_sensor_order),
-        )
     end
 end
 
@@ -1238,8 +939,45 @@ begin # table and JSON output
     end
 end
 
-begin # complete reduction workflow
-    function run_reduction(raw_dir, out_dir; n_mc=4000, profile_starts=40)
+begin # linear reduction workflow and export
+    RECEIVER_REDUCTION_RUN = !isdefined(@__MODULE__, :RECEIVER_REDUCTION_INCLUDE_ONLY) ||
+                             !getfield(@__MODULE__, :RECEIVER_REDUCTION_INCLUDE_ONLY)
+
+    if RECEIVER_REDUCTION_RUN
+        let options = Dict(
+                "raw" => normpath(joinpath(@__DIR__, "..", "RAW")),
+                "out" => joinpath(@__DIR__, "outputs"),
+                "nmc" => "4000",
+                "profile-starts" => "40",
+                "tamb" => "T15,T16",
+            ), position = 1
+            while position <= length(ARGS)
+                argument = ARGS[position]
+                startswith(argument, "--") || error("unknown argument: $argument")
+                if occursin('=', argument)
+                    key, value = split(argument[3:end], '='; limit=2)
+                    options[key] = value
+                else
+                    position == length(ARGS) && error("missing value for $argument")
+                    options[argument[3:end]] = ARGS[position + 1]
+                    position += 1
+                end
+                position += 1
+            end
+            global raw_dir = abspath(options["raw"])
+            global out_dir = abspath(options["out"])
+            global n_mc = parse(Int, options["nmc"])
+            global profile_starts = parse(Int, options["profile-starts"])
+            global TAMB_CHANNELS = Tuple(strip.(split(options["tamb"], ',')))
+        end
+
+        println("Running receiver_reduction.jl")
+        println("  raw data: ", raw_dir)
+        println("  outputs:  ", out_dir)
+        println("  Monte Carlo samples: ", n_mc)
+        println("  profile random starts: ", profile_starts)
+        flush(stdout)
+
         mkpath(out_dir)
         output(filename) = joinpath(out_dir, filename)
         report = Dict{String,Any}()
@@ -1262,7 +1000,15 @@ begin # complete reduction workflow
             "maximum_relative_fit_error" => Dict(
                 "cp" => 6.8e-7, "viscosity" => 1.9e-7, "conductivity" => 6.9e-7),
         )
-        report["geometry"] = geometry_report()
+        report["geometry"] = Dict(
+            "side_mm" => SIDE * 1e3,
+            "A_frt_cm2" => A_FRT * 1e4,
+            "porosity" => POROSITY,
+            "A_solid_m2" => A_SOLID,
+            "rho_eff" => M_MONO / (A_SOLID * L_REC),
+            "wall_weights" => Dict(sensor => round(WTS[sensor]; digits=4)
+                                   for sensor in wall_sensor_order),
+        )
         envelope_columns = (:Re, :Pr, :Gz_L, :eps, :NTU, :Nu, :Bi,
                             :N_rc, :Lam58, :Lam107, :Pe_LD, :eta_nom)
         report["envelope"] = Dict(string(column) =>
@@ -1318,14 +1064,116 @@ begin # complete reduction workflow
         flush(stdout)
         report["crossings"] = Dict(string(round(Int, group.Io_kWm2[1])) =>
             crossings(DataFrame(group)) for group in groupby(groups, :Io_kWm2))
-        report["ltne"] = ltne_report(groups)
+        ltne = Dict{String,Any}()
+        for column in (:Lam58, :Lam107)
+            pooled = linear_fit(groups.Re, groups[!, column])
+            per_flux_ltne = Dict{String,Any}()
+            for group in groupby(groups, :Io_kWm2)
+                fit = linear_fit(group.Re, group[!, column])
+                per_flux_ltne[string(round(Int, group.Io_kWm2[1]))] = Dict(
+                    "slope" => fit.slope, "intercept" => fit.intercept,
+                    "r2" => fit.r2,
+                    "range" => [minimum(group[!, column]), maximum(group[!, column])],
+                )
+            end
+            ltne[string(column)] = Dict(
+                "pooled" => Dict("slope" => pooled.slope,
+                                 "intercept" => pooled.intercept,
+                                 "r2" => pooled.r2),
+                "per_flux" => per_flux_ltne,
+            )
+        end
+        report["ltne"] = ltne
 
         # Transient eigenvalues and identified assembly constants
         println("[3/6] Identifying heating and cooling eigenvalues ...")
         flush(stdout)
-        eigenvalues = build_eigenvalues(raw_dir, groups)
+        eps_q = linear_fit(groups.q_slpm, groups.eps)
+        eigenvalue_rows = NamedTuple[]
+        for (ID, (filename, irradiance)) in HEATING
+            data = load_data(raw_dir, filename)
+            time = data["t"]
+            flow = tail_mean(data["flow"], time)
+            ambient = tail_mean(data["Tamb"], time)
+            outlet = tail_mean(data["T3"], time)
+            mdot = RHO_STD * flow / 60000.0
+            effectiveness = eps_q.intercept + eps_q.slope * flow
+            exchange = effectiveness * mdot * cp_air(0.5 * (ambient + outlet))
+            controller_flow = [tail_mean(signal, time) for signal in data["mfc"]]
+            shares = sum(controller_flow) > 0 ?
+                     controller_flow ./ sum(controller_flow) : fill(0.25, 4)
+
+            for (phase, sensors) in (("heat", DEEP_SENS), ("heat6", COOL_SENS))
+                eigenvalue, deviation, count_sensors = eigen_heating(data, sensors)
+                push!(eigenvalue_rows, (
+                    ID=ID, phase=phase, q=flow, x=exchange,
+                    lam=eigenvalue, lam_sd=deviation, n=count_sensors,
+                    Tamb_e=ambient, T3_e=outlet,
+                    mfc_f1=shares[1], mfc_f2=shares[2],
+                    mfc_f3=shares[3], mfc_f4=shares[4],
+                ))
+            end
+        end
+
+        for (ID, filename) in COOLING
+            data = load_data(raw_dir, filename)
+            time = data["t"]
+            flow = mean(data["flow"])
+            ambient = tail_mean(data["Tamb"], time)
+            outlet = tail_mean(data["T3"], time)
+            mdot = RHO_STD * flow / 60000.0
+            effectiveness = eps_q.intercept + eps_q.slope * flow
+            exchange = effectiveness * mdot * cp_air(0.5 * (ambient + outlet))
+            controller_flow = [mean(signal) for signal in data["mfc"]]
+            shares = sum(controller_flow) > 0 ?
+                     controller_flow ./ sum(controller_flow) : fill(0.25, 4)
+            eigenvalue, deviation, count_sensors = eigen_cooling(data)
+            push!(eigenvalue_rows, (
+                ID=ID, phase="cool", q=flow, x=exchange,
+                lam=eigenvalue, lam_sd=deviation, n=count_sensors,
+                Tamb_e=ambient, T3_e=outlet,
+                mfc_f1=shares[1], mfc_f2=shares[2],
+                mfc_f3=shares[3], mfc_f4=shares[4],
+            ))
+        end
+
+        eigenvalues = DataFrame(eigenvalue_rows)
+        eigenvalues.x_matched = fill(NaN, nrow(eigenvalues))
+        for index in findall(eigenvalues.phase .== "cool")
+            source_id = COOL_PROVENANCE[eigenvalues.ID[index]]
+            source = groups[findfirst(==(source_id), groups.ID), :]
+            eigenvalues.x_matched[index] = source.eps * RHO_STD *
+                eigenvalues.q[index] / 60000.0 *
+                cp_air(0.5 * (eigenvalues.Tamb_e[index] + eigenvalues.T3_e[index]))
+        end
         CSV.write(output("eigenvalues.csv"), eigenvalues)
-        identification = identify_all(eigenvalues)
+
+        identification = Dict{String,Any}()
+        identification_selections = [
+            "cooling" => (eigenvalues.phase .== "cool"),
+            "heating_deep" => (eigenvalues.phase .== "heat"),
+            "heating_all6" => (eigenvalues.phase .== "heat6"),
+            "joint" => in.(eigenvalues.phase, Ref(("cool", "heat"))),
+        ]
+        for (name, selected_rows) in identification_selections
+            selected_rows .&= isfinite.(eigenvalues.lam) .& isfinite.(eigenvalues.x)
+            C_current, K_current, r2_current, _ = identify(
+                eigenvalues.x[selected_rows], eigenvalues.lam[selected_rows],
+            )
+            identification[name] = Dict(
+                "C_eff" => C_current, "K_loss" => K_current, "r2" => r2_current,
+                "n" => count(selected_rows), "dof" => count(selected_rows) - 2,
+            )
+        end
+        matched_rows = (eigenvalues.phase .== "cool") .&
+                       isfinite.(eigenvalues.lam) .& isfinite.(eigenvalues.x_matched)
+        C_matched, K_matched, r2_matched, _ = identify(
+            eigenvalues.x_matched[matched_rows], eigenvalues.lam[matched_rows],
+        )
+        identification["cooling_matched_eps"] = Dict(
+            "C_eff" => C_matched, "K_loss" => K_matched, "r2" => r2_matched,
+            "n" => count(matched_rows), "dof" => count(matched_rows) - 2,
+        )
         report["identification"] = identification
         report["sensor_selection_swing"] = Dict(
             "C_deep" => identification["heating_deep"]["C_eff"],
@@ -1333,26 +1181,201 @@ begin # complete reduction workflow
             "ratio" => identification["heating_deep"]["C_eff"] /
                        identification["heating_all6"]["C_eff"],
         )
-        report["heating_window_sensitivity"] =
-            heating_window_sensitivity(raw_dir, eigenvalues)
+        heating_windows = Dict{String,Any}[]
+        heating_eigenvalues = eigenvalues[eigenvalues.phase .== "heat", :]
+        for (lower, upper) in ((0.05, 0.35), (0.07, 0.45), (0.10, 0.50),
+                               (0.15, 0.60), (0.20, 0.70))
+            estimates = Float64[]
+            for (ID, (filename, irradiance)) in HEATING
+                data = load_data(raw_dir, filename)
+                eigenvalue, _, _ = eigen_heating(data, DEEP_SENS;
+                                                  u_lo=lower, u_hi=upper)
+                push!(estimates, eigenvalue)
+            end
+            selected_rows = isfinite.(estimates)
+            C_window, K_window, r2_window, _ = identify(
+                heating_eigenvalues.x[selected_rows], estimates[selected_rows],
+            )
+            push!(heating_windows, Dict(
+                "u_lo" => lower, "u_hi" => upper,
+                "C_eff" => C_window, "K_loss" => K_window, "r2" => r2_window,
+            ))
+        end
+        report["heating_window_sensitivity"] = heating_windows
         report["monolith"] = Dict("C_monolith_600K" => M_MONO * 1050.0,
                                   "C_monolith_900K" => M_MONO * 1170.0)
 
         # Power closure and systematic sensitivities
         println("[4/6] Evaluating closure, probe, pressure, and sensitivity cases ...")
         flush(stdout)
-        report["delivered_power"] = delivered_power_report(groups, identification)
-        report["T3_sensitivity"] = T3_sensitivity(steady, eigenvalues)
-        references = reference_variants(steady)
+        K_lo = identification["cooling_matched_eps"]["K_loss"]
+        K_hi = identification["heating_deep"]["K_loss"]
+        delivered_per_flux = Dict{String,Any}()
+        for group in groupby(groups, :Io_kWm2)
+            irradiance = group.Io_kWm2[1]
+            f_lo = mean(closure(group, K_lo))
+            f_hi = mean(closure(group, K_hi))
+            candidates = (irradiance, irradiance * f_lo, irradiance * f_hi)
+            delivered_per_flux[string(round(Int, irradiance))] = Dict(
+                "f_Klo" => f_lo, "f_Khi" => f_hi,
+                "G_closure_lo" => irradiance * f_lo,
+                "G_closure_hi" => irradiance * f_hi,
+                "G_nominal" => irradiance,
+                "G_interval" => [minimum(candidates), maximum(candidates)],
+                "eta_nom" => [minimum(group.eta_nom), maximum(group.eta_nom)],
+            )
+        end
+        report["delivered_power"] = Dict(
+            "K_bracket" => [K_lo, K_hi],
+            "per_flux" => delivered_per_flux,
+            "reconciling_dT3" => reconciling_dT3(groups, K_hi),
+        )
+        T3_cases = Dict{String,Any}()
+        T3_offsets = (-DT3_BAND, 0.0, DT3_BAND)
+        for offset in T3_offsets
+            offset_groups = dimensionless(steady; dT3=offset)
+            offset_nusselt = power_law_fit(offset_groups.Re, offset_groups.Nu)
+            eps_star = Dict{String,Any}()
+            for group in groupby(offset_groups, :Io_kWm2)
+                eps_star[string(round(Int, group.Io_kWm2[1]))] =
+                    crossings(DataFrame(group))["eps_local"]
+            end
+            T3_entry = Dict{String,Any}(
+                "eps" => [minimum(offset_groups.eps), maximum(offset_groups.eps)],
+                "Nu_prefactor" => offset_nusselt.prefactor,
+                "Nu_exponent" => offset_nusselt.exponent,
+                "NTU_exponent" => power_law_fit(
+                    offset_groups.Re, offset_groups.NTU,
+                ).exponent,
+                "eps_star" => eps_star,
+                "eta_nom" => [minimum(offset_groups.eta_nom),
+                               maximum(offset_groups.eta_nom)],
+            )
+
+            cooling_rows = eigenvalues[eigenvalues.phase .== "cool", :]
+            matched_exchange = Float64[]
+            for row in eachrow(cooling_rows)
+                source = offset_groups[
+                    findfirst(==(COOL_PROVENANCE[row.ID]), offset_groups.ID), :,
+                ]
+                push!(matched_exchange,
+                      source.eps * RHO_STD * row.q / 60000.0 *
+                      cp_air(0.5 * (row.Tamb_e + row.T3_e + offset)))
+            end
+            C_match, K_match, r2_match, _ = identify(
+                matched_exchange, cooling_rows.lam,
+            )
+
+            heating_rows = eigenvalues[
+                (eigenvalues.phase .== "heat") .& isfinite.(eigenvalues.lam), :,
+            ]
+            offset_eps_q = linear_fit(offset_groups.q_slpm, offset_groups.eps)
+            deep_exchange = [
+                (offset_eps_q.intercept + offset_eps_q.slope * row.q) *
+                RHO_STD * row.q / 60000.0 *
+                cp_air(0.5 * (row.Tamb_e + row.T3_e + offset))
+                for row in eachrow(heating_rows)
+            ]
+            C_deep, K_deep, r2_deep, _ = identify(deep_exchange, heating_rows.lam)
+            T3_entry["identification"] = Dict(
+                "C_match" => C_match, "K_match" => K_match,
+                "r2_match" => r2_match, "C_deep" => C_deep,
+                "K_deep" => K_deep, "r2_deep" => r2_deep,
+            )
+            T3_cases[@sprintf("%+.0f", offset)] = T3_entry
+        end
+        T3_cases["band"] = Dict{String,Any}()
+        for quantity in ("C_match", "K_match", "C_deep", "K_deep")
+            values = [T3_cases[@sprintf("%+.0f", offset)]["identification"][quantity]
+                      for offset in T3_offsets]
+            T3_cases["band"][quantity] = [minimum(values), maximum(values)]
+        end
+        report["T3_sensitivity"] = T3_cases
+        reference_definitions = [
+            "wall quadrature (T8,T12,T11)" =>
+                (data -> sum(WTS[s] .* data[!, Symbol(s, "_ss")]
+                             for s in wall_sensor_order)),
+            "interior probes (T9,T10)" =>
+                (data -> 0.5 .* (data.T9_ss .+ data.T10_ss)),
+            "front wall only (T8)" => (data -> copy(data.T8_ss)),
+            "mid wall only (T12)" => (data -> copy(data.T12_ss)),
+            "rear wall only (T11)" => (data -> copy(data.T11_ss)),
+            "wall+interior mean" => (data -> 0.5 .* (
+                sum(WTS[s] .* data[!, Symbol(s, "_ss")] for s in wall_sensor_order) .+
+                0.5 .* (data.T9_ss .+ data.T10_ss))),
+        ]
+        reference_rows = NamedTuple[]
+        for (name, reference_temperature) in reference_definitions
+            alternative = copy(steady)
+            alternative.Tw_K = reference_temperature(alternative)
+            alternative_groups = dimensionless(alternative)
+            fit = power_law_fit(alternative_groups.Re, alternative_groups.Nu)
+            alternative_crossings = Dict{Int,Float64}()
+            for group in groupby(alternative_groups, :Io_kWm2)
+                alternative_crossings[round(Int, group.Io_kWm2[1])] =
+                    crossings(DataFrame(group))["eps_local"]
+            end
+            push!(reference_rows, (
+                reference=name,
+                eps_min=minimum(alternative_groups.eps),
+                eps_max=maximum(alternative_groups.eps),
+                NTU_min=minimum(alternative_groups.NTU),
+                NTU_max=maximum(alternative_groups.NTU),
+                Nu_min=minimum(alternative_groups.Nu),
+                Nu_max=maximum(alternative_groups.Nu),
+                Nu_prefactor=fit.prefactor,
+                Nu_exponent=fit.exponent,
+                eps_star_456=get(alternative_crossings, 456, NaN),
+                eps_star_304=get(alternative_crossings, 304, NaN),
+                eps_star_256=get(alternative_crossings, 256, NaN),
+            ))
+        end
+        references = DataFrame(reference_rows)
         CSV.write(output("reference_sensitivity.csv"), references)
         report["reference_sensitivity"] =
             [Dict(string(name) => row[name] for name in names(references))
              for row in eachrow(references)]
 
-        pressure, pressure_report = pressure_drop_report(groups)
+        pressure = select(groups, :ID, :Io_kWm2, :q_slpm, :mdot_gs,
+                          :Tg_bar, :dp1_mbar, :dp2_mbar)
+        pressure.dp_pred_mbar = [dp_laminar(mass_flow, temperature)
+                                 for (mass_flow, temperature) in
+                                 zip(pressure.mdot_gs, pressure.Tg_bar)]
+        pressure.ratio = pressure.dp1_mbar ./ pressure.dp_pred_mbar
         CSV.write(output("pressure_drop.csv"), pressure)
-        report["pressure_drop"] = pressure_report
-        report["similarity"] = similarity_report(raw_dir, groups, identification)
+        report["pressure_drop"] = Dict(
+            "resolution_mbar" => DP_FS * DP_ACC,
+            "pred_range" => [minimum(pressure.dp_pred_mbar), maximum(pressure.dp_pred_mbar)],
+            "meas_range" => [minimum(pressure.dp1_mbar), maximum(pressure.dp1_mbar)],
+            "ratio_range" => [minimum(pressure.ratio), maximum(pressure.ratio)],
+            "dp2_range" => [minimum(pressure.dp2_mbar), maximum(pressure.dp2_mbar)],
+        )
+
+        C_similarity = identification["cooling_matched_eps"]["C_eff"]
+        K_similarity = identification["cooling_matched_eps"]["K_loss"]
+        half_times = Dict("wall" => Float64[], "gas" => Float64[])
+        for (ID, (filename, irradiance)) in HEATING
+            data = load_data(raw_dir, filename)
+            time = data["t"]
+            flow = tail_mean(data["flow"], time)
+            mdot = RHO_STD * flow / 60000.0
+            ambient = tail_mean(data["Tamb"], time)
+            row = groups[findfirst(==(ID), groups.ID), :]
+            outlet = tail_mean(data["T3"], time)
+            tau = C_similarity /
+                  (row.eps * mdot * cp_air(0.5 * (ambient + outlet)) + K_similarity)
+            for (name, signal) in (("wall", wall_temperature(data)), ("gas", data["T3"]))
+                normalized = (signal .- signal[1]) ./
+                             (tail_mean(signal, time) - signal[1])
+                half_index = findfirst(>=(0.5), normalized)
+                isnothing(half_index) || push!(half_times[name], time[half_index] / tau)
+            end
+        end
+        report["similarity"] = Dict(
+            name => Dict("t_half_mean" => mean(values),
+                         "cv_percent" => 100 * std(values; corrected=false) / mean(values))
+            for (name, values) in half_times
+        )
 
         # Instrument uncertainty, fixed-profile falsification, and tables
         println("[5/6] Propagating instrument uncertainty with $n_mc samples ...")
@@ -1361,9 +1384,9 @@ begin # complete reduction workflow
         selected_eigenvalues = eigenvalues[
             in.(eigenvalues.phase, Ref(("cool", "heat"))), :]
         for rho in RHO_MFC_CASES
-            uncertainty = monte_carlo(steady, selected_eigenvalues; n=n_mc, rho)
-            uncertainty.rho_mfc = fill(rho, nrow(uncertainty))
-            uncertainty_cases[rho] = uncertainty
+            uncertainty_case = monte_carlo(steady, selected_eigenvalues; n=n_mc, rho)
+            uncertainty_case.rho_mfc = fill(rho, nrow(uncertainty_case))
+            uncertainty_cases[rho] = uncertainty_case
         end
         uncertainty = uncertainty_cases[1.0]
         CSV.write(output("uncertainty.csv"),
@@ -1387,53 +1410,6 @@ begin # complete reduction workflow
         println("Reduction complete. Outputs written to ", out_dir)
         flush(stdout)
 
-        return report, groups, groups_replicates, eigenvalues,
-               uncertainty, references, pressure
-    end
-end
-
-begin # command-line execution
-    function command_line_options(arguments)
-        options = Dict(
-            "raw" => normpath(joinpath(@__DIR__, "..", "RAW")),
-            "out" => joinpath(@__DIR__, "outputs"),
-            "nmc" => "4000",
-            "profile-starts" => "40",
-            "tamb" => "T15,T16",
-        )
-        index = 1
-        while index <= length(arguments)
-            argument = arguments[index]
-            startswith(argument, "--") || error("unknown argument: $argument")
-            if occursin('=', argument)
-                key, value = split(argument[3:end], '='; limit=2)
-                options[key] = value
-            else
-                index == length(arguments) && error("missing value for $argument")
-                options[argument[3:end]] = arguments[index + 1]
-                index += 1
-            end
-            index += 1
-        end
-        return options
-    end
-
-    function main(arguments=ARGS)
-        options = command_line_options(arguments)
-        global TAMB_CHANNELS = Tuple(strip.(split(options["tamb"], ',')))
-        println("Running receiver_reduction.jl")
-        println("  raw data: ", abspath(options["raw"]))
-        println("  outputs:  ", abspath(options["out"]))
-        println("  Monte Carlo samples: ", options["nmc"])
-        println("  profile random starts: ", options["profile-starts"])
-        flush(stdout)
-        result = run_reduction(
-            abspath(options["raw"]),
-            abspath(options["out"]);
-            n_mc=parse(Int, options["nmc"]),
-            profile_starts=parse(Int, options["profile-starts"]),
-        )
-        report = result[1]
         summary_keys = (
             "geometry", "nusselt", "ntu_structure", "identification",
             "sensor_selection_swing", "heating_window_sensitivity",
@@ -1442,11 +1418,5 @@ begin # command-line execution
         )
         JSON3.pretty(stdout, Dict(key => json_safe(report[key]) for key in summary_keys))
         println()
-        return result
     end
-end
-
-if !isdefined(@__MODULE__, :RECEIVER_REDUCTION_INCLUDE_ONLY) ||
-   !getfield(@__MODULE__, :RECEIVER_REDUCTION_INCLUDE_ONLY)
-    main()
 end

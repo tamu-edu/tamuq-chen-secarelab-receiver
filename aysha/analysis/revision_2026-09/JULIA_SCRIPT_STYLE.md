@@ -19,8 +19,10 @@ calculation.  Use this top-to-bottom structure:
 
 Keep scientific quantities visible as named Julia variables and keep equations
 close to the parameters they use.  Prefer direct formulas, arrays, `Dict`s, and
-`DataFrame`s.  Use small functions for repeated calculations, file loading,
-residuals, and plotting, but do not turn the script into a package framework.
+`DataFrame`s.  A calculation performed only once should normally remain in its
+top-to-bottom `begin` block.  Use functions only for operations that repeat,
+numerical kernels that need callbacks or recursion, and cohesive algorithms
+whose internals would obscure the experimental sequence if written inline.
 
 The intended structure is a **sectioned procedural scientific workflow** or a
 **literate/notebook-like Julia script**.  It is not an object-oriented design,
@@ -34,6 +36,8 @@ an application framework, or a hierarchy of configuration and model types.
   experimental meaning.
 - Keep transformations explicit: raw data -> steady values -> dimensionless
   groups -> fitted quantities -> figures and tables.
+- Keep the principal workflow at top level; do not hide it in `main`,
+  `run_analysis`, `make_figures`, or one function per figure.
 - Keep model equations readable in the main script instead of hiding them
   behind generic dispatch layers.
 - Use `begin # descriptive section` blocks as visual and executable cells.
@@ -63,8 +67,10 @@ an application framework, or a hierarchy of configuration and model types.
 > parameters, data/properties/equations, helper functions, reduction or
 > optimization, and plots/exports.  Keep physical variables and equations
 > explicit and near their use.  Prefer direct Julia expressions, arrays,
-> dictionaries, and data frames, with small functions only where calculations
-> repeat.  The result must execute sequentially from start to finish with
+> dictionaries, and data frames.  Inline every one-use analysis and plotting
+> stage; retain functions only for repeated operations or necessary numerical
+> kernels.  Do not wrap the workflow in `main`, `run_analysis`, or one function
+> per figure.  The result must execute sequentially from start to finish with
 > `julia --project=.`.  Do not use `1D_v1.jl`, `0D_v4.jl`, or `1D_v46.jl` as
 > style references, and do not redesign the analysis as a module, class/type
 > hierarchy, or application framework.

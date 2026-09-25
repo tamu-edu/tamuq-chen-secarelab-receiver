@@ -69,8 +69,44 @@ begin # plotting constants
     )
 end
 
+begin # execution paths
+    MAKE_FIGURES_RUN = !isdefined(@__MODULE__, :MAKE_FIGURES_INCLUDE_ONLY) ||
+                       !getfield(@__MODULE__, :MAKE_FIGURES_INCLUDE_ONLY)
+
+    if MAKE_FIGURES_RUN
+        let options = Dict(
+                "raw" => normpath(joinpath(@__DIR__, "..", "RAW")),
+                "out" => joinpath(@__DIR__, "outputs"),
+                "fig" => joinpath(@__DIR__, "figures"),
+            ), position = 1
+            while position <= length(ARGS)
+                argument = ARGS[position]
+                startswith(argument, "--") || error("unknown argument: $argument")
+                if occursin('=', argument)
+                    key, value = split(argument[3:end], '='; limit=2)
+                    options[key] = value
+                else
+                    position == length(ARGS) && error("missing value for $argument")
+                    options[argument[3:end]] = ARGS[position + 1]
+                    position += 1
+                end
+                position += 1
+            end
+            global raw_dir = abspath(options["raw"])
+            global out_dir = abspath(options["out"])
+            global fig_dir = abspath(options["fig"])
+        end
+
+        mkpath(fig_dir)
+        println("Running make_figures.jl")
+        println("  reduction archive: ", out_dir)
+        println("  figures:           ", fig_dir)
+        flush(stdout)
+    end
+end
+
 begin # manuscript plotting style
-    function manuscript_style()
+    if MAKE_FIGURES_RUN
         mpl.rcParams.update(Dict(
             "font.size" => 8,
             "axes.titlesize" => 9,
@@ -116,8 +152,16 @@ begin # manuscript plotting style
 end
 
 begin # plotting traces derived directly from the raw logger files
-    function export_traces(raw_dir, out_dir)
-        mkpath(out_dir)
+    if MAKE_FIGURES_RUN
+        result_stamp = mtime(joinpath(out_dir, "results.json"))
+        derived_traces = ("cooling_decays.csv", "master_curves.csv", "reference_points.csv")
+        traces_are_stale = any(!isfile(joinpath(out_dir, filename)) ||
+                               mtime(joinpath(out_dir, filename)) < result_stamp
+                               for filename in derived_traces)
+
+        if traces_are_stale
+            println("Refreshing plotting traces from the raw logger files ...")
+            flush(stdout)
         steady = reduce_steady(raw_dir, HEATING)
         groups = dimensionless(steady)
         eps_fit = linear_fit(groups.q_slpm, groups.eps)
@@ -211,23 +255,17 @@ begin # plotting traces derived directly from the raw logger files
             joinpath(out_dir, "reference_points.csv"),
             reduce(vcat, reference_frames),
         )
-        return nothing
-    end
-end
-
-begin # author-supplied apparatus montage
-    function convert_apparatus(fig_dir)
-        source = joinpath(fig_dir, "Figure01_setup.tif")
-        destination = joinpath(fig_dir, "fig1_apparatus.png")
-        if !isfile(source)
-            println("note: no Figure01_setup.tif; leaving ", destination, " as is")
-            return nothing
         end
 
-        image_library = PythonPlot.pyimport("PIL.Image")
-        image_library.open(source).convert("RGB").save(destination; dpi=(300, 300))
-        println("wrote fig1_apparatus.png from Figure01_setup.tif")
-        return nothing
+        report = JSON3.read(
+            read(joinpath(out_dir, "results.json"), String),
+            Dict{String,Any},
+        )
+        groups = CSV.read(joinpath(out_dir, "groups.csv"), DataFrame)
+        eigenvalues = CSV.read(joinpath(out_dir, "eigenvalues.csv"), DataFrame)
+        cooling_data = CSV.read(joinpath(out_dir, "cooling_decays.csv"), DataFrame)
+        master_curves = CSV.read(joinpath(out_dir, "master_curves.csv"), DataFrame)
+        reference_points = CSV.read(joinpath(out_dir, "reference_points.csv"), DataFrame)
     end
 end
 
@@ -238,23 +276,10 @@ begin # small data-selection helpers
         return selected
     end
 
-    function json_number(dictionary, key)
-        value = get(dictionary, key, nothing)
-        return isnothing(value) ? NaN : Float64(value)
-    end
-
-    function trace_files_are_stale(out_dir)
-        result_path = joinpath(out_dir, "results.json")
-        result_stamp = mtime(result_path)
-        derived = ("cooling_decays.csv", "master_curves.csv", "reference_points.csv")
-        return any(!isfile(joinpath(out_dir, filename)) ||
-                   mtime(joinpath(out_dir, filename)) < result_stamp
-                   for filename in derived)
-    end
 end
 
 begin # Figure 3: steady temperature field
-    function figure_steady_field(groups, fig_dir)
+    if MAKE_FIGURES_RUN
         figure, axes = plt.subplots(1, 3; figsize=(7.4, 2.9), sharey=true)
         for (axis, flux) in zip(axes, flux_levels)
             data = flux_subset(groups, flux)
@@ -293,7 +318,7 @@ begin # Figure 3: steady temperature field
 end
 
 begin # Figure 4: assembly-scale heat-transfer limitation
-    function figure_assembly_limitation(report, groups, fig_dir)
+    if MAKE_FIGURES_RUN
         apparent = report["nusselt"]
         prefactor = Float64(apparent["prefactor"])
         exponent = Float64(apparent["exponent"])
@@ -422,7 +447,7 @@ begin # Figure 4: assembly-scale heat-transfer limitation
 end
 
 begin # Figure 5: temperature inversion and local nonequilibrium
-    function figure_inversion_ltne(report, groups, fig_dir)
+    if MAKE_FIGURES_RUN
         figure, axes = plt.subplots(1, 3; figsize=(7.4, 2.9))
         flow_axis, effectiveness_axis, deficit_axis = axes
         crossing_effectiveness = Float64[]
@@ -430,8 +455,10 @@ begin # Figure 5: temperature inversion and local nonequilibrium
         for flux in flux_levels
             data = flux_subset(groups, flux)
             crossing = report["crossings"][string(flux)]
-            q_local = json_number(crossing, "q_local")
-            eps_local = json_number(crossing, "eps_local")
+            q_value = get(crossing, "q_local", nothing)
+            eps_value = get(crossing, "eps_local", nothing)
+            q_local = isnothing(q_value) ? NaN : Float64(q_value)
+            eps_local = isnothing(eps_value) ? NaN : Float64(eps_value)
 
             flow_axis.plot(
                 data.q_slpm, data.I_vol, "o-";
@@ -503,8 +530,7 @@ begin # Figure 5: temperature inversion and local nonequilibrium
 end
 
 begin # Figure 6: transient eigenvalue identification
-    function figure_transient_identification(report, eigenvalues, cooling_data,
-                                             master_curves, fig_dir)
+    if MAKE_FIGURES_RUN
         figure, axes = plt.subplots(1, 3; figsize=(7.4, 2.9))
         cooling_axis, eigenvalue_axis, collapse_axis = axes
 
@@ -600,7 +626,7 @@ begin # Figure 6: transient eigenvalue identification
 end
 
 begin # Figure 7: consequences of under-instrumentation
-    function figure_under_instrumentation(report, reference_points, fig_dir)
+    if MAKE_FIGURES_RUN
         reynolds_line = collect(range(21.0, 102.0; length=60))
         figure, axes = plt.subplots(1, 2; figsize=(7.4, 3.1))
         reference_axis, capacitance_axis = axes
@@ -683,81 +709,20 @@ begin # Figure 7: consequences of under-instrumentation
     end
 end
 
-begin # complete figure workflow
-    function make_figures(raw_dir, out_dir, fig_dir)
-        manuscript_style()
-        mkpath(fig_dir)
-
-        println("Running make_figures.jl")
-        println("  reduction archive: ", out_dir)
-        println("  figures:           ", fig_dir)
-        flush(stdout)
-
-        if trace_files_are_stale(out_dir)
-            println("Refreshing plotting traces from the raw logger files ...")
-            flush(stdout)
-            export_traces(raw_dir, out_dir)
+begin # author-supplied apparatus montage and completion
+    if MAKE_FIGURES_RUN
+        apparatus_source = joinpath(fig_dir, "Figure01_setup.tif")
+        apparatus_destination = joinpath(fig_dir, "fig1_apparatus.png")
+        if isfile(apparatus_source)
+            image_library = PythonPlot.pyimport("PIL.Image")
+            image_library.open(apparatus_source).convert("RGB").save(
+                apparatus_destination; dpi=(300, 300),
+            )
+            println("wrote fig1_apparatus.png from Figure01_setup.tif")
+        else
+            println("note: no Figure01_setup.tif; leaving ",
+                    apparatus_destination, " as is")
         end
-
-        report = JSON3.read(
-            read(joinpath(out_dir, "results.json"), String),
-            Dict{String,Any},
-        )
-        groups = CSV.read(joinpath(out_dir, "groups.csv"), DataFrame)
-        eigenvalues = CSV.read(joinpath(out_dir, "eigenvalues.csv"), DataFrame)
-        cooling_data = CSV.read(joinpath(out_dir, "cooling_decays.csv"), DataFrame)
-        master_curves = CSV.read(joinpath(out_dir, "master_curves.csv"), DataFrame)
-        reference_points = CSV.read(joinpath(out_dir, "reference_points.csv"), DataFrame)
-
-        figure_steady_field(groups, fig_dir)
-        figure_assembly_limitation(report, groups, fig_dir)
-        figure_inversion_ltne(report, groups, fig_dir)
-        figure_transient_identification(
-            report, eigenvalues, cooling_data, master_curves, fig_dir,
-        )
-        figure_under_instrumentation(report, reference_points, fig_dir)
-        convert_apparatus(fig_dir)
-
         println("wrote fig3--fig7 to ", fig_dir)
-        return nothing
     end
-end
-
-begin # command-line execution
-    function figure_command_line_options(arguments)
-        options = Dict(
-            "raw" => normpath(joinpath(@__DIR__, "..", "RAW")),
-            "out" => joinpath(@__DIR__, "outputs"),
-            "fig" => joinpath(@__DIR__, "figures"),
-        )
-        index = 1
-        while index <= length(arguments)
-            argument = arguments[index]
-            startswith(argument, "--") || error("unknown argument: $argument")
-            if occursin('=', argument)
-                key, value = split(argument[3:end], '='; limit=2)
-                options[key] = value
-            else
-                index == length(arguments) && error("missing value for $argument")
-                options[argument[3:end]] = arguments[index + 1]
-                index += 1
-            end
-            index += 1
-        end
-        return options
-    end
-
-    function figures_main(arguments=ARGS)
-        options = figure_command_line_options(arguments)
-        make_figures(
-            abspath(options["raw"]),
-            abspath(options["out"]),
-            abspath(options["fig"]),
-        )
-    end
-end
-
-if !isdefined(@__MODULE__, :MAKE_FIGURES_INCLUDE_ONLY) ||
-   !getfield(@__MODULE__, :MAKE_FIGURES_INCLUDE_ONLY)
-    figures_main()
 end
