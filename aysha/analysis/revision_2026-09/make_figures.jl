@@ -22,7 +22,17 @@ begin # libraries and shared reduction equations
     using PythonPlot
     using Statistics
 
-    include(joinpath(@__DIR__, "receiver_reduction.jl"))
+    # Import the reduction equations without launching the reduction. This flag
+    # is needed because VS Code executes Julia files through `include`.
+    let previous = isdefined(@__MODULE__, :RECEIVER_REDUCTION_INCLUDE_ONLY) ?
+                   getfield(@__MODULE__, :RECEIVER_REDUCTION_INCLUDE_ONLY) : false
+        global RECEIVER_REDUCTION_INCLUDE_ONLY = true
+        try
+            include(joinpath(@__DIR__, "receiver_reduction.jl"))
+        finally
+            global RECEIVER_REDUCTION_INCLUDE_ONLY = previous
+        end
+    end
 
     plt = PythonPlot
     mpl = PythonPlot.matplotlib
@@ -678,7 +688,16 @@ begin # complete figure workflow
         manuscript_style()
         mkpath(fig_dir)
 
-        trace_files_are_stale(out_dir) && export_traces(raw_dir, out_dir)
+        println("Running make_figures.jl")
+        println("  reduction archive: ", out_dir)
+        println("  figures:           ", fig_dir)
+        flush(stdout)
+
+        if trace_files_are_stale(out_dir)
+            println("Refreshing plotting traces from the raw logger files ...")
+            flush(stdout)
+            export_traces(raw_dir, out_dir)
+        end
 
         report = JSON3.read(
             read(joinpath(out_dir, "results.json"), String),
@@ -738,6 +757,7 @@ begin # command-line execution
     end
 end
 
-if abspath(PROGRAM_FILE) == @__FILE__
+if !isdefined(@__MODULE__, :MAKE_FIGURES_INCLUDE_ONLY) ||
+   !getfield(@__MODULE__, :MAKE_FIGURES_INCLUDE_ONLY)
     figures_main()
 end

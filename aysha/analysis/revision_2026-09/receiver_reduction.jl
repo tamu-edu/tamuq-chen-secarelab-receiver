@@ -8,8 +8,9 @@ Run with the Aysha project:
 The script follows the same linear scientific-workflow structure as
 `0D_v1.jl` and `1D_v1.exp.All.jl`: libraries, fixed quantities, property
 relations, data reduction functions, uncertainty analysis, and final output.
-Including this file defines the workflow without executing it; direct execution
-runs `main`.
+Running the file directly or with VS Code's "Execute File in REPL" starts the
+workflow.  Set `RECEIVER_REDUCTION_INCLUDE_ONLY = true` before including it
+only when another script needs the definitions without starting the workflow.
 """
 
 begin # libraries
@@ -1244,6 +1245,8 @@ begin # complete reduction workflow
         report = Dict{String,Any}()
 
         # Steady measurements and dimensionless groups
+        println("[1/6] Reducing steady heating and replicate measurements ...")
+        flush(stdout)
         steady = reduce_steady(raw_dir, HEATING)
         steady_replicates = reduce_steady(raw_dir, REPLICATES)
         groups = dimensionless(steady)
@@ -1311,11 +1314,15 @@ begin # complete reduction workflow
         )
 
         # Crossings and local thermal nonequilibrium
+        println("[2/6] Fitting steady correlations and wall-profile transfer units ...")
+        flush(stdout)
         report["crossings"] = Dict(string(round(Int, group.Io_kWm2[1])) =>
             crossings(DataFrame(group)) for group in groupby(groups, :Io_kWm2))
         report["ltne"] = ltne_report(groups)
 
         # Transient eigenvalues and identified assembly constants
+        println("[3/6] Identifying heating and cooling eigenvalues ...")
+        flush(stdout)
         eigenvalues = build_eigenvalues(raw_dir, groups)
         CSV.write(output("eigenvalues.csv"), eigenvalues)
         identification = identify_all(eigenvalues)
@@ -1332,6 +1339,8 @@ begin # complete reduction workflow
                                   "C_monolith_900K" => M_MONO * 1170.0)
 
         # Power closure and systematic sensitivities
+        println("[4/6] Evaluating closure, probe, pressure, and sensitivity cases ...")
+        flush(stdout)
         report["delivered_power"] = delivered_power_report(groups, identification)
         report["T3_sensitivity"] = T3_sensitivity(steady, eigenvalues)
         references = reference_variants(steady)
@@ -1346,6 +1355,8 @@ begin # complete reduction workflow
         report["similarity"] = similarity_report(raw_dir, groups, identification)
 
         # Instrument uncertainty, fixed-profile falsification, and tables
+        println("[5/6] Propagating instrument uncertainty with $n_mc samples ...")
+        flush(stdout)
         uncertainty_cases = Dict{Float64,DataFrame}()
         selected_eigenvalues = eigenvalues[
             in.(eigenvalues.phase, Ref(("cool", "heat"))), :]
@@ -1366,11 +1377,15 @@ begin # complete reduction workflow
             [Dict(string(name) => row[name] for name in names(uncertainty))
              for row in eachrow(uncertainty)]
 
+        println("[6/6] Fitting fixed conductance profiles with $profile_starts random starts ...")
+        flush(stdout)
         report["fixed_profile_test"] = fixed_profile_test(groups; n_starts=profile_starts)
         report["wall_extrapolation"] = wall_extrapolation_sensitivity(groups)
         write_tables(report, groups, uncertainty, out_dir)
         write_supplementary_tables(report, groups, out_dir)
         write_json(output("results.json"), report)
+        println("Reduction complete. Outputs written to ", out_dir)
+        flush(stdout)
 
         return report, groups, groups_replicates, eigenvalues,
                uncertainty, references, pressure
@@ -1406,6 +1421,12 @@ begin # command-line execution
     function main(arguments=ARGS)
         options = command_line_options(arguments)
         global TAMB_CHANNELS = Tuple(strip.(split(options["tamb"], ',')))
+        println("Running receiver_reduction.jl")
+        println("  raw data: ", abspath(options["raw"]))
+        println("  outputs:  ", abspath(options["out"]))
+        println("  Monte Carlo samples: ", options["nmc"])
+        println("  profile random starts: ", options["profile-starts"])
+        flush(stdout)
         result = run_reduction(
             abspath(options["raw"]),
             abspath(options["out"]);
@@ -1425,6 +1446,7 @@ begin # command-line execution
     end
 end
 
-if abspath(PROGRAM_FILE) == @__FILE__
+if !isdefined(@__MODULE__, :RECEIVER_REDUCTION_INCLUDE_ONLY) ||
+   !getfield(@__MODULE__, :RECEIVER_REDUCTION_INCLUDE_ONLY)
     main()
 end
