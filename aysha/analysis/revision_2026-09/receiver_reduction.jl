@@ -26,7 +26,10 @@ begin # libraries
     using Statistics
 end
 
-begin # campaign definition
+#Q: add unit and definition to each parameter
+#Q: add 1-2 sentence description to each function
+
+begin # campaign definition 
     HEATING = [
         "E67" => ("Data_FPT0067_231125_161757", 456e3),
         "E68" => ("Data_FPT0068_231126_115725", 456e3),
@@ -58,7 +61,7 @@ begin # campaign definition
     ]
 
     COOL_PROVENANCE = Dict("C69" => "E69", "C80" => "E80", "C81" => "E81")
-    FLUXES = [456, 304, 256]
+    FLUXES = [456, 304, 256] #Q:I prefer defining the fluxes and flows once, place this first and then replace the values in the HEATING, REPLICATES and COOLING dictionarie with this FLUXES vector
 end
 
 begin # fixed geometry and instrument parameters
@@ -85,7 +88,7 @@ begin # fixed geometry and instrument parameters
     wall_boundaries = [0.0,
                        0.5 * (wall_positions[1] + wall_positions[2]),
                        0.5 * (wall_positions[2] + wall_positions[3]),
-                       L_REC]
+                       L_REC] # Q:explain this
     WTS = Dict(sensor => (wall_boundaries[index + 1] - wall_boundaries[index]) / L_REC
                for (index, sensor) in enumerate(wall_sensor_order))
 
@@ -106,8 +109,7 @@ begin # fixed geometry and instrument parameters
     COOL_SENS = ("T8", "T12", "T11", "T9", "T10", "T3")
     DEEP_SENS = ("T11", "T10", "T3")
 
-    # Python used zero-based column indices. These are the equivalent Julia
-    # one-based positions in the raw logger CSV files.
+    # columns/positions in the raw logger CSV files.
     COLS = (
         t=2, mfc=(7, 8, 9, 10), dp1=17, dp2=18,
         T1=35, T2=36, T3=37, T4=38, T5=39, T6=40, T7=41,
@@ -115,7 +117,7 @@ begin # fixed geometry and instrument parameters
     )
 end
 
-begin # air properties
+begin # air properties #Q: where this came from and why not using the CoolProp in Julia? if not available look for an equivalent thermodynamic's package
     # CoolProp 8.0.0 dry-air properties at 1 atm are represented by Chebyshev
     # fits over 200-1600 K. The fits use the same 1 K grid as the Python code.
     # Maximum relative errors are 6.8e-7 (cp), 1.9e-7 (mu), and 6.9e-7 (k).
@@ -169,6 +171,7 @@ begin # air properties
         return chebyshev_value(coefficients, x)
     end
 
+    # lookup functions for the air properties
     cp_air(T::Real) = air_property(T, CP_COEFFICIENTS, "c_p")
     mu_air(T::Real) = air_property(T, MU_COEFFICIENTS, "mu")
     k_air(T::Real) = air_property(T, K_COEFFICIENTS, "k")
@@ -177,6 +180,7 @@ begin # air properties
     k_air(T::AbstractArray) = k_air.(T)
 
     function h_gas(T_lo, T_hi; n=64)
+        # enthalpy integral for air using trapezoid rule
         temperature = collect(range(Float64(T_lo), Float64(T_hi), length=n))
         heat_capacity = cp_air(temperature)
         return sum(0.5 .* (heat_capacity[1:end-1] .+ heat_capacity[2:end]) .*
@@ -186,6 +190,7 @@ end
 
 begin # common numerical functions
     function linear_fit(x_values, y_values)
+        #Q: why not a built in function in one of the mainstream packages. doing so reduces the lines of code. please adapt for the common numerical functions and consider for others like trapezoid integration
         x = Float64.(x_values)
         y = Float64.(y_values)
         X = hcat(ones(length(x)), x)
@@ -267,7 +272,7 @@ begin # raw logger import
     end
 
     function wall_temperature(data)
-        return reduce(+, [WTS[sensor] .* data[sensor] for sensor in wall_sensor_order])
+        return reduce(+, [WTS[sensor] .* data[sensor] for sensor in wall_sensor_order]) #Q: explain
     end
 end
 
@@ -284,7 +289,7 @@ begin # steady-state and dimensionless reduction
             wall = sum(WTS[sensor] * temperature[sensor] for sensor in wall_sensor_order)
             gas_power = mass_flow * h_gas(ambient, temperature["T3"])
             controller_flow = [tail_mean(signal, time) for signal in data["mfc"]]
-            shares = sum(controller_flow) > 0 ? controller_flow ./ sum(controller_flow) : fill(0.25, 4)
+            shares = sum(controller_flow) > 0 ? controller_flow ./ sum(controller_flow) : fill(0.25, 4) #Q:why there is a minimum flow here, when <=0?
 
             push!(rows, (
                 ID=ID, Io_kWm2=irradiance / 1e3, q_slpm=flow,
@@ -304,7 +309,7 @@ begin # steady-state and dimensionless reduction
         return DataFrame(rows)
     end
 
-    function dimensionless(ss; dT3=0.0)
+    function dimensionless(ss; dT3=0.0) #Q: is the dT3 required for the pertubation?
         output = copy(ss)
         T3 = output.T3_ss .+ dT3
         output.Tg_bar = 0.5 .* (output.Tamb .+ T3)
@@ -411,7 +416,7 @@ begin # inversion crossing, pressure drop, and delivered-power closure
         mass_flux = (mdot_gs * 1e-3 / N_CH) / A_CH
         density = 101325.0 / (287.05 * Tg)
         return 0.5 * Po_square * mu_air(Tg) * L_REC * (mass_flux / density) /
-               D_H^2 / 100.0
+               D_H^2 / 100.0 #Q: explain
     end
 
     closure(data, K_loss) =
@@ -475,7 +480,7 @@ begin # grouped regression and profile-corrected transfer units
             right = (index + 1) * dz
             k1 = N * (wall_profile(row, left; rear, front) - Tg)
             k2 = N * (wall_profile(row, right; rear, front) - (Tg + dz * k1))
-            Tg += dz * (k1 + k2) / 2
+            Tg += dz * (k1 + k2) / 2 #Q: explain this function/equation
         end
         return Tg
     end
@@ -939,12 +944,13 @@ begin # table and JSON output
     end
 end
 
-begin # linear reduction workflow and export
+begin # MAIN linear reduction workflow and export
     RECEIVER_REDUCTION_RUN = !isdefined(@__MODULE__, :RECEIVER_REDUCTION_INCLUDE_ONLY) ||
                              !getfield(@__MODULE__, :RECEIVER_REDUCTION_INCLUDE_ONLY)
 
-    if RECEIVER_REDUCTION_RUN
-        let options = Dict(
+    if RECEIVER_REDUCTION_RUN # do not run if module is simply included and not executed
+        # default options and processing of arguments
+        let options = Dict( 
                 "raw" => normpath(joinpath(@__DIR__, "..", "RAW")),
                 "out" => joinpath(@__DIR__, "outputs"),
                 "nmc" => "4000",
@@ -1026,7 +1032,7 @@ begin # linear reduction workflow and export
                 "r2" => fit.r2,
             )
         end
-        Nu_fd = Dict("T" => 2.976, "H2" => 3.091, "H1" => 3.608)
+        Nu_fd = Dict("T" => 2.976, "H2" => 3.091, "H1" => 3.608) #Q:these are the standard literature parameters
         report["nusselt"] = Dict(
             "prefactor" => nusselt.prefactor,
             "exponent" => nusselt.exponent,
