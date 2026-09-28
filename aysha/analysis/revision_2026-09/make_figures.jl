@@ -44,14 +44,14 @@ begin # plotting constants
         304 => "#c1666b",
         256 => "#8f9779",
     )
-    flux_levels = (456, 304, 256)
+    flux_levels = Tuple(round.(Int, FLUXES ./ 1e3))
 
     cooling_color = Dict(
         "C69" => "#1f4e79",
         "C80" => "#c1666b",
         "C81" => "#8f9779",
     )
-    cooling_flow = Dict("C69" => 10.5, "C80" => 6.6, "C81" => 4.5)
+    cooling_flow = COOLING_FLOWS
 
     reference_color = Dict(
         "front wall only" => "#7a3b2e",
@@ -711,18 +711,6 @@ end
 
 begin # author-supplied apparatus montage and completion
     if MAKE_FIGURES_RUN
-        apparatus_source = joinpath(fig_dir, "Figure01_setup.tif")
-        apparatus_destination = joinpath(fig_dir, "fig1_apparatus.png")
-        if isfile(apparatus_source)
-            image_library = PythonPlot.pyimport("PIL.Image")
-            image_library.open(apparatus_source).convert("RGB").save(
-                apparatus_destination; dpi=(300, 300),
-            )
-            println("wrote fig1_apparatus.png from Figure01_setup.tif")
-        else
-            println("note: no Figure01_setup.tif; leaving ",
-                    apparatus_destination, " as is")
-        end
         println("wrote fig3--fig7 to ", fig_dir)
     end
 end

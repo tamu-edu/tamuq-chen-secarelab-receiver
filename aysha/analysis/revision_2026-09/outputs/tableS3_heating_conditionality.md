@@ -6,4 +6,4 @@
 | (0.15, 0.60) | 227.9 | 0.0739 | 0.9621 |
 | (0.20, 0.70) | 199.5 | 0.0564 | 0.9665 |
 
-Sensor selection: all six receiver probes give 121.6 J K$^{-1}$, the three deep and outlet probes 280.6 J K$^{-1}$, a ratio of 2.31.
+Sensor selection: all six probes 121.6 J K$^{-1}$; deep probes 280.6 J K$^{-1}$; ratio 2.31.

@@ -15,99 +15,117 @@ only when another script needs the definitions without starting the workflow.
 
 begin # libraries
     using CSV
+    using CoolProp_jll
     using DataFrames
     using ForwardDiff
+    using GLM
+    using Interpolations
     using JSON3
-    using LinearAlgebra
     using Optim
     using Printf
     using Random
     using Roots
     using Statistics
+    using Trapz
 end
 
-#Q: add unit and definition to each parameter
-#Q: add 1-2 sentence description to each function
-
 begin # campaign definition 
+    # Imposed aperture irradiance levels [W m^-2]. Define them once here so
+    # every campaign entry and downstream analysis uses the same values.
+    FLUXES = [456e3, 304e3, 256e3]
+
+    # Nominal cooling-flow labels [standard L min^-1]. Reduction always uses
+    # the measured sum of the four MFC signals; these values are plot labels.
+    COOLING_FLOWS = Dict("C69" => 10.5, "C80" => 6.6, "C81" => 4.5)
+
+    # Heating logger basename and imposed irradiance [W m^-2] for each run.
     HEATING = [
-        "E67" => ("Data_FPT0067_231125_161757", 456e3),
-        "E68" => ("Data_FPT0068_231126_115725", 456e3),
-        "E69" => ("Data_FPT0069_231126_140153", 456e3),
-        "E70" => ("Data_FPT0070_231127_090339", 456e3),
-        "E71" => ("Data_FPT0071_231128_102707", 456e3),
-        "E72" => ("Data_FPT0072_231129_104140", 304e3),
-        "E73" => ("Data_FPT0073_231129_132744", 304e3),
-        "E74" => ("Data_FPT0074_231130_123228", 304e3),
-        "E75" => ("Data_FPT0075_231201_162138", 304e3),
-        "E76" => ("Data_FPT0076_231203_120521", 304e3),
-        "E77" => ("Data_FPT0077_231203_161315", 256e3),
-        "E78" => ("Data_FPT0078_231204_132252", 256e3),
-        "E79" => ("Data_FPT0079_231204_172244", 256e3),
-        "E80" => ("Data_FPT0080_231205_095122", 256e3),
-        "E81" => ("Data_FPT0081_231205_135354", 256e3),
+        "E67" => ("Data_FPT0067_231125_161757", FLUXES[1]),
+        "E68" => ("Data_FPT0068_231126_115725", FLUXES[1]),
+        "E69" => ("Data_FPT0069_231126_140153", FLUXES[1]),
+        "E70" => ("Data_FPT0070_231127_090339", FLUXES[1]),
+        "E71" => ("Data_FPT0071_231128_102707", FLUXES[1]),
+        "E72" => ("Data_FPT0072_231129_104140", FLUXES[2]),
+        "E73" => ("Data_FPT0073_231129_132744", FLUXES[2]),
+        "E74" => ("Data_FPT0074_231130_123228", FLUXES[2]),
+        "E75" => ("Data_FPT0075_231201_162138", FLUXES[2]),
+        "E76" => ("Data_FPT0076_231203_120521", FLUXES[2]),
+        "E77" => ("Data_FPT0077_231203_161315", FLUXES[3]),
+        "E78" => ("Data_FPT0078_231204_132252", FLUXES[3]),
+        "E79" => ("Data_FPT0079_231204_172244", FLUXES[3]),
+        "E80" => ("Data_FPT0080_231205_095122", FLUXES[3]),
+        "E81" => ("Data_FPT0081_231205_135354", FLUXES[3]),
     ]
 
     # Replicates are archived but excluded from fitted quantities.
     REPLICATES = [
-        "E82" => ("Data_FPT0082_231210_130825", 256e3),
-        "E83" => ("Data_FPT0083_231211_122053", 256e3),
+        "E82" => ("Data_FPT0082_231210_130825", FLUXES[3]),
+        "E83" => ("Data_FPT0083_231211_122053", FLUXES[3]),
     ]
 
+    # Cooling run IDs and raw logger basenames. Their measured flow is read
+    # from the logger; COOLING_FLOWS above only supplies human-readable labels.
     COOLING = [
         "C69" => "Data_FPT0069-Cooling_231126_153148",
         "C80" => "Data_FPT0080-cooling_231205_112837",
         "C81" => "Data_FPT0081-cooling_231205_153409",
     ]
 
+    # Heating run that supplies the steady initial state for each cooling run.
     COOL_PROVENANCE = Dict("C69" => "E69", "C80" => "E80", "C81" => "E81")
-    FLUXES = [456, 304, 256] #Q:I prefer defining the fluxes and flows once, place this first and then replace the values in the HEATING, REPLICATES and COOLING dictionarie with this FLUXES vector
 end
 
 begin # fixed geometry and instrument parameters
     # Receiver geometry
-    W_CH = 1.5e-3
-    T_WEB = 0.4e-3
-    N_CH = 100
-    L_REC = 0.137
-    SIDE = 10 * (W_CH + T_WEB)
-    A_FRT = SIDE^2
-    A_CH = W_CH^2
-    D_H = W_CH
-    PER = 4 * W_CH
-    POROSITY = N_CH * A_CH / A_FRT
-    A_SOLID = A_FRT - N_CH * A_CH
-    M_MONO = 0.040
-    K_SIC = 40.0
+    W_CH = 1.5e-3                    # square-channel width [m]
+    T_WEB = 0.4e-3                   # SiC web thickness [m]
+    N_CH = 100                       # number of parallel channels [-]
+    L_REC = 0.137                    # receiver axial length [m]
+    SIDE = 10 * (W_CH + T_WEB)       # illuminated square side length [m]
+    A_FRT = SIDE^2                   # illuminated frontal area [m^2]
+    A_CH = W_CH^2                    # open area of one channel [m^2]
+    D_H = W_CH                       # square-channel hydraulic diameter [m]
+    PER = 4 * W_CH                   # wetted perimeter of one channel [m]
+    POROSITY = N_CH * A_CH / A_FRT   # open frontal-area fraction [-]
+    A_SOLID = A_FRT - N_CH * A_CH    # solid frontal area [m^2]
+    M_MONO = 0.040                   # measured monolith mass [kg]
+    K_SIC = 40.0                     # effective SiC conductivity [W m^-1 K^-1]
 
     # Sensor locations
-    Z_WALL = Dict("T8" => 0.011, "T12" => 0.058, "T11" => 0.107)
-    Z_INT = Dict("T9" => 0.058, "T10" => 0.107)
-    wall_sensor_order = ("T8", "T12", "T11")
-    wall_positions = [Z_WALL[sensor] for sensor in wall_sensor_order]
+    Z_WALL = Dict("T8" => 0.011, "T12" => 0.058, "T11" => 0.107) # wall TC z [m]
+    Z_INT = Dict("T9" => 0.058, "T10" => 0.107)                   # interior TC z [m]
+    wall_sensor_order = ("T8", "T12", "T11")                    # front-to-rear order
+    wall_positions = [Z_WALL[sensor] for sensor in wall_sensor_order] # z [m]
+
+    # Midpoints between adjacent thermocouples are control-volume boundaries.
+    # With the receiver faces as the end boundaries, WTS is the fraction of
+    # the receiver length represented by each wall temperature measurement.
     wall_boundaries = [0.0,
                        0.5 * (wall_positions[1] + wall_positions[2]),
                        0.5 * (wall_positions[2] + wall_positions[3]),
-                       L_REC] # Q:explain this
+                       L_REC] # axial control-volume boundaries [m]
     WTS = Dict(sensor => (wall_boundaries[index + 1] - wall_boundaries[index]) / L_REC
-               for (index, sensor) in enumerate(wall_sensor_order))
+               for (index, sensor) in enumerate(wall_sensor_order)) # length weights [-]
 
     # Flow and pressure instrumentation
-    RHO_STD = 101325.0 / (287.05 * 294.25)
-    DP_FS = 200.0
-    DP_ACC = 0.001
-    DT3_BAND = 25.0
-    MFC_FS = 5.722
-    MFC_A_FS = 0.0025
-    MFC_B_REL = 0.025
-    TOL_COVERAGE = 2.0
-    RHO_MFC_CASES = (1.0, 0.0)
+    P_STD = 101325.0                  # reference/property pressure [Pa]
+    T_STD = 294.25                    # Aalborg reference temperature [K]
+    R_AIR = 287.05                    # dry-air gas constant [J kg^-1 K^-1]
+    RHO_STD = P_STD / (R_AIR * T_STD) # standard air density [kg m^-3]
+    DP_FS = 200.0                     # pressure-transducer full scale [mbar]
+    DP_ACC = 0.001                    # pressure accuracy fraction of full scale [-]
+    DT3_BAND = 25.0                   # outlet-TC systematic uncertainty [K]
+    MFC_FS = 5.722                    # each MFC full scale [standard L min^-1]
+    MFC_A_FS = 0.0025                 # MFC accuracy fraction of full scale [-]
+    MFC_B_REL = 0.025                 # MFC accuracy fraction of reading [-]
+    TOL_COVERAGE = 2.0                # stated tolerance coverage factor [-]
+    RHO_MFC_CASES = (1.0, 0.0)        # correlated/independent MFC error cases [-]
 
     # The ambient reference can be replaced from the command line with --tamb.
-    TAMB_CHANNELS = ("T15", "T16")
-    SENSORS = ("T2", "T3", "T8", "T9", "T10", "T11", "T12")
-    COOL_SENS = ("T8", "T12", "T11", "T9", "T10", "T3")
-    DEEP_SENS = ("T11", "T10", "T3")
+    TAMB_CHANNELS = ("T15", "T16") # inlet-reference thermocouples [-]
+    SENSORS = ("T2", "T3", "T8", "T9", "T10", "T11", "T12") # reduced TCs [-]
+    COOL_SENS = ("T8", "T12", "T11", "T9", "T10", "T3") # cooling-fit TCs [-]
+    DEEP_SENS = ("T11", "T10", "T3") # deep heating-fit TCs [-]
 
     # columns/positions in the raw logger CSV files.
     COLS = (
@@ -117,104 +135,76 @@ begin # fixed geometry and instrument parameters
     )
 end
 
-begin # air properties #Q: where this came from and why not using the CoolProp in Julia? if not available look for an equivalent thermodynamic's package
-    # CoolProp 8.0.0 dry-air properties at 1 atm are represented by Chebyshev
-    # fits over 200-1600 K. The fits use the same 1 K grid as the Python code.
-    # Maximum relative errors are 6.8e-7 (cp), 1.9e-7 (mu), and 6.9e-7 (k).
-    P_AIR = 101325.0
-    T_AIR_MIN = 200.0
-    T_AIR_MAX = 1600.0
-    T_AIR_CENTER = 900.0
-    T_AIR_HALF_RANGE = 700.0
+begin # air properties
+    # CoolProp 8.0 supplies dry-air c_p, viscosity and conductivity at 1 atm
+    # with the same EOS and transport correlations as the Python reduction.
+    # The one-time 1 K table keeps the Monte Carlo fast while retaining less
+    # than 1e-6 relative interpolation error over the 200-1600 K range.
+    T_AIR_GRID = collect(200.0:1.0:1600.0) # property-table temperature [K]
+    COOLPROP_VERSION = string(pkgversion(CoolProp_jll)) # binary package version
 
-    CP_COEFFICIENTS = [
-        1112.326521833738, 118.55461309246334, -3.0939714544722343,
-        -11.51766499051778, 5.007902032742699, -0.4336469410171911,
-        -0.5715402549958347, 0.3291775773182228, -0.05376833127680081,
-        -0.04277682928194402, 0.042991940328635486, -0.022589009760191594,
-        0.008516557171015625, -0.0025377659290189594, 0.0008259448213744829,
-        -0.00046141563197419873, 0.00039221815770116344,
-        -0.0002517802429630133, 0.00016907740337569307,
-    ]
-    MU_COEFFICIENTS = [
-        3.8358695937796555e-5, 2.2119539563518034e-5, -2.1660765718609892e-6,
-        5.461802807570149e-7, -1.4053274184219948e-7, 3.8105626169435703e-8,
-        -1.06172172073623e-8, 2.9841508428715123e-9, -8.300841968246233e-10,
-        2.2278412693467136e-10, -5.498643577165391e-11, 1.1156897759967311e-11,
-        -8.553954229889346e-13, -6.723651882206778e-13, 6.573218038638565e-13,
-    ]
-    K_COEFFICIENTS = [
-        0.060166159950534565, 0.03823890120257938, -0.0025345413742716484,
-        0.0006606840752001102, -0.00016874205111542314, 4.4697238515949784e-5,
-        -1.1921418643514947e-5, 3.095505654610283e-6, -7.367646494682498e-7,
-        1.3574247993189645e-7, -7.715369142426102e-10, -1.7838980556699903e-8,
-        1.3841373884409037e-8, -7.085291519288978e-9, 3.587160504666681e-9,
-    ]
-
-    function chebyshev_value(coefficients, x)
-        b1 = zero(x)
-        b2 = zero(x)
-        for index in length(coefficients):-1:2
-            b0 = 2x * b1 - b2 + coefficients[index]
-            b2 = b1
-            b1 = b0
-        end
-        return x * b1 - b2 + coefficients[1]
+    # Evaluate one scalar property through CoolProp's official C interface.
+    # `output` is a PropsSI key and the returned value is in the associated SI unit.
+    function coolprop_air(output, temperature)
+        value = ccall((:PropsSI, CoolProp_jll.libcoolprop), Cdouble,
+                      (Cstring, Cstring, Cdouble, Cstring, Cdouble, Cstring),
+                      output, "T", Float64(temperature), "P", P_STD, "Air")
+        isfinite(value) && abs(value) < 1e100 ||
+            error("CoolProp failed for $output at $temperature K")
+        return value
     end
 
-    function air_property(T, coefficients, name)
-        if T < T_AIR_MIN || T > T_AIR_MAX
-            @warn "air $name requested outside 200-1600 K; endpoint used" temperature=T
-        end
-        Tb = clamp(Float64(T), T_AIR_MIN, T_AIR_MAX)
-        x = (Tb - T_AIR_CENTER) / T_AIR_HALF_RANGE
-        return chebyshev_value(coefficients, x)
-    end
+    CP_AIR_GRID = coolprop_air.("CPMASS", T_AIR_GRID)       # c_p [J kg^-1 K^-1]
+    MU_AIR_GRID = coolprop_air.("VISCOSITY", T_AIR_GRID)   # viscosity [Pa s]
+    K_AIR_GRID = coolprop_air.("CONDUCTIVITY", T_AIR_GRID) # conductivity [W m^-1 K^-1]
+    CP_AIR = linear_interpolation(T_AIR_GRID, CP_AIR_GRID;
+                                  extrapolation_bc=Interpolations.Flat())
+    MU_AIR = linear_interpolation(T_AIR_GRID, MU_AIR_GRID;
+                                  extrapolation_bc=Interpolations.Flat())
+    K_AIR = linear_interpolation(T_AIR_GRID, K_AIR_GRID;
+                                 extrapolation_bc=Interpolations.Flat())
 
-    # lookup functions for the air properties
-    cp_air(T::Real) = air_property(T, CP_COEFFICIENTS, "c_p")
-    mu_air(T::Real) = air_property(T, MU_COEFFICIENTS, "mu")
-    k_air(T::Real) = air_property(T, K_COEFFICIENTS, "k")
-    cp_air(T::AbstractArray) = cp_air.(T)
-    mu_air(T::AbstractArray) = mu_air.(T)
-    k_air(T::AbstractArray) = k_air.(T)
+    cp_air(T::Real) = CP_AIR(T)              # dry-air c_p(T) [J kg^-1 K^-1]
+    mu_air(T::Real) = MU_AIR(T)              # dry-air dynamic viscosity [Pa s]
+    k_air(T::Real) = K_AIR(T)                # dry-air conductivity [W m^-1 K^-1]
+    cp_air(T::AbstractArray) = CP_AIR.(T)
+    mu_air(T::AbstractArray) = MU_AIR.(T)
+    k_air(T::AbstractArray) = K_AIR.(T)
 
+    # Integrate c_p dT to obtain the dry-air specific enthalpy change [J kg^-1].
+    # Trapz supplies the standard trapezoidal integration used by the Python code.
     function h_gas(T_lo, T_hi; n=64)
-        # enthalpy integral for air using trapezoid rule
         temperature = collect(range(Float64(T_lo), Float64(T_hi), length=n))
-        heat_capacity = cp_air(temperature)
-        return sum(0.5 .* (heat_capacity[1:end-1] .+ heat_capacity[2:end]) .*
-                   diff(temperature))
+        return trapz(temperature, cp_air(temperature))
     end
 end
 
 begin # common numerical functions
+    # Fit y = intercept + slope*x by ordinary least squares. GLM supplies the
+    # coefficients, residuals, R^2 and coefficient standard errors.
     function linear_fit(x_values, y_values)
-        #Q: why not a built in function in one of the mainstream packages. doing so reduces the lines of code. please adapt for the common numerical functions and consider for others like trapezoid integration
         x = Float64.(x_values)
         y = Float64.(y_values)
-        X = hcat(ones(length(x)), x)
-        beta = X \ y
-        residual = y - X * beta
+        model = lm(hcat(ones(length(x)), x), y)
+        coefficients = coef(model)
+        errors = length(x) > 2 ? stderror(model) : [NaN, NaN]
+        residual = residuals(model)
         total = sum(abs2, y .- mean(y))
-        r2 = total > 0 ? 1.0 - sum(abs2, residual) / total : 1.0
-        dof = length(x) - 2
-        stderr = if dof > 0
-            covariance = (sum(abs2, residual) / dof) .* inv(X' * X)
-            sqrt(max(covariance[2, 2], 0.0))
-        else
-            NaN
-        end
-        return (slope=beta[2], intercept=beta[1], r2=r2,
-                stderr=stderr, residual=residual)
+        r_squared = total > 0 ? 1.0 - sum(abs2, residual) / total : 1.0
+        return (slope=coefficients[2], intercept=coefficients[1], r2=r_squared,
+                stderr=errors[2], residual=residual)
     end
 
+    # Fit y = prefactor*x^exponent by applying linear regression in log space.
+    # Returned uncertainty is the standard error of the fitted exponent.
     function power_law_fit(x, y)
         fit = linear_fit(log.(Float64.(x)), log.(Float64.(y)))
         return (prefactor=exp(fit.intercept), exponent=fit.slope,
                 r2=fit.r2, stderr=fit.stderr)
     end
 
+    # Linearly interpolate tabulated values and hold the nearest endpoint
+    # outside the grid. This helper also supports ForwardDiff dual values.
     function interpolate_clamped(x_grid, y_grid, x)
         x <= x_grid[1] && return y_grid[1]
         x >= x_grid[end] && return y_grid[end]
@@ -223,25 +213,24 @@ begin # common numerical functions
         return muladd(fraction, y_grid[index + 1] - y_grid[index], y_grid[index])
     end
 
+    # Strip missing and non-finite entries before summary statistics.
     finite_values(values) = filter(isfinite, Float64.(collect(skipmissing(values))))
+    # Return the finite-only mean, or NaN when no usable value exists.
     finite_mean(values) = isempty(finite_values(values)) ? NaN : mean(finite_values(values))
+    # Return the finite-only population standard deviation.
     finite_std(values) = length(finite_values(values)) <= 1 ? 0.0 :
                          std(finite_values(values); corrected=false)
-
-    function finite_quantile(values, probability)
-        kept = sort(finite_values(values))
-        isempty(kept) && return NaN
-        position = 1.0 + (length(kept) - 1) * probability
-        lower = floor(Int, position)
-        upper = ceil(Int, position)
-        lower == upper && return kept[lower]
-        return kept[lower] + (position - lower) * (kept[upper] - kept[lower])
-    end
+    # Use Statistics.quantile on finite entries, or NaN for an empty sample.
+    finite_quantile(values, probability) = isempty(finite_values(values)) ? NaN :
+                                           quantile(finite_values(values), probability)
 end
 
 begin # raw logger import
+    # Convert one DataFrame column to Float64 and map missing entries to NaN.
     numeric_column(data, index) = Float64.(coalesce.(data[!, index], NaN))
 
+    # Read one logger CSV and return time, MFC, pressure and Kelvin-temperature
+    # signals in a dictionary with consistent names used by the reduction.
     function load_data(raw_dir, filename)
         path = joinpath(raw_dir, filename * ".csv")
         isfile(path) || error("raw logger file not found: $path")
@@ -267,16 +256,22 @@ begin # raw logger import
         return output
     end
 
+    # Average the finite samples in the final `window` seconds of a run. This
+    # defines the steady-state value used throughout the reduction.
     function tail_mean(values, time; window=120.0)
         return finite_mean(values[time .>= time[end] - window])
     end
 
+    # Form the axial mean wall temperature at every time using the control-
+    # volume length fractions WTS. Each thermocouple represents its local span.
     function wall_temperature(data)
-        return reduce(+, [WTS[sensor] .* data[sensor] for sensor in wall_sensor_order]) #Q: explain
+        return reduce(+, [WTS[sensor] .* data[sensor] for sensor in wall_sensor_order])
     end
 end
 
 begin # steady-state and dimensionless reduction
+    # Reduce each heating run to one steady-state row. Flow is converted from
+    # standard L/min to mass flow with the MFC reference density.
     function reduce_steady(raw_dir, runs)
         rows = NamedTuple[]
         for (ID, (filename, irradiance)) in runs
@@ -289,7 +284,10 @@ begin # steady-state and dimensionless reduction
             wall = sum(WTS[sensor] * temperature[sensor] for sensor in wall_sensor_order)
             gas_power = mass_flow * h_gas(ambient, temperature["T3"])
             controller_flow = [tail_mean(signal, time) for signal in data["mfc"]]
-            shares = sum(controller_flow) > 0 ? controller_flow ./ sum(controller_flow) : fill(0.25, 4) #Q:why there is a minimum flow here, when <=0?
+            total_controller_flow = sum(controller_flow)
+            total_controller_flow > 0 ||
+                error("$ID has non-positive total MFC flow; controller shares are undefined")
+            shares = controller_flow ./ total_controller_flow
 
             push!(rows, (
                 ID=ID, Io_kWm2=irradiance / 1e3, q_slpm=flow,
@@ -309,9 +307,12 @@ begin # steady-state and dimensionless reduction
         return DataFrame(rows)
     end
 
-    function dimensionless(ss; dT3=0.0) #Q: is the dT3 required for the pertubation?
+    # Calculate dimensionless groups and apparent transfer coefficients from
+    # steady data. `T3_offset` is zero nominally and nonzero only for the
+    # declared systematic outlet-thermocouple sensitivity calculation.
+    function dimensionless(ss; T3_offset=0.0)
         output = copy(ss)
-        T3 = output.T3_ss .+ dT3
+        T3 = output.T3_ss .+ T3_offset
         output.Tg_bar = 0.5 .* (output.Tamb .+ T3)
         output.mdot_ch = output.mdot_gs .* 1e-3 ./ N_CH
         output.Re = output.mdot_ch .* D_H ./ (A_CH .* mu_air(output.Tg_bar))
@@ -336,6 +337,8 @@ begin # steady-state and dimensionless reduction
 end
 
 begin # eigenvalue identification
+    # Estimate the cooling decay eigenvalue by fitting log(T-Tamb) versus time
+    # for eligible sensors in the latter half of the cooling record.
     function eigen_cooling(data; sensors=COOL_SENS, thresh=5.0)
         time = data["t"]
         ambient = tail_mean(data["Tamb"], time)
@@ -351,6 +354,8 @@ begin # eigenvalue identification
         return finite_mean(eigenvalues), finite_std(eigenvalues), length(eigenvalues)
     end
 
+    # Estimate heating eigenvalues from the exponential approach to steady
+    # state within the declared normalized-deficit and R^2 acceptance window.
     function eigen_heating(data, sensors; u_lo=0.07, u_hi=0.45, r2_min=0.95)
         time = data["t"]
         eigenvalues = Float64[]
@@ -370,6 +375,8 @@ begin # eigenvalue identification
         return mean(eigenvalues), std(eigenvalues; corrected=false), length(eigenvalues)
     end
 
+    # Identify effective heat capacity and loss conductance from
+    # lambda=(exchange+K_loss)/C_eff using a straight-line fit.
     function identify(exchange, eigenvalue)
         fit = linear_fit(exchange, eigenvalue)
         C_eff = 1 / fit.slope
@@ -379,6 +386,8 @@ begin # eigenvalue identification
 end
 
 begin # inversion crossing, pressure drop, and delivered-power closure
+    # Locate the flow where the volumetric-inversion index crosses zero. Both
+    # local bracket interpolation and a global linear estimator are returned.
     function crossings(group)
         order = sortperm(group.q_slpm)
         flow = Float64.(group.q_slpm[order])
@@ -411,17 +420,23 @@ begin # inversion crossing, pressure drop, and delivered-power closure
         )
     end
 
+    # Predict laminar square-duct pressure loss [mbar]. For Darcy Poiseuille
+    # number Po=f_D*Re=56.91, Darcy-Weisbach reduces to
+    # Delta p=(Po/2)*mu*L*u/Dh^2 with u=mass_flux/rho; division by 100 converts Pa.
     function dp_laminar(mdot_gs, Tg)
-        Po_square = 56.91
-        mass_flux = (mdot_gs * 1e-3 / N_CH) / A_CH
-        density = 101325.0 / (287.05 * Tg)
+        Po_square = 56.91 # fully developed square-duct Darcy Poiseuille number [-]
+        mass_flux = (mdot_gs * 1e-3 / N_CH) / A_CH # channel mass flux [kg m^-2 s^-1]
+        density = P_STD / (R_AIR * Tg)              # ideal-gas density [kg m^-3]
         return 0.5 * Po_square * mu_air(Tg) * L_REC * (mass_flux / density) /
-               D_H^2 / 100.0 #Q: explain
+               D_H^2 / 100.0
     end
 
+    # Normalize the gas-plus-loss power by nominal incident aperture power.
     closure(data, K_loss) =
         (data.Q_gas_W .+ K_loss .* (data.Tw_K .- data.Tamb)) ./ data.Q_nom_W
 
+    # Compute the uniform T3 shift [K] that would close the steady energy
+    # balance at each flux for a specified loss conductance.
     function reconciling_dT3(data, K_loss)
         output = Dict{String,Any}()
         for group in groupby(data, :Io_kWm2)
@@ -436,6 +451,8 @@ begin # inversion crossing, pressure drop, and delivered-power closure
 end
 
 begin # grouped regression and profile-corrected transfer units
+    # Fit one common log-log exponent with a separate intercept for every
+    # irradiance group, then return the group-specific power-law prefactors.
     function grouped_powerlaw(data, xcol, ycol; gcol=:Io_kWm2)
         x = log.(Float64.(data[!, xcol]))
         y = log.(Float64.(data[!, ycol]))
@@ -445,17 +462,18 @@ begin # grouped regression and profile-corrected transfer units
         for (column, label) in enumerate(labels)
             X[:, column + 1] .= round.(Int, data[!, gcol]) .== label
         end
-        beta = X \ y
-        residual = y - X * beta
-        dof = length(y) - size(X, 2)
-        stderr = sqrt(max((sum(abs2, residual) / dof) * inv(X' * X)[1, 1], 0.0))
-        r2 = 1 - sum(abs2, residual) / sum(abs2, y .- mean(y))
-        prefactors = Dict(string(label) => exp(beta[index + 1])
+        model = lm(X, y)
+        coefficients = coef(model)
+        residual = residuals(model)
+        prefactors = Dict(string(label) => exp(coefficients[index + 1])
                           for (index, label) in enumerate(labels))
-        return Dict("exponent" => beta[1], "stderr" => stderr,
-                    "r2" => r2, "prefactors" => prefactors)
+        r_squared = 1.0 - sum(abs2, residual) / sum(abs2, y .- mean(y))
+        return Dict("exponent" => coefficients[1], "stderr" => stderror(model)[1],
+                    "r2" => r_squared, "prefactors" => prefactors)
     end
 
+    # Interpolate the three measured wall temperatures along z/L. The front
+    # and rear keywords select constant, half-slope or linear extrapolation.
     function wall_profile(row, zeta; rear="const", front="const")
         z = zeta * L_REC
         z_nodes = [Z_WALL["T8"], Z_WALL["T12"], Z_WALL["T11"]]
@@ -472,6 +490,8 @@ begin # grouped regression and profile-corrected transfer units
         return wall
     end
 
+    # Integrate dTg/d(z/L)=N[Tw(z/L)-Tg], where N is the total transfer-unit
+    # count. Each step is Heun's predictor-corrector (explicit trapezoidal) rule.
     function Tg_exit(N, row; rear="const", front="const", steps=400)
         Tg = Float64(row.Tamb)
         dz = 1 / steps
@@ -480,18 +500,25 @@ begin # grouped regression and profile-corrected transfer units
             right = (index + 1) * dz
             k1 = N * (wall_profile(row, left; rear, front) - Tg)
             k2 = N * (wall_profile(row, right; rear, front) - (Tg + dz * k1))
-            Tg += dz * (k1 + k2) / 2 #Q: explain this function/equation
+            # k1 predicts the right-end temperature; averaging k1 and k2
+            # provides the second-order Heun update over this axial step.
+            Tg += dz * (k1 + k2) / 2
         end
         return Tg
     end
 
-    function solve_N(row; dT3=0.0, rear="const", front="const")
-        residual(N) = Tg_exit(N, row; rear, front) - (row.T3_ss + dT3)
+    # Invert the axial gas-energy equation for N so its predicted exit
+    # temperature matches measured T3 plus an optional systematic offset.
+    function solve_N(row; T3_offset=0.0, rear="const", front="const")
+        residual(N) = Tg_exit(N, row; rear, front) - (row.T3_ss + T3_offset)
         return find_zero(residual, (1e-4, 120.0), Roots.Brent())
     end
 
+    # Recompute transfer units using the measured nonuniform wall profile and
+    # propagate the declared T3 systematic band to the fitted Re exponent.
     function ntu_profile_corrected(data; dT3_band=DT3_BAND)
-        solve(offset=0.0) = [solve_N(row; dT3=offset) for row in eachrow(data)]
+        # Solve all runs for one common outlet-temperature offset [K].
+        solve(offset=0.0) = [solve_N(row; T3_offset=offset) for row in eachrow(data)]
         corrected = solve()
         augmented = copy(data)
         augmented.NTU_corr = corrected
@@ -512,6 +539,8 @@ begin # grouped regression and profile-corrected transfer units
 end
 
 begin # fixed-conductance falsification
+    # Integrate the gas equation for a spatially varying conductance profile.
+    # `scale` converts profile values to local transfer-unit density.
     function Tg_exit_h(profile, nodes, row, scale; rear="const", front="const", steps=400)
         Tg = Float64(row.Tamb)
         dz = 1 / steps
@@ -531,18 +560,23 @@ begin # fixed-conductance falsification
         return Tg
     end
 
+    # Fit a positive piecewise-linear conductance profile to selected runs by
+    # multi-start nonlinear least squares in log-profile coordinates.
     function fit_profile(data, indices, node_count, scale, rng;
                          n_starts=40, warm=nothing)
         nodes = collect(range(0.0, 1.0, length=node_count))
         rows = [data[index, :] for index in indices]
         base = mean(solve_N(row) / scale[index] for (row, index) in zip(rows, indices))
 
+        # Return predicted-minus-measured exit temperatures [K] for one profile.
         function residual(log_profile)
             profile = exp.(log_profile)
             return [Tg_exit_h(profile, nodes, row, scale[index]) - row.T3_ss
                     for (row, index) in zip(rows, indices)]
         end
+        # Scalar sum of squared exit-temperature residuals minimized by Optim.
         objective(log_profile) = sum(abs2, residual(log_profile))
+        # Fill Optim's gradient buffer by automatic differentiation.
         gradient!(storage, log_profile) = ForwardDiff.gradient!(storage, objective, log_profile)
 
         starts = [log.(fill(base, node_count))]
@@ -576,6 +610,8 @@ begin # fixed-conductance falsification
         return best_profile, residual(log.(best_profile))
     end
 
+    # Test whether one flow-independent h(z) or Nu(z) profile can reproduce all
+    # exits, and compare it with separate five-node profiles for each flux.
     function fixed_profile_test(data; n_starts=40, seed=20260904)
         rng = MersenneTwister(seed)
         heat_capacity = cp_air(data.Tg_bar)
@@ -648,6 +684,8 @@ begin # fixed-conductance falsification
         return output
     end
 
+    # Repeat the profile-corrected NTU fit for plausible front/rear wall
+    # extrapolations and record infeasible cases where Tw,exit <= Tg,exit.
     function wall_extrapolation_sensitivity(data)
         output = Dict{String,Any}()
         for rear in ("const", "half", "linear"), front in ("const", "linear")
@@ -680,14 +718,20 @@ begin # fixed-conductance falsification
 end
 
 begin # Monte Carlo uncertainty propagation
+    # Return one-sigma MFC error [standard L min^-1] from full-scale and
+    # reading-proportional contributions combined in quadrature.
     mfc_sigma(reading) = sqrt.((MFC_A_FS * MFC_FS)^2 .+ (MFC_B_REL .* reading).^2)
 
+    # Combine the four controller errors into relative total-flow errors for
+    # all Monte Carlo draws while preserving their measured flow shares.
     function mfc_rel_perturbation(shares, total_flow, unit_draws)
         reading = shares .* total_flow
         flow_error = vec(sum(mfc_sigma(reading) .* reshape(unit_draws, 1, :), dims=2))
         return flow_error ./ total_flow
     end
 
+    # Propagate thermocouple and MFC errors through steady, transient and
+    # fitted quantities. `rho` selects correlated or independent MFC errors.
     function monte_carlo(ss, eigenvalues; n=40, seed=20260902, rho=1.0)
         rng = MersenneTwister(seed)
         quantity_names = [
@@ -752,9 +796,9 @@ begin # Monte Carlo uncertainty propagation
             for (column, label) in enumerate(labels)
                 X[:, column + 1] .= round.(Int, groups.Io_kWm2) .== label
             end
-            beta = X \ groups.Lam107
-            push!(samples["Lam107_slope"], beta[1])
-            push!(samples["Lam107_int"], mean(beta[2:end]))
+            coefficients = coef(lm(X, groups.Lam107))
+            push!(samples["Lam107_slope"], coefficients[1])
+            push!(samples["Lam107_int"], mean(coefficients[2:end]))
 
             eig = copy(eigenvalues)
             deviation = [isfinite(value) ? value : 0.0 for value in eig.lam_sd]
@@ -811,12 +855,15 @@ begin # Monte Carlo uncertainty propagation
 end
 
 begin # table and JSON output
+    # Write preformatted Markdown lines to one UTF-8 text file.
     function write_markdown(path, lines)
         open(path, "w") do io
             foreach(line -> println(io, line), lines)
         end
     end
 
+    # Generate the compact main-text tables from the result dictionary and
+    # Monte Carlo confidence intervals.
     function write_tables(report, data, uncertainty, out_dir)
         order = sortperm(collect(zip(data.Io_kWm2, data.q_slpm)))
         measured = [
@@ -845,6 +892,7 @@ begin # table and JSON output
         write_markdown(joinpath(out_dir, "table_reduced_envelope.md"), reduced)
 
         mc = Dict(row.quantity => row for row in eachrow(uncertainty))
+        # Format one Monte Carlo confidence interval for the Markdown table.
         ci(name; scale=1.0, digits=3) = haskey(mc, name) ?
             "[$(round(mc[name].ci_lo * scale; digits)), $(round(mc[name].ci_hi * scale; digits))]" : "—"
         constants = [
@@ -873,6 +921,8 @@ begin # table and JSON output
         write_markdown(joinpath(out_dir, "table_constants.md"), constants)
     end
 
+    # Generate supplementary tables documenting conditionality, wall-reference
+    # sensitivity, fixed-profile tests and auxiliary dimensionless groups.
     function write_supplementary_tables(report, data, out_dir)
         heating = [
             "| deficit window \$u\$ | \$C_{\\rm eff}\$ [J K\$^{-1}\$] | \$K_{\\rm loss}\$ [W K\$^{-1}\$] | \$r^2\$ |",
@@ -926,6 +976,8 @@ begin # table and JSON output
         write_markdown(joinpath(out_dir, "tableS5_auxiliary_groups.md"), groups)
     end
 
+    # Recursively replace non-finite floating-point values with `nothing` so
+    # the report contains valid JSON null values instead of NaN or infinity.
     function json_safe(value)
         value isa AbstractFloat && !isfinite(value) && return nothing
         value isa AbstractDict && return Dict(string(key) => json_safe(item)
@@ -936,6 +988,7 @@ begin # table and JSON output
         return value
     end
 
+    # Serialize a Julia object as indented, standards-compliant JSON.
     function write_json(path, value)
         open(path, "w") do io
             JSON3.pretty(io, json_safe(value))
@@ -985,6 +1038,7 @@ begin # MAIN linear reduction workflow and export
         flush(stdout)
 
         mkpath(out_dir)
+        # Resolve an output filename inside the selected output directory.
         output(filename) = joinpath(out_dir, filename)
         report = Dict{String,Any}()
 
@@ -999,12 +1053,11 @@ begin # MAIN linear reduction workflow and export
         CSV.write(output("groups_replicates.csv"), groups_replicates)
 
         report["air_properties"] = Dict(
-            "source" => "CoolProp 'Air' 8.0.0 Chebyshev surrogate",
-            "coolprop_version" => "8.0.0",
-            "pressure_Pa" => P_AIR,
-            "range_K" => [T_AIR_MIN, T_AIR_MAX],
-            "maximum_relative_fit_error" => Dict(
-                "cp" => 6.8e-7, "viscosity" => 1.9e-7, "conductivity" => 6.9e-7),
+            "source" => "CoolProp 'Air' through the official CoolProp_jll binary",
+            "coolprop_version" => COOLPROP_VERSION,
+            "pressure_Pa" => P_STD,
+            "range_K" => [first(T_AIR_GRID), last(T_AIR_GRID)],
+            "interpolation_step_K" => T_AIR_GRID[2] - T_AIR_GRID[1],
         )
         report["geometry"] = Dict(
             "side_mm" => SIDE * 1e3,
@@ -1032,7 +1085,10 @@ begin # MAIN linear reduction workflow and export
                 "r2" => fit.r2,
             )
         end
-        Nu_fd = Dict("T" => 2.976, "H2" => 3.091, "H1" => 3.608) #Q:these are the standard literature parameters
+        # Standard thermally fully developed laminar square-duct values from
+        # Shah & London (1978) for the conventional T, H2 and H1 wall boundary
+        # conditions. H2 is the primary comparison used in this study.
+        Nu_fd = Dict("T" => 2.976, "H2" => 3.091, "H1" => 3.608)
         report["nusselt"] = Dict(
             "prefactor" => nusselt.prefactor,
             "exponent" => nusselt.exponent,
@@ -1106,8 +1162,10 @@ begin # MAIN linear reduction workflow and export
             effectiveness = eps_q.intercept + eps_q.slope * flow
             exchange = effectiveness * mdot * cp_air(0.5 * (ambient + outlet))
             controller_flow = [tail_mean(signal, time) for signal in data["mfc"]]
-            shares = sum(controller_flow) > 0 ?
-                     controller_flow ./ sum(controller_flow) : fill(0.25, 4)
+            total_controller_flow = sum(controller_flow)
+            total_controller_flow > 0 ||
+                error("$ID has non-positive total MFC flow; controller shares are undefined")
+            shares = controller_flow ./ total_controller_flow
 
             for (phase, sensors) in (("heat", DEEP_SENS), ("heat6", COOL_SENS))
                 eigenvalue, deviation, count_sensors = eigen_heating(data, sensors)
@@ -1131,8 +1189,10 @@ begin # MAIN linear reduction workflow and export
             effectiveness = eps_q.intercept + eps_q.slope * flow
             exchange = effectiveness * mdot * cp_air(0.5 * (ambient + outlet))
             controller_flow = [mean(signal) for signal in data["mfc"]]
-            shares = sum(controller_flow) > 0 ?
-                     controller_flow ./ sum(controller_flow) : fill(0.25, 4)
+            total_controller_flow = sum(controller_flow)
+            total_controller_flow > 0 ||
+                error("$ID has non-positive total MFC flow; controller shares are undefined")
+            shares = controller_flow ./ total_controller_flow
             eigenvalue, deviation, count_sensors = eigen_cooling(data)
             push!(eigenvalue_rows, (
                 ID=ID, phase="cool", q=flow, x=exchange,
@@ -1239,7 +1299,7 @@ begin # MAIN linear reduction workflow and export
         T3_cases = Dict{String,Any}()
         T3_offsets = (-DT3_BAND, 0.0, DT3_BAND)
         for offset in T3_offsets
-            offset_groups = dimensionless(steady; dT3=offset)
+            offset_groups = dimensionless(steady; T3_offset=offset)
             offset_nusselt = power_law_fit(offset_groups.Re, offset_groups.Nu)
             eps_star = Dict{String,Any}()
             for group in groupby(offset_groups, :Io_kWm2)
