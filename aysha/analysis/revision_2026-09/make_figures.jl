@@ -284,11 +284,13 @@ begin # Figure 3: steady temperature field
         for (axis, flux) in zip(axes, flux_levels)
             data = flux_subset(groups, flux)
             for (column, marker) in
-                ((:T8_ss, "o"), (:T12_ss, "s"), (:T11_ss, "^"), (:T3_ss, "D"))
-                fill_color = column == :T3_ss ? "white" : series_color[flux]
+                ((:T8_ss, "o"), (:T12_ss, "s"), (:T11_ss, "^"), (:T3_ss, "o"))
+                gas_temperature = column == :T3_ss
                 axis.plot(
-                    data.q_slpm, data[!, column] .- 273.15, string(marker, "-");
-                    color=series_color[flux], ms=3.8, lw=1.1, mfc=fill_color,
+                    data.q_slpm, data[!, column] .- 273.15;
+                    color=series_color[flux], marker=marker, ls="-", ms=3.8, lw=1.1,
+                    mfc=gas_temperature ? "none" : series_color[flux],
+                    mec=series_color[flux], mew=gas_temperature ? 1.0 : 0.0,
                 )
             end
             axis.set_title(string(flux, raw" kW m$^{-2}$"); loc="left")
@@ -300,15 +302,17 @@ begin # Figure 3: steady temperature field
             mpl.lines.Line2D(
                 [], [];
                 color="0.3", marker=marker, ls="-", ms=3.8,
-                mfc=fill_color, lw=1.1,
+                mfc=fill_color, mec="0.3", mew=edge_width, lw=1.1,
             )
-            for (marker, fill_color) in
-                (("o", "0.3"), ("s", "0.3"), ("^", "0.3"), ("D", "white"))
+            for (marker, fill_color, edge_width) in
+                (("o", "0.3", 0.0), ("s", "0.3", 0.0),
+                 ("^", "0.3", 0.0), ("o", "none", 1.0))
         ]
         axes[1].legend(
             handles,
-            ["wall 11 mm", "wall 58 mm", "wall 107 mm", "gas outlet"];
-            frameon=false, loc="lower left", handlelength=1.5,
+            ["T8, wall 11 mm", "T12, wall 58 mm",
+             "T11, wall 107 mm", "T3, gas outlet"];
+            frameon=false, loc="upper right", handlelength=1.5,
         )
         for (axis, letter) in zip(axes, ("a", "b", "c"))
             panel_letter(axis, letter)
@@ -366,7 +370,7 @@ begin # Figure 4: assembly-scale heat-transfer limitation
             color="0.45", va="bottom", fontsize=7,
         )
         primary_text = @sprintf(
-            "grouped (primary, solid):\n\$\\propto Re_{\\rm nom}^{%.3f}\$, \$r^2\$=%.3f\npooled (dashed):\n\$%.2f\\times10^{-4}Re_{\\rm nom}^{%.2f}\$, \$r^2\$=%.3f",
+            "grouped per irradiance (solid):\n\$\\propto Re_{\\rm nom}^{%.3f}\$, \$r^2\$=%.3f\n\npooled all together(dashed):\n\$%.2f\\times10^{-4}Re_{\\rm nom}^{%.2f}\$, \$r^2\$=%.3f",
             grouped_exponent,
             Float64(grouped["r2"]),
             prefactor * 1e4,
@@ -383,7 +387,7 @@ begin # Figure 4: assembly-scale heat-transfer limitation
         suppress_minor_labels(Nu_axis)
         Nu_axis.set_xlabel(raw"Reynolds number, $Re$")
         Nu_axis.set_ylabel(raw"Apparent Nusselt number, $Nu$")
-        Nu_axis.set_title("Exchange is limited at the assembly scale"; loc="left")
+        #Nu_axis.set_title("Exchange is limited at the assembly scale"; loc="left")
         Nu_axis.legend(; loc="lower right", frameon=false, handlelength=1.0)
 
         groups.NTU_corr = Float64.(report["ntu_profile"]["NTU_corr"])
@@ -423,7 +427,7 @@ begin # Figure 4: assembly-scale heat-transfer limitation
         suppress_minor_labels(NTU_axis; y=true)
         NTU_axis.set_xlabel(raw"Reynolds number, $Re$")
         NTU_axis.set_ylabel(raw"Transfer units, $NTU$")
-        NTU_axis.set_title("Transfer units rise with flow"; loc="left")
+        #NTU_axis.set_title("Transfer units rise with flow"; loc="left")
         NTU_axis.text(
             102, 2.35,
             @sprintf("measured, \$\\propto Re^{%+.2f}\$", corrected_exponent);
@@ -493,12 +497,12 @@ begin # Figure 5: temperature inversion and local nonequilibrium
         effectiveness_axis.axhline(0; color="0.6", lw=0.8, zorder=0)
         flow_axis.set_xlabel(raw"$q$ [sL min$^{-1}$]")
         flow_axis.set_ylabel(raw"$T_{12}-T_8$ [K]")
-        flow_axis.set_title("Front-to-mid side-wall crossing"; loc="left")
-        flow_axis.annotate(
-            "single negative\npoint only";
-            xy=(5.08, 0), xytext=(6.4, -88), fontsize=7, color="0.3",
-            arrowprops=Dict("arrowstyle" => "-", "lw" => 0.7, "color" => "0.45"),
-        )
+        #flow_axis.set_title("Front-to-mid side-wall crossing"; loc="left")
+        #flow_axis.annotate(
+        #    "single negative\npoint only";
+        #    xy=(5.08, 0), xytext=(6.4, -88), fontsize=7, color="0.3",
+        #    arrowprops=Dict("arrowstyle" => "-", "lw" => 0.7, "color" => "0.45"),
+        #)
 
         if !isempty(crossing_effectiveness)
             lower = minimum(crossing_effectiveness)
@@ -510,7 +514,7 @@ begin # Figure 5: temperature inversion and local nonequilibrium
             )
         end
         effectiveness_axis.set_xlabel(raw"Effectiveness, $\varepsilon$")
-        effectiveness_axis.set_title(raw"Crossings collapse on $\varepsilon$"; loc="left")
+        #effectiveness_axis.set_title(raw"Crossings collapse on $\varepsilon$"; loc="left")
         effectiveness_axis.legend(
             ; title=raw"kW m$^{-2}$", loc="lower right", frameon=false,
             handlelength=0.8, fontsize=7, title_fontsize=7,
@@ -518,7 +522,7 @@ begin # Figure 5: temperature inversion and local nonequilibrium
 
         deficit_axis.set_xlabel(raw"Reynolds number, $Re$")
         deficit_axis.set_ylabel(raw"Apparent wall-to-interior deficit, $\Lambda$")
-        deficit_axis.set_title(raw"Wall-to-interior deficit grows with $Re$"; loc="left")
+        #deficit_axis.set_title(raw"Wall-to-interior deficit grows with $Re$"; loc="left")
         deficit_axis.text(90, 0.108, raw"$\Lambda_{107}$"; ha="right", color="0.25")
         deficit_axis.text(90, 0.040, raw"$\Lambda_{58}$"; ha="right", color="0.45")
 
@@ -546,7 +550,7 @@ begin # Figure 6: transient eigenvalue identification
         end
         cooling_axis.set_xlabel("Time [min]")
         cooling_axis.set_ylabel(raw"Normalised excess, $\theta/\theta_0$")
-        cooling_axis.set_title("One shared slow mode"; loc="left")
+        #cooling_axis.set_title("One shared slow mode"; loc="left")
         cooling_axis.set_ylim(1e-1, 1.4)
         cooling_axis.set_xlim(0, 105)
         cooling_axis.set_yticks([0.1, 0.2, 0.5, 1.0])
@@ -559,7 +563,7 @@ begin # Figure 6: transient eigenvalue identification
                 label=string(cooling_flow[ID], raw" sL min$^{-1}$"),
             )
         end
-        cooling_axis.legend(; loc="lower left", frameon=false, handlelength=1.2, fontsize=7)
+        cooling_axis.legend(; loc="upper right", frameon=false, handlelength=1.2, fontsize=7)
 
         identification_series = (
             ("cool", "o", raw"cooling, matched $\varepsilon$ (primary)",
@@ -597,7 +601,7 @@ begin # Figure 6: transient eigenvalue identification
         end
         eigenvalue_axis.set_xlabel(raw"$\varepsilon\,\dot m c_p$ [W K$^{-1}$]")
         eigenvalue_axis.set_ylabel(raw"$\lambda$ [$10^{-3}$ s$^{-1}$]")
-        eigenvalue_axis.set_title(raw"Probe set sets $C_{\rm eff}$"; loc="left")
+        #eigenvalue_axis.set_title(raw"Probe set sets $C_{\rm eff}$"; loc="left")
         eigenvalue_axis.legend(; loc="upper left", frameon=false, handlelength=1.2, fontsize=7)
 
         for (signal, line_style, color) in
@@ -614,7 +618,7 @@ begin # Figure 6: transient eigenvalue identification
         collapse_axis.set_ylim(0, 1.08)
         collapse_axis.set_xlabel(raw"Rescaled time, $t^*$")
         collapse_axis.set_ylabel(raw"Normalised rise, $\theta^*$")
-        collapse_axis.set_title("Transients collapse"; loc="left")
+        #collapse_axis.set_title("Transients collapse"; loc="left")
         collapse_axis.text(1.45, 0.45, "wall"; color="0.3")
         collapse_axis.text(1.45, 0.26, "gas outlet"; color="#c1666b")
 
@@ -657,8 +661,8 @@ begin # Figure 7: consequences of under-instrumentation
         suppress_minor_labels(reference_axis)
         reference_axis.set_xlabel(raw"Reynolds number, $Re$")
         reference_axis.set_ylabel(raw"Apparent Nusselt number, $Nu$")
-        reference_axis.set_title("Same data, five reference probes"; loc="left")
-        reference_axis.legend(; loc="lower right", frameon=false, handlelength=1.2, fontsize=6.5)
+        #reference_axis.set_title("Same data, five reference probes"; loc="left")
+        reference_axis.legend(; loc="upper right", frameon=false, handlelength=1.2, fontsize=6.5)
 
         identification_keys = ("cooling", "heating_deep", "heating_all6", "joint")
         labels = ["cooling\n6 probes", "heating\ndeep 3", "heating\nall 6", "joint\n18 eigenvalues"]
@@ -685,7 +689,7 @@ begin # Figure 7: consequences of under-instrumentation
         )
         capacitance_axis.annotate(
             @sprintf("fit-window\nrange %.0f–%.0f", lower, upper);
-            xy=(1.07, 0.5 * (lower + upper)), xytext=(1.38, 150),
+            xy=(1.07, 0.5 * (lower + upper)), xytext=(1.38, 200),
             fontsize=6.5, color="#8a4a4e",
             arrowprops=Dict("arrowstyle" => "-", "lw" => 0.7, "color" => "#c1666b"),
         )
@@ -701,7 +705,7 @@ begin # Figure 7: consequences of under-instrumentation
         capacitance_axis.set_xlim(-0.5, 3.5)
         capacitance_axis.set_ylim(0, 345)
         capacitance_axis.set_ylabel(raw"Effective capacitance, $C_{\rm eff}$ [J K$^{-1}$]")
-        capacitance_axis.set_title("Same runs, four defensible answers"; loc="left")
+        #capacitance_axis.set_title("Same runs, four defensible answers"; loc="left")
 
         panel_letter(reference_axis, "a")
         panel_letter(capacitance_axis, "b")
