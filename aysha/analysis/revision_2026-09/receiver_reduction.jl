@@ -892,32 +892,73 @@ begin # table and JSON output
         write_markdown(joinpath(out_dir, "table_reduced_envelope.md"), reduced)
 
         mc = Dict(row.quantity => row for row in eachrow(uncertainty))
-        # Format one Monte Carlo confidence interval for the Markdown table.
-        ci(name; scale=1.0, digits=3) = haskey(mc, name) ?
-            "[$(round(mc[name].ci_lo * scale; digits)), $(round(mc[name].ci_hi * scale; digits))]" : "—"
+        # Monte Carlo 95% intervals, formatted with literal format strings so
+        # the emitted table is byte-reproducible; round() left a trailing ".0"
+        # on the integer-valued rows. Extended 2026-10-01 to carry every row
+        # the manuscript's Table 4 reports, so the table is generated in full
+        # rather than part-generated and part-transcribed.
+        has(name) = haskey(mc, name)
+        ci2(name; scale=1.0) = has(name) ?
+            @sprintf("[%.2f, %.2f]", mc[name].ci_lo * scale, mc[name].ci_hi * scale) : "—"
+        ci3(name) = has(name) ? @sprintf("[%.3f, %.3f]", mc[name].ci_lo, mc[name].ci_hi) : "—"
+        ci0(name) = has(name) ? @sprintf("[%.0f, %.0f]", mc[name].ci_lo, mc[name].ci_hi) : "—"
+        sdv(name; scale=1.0) = has(name) ? mc[name].sd * scale : NaN
+        nus = report["nusselt"]
+        npf = report["ntu_profile"]
+        nst = report["ntu_structure"]
+        idn = report["identification"]
+        crs = report["crossings"]
         constants = [
             "| Constant | Value | s.d. | 95% interval | Unit | Notes |",
             "|---|---|---|---|---|---|",
-            @sprintf("| \$Nu_{\\rm app}\$ prefactor \$a\$ | %.2f×10\$^{-4}\$ | %.2f×10\$^{-4}\$ | %s | ×10\$^{-4}\$ | 15 steady runs |",
-                     mc["Nu_a"].value * 1e4, mc["Nu_a"].sd * 1e4,
-                     ci("Nu_a"; scale=1e4, digits=2)),
-            @sprintf("| \$Nu_{\\rm app}\$ exponent, grouped | %.3f | %.3f | %s | – | primary fit |",
-                     report["nusselt"]["grouped"]["exponent"], mc["Nu_b_grouped"].sd,
-                     ci("Nu_b_grouped")),
-            @sprintf("| \$N_{\\rm prof}\$ exponent | %+.3f | %.3f | %s | – | profile integration |",
-                     report["ntu_profile"]["exponent"], mc["NTU_corr_b"].sd,
-                     ci("NTU_corr_b")),
+            @sprintf("| \$Nu_{\\rm app}\$ prefactor \$a\$ (pooled) | %.2f×10\$^{-4}\$ | %.2f×10\$^{-4}\$ | %s | ×10\$^{-4}\$ | 15 steady runs |",
+                     nus["prefactor"] * 1e4, sdv("Nu_a"; scale=1e4), ci2("Nu_a"; scale=1e4)),
+            @sprintf("| \$Nu_{\\rm app}\$ exponent, pooled | %.3f | %.3f | %s | – | instrumental MC; regression SE \$\\pm\$%.3f, \$r^2\$=%.3f |",
+                     nus["exponent"], sdv("Nu_b"), ci3("Nu_b"),
+                     nus["stderr_exponent"], nus["r2"]),
+            @sprintf("| \$Nu_{\\rm app}\$ exponent, grouped (primary) | %.3f | %.3f | %s | – | instrumental MC; regression SE \$\\pm\$%.3f, \$r^2\$=%.4f |",
+                     nus["grouped"]["exponent"], sdv("Nu_b_grouped"), ci3("Nu_b_grouped"),
+                     nus["grouped"]["stderr"], nus["grouped"]["r2"]),
+            @sprintf("| \$N_{\\rm prof}\$ exponent (primary) | %+.3f | %.3f | %s | – | instrumental MC; regression SE \$\\pm\$%.3f; fixed-\$Nu\$ requirement %.3f |",
+                     npf["exponent"], sdv("NTU_corr_b"), ci3("NTU_corr_b"),
+                     npf["stderr"], nst["fixed_Nu_requirement"]),
+            @sprintf("| \$NTU_{\\rm app}\$ exponent (identity, superseded) | %+.3f | — | — | – | isothermal-wall identity; retained for comparison only |",
+                     nst["exponent"]),
         ]
-        for (label, key, mc_key) in (
-            ("cooling matched-\$\\varepsilon\$", "cooling_matched_eps", "C_match"),
-            ("cooling pooled-\$\\varepsilon\$", "cooling", "C_cool"),
-            ("heating deep probes", "heating_deep", "C_deep"),
-            ("joint eigenvalues", "joint", "C_all"),
-        )
-            entry = report["identification"][key]
-            push!(constants, @sprintf("| \$C_{\\rm eff}\$, %s | %.0f | %.0f | %s | J K\$^{-1}\$ | \$r^2\$=%.3f |",
-                  label, entry["C_eff"], mc[mc_key].sd, ci(mc_key; digits=0), entry["r2"]))
+        for flux in ("456", "304", "256")
+            push!(constants,
+                  @sprintf("| Inversion marker \$\\varepsilon^*\$, %s kW m\$^{-2}\$ | %.3f | %.3f | %s | – | operational marker under the adopted wall convention; see §5.1 |",
+                           flux, crs[flux]["eps_local"], sdv("eps_star_" * flux),
+                           ci3("eps_star_" * flux)))
         end
+        push!(constants,
+              @sprintf("| \$\\Lambda_{107}\$ slope [\$Re^{-1}\$] | %.2f×10\$^{-4}\$ | %.2f×10\$^{-4}\$ | %s | ×10\$^{-4}\$ | common slope, per-flux intercepts |",
+                       mc["Lam107_slope"].value * 1e4, sdv("Lam107_slope"; scale=1e4),
+                       ci2("Lam107_slope"; scale=1e4)))
+        for (label, key, mc_key, note) in (
+            ("cooling matched-\$\\varepsilon\$ (primary)", "cooling_matched_eps", "C_match",
+             @sprintf("\$n\$=3, \$r^2\$=%.3f", idn["cooling_matched_eps"]["r2"])),
+            ("cooling pooled-\$\\varepsilon\$", "cooling", "C_cool",
+             @sprintf("\$r^2\$=%.3f", idn["cooling"]["r2"])),
+            ("joint 18 eigenvalues", "joint", "C_all",
+             @sprintf("\$r^2\$=%.3f", idn["joint"]["r2"])),
+            ("heating deep probes", "heating_deep", "C_deep",
+             @sprintf("%.0f J K\$^{-1}\$ if all six probes used", idn["heating_all6"]["C_eff"])),
+        )
+            push!(constants, @sprintf("| \$C_{\\rm eff}\$, %s | %.0f | %.0f | %s | J K\$^{-1}\$ | %s |",
+                  label, idn[key]["C_eff"], sdv(mc_key), ci0(mc_key), note))
+        end
+        for (label, key, mc_key, note) in (
+            ("cooling matched-\$\\varepsilon\$ (primary)", "cooling_matched_eps", "K_match",
+             "secant conductance"),
+            ("heating deep probes", "heating_deep", "K_deep", "tangent conductance"),
+        )
+            push!(constants, @sprintf("| \$K_{\\rm loss}\$, %s | %.3f | %.3f | %s | W K\$^{-1}\$ | %s |",
+                  label, idn[key]["K_loss"], sdv(mc_key), ci3(mc_key), note))
+        end
+        push!(constants,
+              @sprintf("| Monolith capacitance (measured mass) | %.1f – %.1f | — | — | J K\$^{-1}\$ | 40 g \$\\times\\,c_p\$(600–900 K) |",
+                       report["monolith"]["C_monolith_600K"], report["monolith"]["C_monolith_900K"]))
         write_markdown(joinpath(out_dir, "table_constants.md"), constants)
     end
 
