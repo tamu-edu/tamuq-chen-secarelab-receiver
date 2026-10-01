@@ -907,12 +907,11 @@ begin # table and JSON output
         npf = report["ntu_profile"]
         nst = report["ntu_structure"]
         idn = report["identification"]
-        crs = report["crossings"]
         constants = [
             "| Constant | Value | s.d. | 95% interval | Unit | Notes |",
             "|---|---|---|---|---|---|",
             @sprintf("| \$Nu_{\\rm app}\$ prefactor \$a\$ (pooled) | %.2f×10\$^{-4}\$ | %.2f×10\$^{-4}\$ | %s | ×10\$^{-4}\$ | 15 steady runs |",
-                     nus["prefactor"] * 1e4, sdv("Nu_a"; scale=1e4), ci2("Nu_a"; scale=1e4)),
+                     mc["Nu_a"].value * 1e4, sdv("Nu_a"; scale=1e4), ci2("Nu_a"; scale=1e4)),
             @sprintf("| \$Nu_{\\rm app}\$ exponent, pooled | %.3f | %.3f | %s | – | instrumental MC; regression SE \$\\pm\$%.3f, \$r^2\$=%.3f |",
                      nus["exponent"], sdv("Nu_b"), ci3("Nu_b"),
                      nus["stderr_exponent"], nus["r2"]),
@@ -928,7 +927,7 @@ begin # table and JSON output
         for flux in ("456", "304", "256")
             push!(constants,
                   @sprintf("| Inversion marker \$\\varepsilon^*\$, %s kW m\$^{-2}\$ | %.3f | %.3f | %s | – | operational marker under the adopted wall convention; see §5.1 |",
-                           flux, crs[flux]["eps_local"], sdv("eps_star_" * flux),
+                           flux, mc["eps_star_" * flux].value, sdv("eps_star_" * flux),
                            ci3("eps_star_" * flux)))
         end
         push!(constants,
