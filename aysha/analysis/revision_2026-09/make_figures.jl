@@ -479,6 +479,7 @@ begin # Figure 5: temperature inversion and local nonequilibrium
             deficit_axis.plot(
                 data.Re, data.Lam58, "s--";
                 color=series_color[flux], ms=3.4, lw=1.0, mfc="white",
+                mec=series_color[flux], mew=1.0,
             )
 
             if isfinite(q_local)
