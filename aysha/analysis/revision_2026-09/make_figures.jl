@@ -429,8 +429,8 @@ begin # Figure 4: assembly-scale heat-transfer limitation
         NTU_axis.set_ylabel(raw"Transfer units, $NTU$")
         #NTU_axis.set_title("Transfer units rise with flow"; loc="left")
         NTU_axis.text(
-            102, 2.35,
-            @sprintf("measured, \$\\propto Re^{%+.2f}\$", corrected_exponent);
+            35, 1.2,
+            @sprintf("calculated,\n \$\\propto Re^{%+.2f}\$ \n(solid line)", corrected_exponent);
             color="0.15", ha="right",
         )
         NTU_axis.text(
@@ -439,8 +439,8 @@ begin # Figure 4: assembly-scale heat-transfer limitation
             color="0.35", ha="left", va="bottom", fontsize=7,
         )
         NTU_axis.text(
-            102, 0.335,
-            "conductance fixed in \$z\$,\n" * raw"$\propto Re^{-1}$";
+            100, 0.6,
+            "conductance fixed in \$z\$,\n" * raw"$\propto Re^{-1}$" * "\n(dashed line)";
             color="0.5", ha="right",
         )
 
