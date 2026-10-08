@@ -266,6 +266,7 @@ begin # plotting traces derived directly from the raw logger files
         cooling_data = CSV.read(joinpath(out_dir, "cooling_decays.csv"), DataFrame)
         master_curves = CSV.read(joinpath(out_dir, "master_curves.csv"), DataFrame)
         reference_points = CSV.read(joinpath(out_dir, "reference_points.csv"), DataFrame)
+        pressure_drop = CSV.read(joinpath(out_dir, "pressure_drop.csv"), DataFrame)
     end
 end
 
@@ -435,7 +436,7 @@ begin # Figure 4: assembly-scale heat-transfer limitation
         )
         NTU_axis.text(
             21.5, 0.335,
-            "filled: wall-profile integration\n" * raw"open: $-\ln(1-\varepsilon)$";
+            "wall-profile integration (filled symbols)\n" * raw"$-\ln(1-\varepsilon)$ (open symbols)";
             color="0.35", ha="left", va="bottom", fontsize=7,
         )
         NTU_axis.text(
@@ -714,8 +715,86 @@ begin # Figure 7: consequences of under-instrumentation
     end
 end
 
+begin # Figure S1: pressure drop against the composite monolith prediction
+    if MAKE_FIGURES_RUN
+        figure, axes = plt.subplots(1, 2; figsize=(7.4, 3.1))
+        drop_axis, share_axis = axes
+
+        for flux in flux_levels
+            data = flux_subset(pressure_drop, flux)
+            drop_axis.plot(
+                data.q_slpm, data.dp1_mbar;
+                color=series_color[flux], marker="o", ls="-", ms=4.0, lw=1.2,
+                mfc=series_color[flux], mec=series_color[flux], mew=0.0,
+            )
+            drop_axis.plot(
+                data.q_slpm, data.dp_mono_mbar;
+                color=series_color[flux], marker="s", ls="--", ms=3.4, lw=1.0,
+                mfc="white", mec=series_color[flux], mew=1.0,
+            )
+        end
+        # Shade the transducer accuracy floor, +-0.1% of the +-200 mbar span.
+        resolution = DP_FS * DP_ACC
+        drop_axis.axhspan(-resolution, resolution; color="0.86", zorder=0)
+        drop_axis.text(
+            4.4, -0.17, string(raw"transducer floor $\pm$", resolution, " mbar");
+            fontsize=7, color="0.35", ha="left", va="bottom",
+        )
+        drop_axis.set_xlabel(raw"$q$ [sL min$^{-1}$]")
+        drop_axis.set_ylabel(raw"Differential pressure [mbar]")
+
+        style_handles = [
+            mpl.lines.Line2D(
+                [], []; color="0.3", marker=marker, ls=linestyle, ms=marker_size,
+                mfc=fill_color, mec="0.3", mew=edge_width, lw=1.1,
+            )
+            for (marker, linestyle, marker_size, fill_color, edge_width) in
+                (("o", "-", 4.0, "0.3", 0.0), ("s", "--", 3.4, "white", 1.0))
+        ]
+        flux_handles = [
+            mpl.lines.Line2D([], []; color=series_color[flux], lw=2.2)
+            for flux in flux_levels
+        ]
+        drop_axis.legend(
+            vcat(style_handles, flux_handles),
+            vcat(["measured, DP1", "composite monolith model"],
+                 [string(flux, raw" kW m$^{-2}$") for flux in flux_levels]);
+            frameon=false, loc="upper left", handlelength=1.8,
+        )
+
+        # Term-by-term composition of the prediction at the highest metered
+        # flow of the campaign, where the minor losses are largest.
+        headline = pressure_drop[argmax(pressure_drop.q_slpm), :]
+        term_labels = ["core friction,\n" * raw"$\mu(T_g)$ integrated",
+                       "thermal\nacceleration", "face\ncontraction",
+                       "hydrodynamic\nentrance"]
+        term_shares = 100 .* [headline.dp_fric_mbar, headline.dp_mom_mbar,
+                              headline.dp_in_mbar, headline.dp_dev_mbar] ./
+                      headline.dp_mono_mbar
+        positions = collect(reverse(0:(length(term_shares) - 1)))
+        share_axis.barh(
+            positions, term_shares;
+            color=[series_color[flux_levels[1]], "0.45", "0.62", "0.78"], height=0.6,
+        )
+        for (position, share) in zip(positions, term_shares)
+            share_axis.text(share + 1.5, position, @sprintf("%.1f%%", share);
+                            va="center", fontsize=7)
+        end
+        share_axis.set_yticks(positions)
+        share_axis.set_yticklabels(term_labels; fontsize=7)
+        share_axis.set_xlabel("Share of predicted drop [%]")
+        share_axis.set_xlim(0, 112)
+        share_axis.set_xticks([0, 25, 50, 75, 100])
+
+        for (axis, letter) in zip(axes, ("a", "b"))
+            panel_letter(axis, letter)
+        end
+        finish_figure(figure, joinpath(fig_dir, "figS1_pressure_drop.png"))
+    end
+end
+
 begin # author-supplied apparatus montage and completion
     if MAKE_FIGURES_RUN
-        println("wrote fig3--fig7 to ", fig_dir)
+        println("wrote fig3--fig7 and figS1 to ", fig_dir)
     end
 end

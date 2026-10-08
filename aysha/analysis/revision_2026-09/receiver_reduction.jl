@@ -90,6 +90,21 @@ begin # fixed geometry and instrument parameters
     A_SOLID = A_FRT - N_CH * A_CH    # solid frontal area [m^2]
     M_MONO = 0.040                   # measured monolith mass [kg]
     K_SIC = 40.0                     # effective SiC conductivity [W m^-1 K^-1]
+    D_CAVITY = 0.142                 # aluminium cavity bore [m]
+    A_APPROACH = pi / 4 * D_CAVITY^2 # flow approach area ahead of the face [m^2]
+    SIGMA_FACE = N_CH * A_CH / A_APPROACH # face contraction ratio [-]
+
+    # Flow-through monolith pressure-drop constants. The Poiseuille number and
+    # the incremental pressure-drop number are the square-duct values tabulated
+    # by Shah and London; K_INF and C_SHAH are the constants of Shah's apparent
+    # friction-factor correlation for the hydrodynamic entrance region. The two
+    # face coefficients are the sharp-edged contraction and the full dissipation
+    # of the exit velocity head, both at the sigma -> 0 limit of this geometry.
+    PO_SQUARE = 56.91                # fully developed square-duct f_D*Re [-]
+    K_INF = 1.55                     # square-duct K(infinity) [-]
+    C_SHAH = 0.00029                 # square-duct constant of Shah (1978) [-]
+    KC_FACE = 0.50                   # face contraction loss coefficient [-]
+    KE_FACE = 1.00                   # face expansion loss coefficient [-]
 
     # Sensor locations
     Z_WALL = Dict("T8" => 0.011, "T12" => 0.058, "T11" => 0.107) # wall TC z [m]
@@ -424,10 +439,9 @@ begin # inversion crossing, pressure drop, and delivered-power closure
     # number Po=f_D*Re=56.91, Darcy-Weisbach reduces to
     # Delta p=(Po/2)*mu*L*u/Dh^2 with u=mass_flux/rho; division by 100 converts Pa.
     function dp_laminar(mdot_gs, Tg)
-        Po_square = 56.91 # fully developed square-duct Darcy Poiseuille number [-]
         mass_flux = (mdot_gs * 1e-3 / N_CH) / A_CH # channel mass flux [kg m^-2 s^-1]
         density = P_STD / (R_AIR * Tg)              # ideal-gas density [kg m^-3]
-        return 0.5 * Po_square * mu_air(Tg) * L_REC * (mass_flux / density) /
+        return 0.5 * PO_SQUARE * mu_air(Tg) * L_REC * (mass_flux / density) /
                D_H^2 / 100.0
     end
 
@@ -534,6 +548,75 @@ begin # grouped regression and profile-corrected transfer units
             "exponent_T3_band" => band,
             "single_stream_requirement" => -1.0,
             "NTU_corr" => corrected,
+        )
+    end
+end
+
+begin # composite monolith pressure drop
+    # Record the axial gas temperature of the same Heun march that Tg_exit
+    # performs. The two are kept separate because Tg_exit is the residual of a
+    # root find that also runs inside the Monte Carlo loop, where returning
+    # arrays would allocate on every evaluation.
+    function Tg_profile(N, row; rear="const", front="const", steps=400)
+        z = collect(range(0.0, L_REC; length=steps + 1)) # axial stations [m]
+        Tg = zeros(steps + 1)
+        Tg[1] = Float64(row.Tamb)
+        dz = 1 / steps
+        for index in 1:steps
+            left = (index - 1) * dz
+            right = index * dz
+            k1 = N * (wall_profile(row, left; rear, front) - Tg[index])
+            k2 = N * (wall_profile(row, right; rear, front) - (Tg[index] + dz * k1))
+            Tg[index + 1] = Tg[index] + dz * (k1 + k2) / 2
+        end
+        return z, Tg
+    end
+
+    # Apparent Fanning f*Re over the whole channel length, Shah (1978). The
+    # fully developed Fanning value is PO_SQUARE/4 = 14.227 and x_plus is the
+    # dimensionless hydrodynamic development length.
+    function f_apparent_Re(Re)
+        x_plus = L_REC / (D_H * Re)
+        developed = PO_SQUARE / 4
+        entrance = 3.44 / sqrt(x_plus)
+        return entrance +
+               (K_INF / (4 * x_plus) + developed - entrance) / (1 + C_SHAH * x_plus^-2)
+    end
+
+    # Pressure drop of a flow-through monolith in which every channel is open,
+    # as the sum of face contraction, core friction, hydrodynamic entrance,
+    # thermal acceleration and face expansion. Core friction is integrated
+    # along the channel at constant mass flux G with temperature-dependent
+    # viscosity: with u=G*R*Tg/P the Darcy-Weisbach integrand is proportional
+    # to mu(Tg)*Tg, so the one-point evaluation of dp_laminar at Tg_bar is
+    # replaced by the axial integral of the reconstructed gas temperature.
+    function dp_monolith(row; rear="const", front="const", steps=400)
+        N = solve_N(row; rear, front)
+        z, Tg = Tg_profile(N, row; rear, front, steps)
+        mass_flux = (row.mdot_gs * 1e-3 / N_CH) / A_CH # channel mass flux [kg m^-2 s^-1]
+        rho_in = P_STD / (R_AIR * row.Tamb)            # inlet density [kg m^-3]
+        rho_out = P_STD / (R_AIR * row.T3_ss)          # outlet density [kg m^-3]
+        Re_in = mass_flux * D_H / mu_air(row.Tamb)     # inlet channel Reynolds number [-]
+
+        friction = 0.5 * PO_SQUARE * mass_flux * R_AIR / (D_H^2 * P_STD) *
+                   trapz(z, mu_air(Tg) .* Tg)
+        entrance = K_INF * mass_flux^2 / (2 * rho_in)
+        acceleration = mass_flux^2 * (1 / rho_out - 1 / rho_in)
+        contraction = (1 - SIGMA_FACE^2 + KC_FACE) * mass_flux^2 / (2 * rho_in)
+        expansion = -(1 - SIGMA_FACE^2 - KE_FACE) * mass_flux^2 / (2 * rho_out)
+
+        return (
+            NTU_dp=N,
+            Re_in=Re_in,
+            Tg_len_mean=trapz(z, Tg) / L_REC,
+            f_app_ratio=f_apparent_Re(Re_in) / (PO_SQUARE / 4),
+            dp_in_mbar=contraction / 100.0,
+            dp_fric_mbar=friction / 100.0,
+            dp_dev_mbar=entrance / 100.0,
+            dp_mom_mbar=acceleration / 100.0,
+            dp_out_mbar=expansion / 100.0,
+            dp_mono_mbar=(contraction + friction + entrance + acceleration + expansion) /
+                         100.0,
         )
     end
 end
@@ -909,7 +992,7 @@ begin # table and JSON output
         idn = report["identification"]
         constants = [
             "| Constant | Value | s.d. | 95% interval | Unit | Notes |",
-            "|---|---|---|---|---|---|",
+            "| ------------------------------------------------------- | -------------- | -------------- | -------------- | ---------- | ------------------------------------------------------------------------- |",
             @sprintf("| \$Nu_{\\rm app}\$ prefactor \$a\$ (pooled) | %.2f×10\$^{-4}\$ | %.2f×10\$^{-4}\$ | %s | ×10\$^{-4}\$ | 15 steady runs |",
                      mc["Nu_a"].value * 1e4, sdv("Nu_a"; scale=1e4), ci2("Nu_a"; scale=1e4)),
             @sprintf("| \$Nu_{\\rm app}\$ exponent, pooled | %.3f | %.3f | %s | – | instrumental MC; regression SE \$\\pm\$%.3f, \$r^2\$=%.3f |",
@@ -924,11 +1007,16 @@ begin # table and JSON output
             @sprintf("| \$NTU_{\\rm app}\$ exponent (identity, superseded) | %+.3f | — | — | – | isothermal-wall identity; retained for comparison only |",
                      nst["exponent"]),
         ]
-        for flux in ("456", "304", "256")
+        # Row labels are abbreviated after the first of each family, matching the
+        # author's Table 4 layout (2026-10-07); regenerating must not revert it.
+        for (idx, flux) in enumerate(("456", "304", "256"))
+            label = idx == 1 ? "Inversion marker \$\\varepsilon^*\$ @ $flux kW m\$^{-2}\$" :
+                               "@ $flux kW m\$^{-2}\$"
+            note = idx == 1 ? "operational marker under the adopted wall convention; see §5.1" : "same"
             push!(constants,
-                  @sprintf("| Inversion marker \$\\varepsilon^*\$, %s kW m\$^{-2}\$ | %.3f | %.3f | %s | – | operational marker under the adopted wall convention; see §5.1 |",
-                           flux, mc["eps_star_" * flux].value, sdv("eps_star_" * flux),
-                           ci3("eps_star_" * flux)))
+                  @sprintf("| %s | %.3f | %.3f | %s | – | %s |",
+                           label, mc["eps_star_" * flux].value, sdv("eps_star_" * flux),
+                           ci3("eps_star_" * flux), note))
         end
         push!(constants,
               @sprintf("| \$\\Lambda_{107}\$ slope [\$Re^{-1}\$] | %.2f×10\$^{-4}\$ | %.2f×10\$^{-4}\$ | %s | ×10\$^{-4}\$ | common slope, per-flux intercepts |",
@@ -944,16 +1032,18 @@ begin # table and JSON output
             ("heating deep probes", "heating_deep", "C_deep",
              @sprintf("%.0f J K\$^{-1}\$ if all six probes used", idn["heating_all6"]["C_eff"])),
         )
-            push!(constants, @sprintf("| \$C_{\\rm eff}\$, %s | %.0f | %.0f | %s | J K\$^{-1}\$ | %s |",
-                  label, idn[key]["C_eff"], sdv(mc_key), ci0(mc_key), note))
+            prefix = label == "cooling matched-\$\\varepsilon\$ (primary)" ? "\$C_{\\rm eff}\$, " : ""
+            push!(constants, @sprintf("| %s%s | %.0f | %.0f | %s | J K\$^{-1}\$ | %s |",
+                  prefix, label, idn[key]["C_eff"], sdv(mc_key), ci0(mc_key), note))
         end
         for (label, key, mc_key, note) in (
             ("cooling matched-\$\\varepsilon\$ (primary)", "cooling_matched_eps", "K_match",
              "secant conductance"),
             ("heating deep probes", "heating_deep", "K_deep", "tangent conductance"),
         )
-            push!(constants, @sprintf("| \$K_{\\rm loss}\$, %s | %.3f | %.3f | %s | W K\$^{-1}\$ | %s |",
-                  label, idn[key]["K_loss"], sdv(mc_key), ci3(mc_key), note))
+            prefix = label == "cooling matched-\$\\varepsilon\$ (primary)" ? "\$K_{\\rm loss}\$, " : ""
+            push!(constants, @sprintf("| %s%s | %.3f | %.3f | %s | W K\$^{-1}\$ | %s |",
+                  prefix, label, idn[key]["K_loss"], sdv(mc_key), ci3(mc_key), note))
         end
         push!(constants,
               @sprintf("| Monolith capacitance (measured mass) | %.1f – %.1f | — | — | J K\$^{-1}\$ | 40 g \$\\times\\,c_p\$(600–900 K) |",
@@ -1448,6 +1538,17 @@ begin # MAIN linear reduction workflow and export
                                  for (mass_flow, temperature) in
                                  zip(pressure.mdot_gs, pressure.Tg_bar)]
         pressure.ratio = pressure.dp1_mbar ./ pressure.dp_pred_mbar
+
+        # The composite flow-through monolith prediction, resolved into its
+        # five terms, is the reference the measurement is judged against;
+        # dp_pred_mbar is retained so the two can be compared run by run.
+        monolith = [dp_monolith(row) for row in eachrow(groups)]
+        for name in keys(first(monolith))
+            pressure[!, name] = [component[name] for component in monolith]
+        end
+        pressure.uplift = pressure.dp_mono_mbar ./ pressure.dp_pred_mbar
+        pressure.ratio_mono = pressure.dp1_mbar ./ pressure.dp_mono_mbar
+        pressure.friction_share = pressure.dp_fric_mbar ./ pressure.dp_mono_mbar
         CSV.write(output("pressure_drop.csv"), pressure)
         report["pressure_drop"] = Dict(
             "resolution_mbar" => DP_FS * DP_ACC,
@@ -1455,6 +1556,19 @@ begin # MAIN linear reduction workflow and export
             "meas_range" => [minimum(pressure.dp1_mbar), maximum(pressure.dp1_mbar)],
             "ratio_range" => [minimum(pressure.ratio), maximum(pressure.ratio)],
             "dp2_range" => [minimum(pressure.dp2_mbar), maximum(pressure.dp2_mbar)],
+            "mono_range" => [minimum(pressure.dp_mono_mbar),
+                             maximum(pressure.dp_mono_mbar)],
+            "mono_ratio_range" => [minimum(pressure.ratio_mono),
+                                   maximum(pressure.ratio_mono)],
+            "uplift_range" => [minimum(pressure.uplift), maximum(pressure.uplift)],
+            "friction_share_range" => [minimum(pressure.friction_share),
+                                       maximum(pressure.friction_share)],
+            "f_app_ratio_range" => [minimum(pressure.f_app_ratio),
+                                    maximum(pressure.f_app_ratio)],
+            "Re_channel_range" => [minimum(pressure.Re_in), maximum(pressure.Re_in)],
+            "Tg_len_mean_range" => [minimum(pressure.Tg_len_mean),
+                                    maximum(pressure.Tg_len_mean)],
+            "permeability_m2" => 2 * POROSITY * D_H^2 / PO_SQUARE,
         )
 
         C_similarity = identification["cooling_matched_eps"]["C_eff"]
