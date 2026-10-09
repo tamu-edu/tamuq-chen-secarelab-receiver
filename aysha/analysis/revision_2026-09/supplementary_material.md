@@ -84,7 +84,7 @@ The length-averaged wall temperature and the profile-corrected transfer-unit cou
 
 The primary value is the constant/constant case, +0.3407 ± 0.0405, against the single-stream requirement of -1.00. Under the common-slope grouping used for the Nusselt correlation the exponent is +0.3560 ± 0.0099 with r² = 0.9922.
 
-The fixed-conductance falsification of section 5.2 fits a piecewise-linear non-negative h(z) by multi-start least squares in log h and asks whether one flow-independent profile reproduces the fifteen measured outlet temperatures. It does not, in any family or at any node count, and the discriminating statistic is the ordering of the residual in flow rather than its magnitude.
+The fixed-conductance falsification of section 5.2 fits a piecewise-linear non-negative h(z) by multi-start least squares in log h and asks whether one flow-independent profile reproduces the fifteen measured outlet temperatures. It does not, in any family or at any node count, and the discriminating statistic is the ordering of the residual in flow rather than its magnitude. For the shared conductance profile the residual runs from about +80 K at the lowest flow of each configuration to −70 K at the highest.
 
 | Family | nodes | RMS residual [K] | max abs [K] | $r$ vs $\ln Re$ | slope [K per e-fold] |
 |---|---:|---:|---:|---:|---:|
