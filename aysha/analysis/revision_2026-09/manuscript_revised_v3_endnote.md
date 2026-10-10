@@ -1,4 +1,4 @@
-# Transient Thermal Characterization and Dimensionless Correlations for a Structured Silicon Carbide Volumetric Solar Receiver, with Consequences for Reduced-Order Model Validation
+# What depth-resolved transient measurements on a SiC honeycomb solar receiver imply for reduced-order heat transfer closures
 
 A. Melhim and K. E. Kakosimos
 
@@ -10,9 +10,7 @@ Volumetric solar receivers are meant to absorb concentrated radiation in depth a
 
 The measurements show that heat exchange between gas and solid is limited at the scale of the whole assembly rather than inside the channels: the apparent Nusselt number lies one to two orders of magnitude below the laminar duct value, and the transient response is governed by an effective capacitance of 275 ± 38 J K⁻¹, six to seven times that of the monolith alone. More consequential for modelling, the number of transfer units rises with flow, as $Re_{nom}^{+0.341}$, whereas any single-stream model whose heat transfer coefficient is a fixed function of axial position requires it to fall as $Re_{nom}^{−1.00}$. Because the disagreement is in sign rather than magnitude, no recalibration can remove it, and it suggests that what these models miss is the distribution of flow across the receiver. The same runs also show why the usual validation would not notice: depending only on which thermocouple represents the solid, the fitted correlation prefactor changes by a factor of nearly thirty and the identified capacitance spans 122 to 281 J K⁻¹. A model can therefore match the standard validation data while misrepresenting the receiver, which offers a potential explanation for the long-standing gap between predicted and measured absorber performance. We close by identifying the measurements, chiefly a properly ranged pressure drop across the monolith, that would turn these response indices into physical coefficients.
 
-**Keywords:** volumetric solar receiver; silicon carbide honeycomb; local thermal non-equilibrium; transient identification; model validation; dimensionless correlation
-
----
+**Keywords:** volumetric solar receiver; silicon carbide honeycomb; local thermal non-equilibrium; number of transfer units; flow maldistribution; model validation
 
 ## 1. Introduction
 
