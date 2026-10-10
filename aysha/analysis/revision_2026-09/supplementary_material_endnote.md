@@ -1,8 +1,8 @@
 # Supplementary Material
 
-## Transient Thermal Characterization and Dimensionless Correlations for a Structured Silicon Carbide Volumetric Solar Receiver, with Consequences for Reduced-Order Model Validation
+## What depth-resolved transient measurements on a SiC honeycomb solar receiver imply for reduced-order heat transfer closures
 
-A. Melhim, A. G. Konstandopoulos, K. J. Kakosimos
+A. Melhim, K. J. Kakosimos
 
 ---
 
@@ -34,10 +34,10 @@ Where a quantity is a fitted slope, its regression standard error is reported al
 
 | quantity                                            | δT3 = −25 K | δT3 = 0 | δT3 = +25 K | band            |
 | --------------------------------------------------- | -----------:| -------:| -----------:| --------------- |
-| $C_{\rm eff}$, cooling matched-ε (primary) [J K⁻¹] | 271.3 | 275.5 | 280.1 | 271.3 – 280.1 |
-| $K_{\rm loss}$, cooling matched-ε (primary) [W K⁻¹] | 0.0843 | 0.0796 | 0.0752 | 0.0752 – 0.0843 |
-| $C_{\rm eff}$, heating deep probes [J K⁻¹] | 262.0 | 280.6 | 299.2 | 262.0 – 299.2 |
-| $K_{\rm loss}$, heating deep probes [W K⁻¹] | 0.1072 | 0.1136 | 0.1200 | 0.1072 – 0.1200 |
+| $C_{\rm eff}$, cooling matched-ε (primary) [J K⁻¹]  | 271.3       | 275.5   | 280.1       | 271.3 – 280.1   |
+| $K_{\rm loss}$, cooling matched-ε (primary) [W K⁻¹] | 0.0843      | 0.0796  | 0.0752      | 0.0752 – 0.0843 |
+| $C_{\rm eff}$, heating deep probes [J K⁻¹]          | 262.0       | 280.6   | 299.2       | 262.0 – 299.2   |
+| $K_{\rm loss}$, heating deep probes [W K⁻¹]         | 0.1072      | 0.1136  | 0.1200      | 0.1072 – 0.1200 |
 
 The identified capacitance is thus the quantity least sensitive to the outlet-probe systematic — the primary determination moves by 1.6% over the whole band, against the 11% spread among estimators and the ±37 J K⁻¹ Monte Carlo standard deviation — while the loss bracket widens from 0.080–0.114 to 0.075–0.120 W K⁻¹. The structural result of section 4.2 is deliberately constructed to survive the band. Source: `results.json`, key `T3_sensitivity`.
 
@@ -53,11 +53,11 @@ Fit window. Sweeping the deficit window moves the identified capacitance monoton
 
 | deficit window $u$ | $C_{\rm eff}$ [J K$^{-1}$] | $K_{\rm loss}$ [W K$^{-1}$] | $r^2$  |
 | ------------------ | --------------------------:| ---------------------------:| ------:|
-| (0.05, 0.35) | 294.7 | 0.1273 | 0.8407 |
-| (0.07, 0.45) | 280.6 | 0.1136 | 0.9034 |
-| (0.10, 0.50) | 263.7 | 0.0999 | 0.9359 |
-| (0.15, 0.60) | 227.9 | 0.0739 | 0.9621 |
-| (0.20, 0.70) | 199.5 | 0.0564 | 0.9665 |
+| (0.05, 0.35)       | 294.7                      | 0.1273                      | 0.8407 |
+| (0.07, 0.45)       | 280.6                      | 0.1136                      | 0.9034 |
+| (0.10, 0.50)       | 263.7                      | 0.0999                      | 0.9359 |
+| (0.15, 0.60)       | 227.9                      | 0.0739                      | 0.9621 |
+| (0.20, 0.70)       | 199.5                      | 0.0564                      | 0.9665 |
 
 Sensor selection: all six receiver probes give 121.6 J K$^{-1}$, the three deep and outlet probes 280.6 J K$^{-1}$, a ratio of 2.31.
 
@@ -69,12 +69,12 @@ The length-averaged wall temperature and the profile-corrected transfer-unit cou
 
 | Rear / front extrapolation | exponent | s.e.   | runs | infeasible              |
 | -------------------------- | --------:| ------:| ----:| ----------------------- |
-| constant / constant | +0.3408 | 0.0404 | 15 | none |
-| constant / linear | +0.3429 | 0.0408 | 15 | none |
-| half / constant | +0.3307 | 0.0409 | 15 | none |
-| half / linear | +0.3329 | 0.0413 | 15 | none |
-| linear / constant | — | — | 10 | E71, E75, E76, E80, E81 |
-| linear / linear | — | — | 10 | E71, E75, E76, E80, E81 |
+| constant / constant        | +0.3408  | 0.0404 | 15   | none                    |
+| constant / linear          | +0.3429  | 0.0408 | 15   | none                    |
+| half / constant            | +0.3307  | 0.0409 | 15   | none                    |
+| half / linear              | +0.3329  | 0.0413 | 15   | none                    |
+| linear / constant          | —        | —      | 10   | E71, E75, E76, E80, E81 |
+| linear / linear            | —        | —      | 10   | E71, E75, E76, E80, E81 |
 
 The primary value is the constant/constant case, +0.3408 ± 0.0404, against the single-stream requirement of -1.00. Under the common-slope grouping used for the Nusselt correlation the exponent is +0.3558 ± 0.0099 with r² = 0.9922.
 
@@ -82,15 +82,15 @@ The fixed-conductance falsification of section 5.2 fits a piecewise-linear non-n
 
 | Family                             | nodes | RMS residual [K] | max abs [K] | $r$ vs $\ln Re$ | slope [K per e-fold] |
 | ---------------------------------- | -----:| ----------------:| -----------:| ---------------:| --------------------:|
-| shared dimensional $h(z)$ | 2 | 64.2 | 111.3 | -0.943 | -148 |
-| shared dimensional $h(z)$ | 3 | 55.4 | 96.5 | -0.946 | -128 |
-| shared dimensional $h(z)$ | 5 | 54.2 | 95.0 | -0.947 | -126 |
-| shared dimensional $h(z)$ | 7 | 54.2 | 95.0 | -0.947 | -126 |
-| shared $Nu(z)$ | 3 | 55.8 | 95.7 | -0.946 | -132 |
-| shared $Nu(z)$ | 5 | 54.6 | 94.1 | -0.948 | -129 |
-| per-configuration, 256 kW m$^{-2}$ | 5 | 36.0 | 56.9 | -0.996 | -90 |
-| per-configuration, 304 kW m$^{-2}$ | 5 | 67.7 | 97.3 | -0.982 | -128 |
-| per-configuration, 456 kW m$^{-2}$ | 5 | 52.1 | 79.1 | -0.997 | -197 |
+| shared dimensional $h(z)$          | 2     | 64.2             | 111.3       | -0.943          | -148                 |
+| shared dimensional $h(z)$          | 3     | 55.4             | 96.5        | -0.946          | -128                 |
+| shared dimensional $h(z)$          | 5     | 54.2             | 95.0        | -0.947          | -126                 |
+| shared dimensional $h(z)$          | 7     | 54.2             | 95.0        | -0.947          | -126                 |
+| shared $Nu(z)$                     | 3     | 55.8             | 95.7        | -0.946          | -132                 |
+| shared $Nu(z)$                     | 5     | 54.6             | 94.1        | -0.948          | -129                 |
+| per-configuration, 256 kW m$^{-2}$ | 5     | 36.0             | 56.9        | -0.996          | -90                  |
+| per-configuration, 304 kW m$^{-2}$ | 5     | 67.7             | 97.3        | -0.982          | -128                 |
+| per-configuration, 456 kW m$^{-2}$ | 5     | 52.1             | 79.1        | -0.997          | -197                 |
 
 ---
 
@@ -100,27 +100,27 @@ The four auxiliary groups close off the local explanations for the assembly-scal
 
 | Run | $G_0$ [kW m$^{-2}$] | $q$ [sL min$^{-1}$] | $Re_{\rm nom}$ | $Pr$   | $Gz_L$ | $x^*=1/Gz_L$ | $Re\,Pr\,L/D_h$ | $Bi$     | $N_{rc}$ |
 | --- | -------------------:| -------------------:| --------------:| ------:| ------:| ------------:| ---------------:| --------:| --------:|
-| E67 | 456 | 15.28 | 72.2 | 0.6994 | 0.553 | 1.81 | 4610 | 2.53e-05 | 4.32 |
-| E68 | 456 | 12.50 | 58.6 | 0.6996 | 0.449 | 2.23 | 3744 | 1.88e-05 | 4.80 |
-| E69 | 456 | 10.50 | 49.4 | 0.6995 | 0.378 | 2.64 | 3155 | 1.48e-05 | 5.01 |
-| E70 | 456 | 9.11 | 42.5 | 0.6998 | 0.326 | 3.07 | 2717 | 1.19e-05 | 5.55 |
-| E71 | 456 | 7.13 | 33.8 | 0.6993 | 0.259 | 3.86 | 2159 | 8.38e-06 | 5.57 |
-| E72 | 304 | 18.32 | 93.6 | 0.6980 | 0.715 | 1.40 | 5964 | 3.38e-05 | 2.69 |
-| E73 | 304 | 13.17 | 65.2 | 0.6983 | 0.499 | 2.01 | 4160 | 2.17e-05 | 3.40 |
-| E74 | 304 | 9.03 | 44.6 | 0.6984 | 0.341 | 2.93 | 2845 | 1.25e-05 | 3.92 |
-| E75 | 304 | 6.95 | 34.7 | 0.6982 | 0.266 | 3.76 | 2216 | 8.53e-06 | 4.07 |
-| E76 | 304 | 4.53 | 23.2 | 0.6980 | 0.178 | 5.63 | 1481 | 4.80e-06 | 4.04 |
-| E77 | 256 | 13.85 | 78.5 | 0.6985 | 0.600 | 1.67 | 5008 | 2.60e-05 | 1.53 |
-| E78 | 256 | 10.01 | 55.3 | 0.6982 | 0.422 | 2.37 | 3524 | 1.68e-05 | 1.87 |
-| E79 | 256 | 8.04 | 44.2 | 0.6981 | 0.338 | 2.96 | 2818 | 1.22e-05 | 2.03 |
-| E80 | 256 | 6.61 | 36.3 | 0.6981 | 0.277 | 3.60 | 2314 | 9.31e-06 | 2.15 |
-| E81 | 256 | 4.53 | 25.1 | 0.6982 | 0.192 | 5.22 | 1599 | 5.54e-06 | 2.25 |
+| E67 | 456                 | 15.28               | 72.2           | 0.6994 | 0.553  | 1.81         | 4610            | 2.53e-05 | 4.32     |
+| E68 | 456                 | 12.50               | 58.6           | 0.6996 | 0.449  | 2.23         | 3744            | 1.88e-05 | 4.80     |
+| E69 | 456                 | 10.50               | 49.4           | 0.6995 | 0.378  | 2.64         | 3155            | 1.48e-05 | 5.01     |
+| E70 | 456                 | 9.11                | 42.5           | 0.6998 | 0.326  | 3.07         | 2717            | 1.19e-05 | 5.55     |
+| E71 | 456                 | 7.13                | 33.8           | 0.6993 | 0.259  | 3.86         | 2159            | 8.38e-06 | 5.57     |
+| E72 | 304                 | 18.32               | 93.6           | 0.6980 | 0.715  | 1.40         | 5964            | 3.38e-05 | 2.69     |
+| E73 | 304                 | 13.17               | 65.2           | 0.6983 | 0.499  | 2.01         | 4160            | 2.17e-05 | 3.40     |
+| E74 | 304                 | 9.03                | 44.6           | 0.6984 | 0.341  | 2.93         | 2845            | 1.25e-05 | 3.92     |
+| E75 | 304                 | 6.95                | 34.7           | 0.6982 | 0.266  | 3.76         | 2216            | 8.53e-06 | 4.07     |
+| E76 | 304                 | 4.53                | 23.2           | 0.6980 | 0.178  | 5.63         | 1481            | 4.80e-06 | 4.04     |
+| E77 | 256                 | 13.85               | 78.5           | 0.6985 | 0.600  | 1.67         | 5008            | 2.60e-05 | 1.53     |
+| E78 | 256                 | 10.01               | 55.3           | 0.6982 | 0.422  | 2.37         | 3524            | 1.68e-05 | 1.87     |
+| E79 | 256                 | 8.04                | 44.2           | 0.6981 | 0.338  | 2.96         | 2818            | 1.22e-05 | 2.03     |
+| E80 | 256                 | 6.61                | 36.3           | 0.6981 | 0.277  | 3.60         | 2314            | 9.31e-06 | 2.15     |
+| E81 | 256                 | 4.53                | 25.1           | 0.6982 | 0.192  | 5.22         | 1599            | 5.54e-06 | 2.25     |
 
 ---
 
-## S6 Delivered aperture irradiance: the two determinations in full
+## S6 Delivered aperture irradiance
 
-The aperture irradiance is determined two ways, and they disagree.
+The aperture irradiance is determined two ways.
 
 The first is radiometric flux mapping, using the three-step characterization procedure established for this simulator {Haseler, 2021 #7016; Abdellateif, 2023 #7017}: an alumina-coated Lambertian target on a precision three-axis slider, a Gardon-type circular foil radiometer traversed across the focal region on a graded grid with NIST-traceable calibration and calorimetric correction for spectral mismatch, and a parallel high-dynamic-range CCD reconstruction whose grayscale-to-flux transfer fits a power law with a = 1117.5 W m⁻² and exponent 0.903. Gaussian fits to the resulting profiles validate the focal distribution with normalized RMSE of about 0.07 and 0.12 on the two axes {Haseler, 2021 #7016}. Integrating the calibrated map over the receiver face gives nominal values of 456, 304 and 256 kW m⁻² for the three configurations.
 
@@ -140,7 +140,7 @@ No temperature-based result depends on this choice: effectiveness, transfer unit
 
 ---
 
-## S7 What a flow-dependent split requires: three destabilising agents
+## S7 What a flow-dependent split requires
 
 That prescription has been carried out elsewhere, which makes the recommendation concrete rather than aspirational. Nagarajan, Ström and Sjöblom build a reduced-order pseudochannel model of a catalytic converter precisely because single-channel models cannot predict accurately under flow maldistribution in realistic geometries {Nagarajan, 2025 #7007} — the remedy being a few representative channels carrying different flows rather than one channel with a better closure. The same group whose channel-scale Nusselt work anchors section 4.2 has developed flow-distribution models for dual-cell-density monoliths {Reinao, 2023 #7002} and dual-zone packed beds {Díaz, 2025 #7001}. Within the solar field the step has been taken at panel and module scale: Schwager and co-workers resolve the mass-flow distribution among the parallel tubes of a molten-salt receiver panel under flux gradients {Schwager, 2024 #7005}, and the multi-zone unsteady model of Kumar and co-workers resolves exchange between absorbers, casing and return air rather than treating the receiver as one stream {Kumar, 2022 #7013}.
 
