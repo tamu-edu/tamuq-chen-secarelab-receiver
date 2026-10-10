@@ -28,18 +28,18 @@ with the additive coefficient the full-scale repeatability read as a 95% bound a
 
 The two terms have opposite flow dependence, and in this campaign neither is negligible: per-unit readings run 0.69 to 5.72 sL min⁻¹, that is 7% to 100% of full scale, and the additive term exceeds the proportional one for 48% of the per-unit readings. On the summed flow the relative 1σ falls from 3.4% at the lowest campaign flow to 2.6% at the highest for fully correlated units, and from 1.7% to 1.3% for independent ones. A purely proportional model would give a flow-independent 2.5% and would therefore, by construction, be unable to reach a fitted exponent at all; the correct model is predominantly systematic, so it displaces a prefactor, but retains a weak gradient that does reach an exponent. Because the manufacturer states no correlation between units, every instrumental term is computed in both limits: they agree to within 0.0007 on every exponent and within 0.5 J K⁻¹ on every capacitance, so the larger is quoted and both are archived in `uncertainty.csv` under `rho_mfc`.
 
-Where a quantity is a fitted slope, its regression standard error is reported alongside and labelled as such, because the two measure different things: the Monte Carlo term is what the instruments contribute and the regression term is the scatter of the runs about the fitted law. For the pooled Nusselt correlation the regression term is larger by a factor of 16.8 and for the profile-corrected transfer-unit count by 11.2, so in both cases it is the one to read as the uncertainty of the correlation; for the grouped Nusselt correlation, which is much better determined, the ratio is only 2.6 and the instrumental term is not negligible.
+Where a quantity is a fitted slope, its regression standard error is reported alongside and labelled as such, because the two measure different things: the Monte Carlo term is what the instruments contribute and the regression term is the scatter of the runs about the fitted law. For the pooled Nusselt correlation the regression term is larger by a factor of 22.7 and for the profile-corrected transfer-unit count by 13.1, so in both cases it is the one to read as the uncertainty of the correlation; for the grouped Nusselt correlation, which is much better determined, the ratio is only 3.4 and the instrumental term is not negligible.
 
 **Systematic bias in the outlet gas probe** is propagated as a declared band, because it is not a calibration error and is much larger than one. T3 sits in the exit plenum at a convective–radiative equilibrium between the gas and the surrounding hardware and reads neither bulk gas nor wall temperature; the bias is of order tens of kelvin and is not characterized, a difficulty identified as a principal source of the model–experiment gap in this field [10] and demonstrated for thermocouples in monolith channels specifically [19]. Since ε, NTU, $h_{app}$, Nu, ε*, η and — through ε — $C_{eff}$ and $K_{loss}$ all derive from T3, each is reported with a δT3 = ±25 K band alongside its Monte Carlo interval. The band is carried through the identification as well as through the steady groups, by recomputing the abscissa at each offset with the same estimator the archived value uses, so that the zero-offset case reproduces the archived point estimate exactly:
 
 | quantity                                            | δT3 = −25 K | δT3 = 0 | δT3 = +25 K | band            |
 | --------------------------------------------------- | -----------:| -------:| -----------:| --------------- |
-| $C_{\rm eff}$, cooling matched-ε (primary) [J K⁻¹]  | 271.7       | 275.9   | 280.5       | 271.7 – 280.5   |
-| $K_{\rm loss}$, cooling matched-ε (primary) [W K⁻¹] | 0.0844      | 0.0798  | 0.0754      | 0.0754 – 0.0844 |
-| $C_{\rm eff}$, heating deep probes [J K⁻¹]          | 262.2       | 280.7   | 299.4       | 262.2 – 299.4   |
-| $K_{\rm loss}$, heating deep probes [W K⁻¹]         | 0.1073      | 0.1137  | 0.1200      | 0.1073 – 0.1200 |
+| $C_{\rm eff}$, cooling matched-ε (primary) [J K⁻¹] | 271.3 | 275.5 | 280.1 | 271.3 – 280.1 |
+| $K_{\rm loss}$, cooling matched-ε (primary) [W K⁻¹] | 0.0843 | 0.0796 | 0.0752 | 0.0752 – 0.0843 |
+| $C_{\rm eff}$, heating deep probes [J K⁻¹] | 262.0 | 280.6 | 299.2 | 262.0 – 299.2 |
+| $K_{\rm loss}$, heating deep probes [W K⁻¹] | 0.1072 | 0.1136 | 0.1200 | 0.1072 – 0.1200 |
 
-The identified capacitance is thus the quantity least sensitive to the outlet-probe systematic — the primary determination moves by 1.6% over the whole band, against the 11% spread among estimators and the ±37 J K⁻¹ Monte Carlo standard deviation — while the loss bracket widens from 0.080–0.114 to 0.075–0.120 W K⁻¹. The structural result of section 5.2 is deliberately constructed to survive the band. Source: `results.json`, key `T3_sensitivity`.
+The identified capacitance is thus the quantity least sensitive to the outlet-probe systematic — the primary determination moves by 1.6% over the whole band, against the 11% spread among estimators and the ±37 J K⁻¹ Monte Carlo standard deviation — while the loss bracket widens from 0.080–0.114 to 0.075–0.120 W K⁻¹. The structural result of section 4.2 is deliberately constructed to survive the band. Source: `results.json`, key `T3_sensitivity`.
 
 **Estimator choice** is propagated for the inversion threshold, where it dominates: section 4.1 reports ε* located both by interpolation between the bracketing runs and by a global linear regression, and carries the difference as a systematic.
 
@@ -47,50 +47,50 @@ The identified capacitance is thus the quantity least sensitive to the outlet-pr
 
 ## S3 Conditionality of the heating identification
 
-The heating approach to steady state decays with the same eigenvalue in principle, and $log(T_{ss} − T)$ is regressed over a deficit window in $u = (T_{ss} − T)/(T_{ss} − T₀)$. Two choices are unresolvable within this dataset. Sensor selection. With the lamps on, the front probes are held by a local balance between absorbed flux and aperture reradiation with its own short time constant, so their approach to steady state is bi-exponential and does not carry the assembly-scale mode. Using all six receiver probes gives $C_{eff}$ = 121.6 J K⁻¹; using the three deep and outlet probes gives 280.7 J K⁻¹, a ratio of 2.31.
+The heating approach to steady state decays with the same eigenvalue in principle, and $log(T_{ss} − T)$ is regressed over a deficit window in $u = (T_{ss} − T)/(T_{ss} − T₀)$. Two choices are unresolvable within this dataset. Sensor selection. With the lamps on, the front probes are held by a local balance between absorbed flux and aperture reradiation with its own short time constant, so their approach to steady state is bi-exponential and does not carry the assembly-scale mode. Using all six receiver probes gives $C_{eff}$ = 121.6 J K⁻¹; using the three deep and outlet probes gives 280.6 J K⁻¹, a ratio of 2.31.
 
 Fit window. Sweeping the deficit window moves the identified capacitance monotonically while the coefficient of determination improves, so goodness of fit does not select the window.
 
 | deficit window $u$ | $C_{\rm eff}$ [J K$^{-1}$] | $K_{\rm loss}$ [W K$^{-1}$] | $r^2$  |
 | ------------------ | --------------------------:| ---------------------------:| ------:|
-| (0.05, 0.35)       | 294.9                      | 0.1274                      | 0.8405 |
-| (0.07, 0.45)       | 280.7                      | 0.1137                      | 0.9033 |
-| (0.10, 0.50)       | 263.9                      | 0.0999                      | 0.9358 |
-| (0.15, 0.60)       | 228.1                      | 0.0740                      | 0.9621 |
-| (0.20, 0.70)       | 199.6                      | 0.0564                      | 0.9666 |
+| (0.05, 0.35) | 294.7 | 0.1273 | 0.8407 |
+| (0.07, 0.45) | 280.6 | 0.1136 | 0.9034 |
+| (0.10, 0.50) | 263.7 | 0.0999 | 0.9359 |
+| (0.15, 0.60) | 227.9 | 0.0739 | 0.9621 |
+| (0.20, 0.70) | 199.5 | 0.0564 | 0.9665 |
 
-Sensor selection: all six receiver probes give 121.6 J K$^{-1}$, the three deep and outlet probes 280.7 J K$^{-1}$, a ratio of 2.31.
+Sensor selection: all six receiver probes give 121.6 J K$^{-1}$, the three deep and outlet probes 280.6 J K$^{-1}$, a ratio of 2.31.
 
 ---
 
 ## S4 Wall-profile reconstruction and the fixed-conductance falsification
 
-The length-averaged wall temperature and the profile-corrected transfer-unit count both use a piecewise-linear axial wall profile through the probes at 11, 58 and 107 mm over a 137 mm receiver. The front 11 mm and rear 30 mm are unmeasured. Four admissible extrapolation combinations give exponents within 0.013 of one another; a full linear continuation of the rear gradient is inadmissible, because for five of the fifteen runs it places the exit wall below the measured outlet gas temperature, which no single-stream model can produce.
+The length-averaged wall temperature and the profile-corrected transfer-unit count both use a piecewise-linear axial wall profile through the probes at 11, 58 and 107 mm over a 137 mm receiver. The front 11 mm and rear 30 mm are unmeasured. Four admissible extrapolation combinations give exponents within 0.012 of one another; a full linear continuation of the rear gradient is inadmissible, because for five of the fifteen runs it places the exit wall below the measured outlet gas temperature, which no single-stream model can produce.
 
 | Rear / front extrapolation | exponent | s.e.   | runs | infeasible              |
 | -------------------------- | --------:| ------:| ----:| ----------------------- |
-| constant / constant        | +0.3407  | 0.0405 | 15   | none                    |
-| constant / linear          | +0.3429  | 0.0409 | 15   | none                    |
-| half / constant            | +0.3306  | 0.0410 | 15   | none                    |
-| half / linear              | +0.3328  | 0.0414 | 15   | none                    |
-| linear / constant          | —        | —      | 10   | E71, E75, E76, E80, E81 |
-| linear / linear            | —        | —      | 10   | E71, E75, E76, E80, E81 |
+| constant / constant | +0.3408 | 0.0404 | 15 | none |
+| constant / linear | +0.3429 | 0.0408 | 15 | none |
+| half / constant | +0.3307 | 0.0409 | 15 | none |
+| half / linear | +0.3329 | 0.0413 | 15 | none |
+| linear / constant | — | — | 10 | E71, E75, E76, E80, E81 |
+| linear / linear | — | — | 10 | E71, E75, E76, E80, E81 |
 
-The primary value is the constant/constant case, +0.3407 ± 0.0405, against the single-stream requirement of -1.00. Under the common-slope grouping used for the Nusselt correlation the exponent is +0.3560 ± 0.0099 with r² = 0.9922.
+The primary value is the constant/constant case, +0.3408 ± 0.0404, against the single-stream requirement of -1.00. Under the common-slope grouping used for the Nusselt correlation the exponent is +0.3558 ± 0.0099 with r² = 0.9922.
 
-The fixed-conductance falsification of section 5.2 fits a piecewise-linear non-negative h(z) by multi-start least squares in log h and asks whether one flow-independent profile reproduces the fifteen measured outlet temperatures. It does not, in any family or at any node count, and the discriminating statistic is the ordering of the residual in flow rather than its magnitude. For the shared conductance profile the residual runs from about +80 K at the lowest flow of each configuration to −70 K at the highest.
+The fixed-conductance falsification of section 5.2 fits a piecewise-linear non-negative h(z) by multi-start least squares in log h and asks whether one flow-independent profile reproduces the fifteen measured outlet temperatures. It does not, in any family or at any node count, and the discriminating statistic is the ordering of the residual in flow rather than its magnitude. For the shared conductance profile with five nodes, the residual runs from +62 to +95 K at the lowest flow of each configuration to −27 to −85 K at the highest.
 
 | Family                             | nodes | RMS residual [K] | max abs [K] | $r$ vs $\ln Re$ | slope [K per e-fold] |
 | ---------------------------------- | -----:| ----------------:| -----------:| ---------------:| --------------------:|
-| shared dimensional $h(z)$          | 2     | 64.2             | 111.3       | -0.943          | -148                 |
-| shared dimensional $h(z)$          | 3     | 55.4             | 96.4        | -0.946          | -128                 |
-| shared dimensional $h(z)$          | 5     | 54.2             | 95.0        | -0.947          | -126                 |
-| shared dimensional $h(z)$          | 7     | 54.2             | 95.0        | -0.947          | -126                 |
-| shared $Nu(z)$                     | 3     | 55.8             | 96.0        | -0.945          | -132                 |
-| shared $Nu(z)$                     | 5     | 54.6             | 94.4        | -0.947          | -129                 |
-| per-configuration, 256 kW m$^{-2}$ | 5     | 36.0             | 56.9        | -0.996          | -90                  |
-| per-configuration, 304 kW m$^{-2}$ | 5     | 67.7             | 97.3        | -0.982          | -128                 |
-| per-configuration, 456 kW m$^{-2}$ | 5     | 52.1             | 79.1        | -0.997          | -197                 |
+| shared dimensional $h(z)$ | 2 | 64.2 | 111.3 | -0.943 | -148 |
+| shared dimensional $h(z)$ | 3 | 55.4 | 96.5 | -0.946 | -128 |
+| shared dimensional $h(z)$ | 5 | 54.2 | 95.0 | -0.947 | -126 |
+| shared dimensional $h(z)$ | 7 | 54.2 | 95.0 | -0.947 | -126 |
+| shared $Nu(z)$ | 3 | 55.8 | 95.7 | -0.946 | -132 |
+| shared $Nu(z)$ | 5 | 54.6 | 94.1 | -0.948 | -129 |
+| per-configuration, 256 kW m$^{-2}$ | 5 | 36.0 | 56.9 | -0.996 | -90 |
+| per-configuration, 304 kW m$^{-2}$ | 5 | 67.7 | 97.3 | -0.982 | -128 |
+| per-configuration, 456 kW m$^{-2}$ | 5 | 52.1 | 79.1 | -0.997 | -197 |
 
 ---
 
@@ -100,21 +100,21 @@ The four auxiliary groups close off the local explanations for the assembly-scal
 
 | Run | $G_0$ [kW m$^{-2}$] | $q$ [sL min$^{-1}$] | $Re_{\rm nom}$ | $Pr$   | $Gz_L$ | $x^*=1/Gz_L$ | $Re\,Pr\,L/D_h$ | $Bi$     | $N_{rc}$ |
 | --- | -------------------:| -------------------:| --------------:| ------:| ------:| ------------:| ---------------:| --------:| --------:|
-| E67 | 456                 | 15.28               | 72.6           | 0.6837 | 0.543  | 1.84         | 4531            | 2.53e-05 | 4.37     |
-| E68 | 456                 | 12.50               | 58.9           | 0.6838 | 0.441  | 2.27         | 3680            | 1.88e-05 | 4.86     |
-| E69 | 456                 | 10.50               | 49.6           | 0.6838 | 0.372  | 2.69         | 3100            | 1.48e-05 | 5.09     |
-| E70 | 456                 | 9.11                | 42.7           | 0.6839 | 0.320  | 3.12         | 2670            | 1.19e-05 | 5.64     |
-| E71 | 456                 | 7.13                | 34.0           | 0.6837 | 0.254  | 3.93         | 2122            | 8.38e-06 | 5.66     |
-| E72 | 304                 | 18.32               | 94.0           | 0.6845 | 0.704  | 1.42         | 5876            | 3.39e-05 | 2.68     |
-| E73 | 304                 | 13.17               | 65.5           | 0.6835 | 0.490  | 2.04         | 4086            | 2.17e-05 | 3.41     |
-| E74 | 304                 | 9.03                | 44.8           | 0.6834 | 0.335  | 2.99         | 2794            | 1.25e-05 | 3.96     |
-| E75 | 304                 | 6.95                | 34.9           | 0.6838 | 0.261  | 3.83         | 2179            | 8.53e-06 | 4.11     |
-| E76 | 304                 | 4.53                | 23.3           | 0.6846 | 0.175  | 5.71         | 1460            | 4.81e-06 | 4.08     |
-| E77 | 256                 | 13.85               | 78.8           | 0.6889 | 0.594  | 1.68         | 4956            | 2.60e-05 | 1.50     |
-| E78 | 256                 | 10.01               | 55.5           | 0.6876 | 0.418  | 2.39         | 3486            | 1.68e-05 | 1.84     |
-| E79 | 256                 | 8.04                | 44.4           | 0.6875 | 0.334  | 2.99         | 2788            | 1.22e-05 | 2.01     |
-| E80 | 256                 | 6.61                | 36.5           | 0.6874 | 0.274  | 3.64         | 2289            | 9.31e-06 | 2.12     |
-| E81 | 256                 | 4.53                | 25.2           | 0.6878 | 0.190  | 5.27         | 1582            | 5.54e-06 | 2.23     |
+| E67 | 456 | 15.28 | 72.2 | 0.6994 | 0.553 | 1.81 | 4610 | 2.53e-05 | 4.32 |
+| E68 | 456 | 12.50 | 58.6 | 0.6996 | 0.449 | 2.23 | 3744 | 1.88e-05 | 4.80 |
+| E69 | 456 | 10.50 | 49.4 | 0.6995 | 0.378 | 2.64 | 3155 | 1.48e-05 | 5.01 |
+| E70 | 456 | 9.11 | 42.5 | 0.6998 | 0.326 | 3.07 | 2717 | 1.19e-05 | 5.55 |
+| E71 | 456 | 7.13 | 33.8 | 0.6993 | 0.259 | 3.86 | 2159 | 8.38e-06 | 5.57 |
+| E72 | 304 | 18.32 | 93.6 | 0.6980 | 0.715 | 1.40 | 5964 | 3.38e-05 | 2.69 |
+| E73 | 304 | 13.17 | 65.2 | 0.6983 | 0.499 | 2.01 | 4160 | 2.17e-05 | 3.40 |
+| E74 | 304 | 9.03 | 44.6 | 0.6984 | 0.341 | 2.93 | 2845 | 1.25e-05 | 3.92 |
+| E75 | 304 | 6.95 | 34.7 | 0.6982 | 0.266 | 3.76 | 2216 | 8.53e-06 | 4.07 |
+| E76 | 304 | 4.53 | 23.2 | 0.6980 | 0.178 | 5.63 | 1481 | 4.80e-06 | 4.04 |
+| E77 | 256 | 13.85 | 78.5 | 0.6985 | 0.600 | 1.67 | 5008 | 2.60e-05 | 1.53 |
+| E78 | 256 | 10.01 | 55.3 | 0.6982 | 0.422 | 2.37 | 3524 | 1.68e-05 | 1.87 |
+| E79 | 256 | 8.04 | 44.2 | 0.6981 | 0.338 | 2.96 | 2818 | 1.22e-05 | 2.03 |
+| E80 | 256 | 6.61 | 36.3 | 0.6981 | 0.277 | 3.60 | 2314 | 9.31e-06 | 2.15 |
+| E81 | 256 | 4.53 | 25.1 | 0.6982 | 0.192 | 5.22 | 1599 | 5.54e-06 | 2.25 |
 
 ---
 
@@ -128,9 +128,9 @@ The second is an apparent steady energy closure, not model-free: it takes K_loss
 
 $$f = \frac{Q_{\rm gas} + K_{\rm loss}(\bar T_w - T_{\rm amb})}{G_0 A_{\rm frt}}$$
 
-which should equal unity if the radiometric flux is correct. Evaluated at both ends of the identified K_loss bracket and averaged per configuration, it does not: f runs 0.989–1.134 at 456 kW m⁻², 1.149–1.324 at 304 and 0.784–0.916 at 256, giving closure estimates of 451–517, 349–402 and 201–234 kW m⁻², with reported spans 451–517, 304–402 and 201–256 kW m⁻².
+which should equal unity if the radiometric flux is correct. Evaluated at both ends of the identified K_loss bracket and averaged per configuration, it does not: f runs 0.988–1.133 at 456 kW m⁻², 1.148–1.323 at 304 and 0.783–0.915 at 256, giving closure estimates of 450–517, 349–402 and 201–234 kW m⁻², with reported spans 450–517, 304–402 and 200–256 kW m⁻².
 
-We report both estimates, with every power-normalized quantity spanning them. This is not a bounding interval: closure omits storage, inherits a lumped loss model, and carries T3 bias directly into Q_gas, so neither determination is an established bound and the disagreement cannot be assigned to one cause. Apparent efficiency on the nominal basis ranges 0.252–1.224, exceeding unity in the 304 kW m⁻² group.
+We report both estimates, with every power-normalized quantity spanning them. This is not a bounding interval: closure omits storage, inherits a lumped loss model, and carries T3 bias directly into Q_gas, so neither determination is an established bound and the disagreement cannot be assigned to one cause. Apparent efficiency on the nominal basis ranges 0.252–1.223, exceeding unity in the 304 kW m⁻² group.
 
 One contributor is geometric. The Gardon gauge reports flux over its 12.6 mm-radius exposed area [22], 499 mm² against the receiver's 361 mm² face, a ratio of 1.38. In a focused Gaussian spot the gauge averages a larger, more peripheral region than the receiver intercepts, under-reading the face flux: the face-to-gauge ratio for a centred Gaussian is 1.28, 1.17, 1.11 and 1.04 for 1/e² radii of 10, 14, 18 and 30 mm, bracketing the 1.13 required at 456 kW m⁻² and covering roughly half the 1.32 required at 304. This is structural to characterizing a 19 mm receiver with a 25 mm gauge, not execution error, but it does not explain 256 kW m⁻², where closure sits 8–16% below nominal and a broader spot pushes the factor toward unity, so aperture spillage dominates oppositely. Comparably, optical modelling of a directly irradiated reactor on the same simulator found only 1–6% of aperture-incident power reaching the catalytic bed [23]. Supplementary section S6 gives the gauge-averaging calculation and remaining instrument contributions.
 
@@ -154,7 +154,7 @@ A third agent gives the same structure. In Schwager's molten-salt panels the des
 
 The measurement is judged against the decomposition standard for a flow-through monolith, that is, for a substrate in which every channel is open to through flow rather than alternately plugged: the total drop between the cavity and the exit plenum is the sum of a face contraction, core friction, a hydrodynamic entrance contribution, thermal acceleration and a face expansion [24,25]. Core friction uses the square-duct Poiseuille number of 56.91 with all metered flow through the 100 channels, but is integrated along the channel with temperature-dependent properties instead of being evaluated once at T̄_g. At constant channel mass flux and pressure the velocity rises in proportion to the gas temperature while the viscosity of air rises roughly as T^0.7, so the friction integrand scales as T^1.7 and is weighted towards the hot end of the channel; the gas profile is reconstructed by integrating the single-stream energy equation against the measured piecewise-linear wall profile with the transfer-unit count fixed per run so that the exit value reproduces the measured T3, which raises the length-mean gas temperature from 411–539 K to 441–612 K. The entrance contribution uses the square-duct incremental pressure-drop number K(∞) = 1.55 [24]; Shah's apparent friction factor [51] evaluated with the same constants stays within 1.0 to 3.9% of the fully developed value over the campaign (x⁺ = 0.69 to 2.8 against a laminar entry length of x⁺ ≈ 0.09 and channel Reynolds numbers of 33 to 133), so the channels are hydrodynamically developed. The face terms use the sharp-edged contraction and full dissipation of the exit velocity head appropriate to the cavity and plenum that bound the monolith; together with thermal acceleration they contribute 1.2 to 4.9% of the predicted drop, which is consistent with the monolith-reactor literature in finding inlet and outlet minor losses negligible for a single substrate of this slenderness and significant only for short or closely coupled ones [52,53].
 
-The resulting prediction is 0.24 to 1.29 mbar, a uniform 1.20 to 1.31 times the isothermal single-duct estimate it replaces, and 95 to 99% of it remains core friction, so the correction is a variable-property correction and not a minor-loss one. Against it, the measured signal still exceeds the prediction by 1.4 to 2.1 times at high flow (2.74 against 1.29 mbar at 15.3 sL min⁻¹), falls below it at the low-flow end of the 304 and 256 kW m⁻² configurations, and goes negative at the lowest flow (−0.02 against 0.24 mbar at 4.5 sL min⁻¹). The ratio rises monotonically with flow in all three configurations but crosses unity only in those two: at 456 kW m⁻² the measurement exceeds the prediction at every tested flow, the lowest being 1.4 times at 7.1 sL min⁻¹. A negative drop across a resistance in steady forward flow is impossible, so the discrepancy is the signature of a zero offset on a transducer whose ±0.2 mbar accuracy floor, 0.1% of its ±200 mbar span, is the same order as the entire expected monolith drop. The taps evidently span more than the monolith faces, and the second differential channel reads a flat −0.26 to −0.30 mbar in every run and appears unconnected. Figure S1 shows both comparisons.
+The resulting prediction is 0.24 to 1.29 mbar, a uniform 1.19 to 1.30 times the isothermal single-duct estimate it replaces, and 95 to 99% of it remains core friction, so the correction is a variable-property correction and not a minor-loss one. Against it, the measured signal still exceeds the prediction by 1.4 to 2.1 times at high flow (2.74 against 1.29 mbar at 15.3 sL min⁻¹), falls below it at the low-flow end of the 304 and 256 kW m⁻² configurations, and goes negative at the lowest flow (−0.02 against 0.24 mbar at 4.5 sL min⁻¹). The ratio rises monotonically with flow in all three configurations but crosses unity only in those two: at 456 kW m⁻² the measurement exceeds the prediction at every tested flow, the lowest being 1.4 times at 7.1 sL min⁻¹. A negative drop across a resistance in steady forward flow is impossible, so the discrepancy is the signature of a zero offset on a transducer whose ±0.2 mbar accuracy floor, 0.1% of its ±200 mbar span, is the same order as the entire expected monolith drop. The taps evidently span more than the monolith faces, and the second differential channel reads a flat −0.26 to −0.30 mbar in every run and appears unconnected. Figure S1 shows both comparisons.
 
 This matters because pressure drop is how the volumetric-receiver literature diagnoses honeycomb flow behaviour: absorbers with linear velocity dependence tend inherently towards flow instability [27]; high-thermal-conductivity materials with a quadratic characteristic are stable [28]; instability becomes possible when one pressure-drop level maps to more than one outlet temperature, letting a region drift and fail if temperature exceeds material limits [26]. Ávila-Marín's review extends this to honeycombs, identifying a critical flux above which highly porous honeycombs become unstable while wire meshes and low-porosity foams stay stable via their quadratic characteristic [1]; permeability and Forchheimer coefficients from pressure-drop data feed homogeneous equivalent models [13]. Recent unheated monolith measurements show a linear Re–pressure-drop relationship throughout, with progressive underestimation as Re rises through entrance/exit effects [45], large enough at channel Re 50–320 to need a spacing-dependent correction factor increased by misalignment [44]. For straight square channels those homogeneous-equivalent coefficients are not empirical: matching the core-friction term gives a Darcy permeability K₁ = 2φD_h²/(f_D Re) = 4.93 × 10⁻⁸ m², and the Forchheimer coefficient is identically zero in fully developed laminar flow, the face and acceleration terms above supplying the only quadratic content. Our honeycomb therefore sits by construction on the instability-prone, linear side, but our transducer, spanning monolith plus plumbing, cannot separate the absorber's characteristic from comparable entrance, exit and fitting losses. We report this because the fix is inexpensive, and section 5.3 shows this measurement would discriminate between the two candidate mechanisms above.
 

@@ -1,9 +1,9 @@
 | Constant | Value | s.d. | 95% interval | Unit | Notes |
 | ------------------------------------------------------- | -------------- | -------------- | -------------- | ---------- | ------------------------------------------------------------------------- |
-| $Nu_{\rm app}$ prefactor $a$ (pooled) | 3.15×10$^{-4}$ | 0.11×10$^{-4}$ | [2.93, 3.37] | ×10$^{-4}$ | 15 steady runs |
-| $Nu_{\rm app}$ exponent, pooled | 1.444 | 0.003 | [1.438, 1.451] | – | instrumental MC; regression SE $\pm$0.072, $r^2$=0.968 |
-| $Nu_{\rm app}$ exponent, grouped (primary) | 1.472 | 0.003 | [1.466, 1.479] | – | instrumental MC; regression SE $\pm$0.011, $r^2$=0.9993 |
-| $N_{\rm prof}$ exponent (primary) | +0.341 | 0.003 | [0.335, 0.347] | – | instrumental MC; regression SE $\pm$0.040; fixed-$Nu$ requirement -1.000 |
+| $Nu_{\rm app}$ prefactor $a$ (pooled) | 3.14×10$^{-4}$ | 0.11×10$^{-4}$ | [2.93, 3.37] | ×10$^{-4}$ | 15 steady runs |
+| $Nu_{\rm app}$ exponent, pooled | 1.444 | 0.003 | [1.438, 1.451] | – | instrumental MC; regression SE $\pm$ 0.072, $r^2$=0.968 |
+| $Nu_{\rm app}$ exponent, grouped (primary) | 1.472 | 0.003 | [1.466, 1.479] | – | instrumental MC; regression SE $\pm$ 0.011, $r^2$=0.9993 |
+| $N_{\rm prof}$ exponent (primary) | +0.341 | 0.003 | [0.335, 0.347] | – | instrumental MC; regression SE $\pm$ 0.040; fixed-$Nu$ requirement -1.000 |
 | $NTU_{\rm app}$ exponent (identity, superseded) | +0.389 | — | — | – | isothermal-wall identity; retained for comparison only |
 | Inversion marker $\varepsilon^*$ @ 456 kW m$^{-2}$ | 0.666 | 0.002 | [0.661, 0.670] | – | operational marker under the adopted wall convention; see §5.1 |
 | @ 304 kW m$^{-2}$ | 0.655 | 0.003 | [0.650, 0.661] | – | same |
